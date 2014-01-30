@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #
 # Copyright (c) 2012-2014 Poul-Henning Kamp <phk@phk.freebsd.dk>
 # All rights reserved.
