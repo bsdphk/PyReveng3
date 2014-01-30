@@ -51,12 +51,11 @@ class render_mem(object):
 			self.ncol = 4
 		else:
 			self.ncol = 1
-	
 
 	def render_word(self, pj, lo, hi):
 		s = ""
 		t = ""
-		s += pj.apct % lo + " "
+		s += self.apct % lo + " "
 		for i in range(min(self.ncol, hi - lo)):
 			try:
 				v = pj.m.rd(lo + i)
