@@ -52,11 +52,6 @@ cx = cpu.mc6800.mc68hc11()
 
 cx.vectors(pj)
 
-# Random
-for a in range(0xe072, 0xe0e2, 2):
-	cx.codeptr(pj, a)
-for a in range(0xf885, 0xf94d, 2):
-	cx.codeptr(pj, a)
 
 def cbyte(pj, a):
 	c = data.const(pj, a, a + 1)
@@ -94,18 +89,6 @@ class d_asf(data.data):
 			t = ", "
 		s += "}"
 		return s
-
-class d_d3(data.data):
-	def __init__(self, pj, a):
-		super(d_d3, self).__init__(pj, a, a + 3)
-		n = pj.m.bu16(self.lo + 1)
-		pj.todo(n, cx.disass)
-
-	def render(self, pj):
-		return ".STRUCT d3 { 0x%02x, 0x%04x}" % (
-			pj.m.rd(self.lo),
-			pj.m.bu16(self.lo + 1),
-		)
 
 class d_d4(data.data):
 	def __init__(self, pj, a):
@@ -224,7 +207,7 @@ for a in range(0xf94d, 0xfdfe, 16):
 				t += "_"
 			else:
 				t += "?"
-	pj.set_label(a, "LED_" + t)
+	pj.set_label(a, "MSG_" + t)
 
 #######################################################################
 def post_arg_func(ins):
@@ -284,8 +267,47 @@ for a in range(0x9d20, 0x9d68, 4):
 
 for a in range(0x9d68, 0xaa28, 16):
 	d_asf(pj, a)
-for a in range(0x9b81, 0x9bff, 3):
-	d_d3(pj, a)
+
+# ON_KEY table
+x = pj.add(0xe072, 0xe0e2, "on-key-tbl")
+pj.set_label(x.lo, "ON_KEY_TBL")
+n = 0x80
+for a in range(x.lo, x.hi, 2):
+	x = cx.codeptr(pj, a)
+	pj.set_label(x.dst, "ON_KEY_0x%02x" % n)
+	n += 1
+
+# CMD table
+x = pj.add(0x9b81, 0x9bff, "cmd-tbl")
+pj.set_label(x.lo, "CMDTBL")
+for a in range(x.lo, x.hi, 3):
+	y = data.txt(pj, a, a+1, label = False)
+	z = cx.codeptr(pj, a + 1)
+	if y.txt == " ":
+		pj.set_label(z.dst, "CMD_SP")
+	else:
+		pj.set_label(z.dst, "CMD_%s" % y.txt)
+	
+# FN table
+x = pj.add(0xf885, 0xf94d, "fn-tbl")
+pj.set_label(x.lo, "FN_TBL")
+d = dict()
+n = 0
+for a in range(x.lo, x.hi, 2):
+	y = cx.codeptr(pj, a)
+	if not y.dst in d:
+		d[y.dst] = []
+	d[y.dst].append(n)
+	n += 1
+for i in d:
+	e = d[i]
+	if len(e) == 1:
+		pj.set_label(i, "FN_%02d" % e[0])
+	elif len(e) > 10:
+		pj.set_label(i, "FN_UNDEF")
+	else:
+		pj.set_label(i, "FN_%02d_%02d" % (e[0], e[-1]))
+
 
 for a in range(0xaa29, 0xb131, 100):
 	data.data(pj, a, a + 100)
@@ -345,6 +367,14 @@ pj.set_label(0xb846, "ADD_Q")
 pj.set_label(0xb86c, "SUB_Q")
 pj.set_label(0xb892, "MUL_Q")
 pj.set_label(0xecd4, "DISPLAY(Y)")
+
+pj.set_label(0xf1a9, "DISPLAY_YES_NO(Y)")
+pj.set_label(0xf1b7, "IS_YES()")
+pj.set_label(0xf878, "PAUSE()")
+pj.set_label(0xfe5c, "Analog_Capture")
+pj.set_label(0xfe6e, "Capture_One_Analog")
+
+pj.set_label(0xf9, "ON_KEY")
 
 code.lcmt_flows(pj)
 
