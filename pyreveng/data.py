@@ -68,7 +68,7 @@ class dataptr(data):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
 class txt(data):
-	def __init__(self, pj, lo, hi = None):
+	def __init__(self, pj, lo, hi = None, label = True):
 		s = ""
 		a = lo
 		while True:
@@ -108,7 +108,8 @@ class txt(data):
 			if len(t) > 8:
 				break
 			j += 1
-		pj.set_label(lo, t)
+		if label:
+			pj.set_label(lo, t)
 			
 	def render(self, pj):
 		return ".TXT\t'" + self.txt + "'"

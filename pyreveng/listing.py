@@ -113,6 +113,7 @@ class listing(object):
 		if fn == None:
 			self.fo = sys.stdout
 		else:
+			print("Listing into", fn)
 			self.fo = open(fn, "w")
 		misc.fill_gaps(pj)
 		a0 = pj.m.lo
