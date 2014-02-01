@@ -28,6 +28,9 @@
 Skeleton assembly code disassembler
 
 Uses instree and handles canonical jumps, subroutine calls etc.
+
+Prefix instructions are marked with mnemonic "+" and their
+arguments are processed before the instruction.
 """
 
 from __future__ import print_function
@@ -59,28 +62,31 @@ class assy(code.code):
 #######################################################################
 
 class instree_assy(assy):
-	def __init__(self, pj, im, lang):
-		lo = im.adr
-		hi = im.adr + im.len
+	def __init__(self, pj, lim, lang):
+		lo = lim[0].adr
+		hi = lim[-1].adr + lim[-1].len
 		super(instree_assy, self).__init__(pj, lo, hi, lang)
+		lang.init_ins(pj, self)
 		self.cc = True
 		self.dstadr = None
-		self.im = im
-		i = im.spec.split()
-		self.mne = i[0]
+		self.lim = lim
+		self.mne = lim[-1].spec.split()[0]
 		self.oper = list()
-		for j in i[1].split(","):
-			o = None
-			if j in lang.args:
-				x = lang.args[j]
-				if type(x) == str:
-					o = arg_verbatim(pj, x)
-				else:
-					o = lang.args[j](pj, self)
-			elif j != "-":
-				print("Ignoring argument", j, "in", lang.name, i)
-			if o != None:
-				self.oper.append(o)
+		for self.im in lim:
+			i = self.im.spec.split()
+			for j in i[1].split(","):
+				o = None
+				if j in lang.args:
+					x = lang.args[j]
+					if type(x) == str:
+						o = arg_verbatim(pj, x)
+					else:
+						o = lang.args[j](pj, self)
+				elif j != "-":
+					print("Ignoring argument",
+					    j, "in", lang.name, i)
+				if o != None:
+					self.oper.append(o)
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
 
@@ -98,19 +104,30 @@ class instree_disass(object):
 		self.it = instree.instree(iword = word_size, memword=word_size)
 		self.flow_check = []
 
+	def init_ins(self, pj, ins):
+		return
+
 	def disass(self, pj, adr):
 		if pj.find(adr, self.name) != None:
 			return False
-		x = self.it.find(pj, adr)
-		if x != None:
-			y = instree_assy(pj, x, self)
-			for i in self.flow_check:
-				i(y)
-			y.propagate(pj)
-			return True
-		print(self.name, "%x" % adr,
-		    "disass (%02x) failed" % pj.m.rd(adr))
-		return False
+		l = []
+		a = adr
+		while True:
+			x = self.it.find(pj, a)
+			print(x)
+			if x == None:
+				print(self.name, "%x" % adr,
+				    "disass (%02x) failed" % pj.m.rd(adr))
+				break
+			l.append(x)
+			if x.spec[0] != "+":
+				break
+			a += x.len
+		y = instree_assy(pj, l, self)
+		for i in self.flow_check:
+			i(y)
+		y.propagate(pj)
+		return True
 	
 
 #######################################################################

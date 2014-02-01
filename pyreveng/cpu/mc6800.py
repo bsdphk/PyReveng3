@@ -286,9 +286,11 @@ class arg_r(assy.arg_dst):
 class arg_x(object):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_x
+		print(ins)
+		self.ins = ins
 
 	def render(self, pj):
-		return "0x%02x+X" % self.val
+		return "0x%02x+" % self.val + self.ins.idx
 
 class mc6800(assy.instree_disass):
 	def __init__(self, mask=0xffff):
@@ -303,6 +305,9 @@ class mc6800(assy.instree_disass):
 			"x":	arg_x,
 		})
 		self.mask = mask
+
+	def init_ins(self, pj, ins):
+		ins.idx = "X"
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
@@ -322,7 +327,7 @@ FDIV	-		|0 0 0 0 0 0 1 1|
 LSRD	-		|0 0 0 0 0 1 0 0|
 ASLD	-		|0 0 0 0 0 1 0 1|
 
-USEY	-		|0 0 0 1 1 0 0 0|
++	Y		|0 0 0 1 1 0 0 0|
 
 BRSET	d,i,r,>C	|0 0 0 1 0 0 1 0| d		| i		| r		|
 BRCLR	d,i,r,>C	|0 0 0 1 0 0 1 1| d		| i		| r		|
@@ -384,12 +389,18 @@ class arg_y(object):
 	def render(self, pj):
 		return "0x%02x+Y" % self.val
 
+def arg_Y(pj, ins):
+		if ins.mne[-1] == "X":
+			ins.mne = ins.mne[:-1] + "Y"
+		ins.idx = "Y"
+
 class mc68hc11(mc6800):
 	def __init__(self, mask=0xffff):
 		super(mc68hc11, self).__init__(mask=mask)
 		self.it.load_string(mc68hc11_instructions)
 		self.args.update( {
 			"y":	arg_y,
+			"Y":	arg_Y,
 		} )
 
 	def vectors(self, pj, adr = 0xffd6):
