@@ -286,7 +286,6 @@ class arg_r(assy.arg_dst):
 class arg_x(object):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_x
-		print(ins)
 		self.ins = ins
 
 	def render(self, pj):
@@ -402,6 +401,71 @@ class mc68hc11(mc6800):
 			"y":	arg_y,
 			"Y":	arg_Y,
 		} )
+
+	def register_labels(self, pj):
+		pj.set_label(0x1000, "PORTA")
+		pj.set_label(0x1002, "PIOC")
+		pj.set_label(0x1003, "PORTC")
+		pj.set_label(0x1004, "PORTB")
+		pj.set_label(0x1005, "PORTCL")
+		pj.set_label(0x1007, "DDRC")
+		pj.set_label(0x1008, "PORTD")
+		pj.set_label(0x1009, "DDRD")
+		pj.set_label(0x100A, "PORTE")
+		pj.set_label(0x100B, "CFORC")
+		pj.set_label(0x100C, "OC1M")
+		pj.set_label(0x100D, "OC1D")
+		pj.set_label(0x100E, "TCNTH")
+		pj.set_label(0x100F, "TCNTL")
+
+		pj.set_label(0x1010, "TIC1H")
+		pj.set_label(0x1011, "TIC1L")
+		pj.set_label(0x1012, "TIC2H")
+		pj.set_label(0x1013, "TIC2L")
+		pj.set_label(0x1014, "TIC3H")
+		pj.set_label(0x1015, "TIC4L")
+		pj.set_label(0x1016, "TOC1H")
+		pj.set_label(0x1017, "TOC1L")
+		pj.set_label(0x1018, "TOC2H")
+		pj.set_label(0x1019, "TOC2L")
+		pj.set_label(0x101A, "TOC3H")
+		pj.set_label(0x101B, "TOC3L")
+		pj.set_label(0x101C, "TOC4H")
+		pj.set_label(0x101D, "TOC4L")
+		pj.set_label(0x101E, "TI4_O5H")
+		pj.set_label(0x101F, "TI4_O5L")
+
+		pj.set_label(0x1020, "TCTL1")
+		pj.set_label(0x1021, "TCTL2")
+		pj.set_label(0x1022, "TMSK1")
+		pj.set_label(0x1023, "TFLG1")
+		pj.set_label(0x1024, "TMSK2")
+		pj.set_label(0x1025, "TFLG2")
+		pj.set_label(0x1026, "PACTL")
+		pj.set_label(0x1027, "PACNT")
+		pj.set_label(0x1028, "SPCR")
+		pj.set_label(0x1029, "SPSR")
+		pj.set_label(0x102A, "SPDR")
+		pj.set_label(0x102B, "BAUD")
+		pj.set_label(0x102C, "SCCR1")
+		pj.set_label(0x102D, "SCCR2")
+		pj.set_label(0x102E, "SCSR")
+		pj.set_label(0x102F, "SCDR")
+
+		pj.set_label(0x1030, "ADCTL")
+		pj.set_label(0x1031, "ADR1")
+		pj.set_label(0x1032, "ADR2")
+		pj.set_label(0x1033, "ADR3")
+		pj.set_label(0x1034, "ADR4")
+		pj.set_label(0x1035, "BPROT")
+		pj.set_label(0x1036, "EPROG")
+		pj.set_label(0x1039, "OPTION")
+		pj.set_label(0x103A, "COPRST")
+		pj.set_label(0x103B, "PPROG")
+		pj.set_label(0x103C, "HPRIO")
+		pj.set_label(0x103D, "INIT")
+		pj.set_label(0x103F, "CONFIG")
+
 
 	def vectors(self, pj, adr = 0xffd6):
 		for v in (

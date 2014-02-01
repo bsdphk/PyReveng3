@@ -114,7 +114,6 @@ class instree_disass(object):
 		a = adr
 		while True:
 			x = self.it.find(pj, a)
-			print(x)
 			if x == None:
 				print(self.name, "%x" % adr,
 				    "disass (%02x) failed" % pj.m.rd(adr))
