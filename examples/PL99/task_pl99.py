@@ -50,6 +50,8 @@ m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
 pj  = pyreveng.job(m, "PL99")
 cx = cpu.mc6800.mc68hc11()
 
+cx.register_labels(pj)
+
 cx.vectors(pj)
 
 
@@ -103,7 +105,7 @@ class d_d4(data.data):
 		pj.set_label(self.lo, "Q_%04x" % self.lo)
 
 	def render(self, pj):
-		return ".D4 0x%08x %12d %12g" % (self.val, self.dec, float(self.dec) / 2**16)
+		return ".D4 0x%08x %12d %12g" % (self.val, self.dec, float(self.dec) * .83819031)
 
 
 #######################################################################
@@ -111,6 +113,7 @@ class d_d4(data.data):
 led_map = [1, 2, 4, 128, 64, 16, 32, 8, 8]
 
 seven_segment.table(pj, 0xecb4, 0xecd4, map = led_map, verbose = False)
+pj.set_label(0xecb4, "7SEG_TBL")
 
 LED_lbl = {
 	0xf94d:  "_PL-99___LORAN-C",
@@ -332,9 +335,15 @@ pj.todo(0xde00, cx.disass)
 pj.todo(0xde20, cx.disass)
 pj.todo(0xf719, cx.disass)
 
+for a in range(0x9789, 0x97a5, 4):
+	d_d4(pj, a)
+
 for i in range(0xf220, 0xf226, 2):
 	data.dataptr(pj, i, i + 2, pj.m.bu16(i))
 	cword(pj, i + 6)
+
+#for i in range(0x89d8, 0x8a20, 2):
+#	data.dataptr(pj, i, i + 2, pj.m.bu16(i))
 
 for i in range(0xe363, 0xe369, 2):
 	x = cx.codeptr(pj, i)
@@ -366,6 +375,10 @@ pj.set_label(0xb836, "COM_Q")
 pj.set_label(0xb846, "ADD_Q")
 pj.set_label(0xb86c, "SUB_Q")
 pj.set_label(0xb892, "MUL_Q")
+
+pj.set_label(0xec91, "7SEG_XLAT(0x66a9)")
+pj.set_label(0xecaa, "7SEG_DIG(B)")
+
 pj.set_label(0xecd4, "DISPLAY(Y)")
 
 pj.set_label(0xf1a9, "DISPLAY_YES_NO(Y)")
