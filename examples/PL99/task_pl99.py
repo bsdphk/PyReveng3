@@ -93,11 +93,15 @@ class d_asf(data.data):
 		s += "}"
 		return s
 
-class d_d4(data.data):
+class d_q(data.data):
+	"""
+	Numbers are sign + 31 bit binary q-complement fractions:
+		[Sign][31 bit fraction]
+	"""
 	def __init__(self, pj, a):
 		if pj.find(a, ".D4") != None:
 			return
-		super(d_d4, self).__init__(pj, a, a + 4, ".D4")
+		super(d_q, self).__init__(pj, a, a + 4, ".D4")
 		self.val = pj.m.bu32(a)
 		self.dec = self.val
 		if self.dec & 0x80000000:
@@ -106,7 +110,12 @@ class d_d4(data.data):
 		pj.set_label(self.lo, "Q_%04x" % self.lo)
 
 	def render(self, pj):
-		return ".D4 0x%08x %12d %12g" % (self.val, self.dec, float(self.dec) * .83819031)
+		a = self.dec * (2**-31)
+		if a != 0.0:
+			b = 1.0/a
+		else:
+			b = 0.
+		return ".D4 0x%08x %12g = 1/%g" % (self.val, a, b)
 
 
 #######################################################################
@@ -241,7 +250,7 @@ def post_arg_func(ins):
 				data.dataptr(pj, a, a + 2, d)
 				a += 2
 				if d >= 0x8000:
-					d_d4(pj, d)
+					d_q(pj, d)
 			elif j == "B":
 				cbyte(pj, a)
 				# data.data(pj, a, a + 1)
@@ -320,13 +329,13 @@ for a in range(0xb132, 0xb155, 2):
 	data.data(pj, a, a + 2)
 
 for a in range(0xc2fe, 0xc38e, 4):
-	d_d4(pj, a)
+	d_q(pj, a)
 
 for a in range(0xb156, 0xb43e, 4):
 	data.data(pj, a, a + 4)
 
 for a in range(0xc3a6, 0xc41e, 4):
-	d_d4(pj, a)
+	d_q(pj, a)
 
 for a in range(0x906f, 0x9087, 2):
 	c = cword(pj, a)
@@ -350,7 +359,7 @@ pj.todo(0xde20, cx.disass)
 pj.todo(0xf719, cx.disass)
 
 for a in range(0x9789, 0x97a5, 4):
-	d_d4(pj, a)
+	d_q(pj, a)
 
 for i in range(0xf220, 0xf226, 2):
 	data.dataptr(pj, i, i + 2, pj.m.bu16(i))
@@ -362,6 +371,9 @@ for i in range(0xf220, 0xf226, 2):
 for i in range(0xe363, 0xe369, 2):
 	x = cx.codeptr(pj, i)
 
+x = pj.add(0xb963, 0xb975, "tbl")
+for i in range(x.lo, x.hi):
+	cbyte(pj, i)
 
 
 
@@ -372,11 +384,11 @@ data.data(pj, 0xec81, 0xec85)
 data.data(pj, 0xec85, 0xec8b)
 data.data(pj, 0xec8b, 0xec91)
 
-d_d4(pj, 0xcb70)
-d_d4(pj, 0xd4f5)
-d_d4(pj, 0xd4f9)
-d_d4(pj, 0xd4fd)
-d_d4(pj, 0xd501)
+d_q(pj, 0xcb70)
+d_q(pj, 0xd4f5)
+d_q(pj, 0xd4f9)
+d_q(pj, 0xd4fd)
+d_q(pj, 0xd501)
 
 while pj.run():
 	pass
