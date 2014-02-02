@@ -66,6 +66,7 @@ def cword(pj, a):
 	c.val = pj.m.bu16(a)
 	c.typ = ".WORD"
 	c.fmt = "0x%04x" % c.val
+	return c 
 
 class d_chain(data.data):
 	def __init__(self, pj, a):
@@ -327,6 +328,19 @@ for a in range(0xb156, 0xb43e, 4):
 for a in range(0xc3a6, 0xc41e, 4):
 	d_d4(pj, a)
 
+for a in range(0x906f, 0x9087, 2):
+	c = cword(pj, a)
+	c.fmt = "%d" % c.val
+
+x = pj.add(0x9d00, 0x9d20, "tbl")
+x.lcmt += "accessed via 0x9cc2 pointer"
+for a in range(x.lo, x.hi, 2):
+	c = cword(pj, a)
+
+pj.todo(0x9102, cx.disass)
+pj.todo(0x95da, cx.disass)
+pj.todo(0x9b29, cx.disass)
+pj.todo(0x9a96, cx.disass)
 pj.todo(0x9b44, cx.disass)
 pj.todo(0x9b57, cx.disass)
 pj.todo(0xdda1, cx.disass)
