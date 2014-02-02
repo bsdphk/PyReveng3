@@ -107,15 +107,15 @@ class d_q(data.data):
 		if self.dec & 0x80000000:
 			self.dec &= 0x7fffffff
 			self.dec *= -1
-		pj.set_label(self.lo, "Q_%04x" % self.lo)
+		self.dec *= 2**-31
+		pj.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
 
 	def render(self, pj):
-		a = self.dec * (2**-31)
-		if a != 0.0:
-			b = 1.0/a
+		if self.dec != 0.0:
+			b = 1.0/self.dec
 		else:
 			b = 0.
-		return ".D4 0x%08x %12g = 1/%g" % (self.val, a, b)
+		return ".D4 0x%08x %12g = 1/%g" % (self.val, self.dec, b)
 
 
 #######################################################################
@@ -278,6 +278,10 @@ pj.set_label(0x9d20, "CHAINS")
 for a in range(0x9d20, 0x9d68, 4):
 	d_chain(pj, a)
 
+"""
+This is probably ASF data
+(Based partially on number of records = 204)
+"""
 for a in range(0x9d68, 0xaa28, 16):
 	d_asf(pj, a)
 
@@ -322,16 +326,23 @@ for i in d:
 		pj.set_label(i, "FN_%02d_%02d" % (e[0], e[-1]))
 
 
-for a in range(0xaa29, 0xb131, 100):
+#
+# This may be LORSTA data, 18 pieces sounds about right
+#
+x = pj.add(0xaa29, 0xb131, "tbl")
+for a in range(x.lo, x.hi, 100):
 	data.data(pj, a, a + 100)
-
-for a in range(0xb132, 0xb155, 2):
-	data.data(pj, a, a + 2)
 
 for a in range(0xc2fe, 0xc38e, 4):
 	d_q(pj, a)
 
-for a in range(0xb156, 0xb43e, 4):
+# very likely idx into tbl at b156
+x = pj.add(0xb132, 0xb155, "tbl")
+for a in range(x.lo, x.hi, 2):
+	cword(pj, a)
+
+x = pj.add(0xb156, 0xb43e, "tbl")
+for a in range(x.lo, x.hi, 4):
 	data.data(pj, a, a + 4)
 
 for a in range(0xc3a6, 0xc41e, 4):
