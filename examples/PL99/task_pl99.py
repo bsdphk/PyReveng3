@@ -98,7 +98,7 @@ class d_q(data.data):
 	Numbers are sign + 31 bit binary q-complement fractions:
 		[Sign][31 bit fraction]
 	"""
-	def __init__(self, pj, a):
+	def __init__(self, pj, a, lbl = True):
 		if pj.find(a, ".D4") != None:
 			return
 		super(d_q, self).__init__(pj, a, a + 4, ".D4")
@@ -108,7 +108,8 @@ class d_q(data.data):
 			self.dec &= 0x7fffffff
 			self.dec *= -1
 		self.dec *= 2**-31
-		pj.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
+		if lbl:
+			pj.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
 
 	def render(self, pj):
 		if self.dec != 0.0:
@@ -274,15 +275,17 @@ cx.flow_check.append(bogo_flow)
 
 #######################################################################
 
-pj.set_label(0x9d20, "CHAINS")
-for a in range(0x9d20, 0x9d68, 4):
+x = pj.add(0x9d20, 0x9d68, "chain-tbl")
+pj.set_label(x.lo, "CHAINS")
+for a in range(x.lo, x.hi, 4):
 	d_chain(pj, a)
 
 """
 This is probably ASF data
 (Based partially on number of records = 204)
 """
-for a in range(0x9d68, 0xaa28, 16):
+x = pj.add(0x9d68, 0xaa28, "asf-tbl")
+for a in range(x.lo, x.hi, 16):
 	d_asf(pj, a)
 
 # ON_KEY table
@@ -336,14 +339,20 @@ for a in range(x.lo, x.hi, 100):
 for a in range(0xc2fe, 0xc38e, 4):
 	d_q(pj, a)
 
-# very likely idx into tbl at b156
+# idx into tbl at b156
+# Could be LORSTA related, 18 pieces...
+#
 x = pj.add(0xb132, 0xb155, "tbl")
+n = 0
 for a in range(x.lo, x.hi, 2):
-	cword(pj, a)
+	y = cword(pj, a)
+	pj.set_label(0xb156 + y.val, "LORSTA_%d" % n)
+	n += 1
 
 x = pj.add(0xb156, 0xb43e, "tbl")
 for a in range(x.lo, x.hi, 4):
-	data.data(pj, a, a + 4)
+	#data.data(pj, a, a + 4)
+	d_q(pj, a, lbl = False)
 
 for a in range(0xc3a6, 0xc41e, 4):
 	d_q(pj, a)
