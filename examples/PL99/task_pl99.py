@@ -60,6 +60,7 @@ def cbyte(pj, a):
 	c.val = pj.m.rd(a)
 	c.typ = ".BYTE"
 	c.fmt = "0x%02x" % c.val
+	return c
 
 def cword(pj, a):
 	c = data.const(pj, a, a + 2)
@@ -71,6 +72,11 @@ def cword(pj, a):
 class d_chain(data.data):
 	def __init__(self, pj, a):
 		super(d_chain, self).__init__(pj, a, a + 4)
+		self.num = '%c%c%c' % (
+			pj.m.rd(self.lo),
+			pj.m.rd(self.lo + 1),
+			pj.m.rd(self.lo + 2),
+		)
 
 	def render(self, pj):
 		return ".STRUCT chain { '%c%c%c', %d }" % (
@@ -116,7 +122,7 @@ class d_q(data.data):
 			b = 1.0/self.dec
 		else:
 			b = 0.
-		return ".D4 0x%08x %12g = 1/%g" % (self.val, self.dec, b)
+		return ".D4 %12g = 1/%g" % (self.dec, b)
 
 
 #######################################################################
@@ -275,10 +281,13 @@ cx.flow_check.append(bogo_flow)
 
 #######################################################################
 
+chains = []
 x = pj.add(0x9d20, 0x9d68, "chain-tbl")
 pj.set_label(x.lo, "CHAINS")
 for a in range(x.lo, x.hi, 4):
-	d_chain(pj, a)
+	chains.append("GRI_" + d_chain(pj, a).num + "0")
+
+print(chains)
 
 """
 This is probably ASF data
@@ -330,23 +339,51 @@ for i in d:
 
 
 #
-# This may be LORSTA data, 18 pieces sounds about right
+# Chain data, idx'ed by 0x9d20
 #
 x = pj.add(0xaa29, 0xb131, "tbl")
+n = 0
 for a in range(x.lo, x.hi, 100):
-	data.data(pj, a, a + 100)
+	x = pj.add(a, a + 100, "chain-tbl")
+	pj.set_label(a, "CHAIN_" + chains[n])
+	x = cword(pj,  a)
+	x.lcmt = "GRI %d * 5" % (x.val / 5)
+	#data.data(pj, a, a + 100)
+	x = pj.add(a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
+	x = pj.add(a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
+	x = pj.add(a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
+	for c in range(5):
+		d_q(pj, a + 0x02 + c * 4, lbl = False)
+		d_q(pj, a + 0x16 + c * 4, lbl = False)
+		d_q(pj, a + 0x2a + c * 4, lbl = False)
+
+	x = pj.add(a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
+	x = pj.add(a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
+	for c in range(4):
+		x = d_q(pj, a + 0x3e + c * 4, lbl = False)
+		x.lcmt = "%.3f us / 2^23" % (x.dec * 2**23)
+		d_q(pj, a + 0x4e + c * 4, lbl = False)
+
+	x = pj.add(a + 0x5e, a + 0x5e + 5, "epsilon-tbl")
+	for c in range(5):
+		cbyte(pj, a + 0x5e + c)
+
+	x = cbyte(pj, a + 99)
+	x.lcmt = "# slaves"
+	n += 1
 
 for a in range(0xc2fe, 0xc38e, 4):
 	d_q(pj, a)
 
 # idx into tbl at b156
-# Could be LORSTA related, 18 pieces...
+# Chain data (18 pieces)
 #
 x = pj.add(0xb132, 0xb155, "tbl")
 n = 0
 for a in range(x.lo, x.hi, 2):
 	y = cword(pj, a)
-	pj.set_label(0xb156 + y.val, "LORSTA_%d" % n)
+	y.lcmt = chains[n]
+	pj.set_label(0xb156 + y.val, "CHAIN_I_" + chains[n])
 	n += 1
 
 x = pj.add(0xb156, 0xb43e, "tbl")
@@ -413,6 +450,7 @@ d_q(pj, 0xd501)
 while pj.run():
 	pass
 
+pj.set_label(0x6489, "CHAIN_PTR")
 
 pj.set_label(0xb800, "MEMCPY(X, Y, B)")
 pj.set_label(0xb80c, "SHR_Q")
