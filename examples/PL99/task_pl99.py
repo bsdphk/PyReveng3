@@ -337,6 +337,29 @@ for i in d:
 	else:
 		pj.set_label(i, "FN_%02d_%02d" % (e[0], e[-1]))
 
+def longitude(pj, a):
+	x = d_q(pj, a, lbl = False)
+	s = ""
+	v = x.dec * 180.
+	if v < 0:
+		v *= -1
+		s += "W"
+		v = 180. - v
+	else:
+		s += "E"
+	deg = v.__trunc__()
+	v -= deg
+	s += "%4d" % deg
+
+	v *= 60
+	mi = v.__trunc__()
+	v -= mi
+	s += " %2d'" % mi
+
+	v *= 60
+	s += ' %2.3f"' % v
+
+	x.lcmt = s
 
 #
 # Chain data, idx'ed by 0x9d20
@@ -355,7 +378,7 @@ for a in range(x.lo, x.hi, 100):
 	for c in range(5):
 		d_q(pj, a + 0x02 + c * 4, lbl = False)
 		d_q(pj, a + 0x16 + c * 4, lbl = False)
-		d_q(pj, a + 0x2a + c * 4, lbl = False)
+		longitude(pj, a + 0x2a + c * 4)
 
 	x = pj.add(a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
 	x = pj.add(a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
