@@ -115,8 +115,6 @@ class instree_disass(object):
 		while True:
 			x = self.it.find(pj, a)
 			if x == None:
-				print(self.name, "%x" % adr,
-				    "disass (%02x) failed" % pj.m.rd(adr))
 				break
 			l.append(x)
 			if x.spec[0] != "+":
@@ -160,8 +158,12 @@ def arg_flow_jmp(pj, ins):
 	ins.add_flow(pj, ">", True, ins.dstadr)
 
 def arg_flow_jmp_cond(pj, ins):
-	ins.add_flow(pj, ">", ins.cc, ins.dstadr)
-	ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
+	if ins.cc == True:
+		ins.add_flow(pj, ">", "?", ins.dstadr)
+		ins.add_flow(pj, ">", "!?", ins.hi)
+	else:
+		ins.add_flow(pj, ">", ins.cc, ins.dstadr)
+		ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
 
 def arg_flow_call(pj, ins):
 	ins.add_flow(pj, "C", True, ins.dstadr)
