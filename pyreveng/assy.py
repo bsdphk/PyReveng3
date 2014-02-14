@@ -122,6 +122,10 @@ class instree_disass(object):
 			if x.spec[0] != "+":
 				break
 			a += x.len
+		if len(l) == 0:
+			print(self.name, "%x" % adr,
+			    "disass (%02x) failed" % pj.m.rd(adr))
+			return False
 		y = instree_assy(pj, l, self)
 		for i in self.flow_check:
 			i(y)
