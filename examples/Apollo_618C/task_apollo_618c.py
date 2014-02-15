@@ -51,17 +51,33 @@ cx.has_8087()
 
 pj.todo(0xffff0, cx.disass)
 
-###################################################################################
-# Random guesses
-pj.todo(0xe63cf, cx.disass)
-pj.todo(0xe7bd7, cx.disass)
-pj.todo(0xe7fdd, cx.disass)
-pj.todo(0xe834c, cx.disass)
-pj.todo(0xe9251, cx.disass)
-pj.todo(0xfcd68, cx.disass)
-pj.todo(0xffb56, cx.disass)
+#######################################################################
 
-###################################################################################
+def vect(seg, off):
+	a = (seg << 4) + off
+	print("VECTOR %05x" % a)
+	pj.todo(a, cx.disass)
+	pj.set_label(a, "VECTOR")
+
+# Vectors initialized at 0xe21b2...
+vect(0xe000, 0x1e67)
+vect(0xe1f5, 0x35e9)
+vect(0xe737, 0x1fdf)
+vect(0xf8bd, 0x417b)
+
+#######################################################################
+# Random guesses
+
+if False:
+	pj.todo(0xe63cf, cx.disass)
+	pj.todo(0xe7bd7, cx.disass)
+	pj.todo(0xe7fdd, cx.disass)
+	pj.todo(0xe834c, cx.disass)
+	pj.todo(0xe9251, cx.disass)
+	pj.todo(0xfcd68, cx.disass)
+	pj.todo(0xffb56, cx.disass)
+
+#######################################################################
 
 def txl(seg, a):
 	for i in range(2,0x22, 2):
@@ -131,7 +147,7 @@ while more:
 
 #######################################################################
 
-more = True
+more = False
 while more:
 	while pj.run():
 		pass
@@ -146,8 +162,24 @@ while more:
 		elif pj.m.rd(lo) == 0x00 and pj.m.rd(lo + 1) == 0x55:
 			print("%04x, %04x" % (lo, hi))
 			pj.todo(lo + 1, cx.disass)
-			ore = True
+			more = True
 
+
+#######################################################################
+
+def text_lines(pj, a):
+	pj.add(a, a + 24, "text-tbl")
+	data.txt(pj, a, a + 8, label=False)
+	data.txt(pj, a + 8, a + 16, label=False)
+	data.txt(pj, a + 16, a + 24, label=False)
+
+text_lines(pj, 0xe57e0 + 0x1f0)
+text_lines(pj, 0xe57e0 + 0x208)
+text_lines(pj, 0xe57e0 + 0x220)
+
+text_lines(pj, 0xe68d0)
+text_lines(pj, 0xe68e8)
+text_lines(pj, 0xe6900)
 
 #######################################################################
 
