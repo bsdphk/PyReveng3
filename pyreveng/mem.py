@@ -53,7 +53,39 @@ class MemError(Exception):
         def __str__(self):
                 return repr(self.value)
 
-class word_mem(object):
+class address_space(object):
+	"""
+	A vacuous address-space and base-class for actual address-spaces
+	and memory types
+	"""
+	def __init__(self, lo, hi, name = ""):
+		assert lo <= hi
+		self.lo = lo
+		self.hi = hi
+		self.name = name
+
+	def __repr__(self):
+		return "<address_space %s 0x%x-0x%x>" % (
+		    self.name, self.lo, self.hi
+		)
+
+	def __getitem__(self, a):
+		a = self._off(a)
+		raise MemError(a, "Undefined")
+
+	def __setitem__(self, a, d):
+		a = self._off(a)
+		raise MemError(a, "Undefined")
+
+	def _off(self, a):
+		if a < self.lo:
+			raise MemError(a, "Address too low")
+		if a >= self.hi:
+			raise MemError(a, "Address too high")
+		return a - self.lo
+
+
+class word_mem(address_space):
 	"""
 	Word memory is characteristic for a lot of the earliest computers,
 	they could access exactly one word at a time, or possibly fractions
@@ -72,6 +104,8 @@ class word_mem(object):
 		assert bits <= 64
 		assert attr >= 0
 		assert attr <= 7
+
+		super(word_mem, self).__init__(lo, hi)
 
 		self.bits = bits
 		self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
@@ -106,27 +140,26 @@ class word_mem(object):
 		return "<word_mem 0x%x-0x%x, @%d bits, %d attr>" % (
 		    self.lo, self.hi, self.bits, self.attr)
 
-	def _off(self, a):
-		if a < self.lo:
-			raise MemError(a, "Address too low")
-		if a >= self.hi:
-			raise MemError(a, "Address too high")
-		return a - self.lo
-
-	def rd(self, a):
+	def __getitem__(self, a):
 		"""Read location"""
 		b = self._off(a)
 		if not (self.a[b] & DEFINED):
 			raise MemError(a, "Undefined")
 		return self.m[b]
 
-	def wr(self, a, d):
+	def rd(self,a):
+		return self[a]
+
+	def __setitem__(self, a, d):
 		"""Write location"""
 		if (d & ~self.msk):
 			raise MemError(a, "Data too big (0x%x)" % d)
 		b = self._off(a)
 		self.m[b] = self.mt(d)
 		self.a[b] |= DEFINED
+
+	def wr(self, a, d):
+		self[a] = d
 
 	def get_attr(self, a):
 		"""Get attributes"""
