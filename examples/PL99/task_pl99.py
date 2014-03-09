@@ -44,6 +44,13 @@ import listing
 import code
 import seven_segment
 
+seven_segment.known[0x21] = "r"
+seven_segment.known[0x63] = "o"
+seven_segment.known[0x04] = "i"
+seven_segment.known[0x41] = "="
+seven_segment.known[0x20] = "i"
+seven_segment.known[0x30] = "I"
+
 m = mem.byte_mem(0x8000, 0x10000)
 m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
 
@@ -127,7 +134,7 @@ class d_q(data.data):
 
 #######################################################################
 
-led_map = [1, 2, 4, 128, 64, 16, 32, 8, 8]
+led_map = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
 seven_segment.table(pj, 0xecb4, 0xecd4, map = led_map, verbose = False)
 pj.set_label(0xecb4, "7SEG_TBL")
@@ -287,7 +294,6 @@ pj.set_label(x.lo, "CHAINS")
 for a in range(x.lo, x.hi, 4):
 	chains.append("GRI_" + d_chain(pj, a).num + "0")
 
-print(chains)
 
 """
 This is probably ASF data
