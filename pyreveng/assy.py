@@ -93,15 +93,18 @@ class instree_assy(assy):
 #######################################################################
 
 class instree_disass(object):
-	def __init__(self, name, word_size = 8):
+	def __init__(self, name, ins_word = 8, mem_word = None, endian = None):
 		self.name = name
 		self.args = {
 			">R":	arg_flow_return,
 			">J":	arg_flow_jmp,
 			">JC":	arg_flow_jmp_cond,
 			">C":	arg_flow_call,
+			"?":	arg_question,
 		}
-		self.it = instree.instree(iword = word_size, memword=word_size)
+		if mem_word == None:
+			mem_word = ins_word
+		self.it = instree.instree(ins_word, mem_word, endian)
 		self.flow_check = []
 
 	def init_ins(self, pj, ins):
@@ -121,8 +124,8 @@ class instree_disass(object):
 				break
 			a += x.len
 		if len(l) == 0:
-			print(self.name, "%x" % adr,
-			    "disass (%02x) failed" % pj.m.rd(adr))
+			print(self.name, "0x%x" % adr,
+			    "disass (0x%x) failed" % self.it.gw(pj, adr, 0))
 			return False
 		y = instree_assy(pj, l, self)
 		for i in self.flow_check:
@@ -141,6 +144,8 @@ class arg_dst(object):
 	def render(self, pj):
 		if self.dst in pj.labels:
 			return self.pfx + "%s" % pj.labels[self.dst]
+		elif self.dst == None:
+			return self.pfx + "0x?"
 		else:
 			return self.pfx + "0x%x" % self.dst
 
@@ -168,3 +173,7 @@ def arg_flow_jmp_cond(pj, ins):
 def arg_flow_call(pj, ins):
 	ins.add_flow(pj, "C", True, ins.dstadr)
 	ins.add_flow(pj, True, True, ins.hi)
+
+def arg_question(pj, ins):
+	print("??? @0x%x" % ins.lo, ins.im)
+	ins.add_flow(pj, '>', True, None)

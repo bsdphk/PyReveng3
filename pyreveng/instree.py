@@ -246,13 +246,14 @@ class insmatch(object):
 	def __init__(self, it, il, adr, words):
 		self.spec = il.spec
 		self.adr = adr
-		self.len = il.words
+		self.len = il.words * it.width / it.memwidth
 		for i in il.flds:
 			self.__dict__["F_" + i] = il.get_field(i, words)
 
 	def __repr__(self):
 		s = "<InsMatch"
-		s += " @%x:" % self.adr
+		s += " @0x%x:" % self.adr
+		s += "0x%x" % (self.adr + self.len)
 		s += " " + self.spec
 		for i in self.__dict__:
 			if i[:2] == "F_":
@@ -261,9 +262,10 @@ class insmatch(object):
 		return s
 
 class instree(object):
-	def __init__(self, iword=8, memword=8):
-		self.width = iword
-		self.memwidth = memword
+	def __init__(self, ins_word = 8, mem_word = 8, endian = None):
+		self.width = ins_word
+		self.memwidth = mem_word
+		self.endian = endian
 		assert self.width % self.memwidth == 0
 		self.root = insbranch(0)
 		if self.width == self.memwidth:
@@ -272,7 +274,7 @@ class instree(object):
 			self.gw = self.gw16
 		else:
 			raise InsTreeError(
-			    "iword = %d, memword = %d not auto-supported" %
+			    "ins_word = %d, mem_word = %d not auto-supported" %
 			    (self.width, self.memwidth))
 
 	def load_file(self, filename):
@@ -300,7 +302,10 @@ class instree(object):
 		return pj.m.rd(adr + n)
 
 	def gw16(self, pj, adr, n):
-		return pj.m.w16(adr + n * 2)
+		if self.endian == ">":
+			return pj.m.bu16(adr + n * 2)
+		else:
+			return pj.m.lu16(adr + n * 2)
 
 	def findx(self, pj, adr, lvl, l, r):
 		if len(l) <= lvl:
@@ -332,35 +337,6 @@ class instree(object):
 		if x == None:
 			return None
 		return insmatch(self, x, adr, l)
-
-		r = self.root
-		i = 0
-		while True:
-			if len(l) <= i:
-				b = self.gw(pj, adr, i)
-				l.append(b)
-			else:
-				b = l[i]
-			i += 1
-			for r2 in r.find(b):
-				print(">>>", "%x" % adr, r2)
-			print("NOT FOUND", "%x" % adr)
-			return None
-
-			if type(r2) == insbranch:
-				r = r2
-				continue
-
-			print("FOUND", "%x" % adr, i, r2)
-			m = True
-			for j in range(len(l), len(r2.mask)):
-				b = self.gw(pj, adr, j)
-				l.append(b)
-				if r2.mask[j] & b != r2.bits[j]:
-					m = False
-					break
-			if m == True:
-				return insmatch(self, r2, adr, l)
 
 if __name__ == "__main__":
 	it = instree(8)
