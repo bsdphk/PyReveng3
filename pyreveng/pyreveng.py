@@ -48,8 +48,8 @@ class leaf(object):
 		self.tag = tag
 		self.lcmt = ""
 		self.rendered = None
-		p.t.insert(self)
 		self.compact = False
+		p.inbox.append(self)
 
 	def __repr__(self):
 		s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
@@ -73,6 +73,7 @@ class job(object):
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
 		self.labels = dict()
+		self.inbox = []
 
 	def set_label(self, adr, lbl):
 		self.labels[adr] = lbl
@@ -122,9 +123,9 @@ class job(object):
 		self.dolist.append((adr, func))
 
 	def run(self):
-		if len(self.dolist) == 0:
-			return False
+		rv = False
 		while len(self.dolist) > 0:
+			rv = True
 			adr,func = self.dolist.pop()
 			try:
 				func(self, adr)
@@ -133,4 +134,6 @@ class job(object):
 				    self.afmt(adr), func)
 			except:
 				raise
-		return True
+			while len(self.inbox) > 0:
+				self.t.insert(self.inbox.pop(0))
+		return rv
