@@ -117,6 +117,20 @@ if True:
 		v = dptr(pj, a)
 		cx.vector(pj, v)
 
+if True:
+	for a in range(0xf5a, 0xf7a, 2):
+		c = data.const(pj, a, a + 2)
+		c.typ = ".WORD"
+		c.fmt = "0x%04x" % pj.m.bu16(a)
+	for a in range(0xf7a, 0xf7e, 2):
+		c = data.const(pj, a, a + 2)
+		c.typ = ".WORD"
+		c.fmt = "%d" % pj.m.bu16(a)
+	for a in range(0xf7e, 0xfaa, 2):
+		c = data.const(pj, a, a + 2)
+		c.typ = ".WORD"
+		c.fmt = "%d" % pj.m.bu16(a)
+
 while pj.run():
         pass
 

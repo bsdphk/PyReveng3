@@ -111,10 +111,30 @@ def arg_o(pj, ins, to, o):
 	if to == 2:
 		v = pj.m.bu16(ins.hi)
 		ins.hi += 2
-		if o == 0:
-			return assy.arg_verbatim(pj, "@0x%04x" % v)
-		else:
+		if o != 0:
 			return assy.arg_verbatim(pj, "R%d+#0x%04x" % (o, v))
+
+		x = pj.find(v)
+		if len(x) > 0:
+			if x[0].tag != "const":
+				return assy.arg_verbatim(pj, "@0x%04x" % v)
+			return assy.arg_verbatim(pj, "@0x%04x:" % v + x[0].fmt)
+
+		try:
+			w = pj.m.bu16(v)
+		except:
+			return assy.arg_verbatim(pj, "@0x%04x" % v)
+
+		print("XXX", "%04x" % v, "%04x" % w, ins.mne)
+		if ins.mne[-1] == "B":
+			c = data.const(pj, v, v + 1)
+			c.typ = ".BYTE"
+			c.fmt = "0x%02x" % pj.m.rd(v)
+		else:
+			c = data.const(pj, v, v + 2)
+			c.typ = ".WORD"
+			c.fmt = "0x%04x" % w
+		return assy.arg_verbatim(pj, "@0x%04x:" % v + c.fmt)
 
 	if to == 3:
 		return assy.arg_verbatim(pj, "*R%d+" % o)
