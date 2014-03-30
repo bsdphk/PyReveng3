@@ -40,6 +40,9 @@ class data(pyreveng.leaf):
 	def render(self, pj):
 		return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 
+	def arg_render(self, pj):
+		return self.fmt
+
 class const(data):
 	def __init__(self, pj, lo, hi):
 		super(const, self).__init__(pj, lo, hi, "const")
@@ -58,6 +61,9 @@ class codeptr(data):
 
 	def render(self, pj):
 		return ".CODE\t" + pj.render_adr(self.dst)
+
+	def arg_render(self, pj):
+		return pj.render_adr(self.dst)
 
 class dataptr(data):
 	def __init__(self, pj, lo, hi, dst):
@@ -91,6 +97,7 @@ class txt(data):
 
 		super(txt, self).__init__(pj, lo, hi, "txt")
 		self.txt = s
+		self.fmt = "'" + s + "'"
 		t = "t_"
 		j = 0
 		while j < len(s):
@@ -113,4 +120,7 @@ class txt(data):
 			
 	def render(self, pj):
 		return ".TXT\t'" + self.txt + "'"
+
+	def arg_render(self, pj):
+		return "'" + self.txt + "'"
 

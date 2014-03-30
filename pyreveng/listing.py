@@ -130,6 +130,8 @@ class listing(object):
 				ahi = pj.afmt(i.hi)
 				self.fo.write(
 				    "%s-%s [%s]\n" % (alo, ahi, i.tag))
+			elif i.lo < a0:
+				continue
 			else:
 				self.render_chunk(
 				    i.lo, i.hi, rx, i.lcmt, i.compact)
@@ -162,7 +164,6 @@ class listing(object):
 		lcmt = lcmt.rstrip("\n").split("\n")
 		if lcmt[-1] == "":
 			lcmt.pop()
-		#hex = self.pj.m.render(self.pj, lo, hi)
 		hex = self.render_mem(self.pj, lo, hi)
 		i = 0
 		m = max(len(rx), len(lcmt))

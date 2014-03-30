@@ -22,6 +22,47 @@ import code
 import cpu.tms9900
 
 
+cru_adr = {
+	# U12
+	0x080:	"LED_RMT",
+	0x082:	"LED_CV_NORMAL",
+	0x084:	"LED_CC_NORMAL",
+	0x086:	"LED_OVP",
+	0x088:	"LED_UNREGULATED",
+	0x08a:	"LED_CV_LIMIT",
+	0x08c:	"LED_DISABLED",
+	0x08e:	"LED_SRQ",
+
+	# U13
+	0x090:	"LED_OTP",
+	0x092:	"LED_LSN",
+	0x094:	"#M2_MODE",
+	0x096:	"#M1_MODE",
+	0x098:	"LED_INVALID_REQUEST",
+	0x09a:	"#REQ_SERVICE",
+	0x09c:	"TEST",
+	0x09e:	"INTERRUPT_ENABLE",
+
+	# U14
+	0x0c0:	"#DISABLE",
+	0x0c2:	"LED_TLK",
+	0x0c4:	"OVP_RESET",
+	0x0c6:	"RESET_RPG_DECODER",
+	0x0c8:	"TIMER_TRIGGER",
+	0x0ca:	"LED_VOLTAGE",
+	0x0cc:	"LED_CURRENT",
+	0x0ce:	"LED_CC_LIMIT",
+
+	0x0d0:	"VOLTAGE_DAC",
+	# ... 0x0e6
+
+	0x0e8:	"CURRENT_DAC",
+	# ... 0x0fe
+
+	0x100:	"OVP_DAC",
+	0x110:	"LOAD_DACS",
+}
+
 m = mem.byte_mem(0x0000, 0x2000)
 
 fi = open("HP6034A_U25.hex")
@@ -67,6 +108,34 @@ def inline_args(ins):
 cx.flow_check.append(inline_args)
 
 if True:
+	# HPIB input command dispatch
+	l = []
+	for a in range(0x0cd3, 0x0ce2):
+		c = data.txt(pj, a, a + 1, False)
+		l.append(c.txt)
+	print(l)
+	for a in range(0xcee, 0xd0c, 2):
+		c = cx.codeptr(pj, a)
+		n = l.pop(0)
+		if n == "\\r":
+			n = "SEP"
+		elif n == "+":
+			n = "SIGN"
+		elif n == "C":
+			n = "CP"
+		if c.dst not in pj.labels:
+			pj.set_label(c.dst, "CMD_" + n)
+
+if True:
+	for a in range(0x0d0c, 0x0d0f):
+		data.txt(pj, a, a + 1, False)
+	for a in range(0xf43, 0xf4a):
+		data.txt(pj, a, a + 1, False)
+	data.txt(pj, 0xf4a, 0xf4c, False)
+	for a in range(0xf54, 0xf56):
+		data.txt(pj, a, a + 1, False)
+
+if True:
 
 	for i in range(0, 12, 2):
 		dptr(pj, 0x230 + i)
@@ -90,8 +159,8 @@ if True:
 
 if True:
 	# Pure guesswork
-	for a in range(0xcee, 0xd0c, 2):
-		cx.codeptr(pj, a)
+	#for a in range(0xcee, 0xd0c, 2):
+	#	cx.codeptr(pj, a)
 	pj.todo(0x0e1e, cx.disass)
 
 if True:
@@ -102,9 +171,14 @@ if True:
 	pj.todo(0x0e80, cx.disass)
 
 if True:
+	for a in range(0xf1c, 0xf20):
+		data.txt(pj, a, a + 1, False)
+
+if True:
 	pj.todo(0x10b2, cx.disass)
 
 if True:
+	# Continuation addresses when more bytes arrive
 	for a in range(0xf4e, 0xf54, 2):
 		cx.codeptr(pj, a)
 
@@ -131,8 +205,47 @@ if True:
 		c.typ = ".WORD"
 		c.fmt = "%d" % pj.m.bu16(a)
 
+if True:
+	# Failure Flash Codes
+	for a in range(0xcc, 0xd8, 2):
+		dptr(pj, a)
+
 while pj.run():
         pass
+
+pj.set_label(0x00cc, "FAIL_LEDS")
+pj.set_label(0x0140, "FAIL_1")
+pj.set_label(0x0146, "FAIL_2")
+pj.set_label(0x018a, "FAIL_3")
+pj.set_label(0x0190, "FAIL_4")
+pj.set_label(0x01d6, "FAIL_5")
+pj.set_label(0x01e2, "FAIL_6")
+pj.set_label(0x0212, "FLASH_FAIL")
+pj.set_label(0x0656, "MESH_PREMPTED")
+pj.set_label(0x0660, "HPIB_PREMPTED")
+pj.set_label(0x066a, "TIMER_PREMPTED")
+pj.set_label(0x0912, "PON2_1")
+pj.set_label(0x08e4, "PON2_2")
+pj.set_label(0x0894, "PON2_3")
+pj.set_label(0x08bc, "PON2_4")
+pj.set_label(0x0920, "PON2_5")
+pj.set_label(0x0abe, "TIMER_INTR")
+pj.set_label(0x0b7c, "HPIB_INTR")
+pj.set_label(0x0ccc, "HPIP_INCHAR")
+pj.set_label(0x0ce2, "END_INCHAR")
+pj.set_label(0x0d18, "INCHAR_MAIN")
+pj.set_label(0x0f7e, "1_10_100_1000")
+pj.set_label(0x1328, "MESH_INTR")
+pj.set_label(0x175c, "SET_CC_CV_LEDS")
+pj.set_label(0x2002, "NEXT_CHAR_PROC")
+pj.set_label(0x20ca, "CV_DAC_VAL")
+pj.set_label(0x20cc, "CC_DAC_VAL")
+pj.set_label(0x20ce, "CV_DAC_SET")
+pj.set_label(0x20d0, "CC_DAC_SET")
+pj.set_label(0x20d6, "DELAY_VAL")
+pj.set_label(0x20d8, "MODE_SET")
+pj.set_label(0x20da, "MODE_VAL")
+pj.set_label(0x20d4, "COUNT_DOWN")
 
 code.lcmt_flows(pj)
 

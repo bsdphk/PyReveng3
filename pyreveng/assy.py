@@ -149,6 +149,17 @@ class arg_dst(object):
 		else:
 			return self.pfx + "0x%x" % self.dst
 
+class arg_ref(object):
+	def __init__(self, pj, obj):
+		self.obj = obj
+
+	def render(self, pj):
+		s = "(" + pj.render_adr(self.obj.lo) + ")"
+		a = self.obj.arg_render(pj)
+		if a != "":
+			s += "=" + a
+		return s
+
 class arg_verbatim(object):
 	def __init__(self, pj, txt):
 		self.txt = txt

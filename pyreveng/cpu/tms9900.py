@@ -54,9 +54,9 @@ X	so	|0 0 0 0 0 1 0 0 1 0|ts | s	|
 LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     |
 STCR	c,so	|0 0 1 1 0 1| c     |ts | s     |
 
-SBO	disp	|0 0 0 1 1 1 0 1| disp		|
-SBZ	disp	|0 0 0 1 1 1 1 0| disp		|
-TB	disp	|0 0 0 1 1 1 1 1| disp		|
+SBO	cru	|0 0 0 1 1 1 0 1| cru		|
+SBZ	cru	|0 0 0 1 1 1 1 0| cru		|
+TB	cru	|0 0 0 1 1 1 1 1| cru		|
 
 JEQ	r,>JC	|0 0 0 1 0 0 1 1| disp		|
 JGT	r,>JC	|0 0 0 1 0 1 0 1| disp		|
@@ -116,16 +116,14 @@ def arg_o(pj, ins, to, o):
 
 		x = pj.find(v)
 		if len(x) > 0:
-			if x[0].tag != "const":
-				return assy.arg_verbatim(pj, "@0x%04x" % v)
-			return assy.arg_verbatim(pj, "@0x%04x:" % v + x[0].fmt)
+			return assy.arg_ref(pj, x[0])
 
 		try:
 			w = pj.m.bu16(v)
 		except:
-			return assy.arg_verbatim(pj, "@0x%04x" % v)
+			return assy.arg_dst(pj, v, "@")
 
-		print("XXX", "%04x" % v, "%04x" % w, ins.mne)
+		# print("XXX", "%04x" % v, "%04x" % w, ins.mne)
 		if ins.mne[-1] == "B":
 			c = data.const(pj, v, v + 1)
 			c.typ = ".BYTE"
@@ -134,7 +132,7 @@ def arg_o(pj, ins, to, o):
 			c = data.const(pj, v, v + 2)
 			c.typ = ".WORD"
 			c.fmt = "0x%04x" % w
-		return assy.arg_verbatim(pj, "@0x%04x:" % v + c.fmt)
+		return assy.arg_ref(pj, c)
 
 	if to == 3:
 		return assy.arg_verbatim(pj, "*R%d+" % o)
@@ -169,39 +167,53 @@ class arg_c(object):
 	def render(self, pj):
 		return "#0x%x" % self.val
 
-class arg_ptr(assy.arg_dst):
+class arg_ptr(assy.arg_ref):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_ptr
-		c = ins.lang.vector(pj, self.val)
-		ins.dstadr = c.c.dst
-		super(arg_ptr, self).__init__(pj, ins.dstadr)
-
-	def render(self, pj):
-		return "@0x%04x" % self.val
+		self.vector = vector(pj, self.val, ins.lang)
+		ins.dstadr = self.vector.dstadr
+		super(arg_ptr, self).__init__(pj, self.vector)
 
 class arg_i(object):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_iop
 
 	def render(self, pj):
-		return "@0x%04x" % self.val
+		return "#0x%04x" % self.val
 
 class arg_w(assy.arg_verbatim):
 	def __init__(self, pj, ins):
 		super(arg_w, self).__init__(pj, "R%d" % ins.im.F_w)
 
-class arg_disp(assy.arg_verbatim):
+class arg_cru(assy.arg_verbatim):
 	def __init__(self, pj, ins):
-		i = ins.im.F_disp
+		i = ins.im.F_cru
 		if i & 0x80:
 			i -= 0x100
-		super(arg_disp, self).__init__(pj, "%+d" % i)
+		# XXX: This doubling may be model-dependent
+		# XXX: Based on 9980/9981
+		i *= 2
+		super(arg_cru, self).__init__(pj, "R12%#+x" % i)
 
 def arg_sc(pj, ins):
 	if ins.im.F_c == 0:
 		return assy.arg_verbatim(pj, "R0")
 	else:
 		return assy.arg_verbatim(pj, "#%d" % ins.im.F_c)
+
+class vector(data.data):
+	def __init__(self, pj, adr, cx):
+		super(vector, self).__init__(pj, adr, adr + 4)
+		self.ws = data.dataptr(pj, adr + 0x00, adr + 0x02,
+		    pj.m.bu16(adr))
+		self.ip = cx.codeptr(pj, adr + 0x02)
+		self.dstadr = self.ip.dst
+
+	def render(self, pj):
+		return self.ws.render(pj) + "; " + self.ip.render(pj)
+
+	def arg_render(self, pj):
+		return self.ip.arg_render(pj)
 
 class tms9900(assy.instree_disass):
 	def __init__(self):
@@ -219,16 +231,8 @@ class tms9900(assy.instree_disass):
 		    "do":	arg_do,
 		    "da":	arg_da,
 		    "sc":	arg_sc,
-		    "disp":	arg_disp,
+		    "cru":	arg_cru,
 		} )
-
-	def vector(self, pj, adr):
-		c = pj.find(adr, "vector")
-		if c == None:
-			c = pj.add(adr, adr + 4, "vector")
-			c.d = data.dataptr(pj, adr + 0x00, adr + 0x02, pj.m.bu16(adr))
-			c.c = self.codeptr(pj, adr + 0x02)
-		return c
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
@@ -236,10 +240,13 @@ class tms9900(assy.instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
+	def vector(self, pj, adr):
+		return vector(pj, adr, self)
+
 	def vectors(self, pj, adr = 0x0, xops = 1):
 		def vect(pj, a, lbl):
-			c = self.vector(pj, a)
-			pj.set_label(c.c.dst, lbl)
+			c = vector(pj, a, self)
+			pj.set_label(c.dstadr, lbl)
 			return c
 		
 		c = vect(pj, adr, "RESET")

@@ -58,6 +58,8 @@ class leaf(object):
 	def render(self, pj):
 		return self.rendered
 
+	def arg_render(self, pj):
+		return ""
 
 class job(object):
 	"""
@@ -69,7 +71,7 @@ class job(object):
 		self.m = m
 		self.t = tree.tree(m.lo, m.hi)
 		l = max(len("%x" % m.lo), len("%x" % (m.hi - 1)))
-		self.apct = "%%0%dx" % l
+		self.apct = "0x%%0%dx" % l
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
 		self.labels = dict()
