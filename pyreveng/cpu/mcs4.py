@@ -146,7 +146,7 @@ def arg_isz(pj, ins):
 
 class mcs4(assy.instree_disass):
 	def __init__(self):
-		super(mcs4, self).__init__("mcs4", word_size = 8)
+		super(mcs4, self).__init__("mcs4", 8)
 		self.it.load_string(mcs4_instructions)
 		self.args.update( {
 			"data":	arg_data,

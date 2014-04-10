@@ -67,3 +67,4 @@ def fill_gaps(pj):
 
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
+	pj.run()

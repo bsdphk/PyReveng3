@@ -126,6 +126,8 @@ class job(object):
 
 	def run(self):
 		rv = False
+		while len(self.inbox) > 0:
+			self.t.insert(self.inbox.pop(0))
 		while len(self.dolist) > 0:
 			rv = True
 			adr,func = self.dolist.pop()

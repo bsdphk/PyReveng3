@@ -118,6 +118,8 @@ class listing(object):
 		misc.fill_gaps(pj)
 		a0 = pj.m.lo
 		for i in pj:
+			print(i)
+		for i in pj:
 			if i.lo > a0:
 				nxxx += 1
 				cxxx += i.lo - a0
@@ -151,11 +153,18 @@ class listing(object):
 		if hi - lo <= 2:
 			self.render_chunk(lo, hi)
 			return
-		x = self.pj.m.rd(lo)
-		for i in range(lo, hi):
-			if self.pj.m.rd(i) != x:
-				self.render_chunk(lo, hi)
-				return
+		try:
+			print(lo, hi)
+			x = self.pj.m.rd(lo)
+			for i in range(lo, hi):
+				if self.pj.m.rd(i) != x:
+					self.render_chunk(lo, hi)
+					return
+		except mem.MemError:
+			self.render_chunk(lo, hi,
+			    ".UNDEF\t[0x%x]" % (hi - lo), "", True)
+			return
+
 		self.render_chunk(lo, hi,
 		    ".XXX\t0x%02x[0x%x]" % (x, hi - lo), "", True)
 
