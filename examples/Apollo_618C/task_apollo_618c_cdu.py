@@ -53,14 +53,6 @@ m.load_binfile(0x0000, 1, "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
 pj  = pyreveng.job(m, "Apollo618c_cdu")
 
 
-for i in range(0x100,0x600,16):
-	s = "\t/* %03x */\t" % i
-	for j in range(16):
-		s += "0x%02x, " % m[i + j]
-	print(s)
-
-exit(0)
-
 if False:
 	pj.a.address_space("xrom", m)
 	pj.a.address_space("xdata", mem.address_space(0, 0x10000))

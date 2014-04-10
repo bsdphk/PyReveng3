@@ -274,7 +274,7 @@ def arg_anbit(pj, ins):
 
 class mcs51(assy.instree_disass):
 	def __init__(self, lang = "mcs51"):
-		super(mcs51, self).__init__(lang, word_size = 8)
+		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)
 		self.args.update( {
 			"arel":		arg_arel,

@@ -118,8 +118,6 @@ class listing(object):
 		misc.fill_gaps(pj)
 		a0 = pj.m.lo
 		for i in pj:
-			print(i)
-		for i in pj:
 			if i.lo > a0:
 				nxxx += 1
 				cxxx += i.lo - a0

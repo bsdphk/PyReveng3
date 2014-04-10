@@ -547,7 +547,7 @@ import binutils
 
 class i8086(assy.instree_disass):
 	def __init__(self):
-		super(i8086, self).__init__("i8086", word_size = 8)
+		super(i8086, self).__init__("i8086", 8)
 		self.it.load_string(i8086_instructions)
 		self.args.update( {
 			"W":	arg_W,
@@ -604,8 +604,9 @@ class i8086(assy.instree_disass):
 			if x != "":
 				y.lcmt += x + "\n"
 			return False
+		return (b)
 		y = pj.find(adr, self.name)
-		if x != "":
+		if y != "":
 			y.lcmt += x + "\n"
 		if ll > 0 and y.hi - y.lo != ll:
 			print("FAIL", y.render(pj), x)
