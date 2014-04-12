@@ -23,9 +23,10 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
-# Data of various sorts
-#
+
+"""
+Data of various sorts
+"""
 
 from __future__ import print_function
 
