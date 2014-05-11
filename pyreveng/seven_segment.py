@@ -181,6 +181,7 @@ class digit(pyreveng.leaf):
 		if verbose:
 			self.lcmt = lcmt(l)
 		self.rendered = s
+		pj.insert(self)
 
 def table(pj, lo, hi, map = None, inv = False, verbose = False):
 	"""

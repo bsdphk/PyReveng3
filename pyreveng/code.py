@@ -119,6 +119,7 @@ class code(pyreveng.leaf):
 		super(code, self).__init__(pj, lo, hi, lang.name)
 		self.flow_in = []
 		self.flow_out = []
+		pj.insert(self)
 
 	def render(self, pj):
 		return "<Code %x-%x %s>" % (self.lo, self.hi, self.lang.name)

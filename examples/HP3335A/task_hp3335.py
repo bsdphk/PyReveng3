@@ -132,6 +132,7 @@ vec(0x7ffe, "RST")
 class ptr(pyreveng.leaf):
 	def __init__(self, pj, adr):
 		super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
+		pj.insert(self)
 
 	def render(self, pj):
 		v = pj.m.bu16(self.lo)
