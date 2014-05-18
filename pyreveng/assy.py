@@ -131,6 +131,7 @@ class instree_disass(object):
 		for i in self.flow_check:
 			i(y)
 		y.propagate(pj)
+		pj.insert(y)
 		return True
 	
 
