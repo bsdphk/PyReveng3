@@ -269,7 +269,7 @@ def setup(name, binfile, direction):
 		m.load_binfile(0x6000, 1, binfile)
 	else:
 		m.load_binfile(0x7fff, -1, binfile)
-	pj = pyreveng.job(m, name)
+	pj = pyreveng.Job(m, name)
 	cx = cpu.mc6800.mc6800(mask = 0x7fff)
 	eprom(pj, cx.disass, m.lo, m.hi, 0x0400)
 

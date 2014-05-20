@@ -37,7 +37,7 @@ from __future__ import print_function
 import tree
 import mem
 
-class leaf(object):
+class Leaf(object):
 	"""
 	These are the leaves we hang into the tree class.
 
@@ -61,7 +61,7 @@ class leaf(object):
 	def arg_render(self, pj):
 		return ""
 
-class job(object):
+class Job(object):
 	"""
 	A single analysis job
 
@@ -69,7 +69,7 @@ class job(object):
 	def __init__(self, m, name="xxx"):
 		self.name = name
 		self.m = m
-		self.t = tree.tree(m.lo, m.hi)
+		self.t = tree.Tree(m.lo, m.hi)
 		l = max(len("%x" % m.lo), len("%x" % (m.hi - 1)))
 		self.apct = "0x%%0%dx" % l
 		self.dolist = list()
@@ -105,7 +105,7 @@ class job(object):
 		self.t.insert(leaf)
 
 	def add(self, lo, hi, tag):
-		l = leaf(self, lo, hi, tag)
+		l = Leaf(self, lo, hi, tag)
 		self.t.insert(l)
 		return l
 

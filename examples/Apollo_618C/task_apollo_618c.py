@@ -44,7 +44,7 @@ import cpu.i8086
 m = mem.byte_mem(0xe0000, 0x100000)
 m.load_binfile(0xe0000, 1, "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
 
-pj  = pyreveng.job(m, "Apollo618c")
+pj  = pyreveng.Job(m, "Apollo618c")
 
 cx = cpu.i8086.i8086()
 cx.has_8087()

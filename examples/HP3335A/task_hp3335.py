@@ -87,7 +87,7 @@ m.load_binfile(0x6800, 1, "A13U2.bin")
 m.load_binfile(0x7000, 1, "A13U3.bin")
 m.load_binfile(0x7800, 1, "A13U4.bin")
 
-pj = pyreveng.job(m, "HP3335A")
+pj = pyreveng.Job(m, "HP3335A")
 
 pj.apct = "%04x"
 
@@ -129,7 +129,7 @@ vec(0x7ffe, "RST")
 
 #######################################################################
 
-class ptr(pyreveng.leaf):
+class ptr(pyreveng.Leaf):
 	def __init__(self, pj, adr):
 		super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
 		pj.insert(self)

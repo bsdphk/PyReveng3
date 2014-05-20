@@ -93,7 +93,7 @@ for i in fi:
 	j = i.split()
 	m.wr(int(j[0], 16), int(j[1], 16))
 
-pj = pyreveng.job(m, "HP6034A")
+pj = pyreveng.Job(m, "HP6034A")
 
 cx = cpu.tms9900.Tms9981()
 cx.vectors(pj, xops = 0)

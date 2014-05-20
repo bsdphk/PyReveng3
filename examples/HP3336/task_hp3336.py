@@ -136,7 +136,7 @@ import cpu.hp_nanoproc
 m = mem.byte_mem(0x0000, 0x4000)
 m.load_binfile(0, 1, "hp3336.bin")
 
-pj = pyreveng.job(m, "HP3336")
+pj = pyreveng.Job(m, "HP3336")
 
 dx = cpu.hp_nanoproc.hp_nanoproc_pg()
 

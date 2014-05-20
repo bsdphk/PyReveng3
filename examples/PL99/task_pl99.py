@@ -54,7 +54,7 @@ seven_segment.known[0x30] = "I"
 m = mem.byte_mem(0x8000, 0x10000)
 m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
 
-pj  = pyreveng.job(m, "PL99")
+pj  = pyreveng.Job(m, "PL99")
 cx = cpu.mc6800.mc68hc11()
 
 cx.register_labels(pj)

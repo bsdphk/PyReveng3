@@ -105,7 +105,7 @@ def lcmt_flows(pj):
 
 #######################################################################
 
-class Code(pyreveng.leaf):
+class Code(pyreveng.Leaf):
 	"""
 	A single undivisible "instruction" in some language
 	"""

@@ -50,7 +50,7 @@ import cpu.mcs51
 
 m = mem.byte_mem(0x0000, 0x1000)
 m.load_binfile(0x0000, 1, "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
-pj  = pyreveng.job(m, "Apollo618c_cdu")
+pj  = pyreveng.Job(m, "Apollo618c_cdu")
 
 
 if False:

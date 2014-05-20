@@ -86,7 +86,7 @@ def do_one(fn, alist):
 
 	load_xx(m)
 
-	pj = pyreveng.job(m, "HP-9411")
+	pj = pyreveng.Job(m, "HP-9411")
 
 	dx = cpu.hp_nanoproc.hp_nanoproc()
 

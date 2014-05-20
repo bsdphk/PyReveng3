@@ -34,7 +34,7 @@ import pyreveng
 
 #######################################################################
 
-class data(pyreveng.leaf):
+class data(pyreveng.Leaf):
 	def __init__(self, pj, lo, hi, t = "data"):
 		super(data, self).__init__(pj, lo, hi, t)
 		pj.insert(self)

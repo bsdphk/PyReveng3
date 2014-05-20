@@ -60,7 +60,7 @@ def hexfile(fn, a0):
 hexfile("P8316.hex", 0)
 hexfile("P1702.hex", 0x800)
 
-pj = pyreveng.job(m, "Micrologic_ML200")
+pj = pyreveng.Job(m, "Micrologic_ML200")
 
 cpu = cpu.mcs4.mcs4()
 

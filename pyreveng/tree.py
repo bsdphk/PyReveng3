@@ -46,8 +46,8 @@ pretty ok.
 
 from __future__ import print_function
 
-class tree(object):
-	def __init__(self, lo, hi, lim = 128):
+class Tree(object):
+	def __init__(self, lo, hi, lim=128):
 		# lim is only a performance parameter, it does not change
 		# funcationality in any way.
 		self.lo = lo
@@ -69,16 +69,16 @@ class tree(object):
 		assert o.lo < o.hi
 		if o.hi <= self.mid and not self.leaf:
 			if self.less == None:
-				self.less = tree(self.lo, self.mid, self.lim)
+				self.less = Tree(self.lo, self.mid, self.lim)
 			self.less.insert(o)
 		elif o.lo >= self.mid and not self.leaf:
 			if self.more == None:
-				self.more = tree(self.mid, self.hi, self.lim)
+				self.more = Tree(self.mid, self.hi, self.lim)
 			self.more.insert(o)
 		else:
 			self.cuts.append(o)
 
-	def find_range(self, lo, hi, l = None):
+	def find_range(self, lo, hi, l=None):
 		"""
 		Return four lists of objects:
 			Objects which the range is inside
@@ -106,7 +106,7 @@ class tree(object):
 			self.more.find_range(lo, hi, l)
 		return l
 
-	def find_lo(self, lo, l = None):
+	def find_lo(self, lo, l=None):
 		"""
 		Return list of objects with given .lo
 		"""
@@ -121,7 +121,7 @@ class tree(object):
 			self.more.find_lo(lo, l)
 		return l
 
-	def find_hi(self, hi, l = None):
+	def find_hi(self, hi, l=None):
 		"""
 		Return list of objects with given .hi
 		"""
@@ -163,11 +163,11 @@ class tree(object):
 				yield lst.pop(0)
 		while len(lst) > 0:
 			yield lst.pop(0)
-		
+
 if __name__ == "__main__":
 	"""Minimal test cases"""
 
-	class leaf(object):
+	class Leaf(object):
 		def __init__(self, lo, hi, tag):
 			self.lo = lo
 			self.hi = hi
@@ -177,24 +177,24 @@ if __name__ == "__main__":
 			return "%x..%x %s" % (self.lo, self.hi, self.tag)
 
 	print("Testing tree class")
-	it = tree(0, 0x500, 1)
+	it = Tree(0, 0x500, 1)
 
 	# Super items
-	it.insert(leaf(0x100,0x400, 0))
-	it.insert(leaf(0x100,0x300, 0))
-	it.insert(leaf(0x200,0x400, 0))
+	it.insert(Leaf(0x100, 0x400, 0))
+	it.insert(Leaf(0x100, 0x300, 0))
+	it.insert(Leaf(0x200, 0x400, 0))
 
 	# Same items
-	it.insert(leaf(0x200,0x300, 1))
+	it.insert(Leaf(0x200, 0x300, 1))
 
 	# Sub items
-	it.insert(leaf(0x210,0x290, 2))
-	it.insert(leaf(0x200,0x299, 2))
-	it.insert(leaf(0x201,0x300, 2))
+	it.insert(Leaf(0x210, 0x290, 2))
+	it.insert(Leaf(0x200, 0x299, 2))
+	it.insert(Leaf(0x201, 0x300, 2))
 
 	# Skew items
-	it.insert(leaf(0x100,0x299, 3))
-	it.insert(leaf(0x201,0x400, 3))
+	it.insert(Leaf(0x100, 0x299, 3))
+	it.insert(Leaf(0x201, 0x400, 3))
 
 	la = 0
 	ll = 0
@@ -233,7 +233,7 @@ if __name__ == "__main__":
 		assert len(l) == dhi[i]
 	print("  .find_hi() OK")
 
-	l = it.find_range(0x200,0x300)
+	l = it.find_range(0x200, 0x300)
 	for i in range(4):
 		for j in l[i]:
 			assert j.tag == i

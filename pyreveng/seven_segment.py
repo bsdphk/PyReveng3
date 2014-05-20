@@ -152,7 +152,7 @@ def resolve(pj, adr, map, inv):
 		print("NB! Unknown 7seg (TBL idx: 0x%x)" % n)
 	return k, l
 
-class digit(pyreveng.leaf):
+class digit(pyreveng.Leaf):
 	def __init__(self, pj, adr, map = None, inv = False, verbose = False):
 		"""
 		map = [A, B, C, D, E, F, G, RDP, LDP]
