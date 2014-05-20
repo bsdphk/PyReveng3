@@ -163,7 +163,7 @@ def ins_skip(pj, ins):
 	ins.cc = ins.mne[1:]
 	ins.dstadr = ins.hi + 2
 
-class hp_nanoproc(assy.instree_disass):
+class hp_nanoproc(assy.Instree_disass):
 	def __init__(self):
 		super(hp_nanoproc, self).__init__("HP nanoprocessor", 8)
 		self.it.load_string(hp_nanoproc_instructions)

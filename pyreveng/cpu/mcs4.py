@@ -144,7 +144,7 @@ class arg_ladr(assy.arg_dst):
 def arg_isz(pj, ins):
 	ins.cc = "Z"
 
-class mcs4(assy.instree_disass):
+class mcs4(assy.Instree_disass):
 	def __init__(self):
 		super(mcs4, self).__init__("mcs4", 8)
 		self.it.load_string(mcs4_instructions)

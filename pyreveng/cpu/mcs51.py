@@ -272,7 +272,7 @@ def arg_abit(pj, ins):
 def arg_anbit(pj, ins):
 	return "/" + arg_abit(pj, ins)
 
-class mcs51(assy.instree_disass):
+class mcs51(assy.Instree_disass):
 	def __init__(self, lang = "mcs51"):
 		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)

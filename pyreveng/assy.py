@@ -38,13 +38,11 @@ from __future__ import print_function
 import instree
 import code
 
-import pyreveng
-
 #######################################################################
 
-class assy(code.code):
+class Assy(code.Code):
 	def __init__(self, pj, lo, hi, lang):
-		super(assy, self).__init__(pj, lo, hi, lang)
+		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
 
@@ -61,12 +59,11 @@ class assy(code.code):
 
 #######################################################################
 
-class instree_assy(assy):
+class Instree_assy(Assy):
 	def __init__(self, pj, lim, lang):
 		lo = lim[0].adr
 		hi = lim[-1].adr + lim[-1].len
-		super(instree_assy, self).__init__(pj, lo, hi, lang)
-		lang.init_ins(pj, self)
+		super(Instree_assy, self).__init__(pj, lo, hi, lang)
 		self.cc = True
 		self.dstadr = None
 		self.lim = lim
@@ -92,9 +89,9 @@ class instree_assy(assy):
 
 #######################################################################
 
-class instree_disass(object):
+class Instree_disass(code.Decode):
 	def __init__(self, name, ins_word = 8, mem_word = None, endian = None):
-		self.name = name
+		super(Instree_disass, self).__init__(name)
 		self.args = {
 			">R":	arg_flow_return,
 			">J":	arg_flow_jmp,
@@ -107,12 +104,9 @@ class instree_disass(object):
 		self.it = instree.instree(ins_word, mem_word, endian)
 		self.flow_check = []
 
-	def init_ins(self, pj, ins):
-		return
-
-	def disass(self, pj, adr):
+	def decode(self, pj, adr):
 		if pj.find(adr, self.name) != None:
-			return False
+			return None
 		l = []
 		a = adr
 		while True:
@@ -124,16 +118,12 @@ class instree_disass(object):
 				break
 			a += x.len
 		if len(l) == 0:
-			print(self.name, "0x%x" % adr,
-			    "disass (0x%x) failed" % self.it.gw(pj, adr, 0))
-			return False
-		y = instree_assy(pj, l, self)
+			return None
+		y = Instree_assy(pj, l, self)
 		for i in self.flow_check:
 			i(y)
-		y.propagate(pj)
-		pj.insert(y)
-		return True
-	
+		return y
+
 
 #######################################################################
 

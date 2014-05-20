@@ -31,6 +31,10 @@ The code object represents an amount of memory content which is executed
 somehow.  Code objects tie together with "flow" objects, which tell
 where execution will continue.
 
+It is imortant to understand that 'code' is not just assembler code
+but also semi-digested token-sequences in interpreted languages, for
+instance the CHIP-8 'language' on RCA1802 CPUs or the RPN code of a
+HP 48 Calculator.
 """
 
 from __future__ import print_function
@@ -39,7 +43,11 @@ import pyreveng
 
 #######################################################################
 
-class flow(object):
+class Flow(object):
+	"""
+	Flows connect code leaves together and captures where
+	execution can go next and under what condition.
+	"""
 	def __init__(self, fm, typ, cond=True, to=None, lang=None):
 		if lang == None:
 			lang = fm.lang
@@ -61,25 +69,9 @@ class flow(object):
 
 		if self.to != None:
 			pj.todo(self.to, self.lang.disass)
-		if False:
-			if self.typ == True:
-				pj.todo(self.fm.hi, self.lang.disass)
-			elif self.typ == "R":
-				return
-			elif self.typ == ">" or self.typ == "C":
-				if type(self.to) == int:
-					pj.todo(self.to, self.lang.disass)
-			elif self.typ == "S1":
-				x = pj.find(self.fm.hi, self.fm.tag)
-				if x == None:
-					pj.pending_flows[self.fm.hi] = self
-				else:
-					pj.todo(x.hi, self.lang.disass)
-			else:
-				print("Missing flow", self.typ)
 
 	def __repr__(self):
-		s = "<Flow @%x " % self.fm.lo + str(self.typ) 
+		s = "<Flow @%x " % self.fm.lo + str(self.typ)
 		if self.to == None:
 			s += " -"
 		else:
@@ -99,7 +91,7 @@ class flow(object):
 			s += " 0x%x" % self.to
 		leaf.lcmt += s + "\n"
 
-	
+
 #######################################################################
 
 def lcmt_flows(pj):
@@ -107,18 +99,23 @@ def lcmt_flows(pj):
 	Add line-comments for all flow records
 	"""
 	for i in pj:
-		if isinstance(i, code):
+		if isinstance(i, Code):
 			for j in i.flow_out:
 				j.lcmt(i)
 
 #######################################################################
 
-class code(pyreveng.leaf):
+class Code(pyreveng.leaf):
+	"""
+	A single undivisible "instruction" in some language
+	"""
 	def __init__(self, pj, lo, hi, lang):
+		assert isinstance(lang, Decode)
 		self.lang = lang
-		super(code, self).__init__(pj, lo, hi, lang.name)
+		super(Code, self).__init__(pj, lo, hi, lang.name)
 		self.flow_in = []
 		self.flow_out = []
+		lang.init_code(pj, self)
 
 	def render(self, pj):
 		return "<Code %x-%x %s>" % (self.lo, self.hi, self.lang.name)
@@ -127,12 +124,56 @@ class code(pyreveng.leaf):
 		"""
 		Add a flow record
 		"""
-		f = flow(self, typ, cond, to, lang)
+		f = Flow(self, typ, cond, to, lang)
 		self.flow_out.append(f)
 
-	def propagate(self, pj):
+	def commit(self, pj):
 		"""
 		Follow the flow records to find more code
 		"""
 		for f in self.flow_out:
 			f.propagate(pj)
+
+#######################################################################
+
+class Decode(object):
+	"""
+	Base class for decoding code.
+	"""
+	def __init__(self, name):
+		assert type(name) == str
+		self.name = name
+
+	def init_code(self, pj, x):
+		"""
+		A chance to add language specific members to the
+		instruction before we start to flesh it out.
+		"""
+		return
+
+	def decode(self, pj, adr):
+		"""
+		Attempt to decode at adr.
+
+		This should return a code object or None
+
+		The object shall not be pj.insert()'ed, since this function
+		is used for speculative disassembly.
+
+		Default always fails
+		"""
+		return None
+
+	def disass(self, pj, adr):
+		"""
+		Decode at adr and run with it.
+		Complain if it fails.
+		"""
+		x = self.decode(pj, adr)
+		if x == None:
+			print(pj.afmt(adr) + ": disass(%s) failed" % self.name)
+		else:
+			assert isinstance(x, Code)
+			x.commit(pj)
+			pj.insert(x)
+		return x

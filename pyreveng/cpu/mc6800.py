@@ -291,7 +291,7 @@ class arg_x(object):
 	def render(self, pj):
 		return "0x%02x+" % self.val + self.ins.idx
 
-class mc6800(assy.instree_disass):
+class mc6800(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super(mc6800, self).__init__("mc6800", 8)
 		self.it.load_string(mc6800_instructions)
@@ -305,7 +305,7 @@ class mc6800(assy.instree_disass):
 		})
 		self.mask = mask
 
-	def init_ins(self, pj, ins):
+	def init_code(self, pj, ins):
 		ins.idx = "X"
 
 	def codeptr(self, pj, adr):

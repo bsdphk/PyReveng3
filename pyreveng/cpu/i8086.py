@@ -543,9 +543,7 @@ def arg7_st(pj, ins):
 def arg7_mf(pj, ins):
 	ins.mne += "fids" [ins.im.F_mf]
 
-import binutils
-
-class i8086(assy.instree_disass):
+class i8086(assy.Instree_disass):
 	def __init__(self):
 		super(i8086, self).__init__("i8086", 8)
 		self.it.load_string(i8086_instructions)
@@ -583,7 +581,7 @@ class i8086(assy.instree_disass):
 			"mf":	arg7_mf,
 		})
 
-	def init_ins(self, pj, ins):
+	def init_code(self, pj, ins):
 		ins.seg = ""
 
 	def disass(self, pj, adr):
@@ -591,8 +589,10 @@ class i8086(assy.instree_disass):
 		if y != None:
 			return False
 		if (pj.m.rd(adr) & 0xf8) == 0xd8 or (pj.m.rd(adr + 1) & 0xf8) == 0xd8:
-			x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
-			ll = len(x[10:30].split())
+			#x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
+			#ll = len(x[10:30].split())
+			x = ""
+			ll = 0
 		else:
 			x = ""
 			ll = 0

@@ -240,9 +240,9 @@ class vector(data.data):
 	def arg_render(self, pj):
 		return self.ip.arg_render(pj)
 
-class tms9900(assy.instree_disass):
+class Tms9900(assy.Instree_disass):
 	def __init__(self):
-		super(tms9900, self).__init__("TMS 9900", 16, 8, ">")
+		super(Tms9900, self).__init__("TMS 9900", 16, 8, ">")
 		self.it.load_string(tms9900_instructions)
 		self.n_interrupt = 16
 		self.args.update( {
@@ -281,9 +281,9 @@ class tms9900(assy.instree_disass):
 		for i in range(xops):
 			c = vect(pj, 0x40 + i * 4, "XOP%d" % i)
 
-class tms9981(tms9900):
+class Tms9981(Tms9900):
 	def __init__(self):
-		super(tms9981, self).__init__()
+		super(Tms9981, self).__init__()
 		self.n_interrupt = 5
 		
 

@@ -95,7 +95,7 @@ for i in fi:
 
 pj = pyreveng.job(m, "HP6034A")
 
-cx = cpu.tms9900.tms9981()
+cx = cpu.tms9900.Tms9981()
 cx.vectors(pj, xops = 0)
 
 def dptr(pj, a):
