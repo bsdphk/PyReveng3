@@ -63,10 +63,10 @@ cx.vectors(pj)
 # pj.todo(0x7d2, cx.disass)
 
 for i in range(0, 0x18, 8):
-	data.txt(pj, 0x0a2 + i, 0x0a2 + i + 0x08, label=False)
+	data.Txt(pj, 0x0a2 + i, 0x0a2 + i + 0x08, label=False)
 
 for i in range(0, 0x18, 8):
-	data.txt(pj, 0x78a + i, 0x78a + i + 0x08, label=False)
+	data.Txt(pj, 0x78a + i, 0x78a + i + 0x08, label=False)
 
 #######################################################################
 
@@ -107,7 +107,7 @@ pj.set_label(0xc54, "TX_INTR")
 
 #######################################################################
 for a in range(0xba, 0x100, 2):
-	x = data.const(pj, a, a + 2)
+	x = data.Const(pj, a, a + 2)
 	x.typ = ".WORD"
 	x.val = pj.m.lu16(a)
 	x.fmt = "0x%04x" % x.val

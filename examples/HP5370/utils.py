@@ -415,7 +415,7 @@ def dsp_dispatch(pj, cx, start, end):
 		c.lcmt = "DSP_" + i
 		a += 2
 
-class data24(data.const):
+class data24(data.Const):
 	def __init__(self, pj, lo):
 		super(data24, self).__init__(pj, lo, lo + 3)
 		v = pj.m.rd(self.lo) << 16
@@ -426,7 +426,7 @@ class data24(data.const):
 		self.typ = ".24bit"
 		pj.set_label(lo, "c_" + self.fmt)
 
-class float70(data.const):
+class float70(data.Const):
 	def __init__(self, pj, lo):
 		super(float70, self).__init__(pj, lo, lo + 7)
 		x = pj.m.rd(self.lo)

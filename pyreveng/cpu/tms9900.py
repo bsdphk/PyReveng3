@@ -143,11 +143,11 @@ def arg_o(pj, ins, to, o):
 
 		# print("XXX", "%04x" % v, "%04x" % w, ins.mne)
 		if ins.mne[-1] == "B":
-			c = data.const(pj, v, v + 1)
+			c = data.Const(pj, v, v + 1)
 			c.typ = ".BYTE"
 			c.fmt = "0x%02x" % pj.m.rd(v)
 		else:
-			c = data.const(pj, v, v + 2)
+			c = data.Const(pj, v, v + 2)
 			c.typ = ".WORD"
 			c.fmt = "0x%04x" % w
 		return assy.arg_ref(pj, c)
@@ -222,7 +222,7 @@ def arg_sc(pj, ins):
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):
 		super(vector, self).__init__(pj, adr, adr + 4)
-		self.ws = data.dataptr(pj, adr + 0x00, adr + 0x02,
+		self.ws = data.Dataptr(pj, adr + 0x00, adr + 0x02,
 		    pj.m.bu16(adr))
 		self.ip = cx.codeptr(pj, adr + 0x02)
 		self.dstadr = self.ip.dst
@@ -254,7 +254,7 @@ class Tms9900(assy.Instree_disass):
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
-		c = data.codeptr(pj, adr, adr + 2, t)
+		c = data.Codeptr(pj, adr, adr + 2, t)
 		pj.todo(t, self.disass)
 		return c
 

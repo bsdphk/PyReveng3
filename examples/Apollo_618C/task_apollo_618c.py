@@ -75,7 +75,7 @@ def txl(seg, a):
 	for i in range(2,0x22, 2):
 		x = pj.m.lu16(a + i)
 		print("%04x" % seg, i, "%05x" % (a + i), "%04x" % x, "%05x" % (seg * 16 + x))
-		y = data.codeptr(pj, a + i, a + i + 2, seg*16+x)
+		y = data.Codeptr(pj, a + i, a + i + 2, seg*16+x)
 	
 txl(0xff1b, 0xffe00)
 txl(0xff1b, 0xffe22)
@@ -91,7 +91,7 @@ def tbl(seg, off_lo, off_hi):
 	for i in range(off_lo, off_hi, 2):
 		off = pj.m.lu16(i)
 		a = (seg << 4) + off
-		x = data.codeptr(pj, i, i + 2, a)
+		x = data.Codeptr(pj, i, i + 2, a)
 		pj.todo(a, cx.disass)
 
 def tbl2(a):
@@ -161,9 +161,9 @@ while more:
 
 def text_lines(pj, a):
 	pj.add(a, a + 24, "text-tbl")
-	data.txt(pj, a, a + 8, label=False)
-	data.txt(pj, a + 8, a + 16, label=False)
-	data.txt(pj, a + 16, a + 24, label=False)
+	data.Txt(pj, a, a + 8, label=False)
+	data.Txt(pj, a + 8, a + 16, label=False)
+	data.Txt(pj, a + 16, a + 24, label=False)
 
 text_lines(pj, 0xe57e0 + 0x1f0)
 text_lines(pj, 0xe57e0 + 0x208)

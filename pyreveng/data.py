@@ -45,9 +45,9 @@ class Data(job.Leaf):
 	def arg_render(self, pj):
 		return self.fmt
 
-class const(Data):
+class Const(Data):
 	def __init__(self, pj, lo, hi):
-		super(const, self).__init__(pj, lo, hi, "const")
+		super(Const, self).__init__(pj, lo, hi, "const")
 		self.typ = None
 		self.val = None
 		self.fmt = None
@@ -56,9 +56,9 @@ class const(Data):
 	def render(self, pj):
 		return self.typ + "\t" + self.fmt
 
-class codeptr(Data):
+class Codeptr(Data):
 	def __init__(self, pj, lo, hi, dst):
-		super(codeptr, self).__init__(pj, lo, hi, "codeptr")
+		super(Codeptr, self).__init__(pj, lo, hi, "codeptr")
 		self.dst = dst
 
 	def render(self, pj):
@@ -67,15 +67,15 @@ class codeptr(Data):
 	def arg_render(self, pj):
 		return pj.render_adr(self.dst)
 
-class dataptr(Data):
+class Dataptr(Data):
 	def __init__(self, pj, lo, hi, dst):
-		super(dataptr, self).__init__(pj, lo, hi, "dataptr")
+		super(Dataptr, self).__init__(pj, lo, hi, "dataptr")
 		self.dst = dst
 
 	def render(self, pj):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
-class txt(Data):
+class Txt(Data):
 	def __init__(self, pj, lo, hi=None, label=True):
 		s = ""
 		a = lo
@@ -97,7 +97,7 @@ class txt(Data):
 		if hi == None:
 			hi = a
 
-		super(txt, self).__init__(pj, lo, hi, "txt")
+		super(Txt, self).__init__(pj, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"
 		t = "t_"

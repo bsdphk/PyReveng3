@@ -54,14 +54,14 @@ cx.vectors(pj)
 
 
 def cbyte(pj, a):
-	c = data.const(pj, a, a + 1)
+	c = data.Const(pj, a, a + 1)
 	c.val = pj.m.rd(a)
 	c.typ = ".BYTE"
 	c.fmt = "0x%02x" % c.val
 	return c
 
 def cword(pj, a):
-	c = data.const(pj, a, a + 2)
+	c = data.Const(pj, a, a + 2)
 	c.val = pj.m.bu16(a)
 	c.typ = ".WORD"
 	c.fmt = "0x%04x" % c.val
@@ -252,13 +252,13 @@ def post_arg_func(ins):
 		for j in i:
 			if j == "W":
 				d = pj.m.bu16(a)
-				data.dataptr(pj, a, a + 2, d)
+				data.Dataptr(pj, a, a + 2, d)
 				a += 2
 				if d >= 0x8000:
 					d_q(pj, d)
 			elif j == "B":
 				cbyte(pj, a)
-				# data.data(pj, a, a + 1)
+				# data.Data(pj, a, a + 1)
 				a += 1
 			else:
 				assert False
@@ -307,7 +307,7 @@ for a in range(x.lo, x.hi, 2):
 x = pj.add(0x9b81, 0x9bff, "cmd-tbl")
 pj.set_label(x.lo, "CMDTBL")
 for a in range(x.lo, x.hi, 3):
-	y = data.txt(pj, a, a+1, label=False)
+	y = data.Txt(pj, a, a+1, label=False)
 	z = cx.codeptr(pj, a + 1)
 	if y.txt == " ":
 		pj.set_label(z.dst, "CMD_SP")
@@ -401,7 +401,7 @@ for a in range(x.lo, x.hi, 100):
 	pj.set_label(a, "CHAIN_" + chains[n])
 	x = cword(pj, a)
 	x.lcmt = "GRI %d * 5" % (x.val / 5)
-	#data.data(pj, a, a + 100)
+	#data.Data(pj, a, a + 100)
 	x = pj.add(a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
 	x = pj.add(a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
 	x = pj.add(a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
@@ -441,7 +441,7 @@ for a in range(x.lo, x.hi, 2):
 
 x = pj.add(0xb156, 0xb43e, "tbl")
 for a in range(x.lo, x.hi, 4):
-	#data.data(pj, a, a + 4)
+	#data.Data(pj, a, a + 4)
 	d_q(pj, a, lbl=False)
 
 for a in range(0xc3a6, 0xc41e, 4):
@@ -472,11 +472,11 @@ for a in range(0x9789, 0x97a5, 4):
 	d_q(pj, a)
 
 for i in range(0xf220, 0xf226, 2):
-	data.dataptr(pj, i, i + 2, pj.m.bu16(i))
+	data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
 	cword(pj, i + 6)
 
 #for i in range(0x89d8, 0x8a20, 2):
-#	data.dataptr(pj, i, i + 2, pj.m.bu16(i))
+#	data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
 
 for i in range(0xe363, 0xe369, 2):
 	x = cx.codeptr(pj, i)
