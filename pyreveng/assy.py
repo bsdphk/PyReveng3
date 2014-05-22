@@ -51,12 +51,15 @@ class Assy(code.Code):
 		for i in self.oper:
 			if i == None:
 				continue
-			elif type(i) == str:
-				s += t + i
-				t = ","
-			else:
-				s += t + i.render(pj)
-				t = ","
+			s += t
+			t = ","
+			if type(i) == str:
+				s += i
+				continue
+			try:
+				s += i.render(pj)
+			except AttributeError:
+				s += str(i)
 		return s
 
 #######################################################################
@@ -93,11 +96,10 @@ class Instree_disass(code.Decode):
 	def __init__(self, name, ins_word=8, mem_word=None, endian=None):
 		super(Instree_disass, self).__init__(name)
 		self.args = {
-			">R":	arg_flow_return,
-			">J":	arg_flow_jmp,
-			">JC":	arg_flow_jmp_cond,
-			">C":	arg_flow_call,
-			"?":	arg_question,
+			">R":	Arg_flow_return,
+			">J":	Arg_flow_jmp,
+			">JC":	Arg_flow_jmp_cond,
+			">C":	Arg_flow_call,
 		}
 		if mem_word == None:
 			mem_word = ins_word
@@ -125,37 +127,58 @@ class Instree_disass(code.Decode):
 
 #######################################################################
 
-class arg_dst(object):
+class Arg(object):
+	def __init__(self, pj):
+		self.pj = pj
+
+class Arg_dst(Arg):
 	def __init__(self, pj, dst, pfx=""):
+		super(Arg_dst, self).__init__(pj)
 		self.dst = dst
 		self.pfx = pfx
 
-	def render(self, pj):
-		if self.dst in pj.labels:
-			return self.pfx + "%s" % pj.labels[self.dst]
+	def __str__(self):
+		l = self.pj.labels.get(self.dst)
+		if l != None:
+			return self.pfx + "%s" % l
 		elif self.dst == None:
 			return self.pfx + "0x?"
 		else:
 			return self.pfx + "0x%x" % self.dst
 
-class arg_ref(object):
+class Arg_ref(Arg):
 	def __init__(self, pj, obj):
+		super(Arg_dst, self).__init__(pj)
 		self.obj = obj
 
-	def render(self, pj):
-		s = "(" + pj.render_adr(self.obj.lo) + ")"
-		a = self.obj.arg_render(pj)
+	def __str__(self):
+		s = "(" + self.pj.render_adr(self.obj.lo) + ")"
+		a = self.obj.arg_render(self.pj)
 		if a != "":
 			s += "=" + a
 		return s
 
-def arg_flow_return(pj, ins):
+class Arg_imm(Arg):
+	def __init__(self, pj, val, wid=0):
+		super(Arg_imm, self).__init__(pj)
+		self.val = val
+		self.wid = wid
+		assert wid & 3 == 0
+
+	def __str__(self):
+		s = "#0x%"
+		if self.wid:
+			s += "0%d" % (self.wid / 4)
+		s += "x"
+		return s % self.val
+
+def Arg_flow_return(pj, ins):
 	ins.add_flow(pj, "R", ins.cc)
 
-def arg_flow_jmp(pj, ins):
+def Arg_flow_jmp(pj, ins):
 	ins.add_flow(pj, ">", True, ins.dstadr)
 
-def arg_flow_jmp_cond(pj, ins):
+def Arg_flow_jmp_cond(pj, ins):
 	if ins.cc == True:
 		ins.add_flow(pj, ">", "?", ins.dstadr)
 		ins.add_flow(pj, ">", "!?", ins.hi)
@@ -163,10 +186,6 @@ def arg_flow_jmp_cond(pj, ins):
 		ins.add_flow(pj, ">", ins.cc, ins.dstadr)
 		ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
 
-def arg_flow_call(pj, ins):
+def Arg_flow_call(pj, ins):
 	ins.add_flow(pj, "C", True, ins.dstadr)
 	ins.add_flow(pj, True, True, ins.hi)
-
-def arg_question(pj, ins):
-	print("??? @0x%x" % ins.lo, ins.im)
-	ins.add_flow(pj, '>', True, None)

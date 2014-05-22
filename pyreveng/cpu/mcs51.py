@@ -192,7 +192,7 @@ XRL	adir,#data	|0 1 1 0 0 0 1 1| adir		| data		|
 """
 
 
-class arg_adir(assy.arg_dst):
+class arg_adir(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		ins.dstadr = ins.im.F_adir
@@ -205,7 +205,7 @@ class arg_adir(assy.arg_dst):
 			return s[0]
 		return super(arg_adir, self).render(pj)
 
-class arg_adir2(assy.arg_dst):
+class arg_adir2(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		ins.dstadr = ins.im.F_adir2
@@ -218,19 +218,19 @@ class arg_adir2(assy.arg_dst):
 			return s
 		return super(arg_adir2, self).render(pj)
 
-class arg_a11(assy.arg_dst):
+class arg_a11(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		a = (ins.im.F_ahi << 8) | ins.im.F_alo
 		ins.dstadr = (ins.hi & 0xf800) + a
 		super(arg_a11, self).__init__(pj, ins.dstadr)
 
-class arg_a16(assy.arg_dst):
+class arg_a16(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
 		ins.dstadr &= ins.lang.amask
 		super(arg_a16, self).__init__(pj, ins.dstadr)
 
-class arg_arel(assy.arg_dst):
+class arg_arel(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		a = ins.im.F_arel
 		if a & 0x80:

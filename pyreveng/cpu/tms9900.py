@@ -134,12 +134,12 @@ def arg_o(pj, ins, to, o):
 
 		x = pj.find(v)
 		if len(x) > 0:
-			return assy.arg_ref(pj, x[0])
+			return assy.Arg_ref(pj, x[0])
 
 		try:
 			w = pj.m.bu16(v)
 		except:
-			return assy.arg_dst(pj, v, "@")
+			return assy.Arg_dst(pj, v, "@")
 
 		# print("XXX", "%04x" % v, "%04x" % w, ins.mne)
 		if ins.mne[-1] == "B":
@@ -150,7 +150,7 @@ def arg_o(pj, ins, to, o):
 			c = data.Const(pj, v, v + 2)
 			c.typ = ".WORD"
 			c.fmt = "0x%04x" % w
-		return assy.arg_ref(pj, c)
+		return assy.Arg_ref(pj, c)
 
 	if to == 3:
 		return "*R%d+" % o
@@ -165,12 +165,12 @@ def arg_b(pj, ins):
 	if ins.im.F_b:
 		ins.mne += "B"
 
-class arg_da(assy.arg_dst):
+class arg_da(assy.Arg_dst):
         def __init__(self, pj, ins):
 		ins.dstadr = ins.im.F_da
 		super(arg_da, self).__init__(pj, ins.dstadr)
 
-class arg_r(assy.arg_dst):
+class arg_r(assy.Arg_dst):
         def __init__(self, pj, ins):
 		i = ins.im.F_disp
 		if i & 0x80:
@@ -185,7 +185,7 @@ class arg_c(object):
 	def render(self, pj):
 		return "#0x%x" % self.val
 
-class arg_ptr(assy.arg_ref):
+class arg_ptr(assy.Arg_ref):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_ptr
 		self.vector = vector(pj, self.val, ins.lang)

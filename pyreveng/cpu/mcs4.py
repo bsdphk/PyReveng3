@@ -127,12 +127,12 @@ class arg_rr(object):
 	def render(self, pj):
 		return "rr%d" % self.reg
 
-class arg_adr(assy.arg_dst):
+class arg_adr(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		ins.dstadr = (ins.lo & ~0xff) | ins.im.F_adr
 		super(arg_adr, self).__init__(pj, ins.dstadr)
 
-class arg_ladr(assy.arg_dst):
+class arg_ladr(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
 		super(arg_ladr, self).__init__(pj, ins.dstadr)

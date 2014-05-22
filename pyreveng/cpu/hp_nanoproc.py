@@ -104,7 +104,7 @@ class arg_imm(object):
 	def render(self, pj):
 		return "#0x%x" % self.value
 
-class arg_adrl(assy.arg_dst):
+class arg_adrl(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		ins.dstadr = (ins.lo & 0xf800) | (ins.im.F_ahi<<8) | ins.im.F_alo
 		super(arg_adrl, self).__init__(pj, ins.dstadr)
@@ -197,7 +197,7 @@ LRET >R	      |0 1 1 0 1 1 1 1|0 1 0 1 1 0 0 0|1 0 1 1 1 0 0 0|
 MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
 """
 
-class arg_pgadr(assy.arg_dst):
+class arg_pgadr(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		ins.dstadr = ins.im.F_pgno << 11
 		ins.dstadr |= (ins.im.F_ahi<<8) | ins.im.F_alo

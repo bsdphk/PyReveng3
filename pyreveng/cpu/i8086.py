@@ -379,7 +379,7 @@ class arg_da(object):
 		return "0x%04x" % self.value
 
 
-class arg_ipcs(assy.arg_dst):
+class arg_ipcs(assy.Arg_dst):
 	""" Long address (seg:off) """
 	def __init__(self, pj, ins):
 		self.seg = ins.im.F_slo | (ins.im.F_shi << 8)
@@ -391,7 +391,7 @@ class arg_ipcs(assy.arg_dst):
 	def render(self, pj):
 		return "0x%04x:0x%04x" % (self.seg, self.off)
 
-class arg_Rel(assy.arg_dst):
+class arg_Rel(assy.Arg_dst):
 	""" Relative address """
 	def __init__(self, pj, ins):
 		d = ins.im.F_i1 | (ins.im.F_i2 << 8)
@@ -400,7 +400,7 @@ class arg_Rel(assy.arg_dst):
 		ins.dstadr = ins.hi + d
 		super(arg_Rel, self).__init__(pj, ins.dstadr)
 
-class arg_rel(assy.arg_dst):
+class arg_rel(assy.Arg_dst):
 	""" Relative address """
 	def __init__(self, pj, ins):
 		d = ins.im.F_disp

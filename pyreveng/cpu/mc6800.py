@@ -34,11 +34,6 @@ Presently supported variants:
 
 from __future__ import print_function
 
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join("..")))
-
 from pyreveng import pyreveng, mem, assy, data
 
 mc6800_instructions = """
@@ -241,51 +236,37 @@ LDX	e	|1 1 1 1 1 1 1 0| e1		| e2		|
 STX	e	|1 1 1 1 1 1 1 1| e1		| e2		|
 """
 
-class arg_d(assy.arg_dst):
+def arg_d(pj, ins):
+	ins.dstadr = ins.im.F_d
+	return assy.Arg_dst(pj, ins.dstadr)
+
+def arg_e(pj, ins):
+	ins.dstadr = (ins.im.F_e1 << 8) | ins.im.F_e2
+	return assy.Arg_dst(pj, ins.dstadr)
+
+def arg_i(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_i, 8)
+
+def arg_I(pj, ins):
+	ins.dstadr = (ins.im.F_I1 << 8) | ins.im.F_I2
+	return assy.Arg_dst(pj, ins.dstadr, "#")
+
+def arg_r(pj, ins):
+	a = ins.im.F_r
+	if a & 0x80:
+		a -= 256
+	ins.dstadr = ins.hi + a
+	if ins.mne != "BRA":
+		ins.cc = ins.mne[1:]
+	return assy.Arg_dst(pj, ins.dstadr)
+
+class arg_x(assy.Arg):
 	def __init__(self, pj, ins):
-		ins.dstadr = ins.im.F_d
-		super(arg_d, self).__init__(pj, ins.dstadr)
-
-class arg_e(assy.arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_e1 << 8) | ins.im.F_e2
-		super(arg_e, self).__init__(pj, ins.dstadr)
-
-class arg_i(object):
-	def __init__(self, pj, ins):
-		self.val = ins.im.F_i
-
-	def render(self, pj):
-		return "#0x%02x" % self.val
-
-if False:
-	# This is probably overdoing things...
-	class arg_i(assy.arg_dst):
-		def __init__(self, pj, ins):
-			ins.dstadr = ins.im.F_i
-			super(arg_i, self).__init__(pj, ins.dstadr, "#")
-
-class arg_I(assy.arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_I1 << 8) | ins.im.F_I2
-		super(arg_I, self).__init__(pj, ins.dstadr, "#")
-
-class arg_r(assy.arg_dst):
-	def __init__(self, pj, ins):
-		a = ins.im.F_r
-		if a & 0x80:
-			a -= 256
-		ins.dstadr = ins.hi + a
-		if ins.mne != "BRA":
-			ins.cc = ins.mne[1:]
-		super(arg_r, self).__init__(pj, ins.dstadr)
-
-class arg_x(object):
-	def __init__(self, pj, ins):
+		super(arg_x, self).__init__(pj)
 		self.val = ins.im.F_x
 		self.ins = ins
 
-	def render(self, pj):
+	def __str__(self):
 		return "0x%02x+" % self.val + self.ins.idx
 
 class mc6800(assy.Instree_disass):
@@ -378,11 +359,12 @@ STD	e		|1 1 1 1 1 1 0 1| e1		| e2		|
 
 """
 
-class arg_y(object):
+class arg_y(assy.Arg):
 	def __init__(self, pj, ins):
+		super(arg_y, self).__init__(pj)
 		self.val = ins.im.F_y
 
-	def render(self, pj):
+	def __str__(self):
 		return "0x%02x+Y" % self.val
 
 def arg_Y(pj, ins):
