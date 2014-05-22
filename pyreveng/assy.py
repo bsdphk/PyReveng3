@@ -49,11 +49,14 @@ class Assy(code.Code):
 		s = self.mne + "\t"
 		t = ""
 		for i in self.oper:
-			if type(i) == str:
+			if i == None:
+				continue
+			elif type(i) == str:
 				s += t + i
+				t = ","
 			else:
 				s += t + i.render(pj)
-			t = ","
+				t = ","
 		return s
 
 #######################################################################
@@ -71,18 +74,16 @@ class Instree_assy(Assy):
 		for self.im in lim:
 			i = self.im.spec.split()
 			for j in i[1].split(","):
-				o = None
-				if j in lang.args:
-					x = lang.args[j]
-					if type(x) == str:
-						o = arg_verbatim(pj, x)
-					else:
-						o = lang.args[j](pj, self)
-				elif j != "-":
+				if j == "-":
+					continue
+				x = lang.args.get(j)
+				if x == None:
 					print("Ignoring argument",
 					    j, "in", lang.name, i)
-				if o != None:
-					self.oper.append(o)
+				elif type(x) == str:
+					self.oper.append(x)
+				else:
+					self.oper.append(x(pj, self))
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
 
@@ -104,8 +105,6 @@ class Instree_disass(code.Decode):
 		self.flow_check = []
 
 	def decode(self, pj, adr):
-		if pj.find(adr, self.name) != None:
-			return None
 		l = []
 		a = adr
 		while True:
@@ -149,13 +148,6 @@ class arg_ref(object):
 		if a != "":
 			s += "=" + a
 		return s
-
-class arg_verbatim(object):
-	def __init__(self, pj, txt):
-		self.txt = txt
-
-	def render(self, pj):
-		return self.txt
 
 def arg_flow_return(pj, ins):
 	ins.add_flow(pj, "R", ins.cc)

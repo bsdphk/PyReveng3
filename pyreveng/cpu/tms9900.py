@@ -122,15 +122,15 @@ LREX	?	|0 0 0 0 0 0 1 1 1 1 1| n	|
 
 def arg_o(pj, ins, to, o):
 	if to == 0:
-		return assy.arg_verbatim(pj, "R%d" % o)
+		return "R%d" % o
 	if to == 1:
-		return assy.arg_verbatim(pj, "*R%d" % o)
+		return "*R%d" % o
 
 	if to == 2:
 		v = pj.m.bu16(ins.hi)
 		ins.hi += 2
 		if o != 0:
-			return assy.arg_verbatim(pj, "R%d+#0x%04x" % (o, v))
+			return "R%d+#0x%04x" % (o, v)
 
 		x = pj.find(v)
 		if len(x) > 0:
@@ -153,7 +153,7 @@ def arg_o(pj, ins, to, o):
 		return assy.arg_ref(pj, c)
 
 	if to == 3:
-		return assy.arg_verbatim(pj, "*R%d+" % o)
+		return "*R%d+" % o
 	
 def arg_so(pj, ins):
 	return arg_o(pj, ins, ins.im.F_ts, ins.im.F_s)
@@ -199,25 +199,23 @@ class arg_i(object):
 	def render(self, pj):
 		return "#0x%04x" % self.val
 
-class arg_w(assy.arg_verbatim):
-	def __init__(self, pj, ins):
-		super(arg_w, self).__init__(pj, "R%d" % ins.im.F_w)
+def arg_w(pj, ins):
+	return "R%d" % ins.im.F_w
 
-class arg_cru(assy.arg_verbatim):
-	def __init__(self, pj, ins):
-		i = ins.im.F_cru
-		if i & 0x80:
-			i -= 0x100
-		# XXX: This doubling may be model-dependent
-		# XXX: Based on 9980/9981
-		i *= 2
-		super(arg_cru, self).__init__(pj, "R12%#+x" % i)
+def arg_cru(pj, ins):
+	i = ins.im.F_cru
+	if i & 0x80:
+		i -= 0x100
+	# XXX: This doubling may be model-dependent
+	# XXX: Based on 9980/9981
+	i *= 2
+	return "R12%#+x" % i
 
 def arg_sc(pj, ins):
 	if ins.im.F_c == 0:
-		return assy.arg_verbatim(pj, "R0")
+		return "R0"
 	else:
-		return assy.arg_verbatim(pj, "#%d" % ins.im.F_c)
+		return "#%d" % ins.im.F_c
 
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):
