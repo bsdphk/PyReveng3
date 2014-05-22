@@ -84,19 +84,11 @@ KBP	-		|1 1 1 1|1 1 0 0|
 DCL	-		|1 1 1 1|1 1 0 1|
 """
 
-class arg_data(object):
-	def __init__(self, pj, ins):
-		self.value = ins.im.F_data
+def arg_data(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_data, 8)
 
-	def render(self, pj):
-		return "#0x%02x" % self.value
-
-class arg_d(object):
-	def __init__(self, pj, ins):
-		self.value = ins.im.F_d
-
-	def render(self, pj):
-		return "#0x%01x" % self.value
+def arg_d(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_d, 4)
 
 class arg_cc(object):
 	def __init__(self, pj, ins):
@@ -111,31 +103,19 @@ class arg_cc(object):
 		else:
 			return x
 
-class arg_r(object):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.reg = ins.im.F_r
+def arg_r(pj, ins):
+	return "r%d" % ins.im.F_r
 
-	def render(self, pj):
-		return "r%d" % self.reg
+def arg_rr(pj, ins):
+	return "rr%d" % (ins.im.F_rr << 1)
 
-class arg_rr(object):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.reg = ins.im.F_rr << 1
+def arg_adr(pj, ins):
+	ins.dstadr = (ins.lo & ~0xff) | ins.im.F_adr
+	return assy.Arg_dst(pj, ins.dstadr)
 
-	def render(self, pj):
-		return "rr%d" % self.reg
-
-class arg_adr(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & ~0xff) | ins.im.F_adr
-		super(arg_adr, self).__init__(pj, ins.dstadr)
-
-class arg_ladr(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
-		super(arg_ladr, self).__init__(pj, ins.dstadr)
+def arg_ladr(pj, ins):
+	ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
+	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_isz(pj, ins):
 	ins.cc = "Z"
