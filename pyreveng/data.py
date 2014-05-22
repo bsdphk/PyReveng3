@@ -34,9 +34,9 @@ import pyreveng
 
 #######################################################################
 
-class data(pyreveng.Leaf):
-	def __init__(self, pj, lo, hi, t = "data"):
-		super(data, self).__init__(pj, lo, hi, t)
+class Data(pyreveng.Leaf):
+	def __init__(self, pj, lo, hi, t="data"):
+		super(Data, self).__init__(pj, lo, hi, t)
 		pj.insert(self)
 
 	def render(self, pj):
@@ -45,7 +45,7 @@ class data(pyreveng.Leaf):
 	def arg_render(self, pj):
 		return self.fmt
 
-class const(data):
+class const(Data):
 	def __init__(self, pj, lo, hi):
 		super(const, self).__init__(pj, lo, hi, "const")
 		self.typ = None
@@ -56,7 +56,7 @@ class const(data):
 	def render(self, pj):
 		return self.typ + "\t" + self.fmt
 
-class codeptr(data):
+class codeptr(Data):
 	def __init__(self, pj, lo, hi, dst):
 		super(codeptr, self).__init__(pj, lo, hi, "codeptr")
 		self.dst = dst
@@ -67,7 +67,7 @@ class codeptr(data):
 	def arg_render(self, pj):
 		return pj.render_adr(self.dst)
 
-class dataptr(data):
+class dataptr(Data):
 	def __init__(self, pj, lo, hi, dst):
 		super(dataptr, self).__init__(pj, lo, hi, "dataptr")
 		self.dst = dst
@@ -75,8 +75,8 @@ class dataptr(data):
 	def render(self, pj):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
-class txt(data):
-	def __init__(self, pj, lo, hi = None, label = True):
+class txt(Data):
+	def __init__(self, pj, lo, hi=None, label=True):
 		s = ""
 		a = lo
 		while True:

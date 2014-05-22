@@ -76,7 +76,7 @@ def cword(pj, a):
 	c.fmt = "0x%04x" % c.val
 	return c 
 
-class d_chain(data.data):
+class d_chain(data.Data):
 	def __init__(self, pj, a):
 		super(d_chain, self).__init__(pj, a, a + 4)
 		self.num = '%c%c%c' % (
@@ -93,7 +93,7 @@ class d_chain(data.data):
 			pj.m.rd(self.lo + 3),
 		)
 
-class d_asf(data.data):
+class d_asf(data.Data):
 	def __init__(self, pj, a):
 		super(d_asf, self).__init__(pj, a, a + 16)
 
@@ -106,7 +106,7 @@ class d_asf(data.data):
 		s += "}"
 		return s
 
-class d_q(data.data):
+class d_q(data.Data):
 	"""
 	Numbers are sign + 31 bit binary q-complement fractions:
 		[Sign][31 bit fraction]
@@ -496,12 +496,12 @@ for i in range(x.lo, x.hi):
 
 
 
-data.data(pj, 0xca73, 0xca7c)
+data.Data(pj, 0xca73, 0xca7c)
 
-data.data(pj, 0xec7c, 0xec81)
-data.data(pj, 0xec81, 0xec85)
-data.data(pj, 0xec85, 0xec8b)
-data.data(pj, 0xec8b, 0xec91)
+data.Data(pj, 0xec7c, 0xec81)
+data.Data(pj, 0xec81, 0xec85)
+data.Data(pj, 0xec85, 0xec8b)
+data.Data(pj, 0xec8b, 0xec91)
 
 d_q(pj, 0xcb70)
 d_q(pj, 0xd4f5)
