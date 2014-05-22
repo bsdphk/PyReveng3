@@ -54,7 +54,7 @@ seven_segment.known[0x30] = "I"
 m = mem.byte_mem(0x8000, 0x10000)
 m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
 
-pj  = pyreveng.Job(m, "PL99")
+pj = pyreveng.Job(m, "PL99")
 cx = cpu.mc6800.mc68hc11()
 
 cx.register_labels(pj)
@@ -74,7 +74,7 @@ def cword(pj, a):
 	c.val = pj.m.bu16(a)
 	c.typ = ".WORD"
 	c.fmt = "0x%04x" % c.val
-	return c 
+	return c
 
 class d_chain(data.Data):
 	def __init__(self, pj, a):
@@ -111,7 +111,7 @@ class d_q(data.Data):
 	Numbers are sign + 31 bit binary q-complement fractions:
 		[Sign][31 bit fraction]
 	"""
-	def __init__(self, pj, a, lbl = True):
+	def __init__(self, pj, a, lbl=True):
 		if pj.find(a, ".D4") != None:
 			return
 		super(d_q, self).__init__(pj, a, a + 4, ".D4")
@@ -136,7 +136,7 @@ class d_q(data.Data):
 
 led_map = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
-seven_segment.table(pj, 0xecb4, 0xecd4, map = led_map, verbose = False)
+seven_segment.table(pj, 0xecb4, 0xecd4, map=led_map, verbose=False)
 pj.set_label(0xecb4, "7SEG_TBL")
 
 LED_lbl = {
@@ -219,7 +219,7 @@ LED_lbl = {
 }
 
 for a in range(0xf94d, 0xfdfe, 16):
-	c = seven_segment.table(pj, a, a + 16, map = led_map, verbose = False)
+	c = seven_segment.table(pj, a, a + 16, map=led_map, verbose=False)
 	t = LED_lbl.get(a)
 	assert t != None
 	if t == None:
@@ -316,13 +316,13 @@ for a in range(x.lo, x.hi, 2):
 x = pj.add(0x9b81, 0x9bff, "cmd-tbl")
 pj.set_label(x.lo, "CMDTBL")
 for a in range(x.lo, x.hi, 3):
-	y = data.txt(pj, a, a+1, label = False)
+	y = data.txt(pj, a, a+1, label=False)
 	z = cx.codeptr(pj, a + 1)
 	if y.txt == " ":
 		pj.set_label(z.dst, "CMD_SP")
 	else:
 		pj.set_label(z.dst, "CMD_%s" % y.txt)
-	
+
 # FN table
 x = pj.add(0xf885, 0xf94d, "fn-tbl")
 pj.set_label(x.lo, "FN_TBL")
@@ -347,7 +347,7 @@ def longitude(pj, a):
 	"""
 	This gives values closely matching table values
 	"""
-	x = d_q(pj, a, lbl = False)
+	x = d_q(pj, a, lbl=False)
 	s = ""
 	v = x.dec * 180.
 	if v < 0:
@@ -375,7 +375,7 @@ def lattitude(pj, a):
 	"""
 	This calculation is not quite right.
 	"""
-	x = d_q(pj, a, lbl = False)
+	x = d_q(pj, a, lbl=False)
 	s = ""
 	v = x.dec * 90.
 	v = 108 - v
@@ -408,23 +408,23 @@ n = 0
 for a in range(x.lo, x.hi, 100):
 	x = pj.add(a, a + 100, "chain-tbl")
 	pj.set_label(a, "CHAIN_" + chains[n])
-	x = cword(pj,  a)
+	x = cword(pj, a)
 	x.lcmt = "GRI %d * 5" % (x.val / 5)
 	#data.data(pj, a, a + 100)
 	x = pj.add(a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
 	x = pj.add(a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
 	x = pj.add(a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
 	for c in range(5):
-		d_q(pj, a + 0x02 + c * 4, lbl = False)
+		d_q(pj, a + 0x02 + c * 4, lbl=False)
 		lat = lattitude(pj, a + 0x16 + c * 4)
 		lon = longitude(pj, a + 0x2a + c * 4)
 
 	x = pj.add(a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
 	x = pj.add(a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
 	for c in range(4):
-		x = d_q(pj, a + 0x3e + c * 4, lbl = False)
+		x = d_q(pj, a + 0x3e + c * 4, lbl=False)
 		x.lcmt = "%.3f us / 2^23" % (x.dec * 2**23)
-		d_q(pj, a + 0x4e + c * 4, lbl = False)
+		d_q(pj, a + 0x4e + c * 4, lbl=False)
 
 	x = pj.add(a + 0x5e, a + 0x5e + 5, "epsilon-tbl")
 	for c in range(5):
@@ -451,7 +451,7 @@ for a in range(x.lo, x.hi, 2):
 x = pj.add(0xb156, 0xb43e, "tbl")
 for a in range(x.lo, x.hi, 4):
 	#data.data(pj, a, a + 4)
-	d_q(pj, a, lbl = False)
+	d_q(pj, a, lbl=False)
 
 for a in range(0xc3a6, 0xc41e, 4):
 	d_q(pj, a)
@@ -544,4 +544,4 @@ if False:
 	a.reduce(pj)
 	a.dot(pj, "/tmp/_2.dot")
 
-listing.Listing(pj, "/tmp/_.PL99.out", ncol = 4, fmt = "x", ascii = True)
+listing.Listing(pj, "/tmp/_.PL99.out", ncol=4, fmt="x", ascii=True)
