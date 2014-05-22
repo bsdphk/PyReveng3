@@ -272,5 +272,5 @@ pj.set_label(0x20d4, "COUNT_DOWN")
 
 code.lcmt_flows(pj)
 
-listing.listing(pj, "/tmp/_.hp6034a.out", ncol = 4, fmt = "x", ascii = True)
+listing.Listing(pj, "/tmp/_.hp6034a.out", ncol = 4, fmt = "x", ascii = True)
 

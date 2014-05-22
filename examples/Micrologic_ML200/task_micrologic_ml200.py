@@ -105,7 +105,7 @@ if False:
 	"""
 
 code.lcmt_flows(pj)
-listing.listing(pj, "/tmp/_.micrologic_ml200.txt", ncol = 2)
+listing.Listing(pj, "/tmp/_.micrologic_ml200.txt", ncol = 2)
 
 if False:
 	import a2

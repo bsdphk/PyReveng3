@@ -65,4 +65,4 @@ utils.apply_labels(pj, "A")
 utils.tramp(pj)
 
 code.lcmt_flows(pj)
-listing.listing(pj, "/tmp/_.hp5370a.out")
+listing.Listing(pj, "/tmp/_.hp5370a.out")

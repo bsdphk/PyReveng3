@@ -51,6 +51,6 @@ while pj.run():
         pass
 
 code.lcmt_flows(pj)
-listing.listing(pj, "/tmp/_.hp5359a.out")
+listing.Listing(pj, "/tmp/_.hp5359a.out")
 
 

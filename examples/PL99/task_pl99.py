@@ -544,4 +544,4 @@ if False:
 	a.reduce(pj)
 	a.dot(pj, "/tmp/_2.dot")
 
-listing.listing(pj, "/tmp/_.PL99.out", ncol = 4, fmt = "x", ascii = True)
+listing.Listing(pj, "/tmp/_.PL99.out", ncol = 4, fmt = "x", ascii = True)

@@ -164,7 +164,7 @@ while pj.run():
 	pass
 
 code.lcmt_flows(pj)
-listing.listing(pj, "/tmp/_.hp3325a.txt")
+listing.Listing(pj, "/tmp/_.hp3325a.txt")
  
 if False:
 	import analysis

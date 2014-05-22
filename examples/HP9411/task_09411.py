@@ -123,7 +123,7 @@ def do_one(fn, alist):
 
 	if True:
 		code.lcmt_flows(pj)
-	listing.listing(pj, fn="/tmp/_.HP" + fn, fmt="o", ncol=1)
+	listing.Listing(pj, fn="/tmp/_.HP" + fn, fmt="o", ncol=1)
 
 do_one("09411-17002_Rev-2640.src",
 	[0x0, 0xff, 0x37a, 0x387, 0x38b, 0x38e, 0x391, 0x39b, 0x3a3, 0x4e4]

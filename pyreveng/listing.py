@@ -30,8 +30,8 @@ import sys
 import mem
 import misc
 
-class render_mem(object):
-	def __init__(self, pj, fmt = "x", ascii = True, ncol = None):
+class Render_mem(object):
+	def __init__(self, pj, fmt="x", ascii=True, ncol=None):
 
 		self.ascii = ascii
 
@@ -100,13 +100,13 @@ class render_mem(object):
 			lo += self.ncol
 		return l
 
-class listing(object):
-	def __init__(self, pj, fn = None, ascii=True, ncol = None, fmt = "x"):
+class Listing(object):
+	def __init__(self, pj, fn=None, ascii=True, ncol=None, fmt="x"):
 		self.pj = pj
 		self.fmt = fmt
 		self.ascii = ascii
 
-		self.render_mem = render_mem(pj, fmt, ascii, ncol).render
+		self.render_mem = Render_mem(pj, fmt, ascii, ncol).render
 
 		nxxx = 0
 		cxxx = 0
@@ -166,7 +166,7 @@ class listing(object):
 		self.render_chunk(lo, hi,
 		    ".XXX\t0x%02x[0x%x]" % (x, hi - lo), "", True)
 
-	def render_chunk(self, lo, hi, rx = ".XXX", lcmt = "", compact = False):
+	def render_chunk(self, lo, hi, rx=".XXX", lcmt="", compact=False):
 		rx = rx.strip().split("\n")
 		lcmt = lcmt.rstrip("\n").split("\n")
 		if lcmt[-1] == "":
