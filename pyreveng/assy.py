@@ -89,7 +89,7 @@ class Instree_assy(Assy):
 #######################################################################
 
 class Instree_disass(code.Decode):
-	def __init__(self, name, ins_word = 8, mem_word = None, endian = None):
+	def __init__(self, name, ins_word=8, mem_word=None, endian=None):
 		super(Instree_disass, self).__init__(name)
 		self.args = {
 			">R":	arg_flow_return,

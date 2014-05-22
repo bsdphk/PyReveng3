@@ -39,7 +39,8 @@ def bcount(i):
 	return (((i + (i >> 4) & 0xF0F0F0F) * 0x1010101) & 0xffffffff) >> 24
 
 class InsTreeError(Exception):
-	def __init__(self, reason, diag = None):
+	def __init__(self, reason, diag=None):
+		super(InsTreeError, self).__init__()
 		self.value = reason
 		self.diag = diag
 
@@ -123,7 +124,7 @@ class insline(object):
 		self.bits = [0] * self.words
 		self.flds = dict()
 
-		for b,w,i in l:
+		for b, w, i in l:
 			x = parse_match(i)
 			j = b // width
 			o = (10 * width - (b + w)) % width
@@ -134,7 +135,7 @@ class insline(object):
 					raise InsTreeError(
 					    "Error: multiple words in field: '%s'\n  %s"
 					    % (i, line))
-				self.flds[k[0]] = (j, o, (1 << w) - 1) 
+				self.flds[k[0]] = (j, o, (1 << w) - 1)
 			else:
 				assert x[0] == w
 				self.mask[j] |= x[1] << o
@@ -189,7 +190,7 @@ class insbranch(object):
 			return
 		xm = x.mask[self.lvl]
 		xb = x.bits[self.lvl]
-		for i,d in self.t:
+		for i, d in self.t:
 			if i != xm:
 				continue
 			if xb not in d:
@@ -209,11 +210,11 @@ class insbranch(object):
 		self.t.append((xm, d))
 		#print("T", self.t)
 		self.t.sort(key=lambda x: -bcount(x[0]))
-		return 
+		return
 
 	def print(self, fmt="%x", pfx=""):
 		print(pfx, "[%d]" % self.lvl)
-		for i,x in self.t:
+		for i, x in self.t:
 			print(pfx, "    ", "&" + fmt % i)
 			l = x.keys()
 			l.sort()
@@ -231,7 +232,7 @@ class insbranch(object):
 		return "<Branch %d>" % self.lvl
 
 	def find(self, v):
-		for i,d in self.t:
+		for i, d in self.t:
 			x = v & i
 			if x in d:
 				yield d[x]
@@ -240,7 +241,7 @@ class insbranch(object):
 
 
 #######################################################################
-# 
+#
 
 class insmatch(object):
 	def __init__(self, it, il, adr, words):
@@ -262,7 +263,7 @@ class insmatch(object):
 		return s
 
 class instree(object):
-	def __init__(self, ins_word = 8, mem_word = 8, endian = None):
+	def __init__(self, ins_word=8, mem_word=8, endian=None):
 		self.width = ins_word
 		self.memwidth = mem_word
 		self.endian = endian
@@ -315,7 +316,7 @@ class instree(object):
 			b = l[lvl]
 
 		for i in r.find(b):
-			if type (i) == insbranch:
+			if type(i) == insbranch:
 				x = self.findx(pj, adr, lvl + 1, l, i)
 				if x != None:
 					return x

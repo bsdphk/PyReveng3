@@ -119,7 +119,7 @@ class Txt(Data):
 			j += 1
 		if label:
 			pj.set_label(lo, t)
-			
+
 	def render(self, pj):
 		return ".TXT\t'" + self.txt + "'"
 

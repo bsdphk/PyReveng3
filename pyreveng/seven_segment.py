@@ -32,7 +32,7 @@ from __future__ import print_function
 
 from . import job, mem
 
-default_map = ( 1, 2, 4, 8, 16, 32, 64, 128, 0)
+default_map = (1, 2, 4, 8, 16, 32, 64, 128, 0)
 
 known = {
 	# Index is A-G with canonical (ie: default_map) values
@@ -76,7 +76,7 @@ known = {
 }
 
 known_rev = {}
-for i,j in known.items():
+for i, j in known.items():
 	known_rev[j] = i
 
 def lcmt(segs):
@@ -152,7 +152,7 @@ def resolve(pj, adr, map, inv):
 	return k, l
 
 class digit(job.Leaf):
-	def __init__(self, pj, adr, map = None, inv = False, verbose = False):
+	def __init__(self, pj, adr, map=None, inv=False, verbose=False):
 		"""
 		map = [A, B, C, D, E, F, G, RDP, LDP]
 		"""
@@ -182,7 +182,7 @@ class digit(job.Leaf):
 		self.rendered = s
 		pj.insert(self)
 
-def table(pj, lo, hi, map = None, inv = False, verbose = False):
+def table(pj, lo, hi, map=None, inv=False, verbose=False):
 	"""
 	map = [A, B, C, D, E, F, G, RDP, LDP]
 	"""
@@ -198,7 +198,7 @@ def table(pj, lo, hi, map = None, inv = False, verbose = False):
 #######################################################################
 # Hunt for 7segment decoding tables
 
-def hunt(pj, lo, hi, pattern = "01234567", distance = 1):
+def hunt(pj, lo, hi, pattern="01234567", distance=1):
 	def bc(a):
 		return bin(a).count("1")
 	print('7-segment hunt (0x%x-0x%x) for "%s"' % (lo, hi, pattern))
@@ -288,7 +288,7 @@ def hunt(pj, lo, hi, pattern = "01234567", distance = 1):
 		print("\t\tPossible map bits:", map)
 		s = "\t\tProbable table contents:"
 		while True:
-			x,y = resolve(pj, adr, map, inv)
+			x, y = resolve(pj, adr, map, inv)
 			if x == None:
 				break
 			s += " " + x

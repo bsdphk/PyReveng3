@@ -91,7 +91,7 @@ class Job(object):
 		for i in self.t:
 			yield i
 
-	def find(self, adr, tag = None):
+	def find(self, adr, tag=None):
 		x = self.t.find_lo(adr)
 		if tag == None:
 			return x
@@ -131,7 +131,7 @@ class Job(object):
 		rv = False
 		while len(self.dolist) > 0:
 			rv = True
-			adr,func = self.dolist.pop()
+			adr, func = self.dolist.pop()
 			try:
 				func(self, adr)
 			except mem.MemError:

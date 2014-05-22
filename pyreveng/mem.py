@@ -48,6 +48,7 @@ DEFINED = (1 << 7)
 
 class MemError(Exception):
         def __init__(self, adr, reason):
+		super(MemError, self).__init__()
                 self.adr = adr
                 self.reason = reason
                 self.value = ("0x%x:" % adr + str(self.reason),)
@@ -59,7 +60,7 @@ class address_space(object):
 	A vacuous address-space and base-class for actual address-spaces
 	and memory types
 	"""
-	def __init__(self, lo, hi, name = ""):
+	def __init__(self, lo, hi, name=""):
 		assert lo <= hi
 		self.lo = lo
 		self.hi = hi
@@ -148,7 +149,7 @@ class word_mem(address_space):
 			raise MemError(a, "Undefined")
 		return self.m[b]
 
-	def rd(self,a):
+	def rd(self, a):
 		return self[a]
 
 	def __setitem__(self, a, d):
@@ -173,7 +174,7 @@ class word_mem(address_space):
 			raise MemError(a, "Attribute too big (0x%x)" % x)
 		b = self._off(a)
 		self.a[b] |= x
-		
+
 	def clr_attr(self, a, x):
 		"""Clear attributes"""
 		if (x & ~self.amsk):
@@ -224,7 +225,7 @@ class word_mem(address_space):
 			lo += 1
 			l.append(s)
 		return l
-				
+
 
 class byte_mem(word_mem):
 	"""
@@ -238,7 +239,7 @@ class byte_mem(word_mem):
 	and leave it up to everybody else to use the right one.
 	"""
 
-	def __init__(self, lo, hi, attr = 0):
+	def __init__(self, lo, hi, attr=0):
 		super(byte_mem, self).__init__(lo, hi, 8, attr)
 		self.ncol = 4
 		self.ascii = True
@@ -282,7 +283,7 @@ class byte_mem(word_mem):
 
 	def lu16(self, a):
 		"""Little Endian Unsigned 16-bit half-word"""
-		b = self.rd(a) 
+		b = self.rd(a)
 		b |= self.rd(a + 1) << 8
 		return b
 
@@ -296,7 +297,7 @@ class byte_mem(word_mem):
 
 	def lu64(self, a):
 		"""Little Endian Unsigned 64-bit double-word"""
-		b = self.rd(a) 
+		b = self.rd(a)
 		b |= self.rd(a + 1) << 8
 		b |= self.rd(a + 2) << 16
 		b |= self.rd(a + 3) << 24

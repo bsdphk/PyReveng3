@@ -48,9 +48,9 @@ def ask_objdump(p, adr, m, M):
 	fd.close()
 	r = check_output("/usr/local/bin/objdump -b binary -D" +
 	    " -m" + m +
-	    " -M" + M + 
+	    " -M" + M +
 	    " --adjust-vma=0x%x" % adr +
-	    " " + nm, shell = True
+	    " " + nm, shell=True
 	)
 	r = r.split("\n")
 	os.unlink(nm)
