@@ -31,9 +31,6 @@ Disassembler for TI TMS9900 microprocessor
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import instree, assy, data
 
 tms9900_instructions = """
@@ -154,7 +151,7 @@ def arg_o(pj, ins, to, o):
 
 	if to == 3:
 		return "*R%d+" % o
-	
+
 def arg_so(pj, ins):
 	return arg_o(pj, ins, ins.im.F_ts, ins.im.F_s)
 
@@ -165,25 +162,19 @@ def arg_b(pj, ins):
 	if ins.im.F_b:
 		ins.mne += "B"
 
-class arg_da(assy.Arg_dst):
-        def __init__(self, pj, ins):
-		ins.dstadr = ins.im.F_da
-		super(arg_da, self).__init__(pj, ins.dstadr)
+def arg_da(pj, ins):
+	ins.dstadr = ins.im.F_da
+	return assy.Arg_dst(pj, ins.dstadr)
 
-class arg_r(assy.Arg_dst):
-        def __init__(self, pj, ins):
-		i = ins.im.F_disp
-		if i & 0x80:
-			i -= 256
-		ins.dstadr = ins.hi + i * 2
-		super(arg_r, self).__init__(pj, ins.dstadr)
+def arg_r(pj, ins):
+	i = ins.im.F_disp
+	if i & 0x80:
+		i -= 256
+	ins.dstadr = ins.hi + i * 2
+	return assy.Arg_dst(pj, ins.dstadr)
 
-class arg_c(object):
-	def __init__(self, pj, ins):
-		self.val = ins.im.F_c
-
-	def render(self, pj):
-		return "#0x%x" % self.val
+def arg_c(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_c)
 
 class arg_ptr(assy.Arg_ref):
 	def __init__(self, pj, ins):
@@ -192,12 +183,8 @@ class arg_ptr(assy.Arg_ref):
 		ins.dstadr = self.vector.dstadr
 		super(arg_ptr, self).__init__(pj, self.vector)
 
-class arg_i(object):
-	def __init__(self, pj, ins):
-		self.val = ins.im.F_iop
-
-	def render(self, pj):
-		return "#0x%04x" % self.val
+def arg_i(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_iop, 16)
 
 def arg_w(pj, ins):
 	return "R%d" % ins.im.F_w
@@ -236,7 +223,7 @@ class Tms9900(assy.Instree_disass):
 		super(Tms9900, self).__init__("TMS 9900", 16, 8, ">")
 		self.it.load_string(tms9900_instructions)
 		self.n_interrupt = 16
-		self.args.update( {
+		self.args.update({
 		    "r":	arg_r,
 		    "i":	arg_i,
 		    "ptr":	arg_ptr,
@@ -248,7 +235,7 @@ class Tms9900(assy.Instree_disass):
 		    "da":	arg_da,
 		    "sc":	arg_sc,
 		    "cru":	arg_cru,
-		} )
+		})
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
@@ -259,12 +246,12 @@ class Tms9900(assy.Instree_disass):
 	def vector(self, pj, adr):
 		return vector(pj, adr, self)
 
-	def vectors(self, pj, adr = 0x0, xops = 1):
+	def vectors(self, pj, adr=0x0, xops=1):
 		def vect(pj, a, lbl):
 			c = vector(pj, a, self)
 			pj.set_label(c.dstadr, lbl)
 			return c
-		
+
 		c = vect(pj, adr, "RESET")
 		for i in range(1, self.n_interrupt):
 			if pj.m.bu16(i * 4) != 0:
@@ -276,7 +263,6 @@ class Tms9981(Tms9900):
 	def __init__(self):
 		super(Tms9981, self).__init__()
 		self.n_interrupt = 5
-		
 
 if __name__ == "__main__":
 	h = tms9900()

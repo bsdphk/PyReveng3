@@ -148,7 +148,7 @@ class Arg_dst(Arg):
 
 class Arg_ref(Arg):
 	def __init__(self, pj, obj):
-		super(Arg_dst, self).__init__(pj)
+		super(Arg_ref, self).__init__(pj)
 		self.obj = obj
 
 	def __str__(self):
