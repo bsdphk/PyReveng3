@@ -30,11 +30,11 @@ Data of various sorts
 
 from __future__ import print_function
 
-import pyreveng
+from . import job
 
 #######################################################################
 
-class Data(pyreveng.Leaf):
+class Data(job.Leaf):
 	def __init__(self, pj, lo, hi, t="data"):
 		super(Data, self).__init__(pj, lo, hi, t)
 		pj.insert(self)

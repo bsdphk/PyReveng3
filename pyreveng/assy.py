@@ -35,8 +35,7 @@ arguments are processed before the instruction.
 
 from __future__ import print_function
 
-import instree
-import code
+from . import instree, code
 
 #######################################################################
 

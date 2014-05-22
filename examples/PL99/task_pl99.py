@@ -29,20 +29,11 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
 #######################################################################
 # Stuff we need...
 
-#import utils
-
-import pyreveng
-import mem
-import data
-import cpu.mc6800
-import listing
-import code
-import seven_segment
+from pyreveng import job, mem, data, seven_segment, code, listing
+import pyreveng.cpu.mc6800 as mc6800
 
 seven_segment.known[0x21] = "r"
 seven_segment.known[0x63] = "o"
@@ -54,8 +45,8 @@ seven_segment.known[0x30] = "I"
 m = mem.byte_mem(0x8000, 0x10000)
 m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
 
-pj = pyreveng.Job(m, "PL99")
-cx = cpu.mc6800.mc68hc11()
+pj = job.Job(m, "PL99")
+cx = mc6800.mc68hc11()
 
 cx.register_labels(pj)
 

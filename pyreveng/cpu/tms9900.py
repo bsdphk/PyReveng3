@@ -34,11 +34,7 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join("..")))
-
-import pyreveng
-import instree
-import assy
+from pyreveng import instree, assy, data
 
 tms9900_instructions = """
 A	b,so,do	|1 0 1|b|td | d     |ts | s     |
@@ -123,9 +119,6 @@ CKON	?	|0 0 0 0 0 0 1 1 1 0 1| n	|
 LREX	?	|0 0 0 0 0 0 1 1 1 1 1| n	|
 
 """
-
-import data
-
 
 def arg_o(pj, ins, to, o):
 	if to == 0:
@@ -226,7 +219,7 @@ def arg_sc(pj, ins):
 	else:
 		return assy.arg_verbatim(pj, "#%d" % ins.im.F_c)
 
-class vector(data.data):
+class vector(data.Data):
 	def __init__(self, pj, adr, cx):
 		super(vector, self).__init__(pj, adr, adr + 4)
 		self.ws = data.dataptr(pj, adr + 0x00, adr + 0x02,

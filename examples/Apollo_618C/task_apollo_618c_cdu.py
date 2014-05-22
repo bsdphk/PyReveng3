@@ -36,21 +36,12 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import data
-import listing
-import code
-import cpu.mcs51
+from pyreveng import job, mem, data, listing, code
+import pyreveng.cpu.mcs51 as mcs51
 
 m = mem.byte_mem(0x0000, 0x1000)
 m.load_binfile(0x0000, 1, "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
-pj  = pyreveng.Job(m, "Apollo618c_cdu")
+pj  = job.Job(m, "Apollo618c_cdu")
 
 
 if False:
@@ -62,7 +53,7 @@ if False:
 		print(i, pj.a[i])
 	exit(0)
 
-cx = cpu.mcs51.i8032()
+cx = mcs51.i8032()
 
 cx.set_adr_mask(0xfff)
 

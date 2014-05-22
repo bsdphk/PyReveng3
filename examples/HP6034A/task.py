@@ -29,21 +29,8 @@ from __future__ import print_function
 import os
 import sys
 
-#######################################################################
-# Set up a search path to two levels below
-
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import listing
-import data
-import code
-import cpu.tms9900
-
+from pyreveng import job, mem, listing, data, code
+import pyreveng.cpu.tms9900 as tms9900
 
 cru_adr = {
 	# U12
@@ -93,9 +80,9 @@ for i in fi:
 	j = i.split()
 	m.wr(int(j[0], 16), int(j[1], 16))
 
-pj = pyreveng.Job(m, "HP6034A")
+pj = job.Job(m, "HP6034A")
 
-cx = cpu.tms9900.Tms9981()
+cx = tms9900.Tms9981()
 cx.vectors(pj, xops = 0)
 
 def dptr(pj, a):

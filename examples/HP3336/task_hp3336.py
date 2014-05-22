@@ -29,12 +29,9 @@ from __future__ import print_function
 import os
 import sys
 
-#######################################################################
-# Set up a search path to two levels below
+from pyreveng import job, mem, code, listing
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
+import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 symbols = {
 	0x1047:	"CMD_RE",
@@ -123,22 +120,12 @@ symbols = {
 	0x1daa:	"ERR_9_option",
 }
 
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import code
-import listing
-
-import cpu.hp_nanoproc
-
 m = mem.byte_mem(0x0000, 0x4000)
 m.load_binfile(0, 1, "hp3336.bin")
 
-pj = pyreveng.Job(m, "HP3336")
+pj = job.Job(m, "HP3336")
 
-dx = cpu.hp_nanoproc.hp_nanoproc_pg()
+dx = hp_nanoproc.hp_nanoproc_pg()
 
 pj.todo(0, dx.disass)
 pj.todo(0xff, dx.disass)

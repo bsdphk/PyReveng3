@@ -28,11 +28,9 @@ from __future__ import print_function
 
 import math
 
-import pyreveng
-import mem
-import cpu.mc6800
-import code
-import data
+from pyreveng import job, mem, code, data
+
+import pyreveng.cpu.mc6800 as mc6800
 
 #----------------------------------------------------------------------
 
@@ -269,8 +267,8 @@ def setup(name, binfile, direction):
 		m.load_binfile(0x6000, 1, binfile)
 	else:
 		m.load_binfile(0x7fff, -1, binfile)
-	pj = pyreveng.Job(m, name)
-	cx = cpu.mc6800.mc6800(mask = 0x7fff)
+	pj = job.Job(m, name)
+	cx = mc6800.mc6800(mask = 0x7fff)
 	eprom(pj, cx.disass, m.lo, m.hi, 0x0400)
 
 	cx.vectors(pj, 0x7ff8)

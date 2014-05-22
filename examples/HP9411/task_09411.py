@@ -33,20 +33,9 @@ from __future__ import print_function
 import os
 import sys
 
-#######################################################################
-# Set up a search path to two levels below
+from pyreveng import pyreveng, mem, code, listing
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import code
-import listing
-
-import cpu.hp_nanoproc
+import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 def do_one(fn, alist):
 
@@ -88,7 +77,7 @@ def do_one(fn, alist):
 
 	pj = pyreveng.Job(m, "HP-9411")
 
-	dx = cpu.hp_nanoproc.hp_nanoproc()
+	dx = hp_nanoproc.hp_nanoproc()
 
 	if True:
 		for i in alist:

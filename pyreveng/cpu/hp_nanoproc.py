@@ -45,9 +45,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join("..")))
 
 
-import pyreveng
-import instree
-import assy
+from pyreveng import instree, assy
 
 # Lower-case means we guessed
 # Uppercase came from 09411 listing

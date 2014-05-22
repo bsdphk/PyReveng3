@@ -30,8 +30,7 @@
 
 from __future__ import print_function
 
-import pyreveng
-import mem
+from . import job, mem
 
 default_map = ( 1, 2, 4, 8, 16, 32, 64, 128, 0)
 
@@ -152,7 +151,7 @@ def resolve(pj, adr, map, inv):
 		print("NB! Unknown 7seg (TBL idx: 0x%x)" % n)
 	return k, l
 
-class digit(pyreveng.Leaf):
+class digit(job.Leaf):
 	def __init__(self, pj, adr, map = None, inv = False, verbose = False):
 		"""
 		map = [A, B, C, D, E, F, G, RDP, LDP]

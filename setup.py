@@ -24,47 +24,22 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Misc generally usable functions which don't reallly belong anywhere else
-"""
+from setuptools import setup
 
-from __future__ import print_function
+def readme():
+	with open('README.rst') as f:
+		return f.read()
 
-from . import mem
-
-def fill_gaps(pj):
-	# First GAPs, where mem cannot be read
-
-	def add_gap(pj, lo, hi):
-		print("... adding .GAP 0x%x-0x%x" % (lo, hi))
-		x = pj.add(lo, hi, "gap")
-		x.rendered = ".GAP 0x%x" % (hi - lo)
-		x.compact = True
-
-	gaps = 0
-	ngaps = 0
-	for i in pj.gaps():
-		a = i[0]
-		b = i[1]
-		g0 = a
-		g1 = False
-		for j in range(a, b):
-			try:
-				pj.m.rd(j)
-				if g1:
-					add_gap(pj, g0, j)
-					ngaps += 1
-					gaps += j - g0
-				g1 = False
-			except mem.MemError:
-				if not g1:
-					g1 = True
-					g0 = j
-		if g1:
-			add_gap(pj, g0, b)
-			ngaps += 1
-			gaps += b - g0
-
-	if ngaps:
-		print("%d GAPs containing %d bytes" % (ngaps, gaps))
-	pj.run()
+setup(name='pyreveng',
+	version='3.0',
+	description='Reverse Engineering Toolkit',
+	long_description=readme(),
+	classifiers=[],
+	keywords='reverse-engineering disassembly  disassembler',
+	url='https://github.com/bsdphk/PyReveng3',
+	author='Poul-Henning Kamp',
+	author_email='phk@FreeBSD.org',
+	license='BSD',
+	packages=['pyreveng'],
+	zip_safe=False)
+	

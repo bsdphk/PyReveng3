@@ -29,25 +29,13 @@ from __future__ import print_function
 import os
 import sys
 
-#######################################################################
-# Set up a search path to two levels below
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
+from pyreveng import job, mem, listing, code
 
-#######################################################################
+import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 symbols = {
 }
-
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import listing
-import code
-
-import cpu.hp_nanoproc
 
 #######################################################################
 # Slightly confusing mapping of memory for this one.  Probably an
@@ -69,11 +57,11 @@ m.load_data(0x3000, 1, d[0x1000:])
 
 #######################################################################
 
-pj = pyreveng.Job(m, "HP3325A")
+pj = job.Job(m, "HP3325A")
 
 #######################################################################
 
-dx = cpu.hp_nanoproc.hp_nanoproc_pg()
+dx = hp_nanoproc.hp_nanoproc_pg()
 
 pj.todo(0, dx.disass)
 pj.todo(0xff, dx.disass)

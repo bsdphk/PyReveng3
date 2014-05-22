@@ -29,10 +29,9 @@ from __future__ import print_function
 import os
 import sys
 
-#######################################################################
-# Set up a search path to two levels below
+from pyreveng import job, mem, listing, code, seven_segment
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
+import pyreveng.cpu.mc6800 as mc6800
 
 #######################################################################
 
@@ -71,23 +70,13 @@ symbols = {
 	0x7d0c:		"KEY_ENTRY_CLEAR",
 	0x7d2f:		"DIGIT",
 }
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import listing
-import code
-import seven_segment
-
-import cpu.mc6800
 
 m = mem.byte_mem(0x6800, 0x8000)
 m.load_binfile(0x6800, 1, "A13U2.bin")
 m.load_binfile(0x7000, 1, "A13U3.bin")
 m.load_binfile(0x7800, 1, "A13U4.bin")
 
-pj = pyreveng.Job(m, "HP3335A")
+pj = job.Job(m, "HP3335A")
 
 pj.apct = "%04x"
 
@@ -114,7 +103,7 @@ for i in (0x6fff, 0x77ff, 0x7ff7):
 
 #######################################################################
 
-cpu = cpu.mc6800.mc6800(mask = 0x7fff)
+cpu = mc6800.mc6800(mask = 0x7fff)
 
 def vec(a, n):
 	c = pj.add(a, a + 2, "vector")
@@ -129,7 +118,7 @@ vec(0x7ffe, "RST")
 
 #######################################################################
 
-class ptr(pyreveng.Leaf):
+class ptr(job.Leaf):
 	def __init__(self, pj, adr):
 		super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
 		pj.insert(self)

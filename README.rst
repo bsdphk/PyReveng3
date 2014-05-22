@@ -1,7 +1,7 @@
 PyReveng3 is a toolkit for reverse engineering and analysing binary
 programs, or for that matter, binary data.
 
-The fundamental idea is to built data structures representing the
+The fundamental idea is to build data structures representing the
 analysis, available for further programatic spelunking, rather than
 just a textual representation where the structure is flattened.
 

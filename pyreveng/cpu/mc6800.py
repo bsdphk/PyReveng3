@@ -39,10 +39,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join("..")))
 
-import pyreveng
-import mem
-import assy
-import data
+from pyreveng import pyreveng, mem, assy, data
 
 mc6800_instructions = """
 NOP	-	|0 0 0 0 0 0 0 1|

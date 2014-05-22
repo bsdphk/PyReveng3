@@ -30,18 +30,10 @@ import os
 import sys
 
 #######################################################################
-# Set up a search path to two levels below
-
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
 # Stuff we need...
 
-import pyreveng
-import mem
-import listing
-import code
-import cpu.mcs4
+from pyreveng import pyreveng, mem, listing, code
+import pyreveng.cpu.mcs4 as mcs4
 
 m = mem.byte_mem(0x0, 0x900)
 def hexfile(fn, a0):
@@ -62,7 +54,7 @@ hexfile("P1702.hex", 0x800)
 
 pj = pyreveng.Job(m, "Micrologic_ML200")
 
-cpu = cpu.mcs4.mcs4()
+cpu = mcs4.mcs4()
 
 pj.todo(0, cpu.disass)
 

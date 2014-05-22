@@ -34,8 +34,7 @@ useful to analyse multiple versions of a given image in parallel.
 
 from __future__ import print_function
 
-import tree
-import mem
+from . import tree, mem
 
 class Leaf(object):
 	"""

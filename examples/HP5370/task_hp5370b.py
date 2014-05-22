@@ -29,17 +29,8 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
-
-#######################################################################
-# Stuff we need...
-
+from pyreveng import listing, code, data, seven_segment
 import utils
-
-import listing
-import code
-import data
-import seven_segment
 
 pj,cpu = utils.setup("HP5370B", "HP5370B.ROM", -1)
 

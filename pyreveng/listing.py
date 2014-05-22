@@ -27,8 +27,7 @@
 from __future__ import print_function
 
 import sys
-import mem
-import misc
+from . import mem, misc
 
 class Render_mem(object):
 	def __init__(self, pj, fmt="x", ascii=True, ncol=None):

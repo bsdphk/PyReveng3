@@ -29,24 +29,16 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "pyreveng")))
+from pyreveng import job, mem, data, listing, code
 
-#######################################################################
-# Stuff we need...
-
-import pyreveng
-import mem
-import data
-import listing
-import code
-import cpu.i8086
+import pyreveng.cpu.i8086 as i8086
 
 m = mem.byte_mem(0xe0000, 0x100000)
 m.load_binfile(0xe0000, 1, "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
 
-pj  = pyreveng.Job(m, "Apollo618c")
+pj  = job.Job(m, "Apollo618c")
 
-cx = cpu.i8086.i8086()
+cx = i8086.i8086()
 cx.has_8087()
 
 pj.todo(0xffff0, cx.disass)

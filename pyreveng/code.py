@@ -39,7 +39,7 @@ HP 48 Calculator.
 
 from __future__ import print_function
 
-import pyreveng
+from . import job
 
 #######################################################################
 
@@ -105,7 +105,7 @@ def lcmt_flows(pj):
 
 #######################################################################
 
-class Code(pyreveng.Leaf):
+class Code(job.Leaf):
 	"""
 	A single undivisible "instruction" in some language
 	"""
