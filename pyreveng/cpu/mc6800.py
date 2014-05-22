@@ -295,7 +295,7 @@ class mc6800(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super(mc6800, self).__init__("mc6800", 8)
 		self.it.load_string(mc6800_instructions)
-		self.args.update( {
+		self.args.update({
 			"d":	arg_d,
 			"e":	arg_e,
 			"i":	arg_i,
@@ -314,7 +314,7 @@ class mc6800(assy.Instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
-	def vectors(self, pj, adr = 0xfff8):
+	def vectors(self, pj, adr=0xfff8):
 		for v in ("IRQ", "SWI", "NMI", "RST"):
 			c = self.codeptr(pj, adr)
 			pj.set_label(c.dst, "VEC" + v)
@@ -389,18 +389,20 @@ class arg_y(object):
 		return "0x%02x+Y" % self.val
 
 def arg_Y(pj, ins):
-		if ins.mne[-1] == "X":
-			ins.mne = ins.mne[:-1] + "Y"
-		ins.idx = "Y"
+	if ins.mne[-1] == "X":
+		ins.mne = ins.mne[:-1] + "Y"
+	ins.idx = "Y"
 
 class mc68hc11(mc6800):
 	def __init__(self, mask=0xffff):
 		super(mc68hc11, self).__init__(mask=mask)
 		self.it.load_string(mc68hc11_instructions)
-		self.args.update( {
+		self.args.update(
+			{
 			"y":	arg_y,
 			"Y":	arg_Y,
-		} )
+			}
+		)
 
 	def register_labels(self, pj):
 		pj.set_label(0x1000, "PORTA")
@@ -467,14 +469,14 @@ class mc68hc11(mc6800):
 		pj.set_label(0x103F, "CONFIG")
 
 
-	def vectors(self, pj, adr = 0xffd6):
+	def vectors(self, pj, adr=0xffd6):
 		for v in (
 			"SCI",
-			"SPI", "PAI", "PAO", "TO",
-			"I4O5","OC4", "OC3", "OC2",
-			"OC1", "IC3", "IC2", "IC1",
-			"RTI", "IRQ", "XIRQ", "SWI",
-			"ILL", "COP", "CME", "RESET"
+			"SPI",  "PAI", "PAO",  "TO",
+			"I4O5", "OC4", "OC3",  "OC2",
+			"OC1",  "IC3", "IC2",  "IC1",
+			"RTI",  "IRQ", "XIRQ", "SWI",
+			"ILL",  "COP", "CME",  "RESET"
 			):
 			c = self.codeptr(pj, adr)
 			pj.set_label(c.dst, "VEC" + v)
