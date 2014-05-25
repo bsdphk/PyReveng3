@@ -150,7 +150,6 @@ class Listing(object):
 			self.render_chunk(lo, hi)
 			return
 		try:
-			print(lo, hi)
 			x = self.pj.m.rd(lo)
 			for i in range(lo, hi):
 				if self.pj.m.rd(i) != x:
