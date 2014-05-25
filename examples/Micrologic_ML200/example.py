@@ -26,13 +26,15 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import pyreveng, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4
 
-def task():
+def setup():
 
 	m = mem.byte_mem(0x0, 0x900)
-	def hexfile(fn, a0):
+	def hexfile(bn, a0):
+		fn = os.path.join(os.path.dirname(__file__), bn)
 		fi = open(fn)
 		for i in fi:
 			j = i.split()
@@ -51,6 +53,10 @@ def task():
 	pj = pyreveng.Job(m, "Micrologic_ML200")
 
 	cpu = mcs4.mcs4()
+
+	return pj, cpu
+
+def task(pj, cpu):
 
 	pj.todo(0, cpu.disass)
 
@@ -92,11 +98,13 @@ def task():
 			are 3-byte constants
 		"""
 
+
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 2)
 
-	return pj
-
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

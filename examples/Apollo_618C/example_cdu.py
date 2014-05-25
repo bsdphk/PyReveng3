@@ -33,15 +33,20 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.mcs51 as mcs51
 
-def task():
-
+def setup():
 	m = mem.byte_mem(0x0000, 0x1000)
-	m.load_binfile(0x0000, 1, "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
+	fn = os.path.join(os.path.dirname(__file__),
+	    "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
+	m.load_binfile(0x0000, 1, fn)
 	pj  = job.Job(m, "Apollo618c_cdu")
+	cx = mcs51.i8032()
+	return pj, cx
 
+def task(pj, cx):
 
 	if False:
 		pj.a.address_space("xrom", m)
@@ -52,7 +57,6 @@ def task():
 			print(i, pj.a[i])
 		exit(0)
 
-	cx = mcs51.i8032()
 
 	cx.set_adr_mask(0xfff)
 
@@ -137,9 +141,13 @@ def task():
 	#data--- pj.set_label(0x5e, "timeout") 
 	#######################################################################
 
-	listing.Listing(pj, ncol = 3, fmt = "x", ascii = True)
-	return pj
+def output(pj):
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol = 3)
 
 if __name__ == '__main__':
-	task()
+	print(__file__)
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

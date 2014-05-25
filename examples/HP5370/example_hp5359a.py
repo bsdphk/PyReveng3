@@ -29,10 +29,10 @@ from __future__ import print_function
 from pyreveng import code, listing, seven_segment
 import utils
 
-def task():
+def setup():
+	return utils.setup("HP5359A", "HP5359A.ROM", 1)
 
-	pj,cpu = utils.setup("hp5359a", "HP5359A.ROM", 1)
-
+def task(pj, cpu):
 	seven_segment.table(pj, 0x7fbf, 0x7fda, verbose=False)
 
 	ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
@@ -41,9 +41,11 @@ def task():
 	while pj.run():
 		pass
 
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj)
-	return pj
 
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)

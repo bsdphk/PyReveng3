@@ -26,8 +26,21 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, code, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
+
+def setup():
+
+	m = mem.byte_mem(0x0000, 0x4000)
+	fn = os.path.join(os.path.dirname(__file__), "hp3336.bin")
+	m.load_binfile(0, 1, fn)
+
+	pj = job.Job(m, "HP3336")
+
+	dx = hp_nanoproc.hp_nanoproc_pg()
+
+	return pj, dx
 
 symbols = {
 	0x1047:	"CMD_RE",
@@ -116,15 +129,8 @@ symbols = {
 	0x1daa:	"ERR_9_option",
 }
 
-def task():
 
-	m = mem.byte_mem(0x0000, 0x4000)
-	m.load_binfile(0, 1, "hp3336.bin")
-
-	pj = job.Job(m, "HP3336")
-
-	dx = hp_nanoproc.hp_nanoproc_pg()
-
+def task(pj, dx):
 	pj.todo(0, dx.disass)
 	pj.todo(0xff, dx.disass)
 
@@ -212,10 +218,12 @@ def task():
 	while pj.run():
 		pass
 
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj)
-	return pj
 
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

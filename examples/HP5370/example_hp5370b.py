@@ -29,11 +29,12 @@ from __future__ import print_function
 from pyreveng import listing, code, data, seven_segment
 import utils
 
-def task():
 
-	pj,cpu = utils.setup("hp5370b", "HP5370B.ROM", -1)
+def setup():
+	return utils.setup("HP5370B", "HP5370B.ROM", -1)
 
 
+def task(pj, cpu):
 	ct = utils.cmd_tbl(pj, 0x7c64, 0x7c98)
 	cta = utils.arg_range(pj, ct, 0x7d6c, 0x7d88)
 
@@ -98,10 +99,12 @@ def task():
 	utils.apply_labels(pj, "B")
 	utils.tramp(pj)
 
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj)
-	return pj
 
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

@@ -26,6 +26,7 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, data, seven_segment, code, listing
 import pyreveng.cpu.mc6800 as mc6800
 
@@ -36,14 +37,18 @@ seven_segment.known[0x41] = "="
 seven_segment.known[0x20] = "i"
 seven_segment.known[0x30] = "I"
 
-def task():
+def setup():
 
 	m = mem.byte_mem(0x8000, 0x10000)
-	m.load_binfile(0x8000, 1, "PL99.mc68hc11.bin")
+	fn = os.path.join(os.path.dirname(__file__), "PL99.mc68hc11.bin")
+	m.load_binfile(0x8000, 1, fn)
 
 	pj = job.Job(m, "PL99")
 	cx = mc6800.mc68hc11()
+	return pj, cx
 
+
+def task(pj, cx):
 	cx.register_labels(pj)
 
 	cx.vectors(pj)
@@ -522,10 +527,11 @@ def task():
 
 	pj.set_label(0xf9, "ON_KEY")
 
+def output(pj):
 	code.lcmt_flows(pj)
-
-	listing.Listing(pj, ncol=4, fmt="x", ascii=True)
-	return pj
+	listing.Listing(pj, ncol=4)
 
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)

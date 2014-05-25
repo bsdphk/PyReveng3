@@ -26,19 +26,24 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.i8086 as i8086
 
-def task():
+def setup():
 
 	m = mem.byte_mem(0xe0000, 0x100000)
-	m.load_binfile(0xe0000, 1, "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
+        fn = os.path.join(os.path.dirname(__file__),
+	    "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
+	m.load_binfile(0xe0000, 1, fn)
 
 	pj  = job.Job(m, "Apollo618c")
 
 	cx = i8086.i8086()
 	cx.has_8087()
+	return pj,cx
 
+def task(pj, cx):
 	pj.todo(0xffff0, cx.disass)
 
 	#######################################################################
@@ -173,13 +178,12 @@ def task():
 
 	#######################################################################
 
+def output(pj):
 	code.lcmt_flows(pj)
-
-	#######################################################################
-
-	listing.Listing(pj, ncol = 8, fmt = "x", ascii = True)
-	return pj
+	listing.Listing(pj, ncol = 8)
 
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

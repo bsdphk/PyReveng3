@@ -26,8 +26,23 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, listing, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
+
+def setup():
+
+	m = mem.byte_mem(0x6800, 0x8000)
+	
+	dn = os.path.dirname(__file__)
+	m.load_binfile(0x6800, 1, os.path.join(dn, "A13U2.bin"))
+	m.load_binfile(0x7000, 1, os.path.join(dn, "A13U3.bin"))
+	m.load_binfile(0x7800, 1, os.path.join(dn, "A13U4.bin"))
+
+	pj = job.Job(m, "HP3335A")
+	cpu = mc6800.mc6800(mask = 0x7fff)
+
+	return pj, cpu
 
 symbols = {
 	0x6800:		"KEY_PRESET_STORE",
@@ -65,16 +80,7 @@ symbols = {
 	0x7d2f:		"DIGIT",
 }
 
-def task():
-
-	m = mem.byte_mem(0x6800, 0x8000)
-	m.load_binfile(0x6800, 1, "A13U2.bin")
-	m.load_binfile(0x7000, 1, "A13U3.bin")
-	m.load_binfile(0x7800, 1, "A13U4.bin")
-
-	pj = job.Job(m, "HP3335A")
-
-	pj.apct = "%04x"
+def task(pj, cpu):
 
 	#######################################################################
 
@@ -98,8 +104,6 @@ def task():
 		c.rendered = c.tag
 
 	#######################################################################
-
-	cpu = mc6800.mc6800(mask = 0x7fff)
 
 	def vec(a, n):
 		c = pj.add(a, a + 2, "vector")
@@ -186,12 +190,13 @@ def task():
 	while pj.run():
 		pass
 
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj)
 
-	return pj
-
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 
 

@@ -26,11 +26,11 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, listing, code
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
-
-def task():
+def setup():
 
 	#######################################################################
 	# Slightly confusing mapping of memory for this one.  Probably an
@@ -38,13 +38,15 @@ def task():
 
 	m = mem.byte_mem(0x0000, 0x4000)
 
-	fi = open("A6U1.bin", "rb")
+	fn = os.path.join(os.path.dirname(__file__), "A6U1.bin")
+	fi = open(fn, "rb")
 	d = bytearray(fi.read())
 	fi.close()
 	m.load_data(0x0000, 1, d[:0x1000])
 	m.load_data(0x2000, 1, d[0x1000:])
 
-	fi = open("A6U2.bin", "rb")
+	fn = os.path.join(os.path.dirname(__file__), "A6U2.bin")
+	fi = open(fn, "rb")
 	d = bytearray(fi.read())
 	fi.close()
 	m.load_data(0x1000, 1, d[:0x1000])
@@ -57,7 +59,9 @@ def task():
 	#######################################################################
 
 	dx = hp_nanoproc.hp_nanoproc_pg()
+	return pj, dx
 
+def task(pj, dx):
 	pj.todo(0, dx.disass)
 	pj.todo(0xff, dx.disass)
 
@@ -141,11 +145,12 @@ def task():
 	while pj.run():
 		pass
 
+def output(pj):
 	code.lcmt_flows(pj)
 	listing.Listing(pj)
 
-	return pj
-
 if __name__ == '__main__':
-	task()
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

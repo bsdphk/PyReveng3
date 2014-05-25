@@ -26,8 +26,23 @@
 
 from __future__ import print_function
 
+import os
 from pyreveng import job, mem, listing, data, code
 import pyreveng.cpu.tms9900 as tms9900
+
+def setup():
+
+	m = mem.byte_mem(0x0000, 0x2000)
+
+	fn = os.path.join(os.path.dirname(__file__), "HP6034A_U25.hex")
+	fi = open(fn)
+	for i in fi:
+		j = i.split()
+		m.wr(int(j[0], 16), int(j[1], 16))
+
+	pj = job.Job(m, "HP6034A")
+	cx = tms9900.Tms9981()
+	return pj, cx
 
 cru_adr = {
 	# U12
@@ -70,18 +85,8 @@ cru_adr = {
 	0x110:	"LOAD_DACS",
 }
 
-def task():
+def task(pj, cx):
 
-	m = mem.byte_mem(0x0000, 0x2000)
-
-	fi = open("HP6034A_U25.hex")
-	for i in fi:
-		j = i.split()
-		m.wr(int(j[0], 16), int(j[1], 16))
-
-	pj = job.Job(m, "HP6034A")
-
-	cx = tms9900.Tms9981()
 	cx.vectors(pj, xops = 0)
 
 	def dptr(pj, a):
@@ -256,10 +261,12 @@ def task():
 	pj.set_label(0x20da, "MODE_VAL")
 	pj.set_label(0x20d4, "COUNT_DOWN")
 
-	code.lcmt_flows(pj)
 
-	listing.Listing(pj, ncol = 4, fmt = "x", ascii = True)
-	return pj
+def output(pj):
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol = 4)
 
 if __name__ == '__main__':
-        task()
+        pj, cx = setup()
+	task(pj, cx)
+	output(pj)

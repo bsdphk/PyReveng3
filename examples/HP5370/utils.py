@@ -27,6 +27,7 @@
 from __future__ import print_function
 
 import math
+import os
 
 from pyreveng import job, mem, code, data
 
@@ -263,10 +264,11 @@ def apply_labels(pj, type):
 def setup(name, binfile, direction):
 	print("\n\nDoing: " + binfile)
 	m = mem.byte_mem(0x6000, 0x8000)
+	fn = os.path.join(os.path.dirname(__file__), binfile)
 	if direction == 1:
-		m.load_binfile(0x6000, 1, binfile)
+		m.load_binfile(0x6000, 1, fn)
 	else:
-		m.load_binfile(0x7fff, -1, binfile)
+		m.load_binfile(0x7fff, -1, fn)
 	pj = job.Job(m, name)
 	cx = mc6800.mc6800(mask = 0x7fff)
 	eprom(pj, cx.disass, m.lo, m.hi, 0x0400)
