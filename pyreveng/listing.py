@@ -110,10 +110,9 @@ class Listing(object):
 		nxxx = 0
 		cxxx = 0
 		if fn == None:
-			self.fo = sys.stdout
-		else:
-			print("Listing into", fn)
-			self.fo = open(fn, "w")
+			fn = "/tmp/_." + pj.name + ".txt"
+		print("Listing into", fn)
+		self.fo = open(fn, "w")
 		misc.fill_gaps(pj)
 		a0 = pj.m.lo
 		for i in pj:
