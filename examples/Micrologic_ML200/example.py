@@ -27,7 +27,7 @@
 from __future__ import print_function
 
 import os
-from pyreveng import pyreveng, mem, listing, code
+from pyreveng import job, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4
 
 def setup():
@@ -50,7 +50,7 @@ def setup():
 	hexfile("P8316.hex", 0)
 	hexfile("P1702.hex", 0x800)
 
-	pj = pyreveng.Job(m, "Micrologic_ML200")
+	pj = job.Job(m, "Micrologic_ML200")
 
 	cpu = mcs4.mcs4()
 
