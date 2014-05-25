@@ -26,35 +26,39 @@
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import listing, code, seven_segment
 import utils
 
-pj,cpu = utils.setup("HP5370A", "HP5370A.ROM", -1)
+def task():
 
-seven_segment.table(pj, 0x7e29, 0x7e39, verbose=False)
+	pj,cpu = utils.setup("hp5370a", "HP5370A.ROM", -1)
 
-ct = utils.cmd_tbl(pj, 0x7c5d, 0x7c91)
-cta = utils.arg_range(pj, ct, 0x7d65, 0x7d81)
-utils.cmd_dispatch(pj, cpu, cta, 0x644c)
+	seven_segment.table(pj, 0x7e29, 0x7e39, verbose=False)
 
-pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
-utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
+	ct = utils.cmd_tbl(pj, 0x7c5d, 0x7c91)
+	cta = utils.arg_range(pj, ct, 0x7d65, 0x7d81)
+	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
 
-utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
+	pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
+	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
 
-for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
-	utils.float70(pj, i)
+	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
 
-utils.square_tbl(pj)
+	for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
+		utils.float70(pj, i)
 
-while pj.run():
-        pass
+	utils.square_tbl(pj)
 
-utils.apply_labels(pj, "A")
-utils.tramp(pj)
+	while pj.run():
+		pass
 
-code.lcmt_flows(pj)
-listing.Listing(pj, "/tmp/_.hp5370a.out")
+	utils.apply_labels(pj, "A")
+	utils.tramp(pj)
+
+	code.lcmt_flows(pj)
+	listing.Listing(pj)
+	return pj
+
+if __name__ == '__main__':
+	task()
+

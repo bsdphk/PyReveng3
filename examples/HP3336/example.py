@@ -26,11 +26,7 @@
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import job, mem, code, listing
-
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 symbols = {
@@ -120,99 +116,106 @@ symbols = {
 	0x1daa:	"ERR_9_option",
 }
 
-m = mem.byte_mem(0x0000, 0x4000)
-m.load_binfile(0, 1, "hp3336.bin")
+def task():
 
-pj = job.Job(m, "HP3336")
+	m = mem.byte_mem(0x0000, 0x4000)
+	m.load_binfile(0, 1, "hp3336.bin")
 
-dx = hp_nanoproc.hp_nanoproc_pg()
+	pj = job.Job(m, "HP3336")
 
-pj.todo(0, dx.disass)
-pj.todo(0xff, dx.disass)
+	dx = hp_nanoproc.hp_nanoproc_pg()
 
-#######################################################################
-if True:
-	for a0 in range(4,0x20,4):
-		assert pj.m.rd(a0) == 0xc8
-		pg = (pj.m.rd(a0 + 1) & 0x07) << 11
-		assert pg == a0 << 9
-		dpf = pj.m.rd(a0 + 2) << 8
-		dpf |= pj.m.rd(a0 + 3)
-		dpf &= 0x7ff 
-		dpf |= pg
-		pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
-		pj.todo(a0, dx.disass)
-		pj.todo(dpf, dx.disass)
-		for a1 in range(pg, dpf, 2):
-			da = pj.m.rd(a1) << 8
-			da |= pj.m.rd(a1 + 1)
-			da &= 0x7ff
-			da |= pg
-			v = a0 << 3
-			v |= (a1 - pg) >> 1
-			pj.set_label(a1, "PTR_%02x" % v)
-			pj.set_label(da, "FN_%02x" % v)
-			pj.todo(a1, dx.disass)
+	pj.todo(0, dx.disass)
+	pj.todo(0xff, dx.disass)
+
+	#######################################################################
+	if True:
+		for a0 in range(4,0x20,4):
+			assert pj.m.rd(a0) == 0xc8
+			pg = (pj.m.rd(a0 + 1) & 0x07) << 11
+			assert pg == a0 << 9
+			dpf = pj.m.rd(a0 + 2) << 8
+			dpf |= pj.m.rd(a0 + 3)
+			dpf &= 0x7ff 
+			dpf |= pg
+			pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
+			pj.todo(a0, dx.disass)
+			pj.todo(dpf, dx.disass)
+			for a1 in range(pg, dpf, 2):
+				da = pj.m.rd(a1) << 8
+				da |= pj.m.rd(a1 + 1)
+				da &= 0x7ff
+				da |= pg
+				v = a0 << 3
+				v |= (a1 - pg) >> 1
+				pj.set_label(a1, "PTR_%02x" % v)
+				pj.set_label(da, "FN_%02x" % v)
+				pj.todo(a1, dx.disass)
+			
+
+	#######################################################################
+	def jmp_table(lo, hi, span, txt = "table"):
+		x = pj.add(lo, hi, "table")
+		for a in range(lo, hi, span):
+			pj.todo(a, dx.disass)
+		# x.blockcmt = "-\n" + txt + "\n-\n"
+		return x
+
+	#######################################################################
+	if True:
+		# Comes from 0x0d01
+		# returns to 0xd02
+		jmp_table(0x0f80, 0x0fa8, 4, "LED Segment Table")
+
+	#######################################################################
+	if True:
+		# Comes from 0xab2
+		# does not return
+		jmp_table(0x0fa8, 0x0fc0, 2)
+
+	#######################################################################
+	if True:
+		# Comes from 0xb3b
+		# returns to 0xb3c
+		jmp_table(0x0fc0, 0x0fe0, 4)
+
+	#######################################################################
+	if True:
+		# Comes from 0xb62
+		# returns to 0xb63
+		jmp_table(0x0fe0, 0x1000, 4)
+
+	#######################################################################
+	if True:
+		# Comes from 0x1aa0
+		# returns to 1aa1
+		jmp_table(0x1840, 0x1878, 8)
+
+	#######################################################################
+	if True:
+		# Comes from 0x29f9
+		# returns to 29fa
+		x = jmp_table(0x2fb8, 0x3000, 8)
 		
+	#######################################################################
+	if True:
+		# Comes from 0x3c37
+		# does RET
+		x = jmp_table(0x3fd8, 0x4000, 4)
 
-#######################################################################
-def jmp_table(lo, hi, span, txt = "table"):
-	x = pj.add(lo, hi, "table")
-	for a in range(lo, hi, span):
-	        pj.todo(a, dx.disass)
-	# x.blockcmt = "-\n" + txt + "\n-\n"
-	return x
-
-#######################################################################
-if True:
-	# Comes from 0x0d01
-	# returns to 0xd02
-	jmp_table(0x0f80, 0x0fa8, 4, "LED Segment Table")
-
-#######################################################################
-if True:
-	# Comes from 0xab2
-	# does not return
-	jmp_table(0x0fa8, 0x0fc0, 2)
-
-#######################################################################
-if True:
-	# Comes from 0xb3b
-	# returns to 0xb3c
-	jmp_table(0x0fc0, 0x0fe0, 4)
-
-#######################################################################
-if True:
-	# Comes from 0xb62
-	# returns to 0xb63
-	jmp_table(0x0fe0, 0x1000, 4)
-
-#######################################################################
-if True:
-	# Comes from 0x1aa0
-	# returns to 1aa1
-	jmp_table(0x1840, 0x1878, 8)
-
-#######################################################################
-if True:
-	# Comes from 0x29f9
-	# returns to 29fa
-	x = jmp_table(0x2fb8, 0x3000, 8)
-	
-#######################################################################
-if True:
-	# Comes from 0x3c37
-	# does RET
-	x = jmp_table(0x3fd8, 0x4000, 4)
-
-#######################################################################
-if True:
-	for a,l in symbols.items():
-		pj.set_label(a,l)
+	#######################################################################
+	if True:
+		for a,l in symbols.items():
+			pj.set_label(a,l)
 
 
-while pj.run():
-	pass
+	while pj.run():
+		pass
 
-code.lcmt_flows(pj)
-listing.Listing(pj, "/tmp/_.hp3336.txt")
+	code.lcmt_flows(pj)
+	listing.Listing(pj)
+	return pj
+
+if __name__ == '__main__':
+	task()
+

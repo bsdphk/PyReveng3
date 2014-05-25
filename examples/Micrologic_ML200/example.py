@@ -26,82 +26,77 @@
 
 from __future__ import print_function
 
-import os
-import sys
-
-#######################################################################
-# Stuff we need...
-
 from pyreveng import pyreveng, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4
 
-m = mem.byte_mem(0x0, 0x900)
-def hexfile(fn, a0):
-	fi = open(fn)
-	for i in fi:
-		j = i.split()
-		if len(j) == 0:
-			continue
-		if j[0][0] == "#":
-			continue
-		a = int(j[0], 16)
-		b = int(j[1], 16)
-		m.wr(a0 + a, b)
-	fi.close()
+def task():
 
-hexfile("P8316.hex", 0)
-hexfile("P1702.hex", 0x800)
+	m = mem.byte_mem(0x0, 0x900)
+	def hexfile(fn, a0):
+		fi = open(fn)
+		for i in fi:
+			j = i.split()
+			if len(j) == 0:
+				continue
+			if j[0][0] == "#":
+				continue
+			a = int(j[0], 16)
+			b = int(j[1], 16)
+			m.wr(a0 + a, b)
+		fi.close()
 
-pj = pyreveng.Job(m, "Micrologic_ML200")
+	hexfile("P8316.hex", 0)
+	hexfile("P1702.hex", 0x800)
 
-cpu = mcs4.mcs4()
+	pj = pyreveng.Job(m, "Micrologic_ML200")
 
-pj.todo(0, cpu.disass)
+	cpu = mcs4.mcs4()
 
-while pj.run():
-	pass
+	pj.todo(0, cpu.disass)
 
-pj.set_label(0x6e8, "Incr_rr0()")
-pj.set_label(0x6bc, "Count_Down()")
+	while pj.run():
+		pass
 
-if False:
-	cmt = """-
-	This is the RESET "countdown" routine
+	pj.set_label(0x6e8, "Incr_rr0()")
+	pj.set_label(0x6bc, "Count_Down()")
 
-	Displays:
-	  .9.9.9.9 9.9
-	  .8.8.8.8 8.8
-	  ...
-	  .0.0.0.0 0.0
+	if False:
+		cmt = """-
+		This is the RESET "countdown" routine
 
-	It calls 0x5ca a lot, presumably to let the analog stuff settle ?
-	"""
+		Displays:
+		  .9.9.9.9 9.9
+		  .8.8.8.8 8.8
+		  ...
+		  .0.0.0.0 0.0
 
-pj.set_label(0x7df, "Update_Display()")
+		It calls 0x5ca a lot, presumably to let the analog stuff settle ?
+		"""
 
-if False:
-	cmt = """
-	The display is driven by two chains of 3 three P4003 10-bit shift
-	registers, which again drives 7447 7-segment drivers.
-	On entry r2 contains 0x20 or 0x40, depending on which clock-pulse
-	line should be driven.
-	A total of 30 pulses are sent:
-		6 x 1  Decimal points, left to right
-		6 x 4  BCD to 7447, LSD to MSD order.
-	"""
+	pj.set_label(0x7df, "Update_Display()")
 
-if False:
-	cmt = """
-		0x66a-0x676
-		are 3-byte constants
-	"""
+	if False:
+		cmt = """
+		The display is driven by two chains of 3 three P4003 10-bit shift
+		registers, which again drives 7447 7-segment drivers.
+		On entry r2 contains 0x20 or 0x40, depending on which clock-pulse
+		line should be driven.
+		A total of 30 pulses are sent:
+			6 x 1  Decimal points, left to right
+			6 x 4  BCD to 7447, LSD to MSD order.
+		"""
 
-code.lcmt_flows(pj)
-listing.Listing(pj, "/tmp/_.micrologic_ml200.txt", ncol = 2)
+	if False:
+		cmt = """
+			0x66a-0x676
+			are 3-byte constants
+		"""
 
-if False:
-	import a2
-	a = a2.analysis(pj)
-	a.dot(pj, "/tmp/_1.dot")
-	a.reduce(pj)
-	a.dot(pj, "/tmp/_2.dot")
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol = 2)
+
+	return pj
+
+if __name__ == '__main__':
+	task()
+

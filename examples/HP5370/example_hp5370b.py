@@ -26,78 +26,82 @@
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import listing, code, data, seven_segment
 import utils
 
-pj,cpu = utils.setup("HP5370B", "HP5370B.ROM", -1)
+def task():
+
+	pj,cpu = utils.setup("hp5370b", "HP5370B.ROM", -1)
 
 
-ct = utils.cmd_tbl(pj, 0x7c64, 0x7c98)
-cta = utils.arg_range(pj, ct, 0x7d6c, 0x7d88)
+	ct = utils.cmd_tbl(pj, 0x7c64, 0x7c98)
+	cta = utils.arg_range(pj, ct, 0x7d6c, 0x7d88)
 
-def ptr(pj, a):
-	return data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
+	def ptr(pj, a):
+		return data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
 
-def cbyte(pj, a):
-	c = data.Const(pj, a, a + 1)
-	c.val = pj.m.rd(a)
-	c.typ = ".BYTE"
-	c.fmt = "0x%02x" % c.val
+	def cbyte(pj, a):
+		c = data.Const(pj, a, a + 1)
+		c.val = pj.m.rd(a)
+		c.typ = ".BYTE"
+		c.fmt = "0x%02x" % c.val
 
-ptr(pj, 0x6403)
-ptr(pj, 0x6405)
-ptr(pj, 0x6407)
+	ptr(pj, 0x6403)
+	ptr(pj, 0x6405)
+	ptr(pj, 0x6407)
 
-pj.set_label(0x7eed, "RAM_TEST_VALS")
-for a in range(0x7eed, 0x7ef9):
-	cbyte(pj,a)
+	pj.set_label(0x7eed, "RAM_TEST_VALS")
+	for a in range(0x7eed, 0x7ef9):
+		cbyte(pj,a)
 
-c = ptr(pj, 0x7915)
-pj.set_label(c.lo, "@7SEGCODES")
-pj.set_label(c.dst, "7SEGCODES")
-c = seven_segment.table(pj, c.dst, c.dst + 0x10, verbose=False)
+	c = ptr(pj, 0x7915)
+	pj.set_label(c.lo, "@7SEGCODES")
+	pj.set_label(c.dst, "7SEGCODES")
+	c = seven_segment.table(pj, c.dst, c.dst + 0x10, verbose=False)
 
-pj.set_label(0x7ead, "ROM_LOCS")
-for a in range(0x7ead, 0x7ebf, 2):
-	ptr(pj, a)
+	pj.set_label(0x7ead, "ROM_LOCS")
+	for a in range(0x7ead, 0x7ebf, 2):
+		ptr(pj, a)
 
-# XXX: Add mising flow
-pj.todo(0x6845, cpu.disass)
-pj.todo(0x6867, cpu.disass)
+	# XXX: Add mising flow
+	pj.todo(0x6845, cpu.disass)
+	pj.todo(0x6867, cpu.disass)
 
-for i in range(0x6b23, 0x6b3b, 3):
-	utils.data24(pj, i)
+	for i in range(0x6b23, 0x6b3b, 3):
+		utils.data24(pj, i)
 
-for a in range(0x77d7, 0x77f7, 4):
-	data.Txt(pj, a, a + 4)
+	for a in range(0x77d7, 0x77f7, 4):
+		data.Txt(pj, a, a + 4)
 
-data.Txt(pj, 0x78f3, 0x78f7)
-data.Txt(pj, 0x78f7, 0x78fd)
-data.Txt(pj, 0x78fd, 0x78ff)
+	data.Txt(pj, 0x78f3, 0x78f7)
+	data.Txt(pj, 0x78f7, 0x78fd)
+	data.Txt(pj, 0x78fd, 0x78ff)
 
-utils.cmd_dispatch(pj, cpu, cta, 0x644c)
+	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
 
-pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
-utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
+	pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
+	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
 
-utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
+	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
 
-for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
-	utils.float70(pj, i)
+	for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
+		utils.float70(pj, i)
 
-c = cpu.codeptr(pj, 0x7909)
-pj.set_label(c.dst, "HPIB_CMD_PARSE")
+	c = cpu.codeptr(pj, 0x7909)
+	pj.set_label(c.dst, "HPIB_CMD_PARSE")
 
-utils.square_tbl(pj)
+	utils.square_tbl(pj)
 
-while pj.run():
-        pass
+	while pj.run():
+		pass
 
-utils.apply_labels(pj, "B")
-utils.tramp(pj)
+	utils.apply_labels(pj, "B")
+	utils.tramp(pj)
 
-code.lcmt_flows(pj)
-listing.Listing(pj, "/tmp/_.hp5370b.out")
+	code.lcmt_flows(pj)
+	listing.Listing(pj)
+	return pj
+
+if __name__ == '__main__':
+	task()
+

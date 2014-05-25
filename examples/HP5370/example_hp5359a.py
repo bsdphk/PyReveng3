@@ -26,24 +26,24 @@
 
 from __future__ import print_function
 
-import os
-import sys
-
-
 from pyreveng import code, listing, seven_segment
 import utils
 
-pj,cpu = utils.setup("HP5359A", "HP5359A.ROM", 1)
+def task():
 
-seven_segment.table(pj, 0x7fbf, 0x7fda, verbose=False)
+	pj,cpu = utils.setup("hp5359a", "HP5359A.ROM", 1)
 
-ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
-print(ct)
+	seven_segment.table(pj, 0x7fbf, 0x7fda, verbose=False)
 
-while pj.run():
-        pass
+	ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
+	print(ct)
 
-code.lcmt_flows(pj)
-listing.Listing(pj, "/tmp/_.hp5359a.out")
+	while pj.run():
+		pass
 
+	code.lcmt_flows(pj)
+	listing.Listing(pj)
+	return pj
 
+if __name__ == '__main__':
+	task()
