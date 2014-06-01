@@ -83,6 +83,7 @@ class Instree_assy(Assy):
 				if x == None:
 					print("Ignoring argument",
 					    j, "in", lang.name, i)
+					self.oper.append("?" + j + "?")
 				elif type(x) == str:
 					self.oper.append(x)
 				else:
@@ -97,6 +98,7 @@ class Instree_disass(code.Decode):
 		super(Instree_disass, self).__init__(name)
 		self.args = {
 			">R":	Arg_flow_return,
+			">RC":	Arg_flow_return_cond,
 			">J":	Arg_flow_jmp,
 			">JC":	Arg_flow_jmp_cond,
 			">C":	Arg_flow_call,
@@ -132,19 +134,20 @@ class Arg(object):
 		self.pj = pj
 
 class Arg_dst(Arg):
-	def __init__(self, pj, dst, pfx=""):
+	def __init__(self, pj, dst, pfx="", sfx=""):
 		super(Arg_dst, self).__init__(pj)
 		self.dst = dst
 		self.pfx = pfx
+		self.sfx = sfx
 
 	def __str__(self):
 		l = self.pj.labels.get(self.dst)
 		if l != None:
-			return self.pfx + "%s" % l
+			return self.pfx + "%s" % l + self.sfx
 		elif self.dst == None:
-			return self.pfx + "0x?"
+			return self.pfx + "0x?" + self.sfx
 		else:
-			return self.pfx + "0x%x" % self.dst
+			return self.pfx + "0x%x" % self.dst + self.sfx
 
 class Arg_ref(Arg):
 	def __init__(self, pj, obj):
@@ -174,6 +177,10 @@ class Arg_imm(Arg):
 
 def Arg_flow_return(pj, ins):
 	ins.add_flow(pj, "R", ins.cc)
+
+def Arg_flow_return_cond(pj, ins):
+	ins.add_flow(pj, "R", ins.cc)
+	ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
 
 def Arg_flow_jmp(pj, ins):
 	ins.add_flow(pj, ">", True, ins.dstadr)
