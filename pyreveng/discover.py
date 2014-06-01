@@ -41,10 +41,17 @@ Things to do:
 
 from __future__ import print_function
 
+from pyreveng import mem
+
 class Discover(object):
 	def __init__(self, pj, cx):
 		self.pj = pj
 		self.cx = cx
+
+		# Clear the backlog first
+		while pj.run():
+			continue
+
 		self.build_all()
 		self.map_flows()
 		self.map_overlap()
@@ -78,7 +85,10 @@ class Discover(object):
 		n = 0
 		for lx, hx in self.pj.gaps():
 			for adr in range(lx, hx):
-				x = self.cx.decode(self.pj, adr)
+				try:
+					x = self.cx.decode(self.pj, adr)
+				except mem.MemError:
+					continue
 				if x == None:
 					continue
 				self.code[adr] = x
@@ -224,8 +234,12 @@ class Discover(object):
 		return n
 
 	def commit(self):
+		n = 0
 		for i in self.code.keys():
 			if self.trust[i] > 0 and self.trust[i] < 10:
 				c = self.code[i]
+				c.lcmt += "<discover>\n"
 				c.commit(self.pj)
 				self.pj.insert(c)
+				n += 1
+		print("Committed", n)
