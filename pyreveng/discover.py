@@ -225,7 +225,7 @@ class Discover(object):
 
 	def commit(self):
 		for i in self.code.keys():
-			if self.trust[i] > 0:
+			if self.trust[i] > 0 and self.trust[i] < 10:
 				c = self.code[i]
 				c.commit(self.pj)
 				self.pj.insert(c)
