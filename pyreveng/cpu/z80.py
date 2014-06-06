@@ -59,7 +59,7 @@ PUSH	qq		|1 1| qq|0 1 0 1|
 POP	qq		|1 1| qq|0 0 0 1|
 EX	DE,HL		|1 1 1 0 1 0 1 1|
 EX	AF,AF'		|0 0 0 0 1 0 0 0|
-EXX	-		|1 1 0 1 1 0 0 0|
+EXX	-		|1 1 0 1 1 0 0 1|
 EX	(SP),HL		|1 1 1 0 0 0 1 1|
 LDI	-		|1 1 1 0 1 1 0 1|1 0 1 0 0 0 0 0|
 LDIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 0 0|
@@ -179,26 +179,40 @@ RET	>R		|1 1 0 0 1 0 0 1|
 RET	cc,>RC		|1 1|  cc |0 0 0|
 RETI	>R		|1 1 1 0 1 1 0 1|0 1 0 0 1 1 0 1|
 RETN	>R		|1 1 1 0 1 1 0 1|0 1 0 0 0 1 0 1|
-RST	t,>R		|1 1|  t  |1 1 1|
+RST	t,>C		|1 1|  t  |1 1 1|
 
 IN	A,(i)		|1 1 0 1 1 0 1 1| io		|
-IN	r,(C)		|1 1 1 0 1 1 0 1|0 1|  r  |0 0 0|
+IN	rd,(C)		|1 1 1 0 1 1 0 1|0 1|  rd |0 0 0|
 INI	-		|1 1 1 0 1 1 0 1|1 0 1 0 0 0 1 0|
 INIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 1 0|
 IND	-		|1 1 1 0 1 1 0 1|1 0 1 0 1 0 1 0|
 INDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 0|
 
 OUT	(o),A		|1 1 0 1 0 0 1 1| io		|
-OUT	(C),r		|1 1 1 0 1 1 0 1|0 1|  r  |0 0 1|
+OUT	(C),rs		|1 1 1 0 1 1 0 1|0 1|  rs |0 0 1|
 
 OUTI	-		|1 1 1 0 1 1 0 1|1 0 1 0 0 0 1 1|
 OUTIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 1 1|
 OUTD	-		|1 1 1 0 1 1 0 1|1 0 1 0 1 0 1 1|
 OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
++IX	iIX		|1 1 1 1 1 1 0 1|
++IY	iIX		|1 1 0 1 1 1 0 1|
 """
+
+def arg_e(pj, ins):
+	ins.dstadr = ins.hi
+	e = ins.im.F_e
+	if e & 0x80:
+		e -= 256
+	ins.dstadr += e
+	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_nn(pj, ins):
 	ins.dstadr = (ins.im.F_n2 << 8) | ins.im.F_n1
+	return assy.Arg_dst(pj, ins.dstadr)
+
+def arg_t(pj, ins):
+	ins.dstadr = ins.im.F_t << 3
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_inn(pj, ins):
@@ -206,10 +220,10 @@ def arg_inn(pj, ins):
 	return assy.Arg_dst(pj, ins.dstadr, "(", ")")
 
 def arg_dd(pj, ins):
-	return ["BC", "DE", "HL", "SP"][ins.im.F_dd]
+	return ["BC", "DE", ins.idx, "SP"][ins.im.F_dd]
 
 def arg_qq(pj, ins):
-	return ["BC", "DE", "HL", "AF"][ins.im.F_qq]
+	return ["BC", "DE", ins.idx, "AF"][ins.im.F_qq]
 
 def arg_rs(pj, ins):
 	return ["B", "C", "D", "E", "H", "L", None, "A"][ins.im.F_rs]
@@ -221,11 +235,34 @@ def arg_cc(pj, ins):
 	ins.cc = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"][ins.im.F_cc]
 	return ins.cc
 
+def arg_b(pj, ins):
+	return assy.Arg_imm(pj, ins.im.F_b, 8)
+
 def arg_n(pj, ins):
 	return assy.Arg_imm(pj, ins.im.F_n, 8)
 
 def arg_io(pj, ins):
 	return assy.Arg_imm(pj, ins.im.F_io, 8)
+
+def arg_ix(pj, ins):
+	ins.idx = "IX"
+
+def arg_iy(pj, ins):
+	ins.idx = "IY"
+
+def arg_hl(pj, ins):
+	return ins.idx
+
+def arg_ihl(pj, ins):
+	if ins.idx == "HL":
+		return "(HL)"
+	d = pj.m.rd(ins.hi)
+	ins.hi += 1
+	if d & 0x80:
+		d = 256 - d
+		return "(%s-0x%x)" % (ins.idx, d)
+	else:
+		return "(%s+0x%x)" % (ins.idx, d)
 
 class z80(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
@@ -236,21 +273,34 @@ class z80(assy.Instree_disass):
 			"qq":	arg_qq,
 			"nn":	arg_nn,
 			"n":	arg_n,
+			"b":	arg_b,
+			"e":	arg_e,
 			"dd":	arg_dd,
 			"rs":	arg_rs,
 			"rd":	arg_rd,
 			"(nn)":	arg_inn,
 			"(o)":	arg_io,
 			"(i)":	arg_io,
+			"(HL)":	arg_ihl,
+			"HL":	arg_hl,
+			"t":	arg_t,
+			"iIX":	arg_ix,
+			"iIY":	arg_iy,
 			"A":	"A",
-			"(HL)":	"(HL)",
+			"DE":	"DE",
 			"(DE)":	"(DE)",
 			"(BC)":	"(BC)",
-			"HL":	"HL",
-			"DE":	"DE",
+			"(SP)":	"(SP)",
+			"(C)":	"(C)",
 			"SP":	"SP",
 			"I":	"I",
 			"2":	"2",
+			"C":	"C",
+			"NC":	"NC",
+			"NZ":	"NZ",
+			"Z":	"Z",
+			"AF":	"AF",
+			"AF'":	"AF'",
 		})
 		self.mask = mask
 
