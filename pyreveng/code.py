@@ -169,8 +169,8 @@ class Decode(object):
 		Decode at adr and run with it.
 		Complain if it fails.
 		"""
-		y = pj.find(adr, self.name)
-		if y != None:
+		y = pj.find(adr)
+		if len(y) > 0:
 			return y
 		x = self.decode(pj, adr)
 		if x == None:
