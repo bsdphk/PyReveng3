@@ -247,7 +247,8 @@ class insmatch(object):
 	def __init__(self, it, il, adr, words):
 		self.spec = il.spec
 		self.adr = adr
-		self.len = il.words * it.width / it.memwidth
+		#OE: Fix for python 3.X - use // instead of /
+		self.len = il.words * it.width // it.memwidth
 		for i in il.flds:
 			self.__dict__["F_" + i] = il.get_field(i, words)
 
