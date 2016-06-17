@@ -47,13 +47,13 @@ import ctypes
 DEFINED = (1 << 7)
 
 class MemError(Exception):
-        def __init__(self, adr, reason):
+	def __init__(self, adr, reason):
 		super(MemError, self).__init__()
-                self.adr = adr
-                self.reason = reason
-                self.value = ("0x%x:" % adr + str(self.reason),)
-        def __str__(self):
-                return repr(self.value)
+		self.adr = adr
+		self.reason = reason
+		self.value = ("0x%x:" % adr + str(self.reason),)
+	def __str__(self):
+		return repr(self.value)
 
 class address_space(object):
 	"""
