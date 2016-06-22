@@ -127,7 +127,7 @@ class Tree(object):
 		"""
 		if l == None:
 			l = []
-		if hi < self.mid and self.less != None:
+		if hi <= self.mid and self.less != None:
 			self.less.find_hi(hi, l)
 		for i in self.cuts:
 			if hi == i.hi:
