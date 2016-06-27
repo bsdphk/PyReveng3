@@ -95,10 +95,10 @@ LEAX	P	|0 0 1 1 0 0 0 0|X| R |i| m	|
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
 LEAS	P	|0 0 1 1 0 0 1 0|X| R |i| m     |
 LEAU	P	|0 0 1 1 0 0 1 1|X| R |i| m     |
-PSHS	i	|0 0 1 1 0 1 0 0| i		|
-PULS	i	|0 0 1 1 0 1 0 1| i		|
-PSHU	i	|0 0 1 1 0 1 1 0| i		|
-PULU	i	|0 0 1 1 0 1 1 1| i		|
+PSHS	s	|0 0 1 1 0 1 0 0| i		|
+PULS	s	|0 0 1 1 0 1 0 1| i		|
+PSHU	s	|0 0 1 1 0 1 1 0| i		|
+PULU	s	|0 0 1 1 0 1 1 1| i		|
 RTS	>R	|0 0 1 1 1 0 0 1|
 ABX	-	|0 0 1 1 1 0 1 0|
 RTI	>R	|0 0 1 1 1 0 1 1|
@@ -254,6 +254,11 @@ LDU	E	|1 1 1 1 1 1 1 0| E1		| E2		|
 STU	E	|1 1 1 1 1 1 1 1| E1		| E2		|
 """
 
+mc6809_macro_instructions = """
+LDD	i	|1 1 0 0 0 1 1 0| i		|0 0 0 1 1 1 0 1|
+CLRD	-	|0 1 0 1 1 1 1 1|0 0 0 1 1 1 0 1|
+"""
+
 class arg_i(object):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_i
@@ -285,12 +290,35 @@ class arg_R(assy.Arg_dst):
 		ins.dstadr = (ins.hi + a) & 0xffff
 		super(arg_R, self).__init__(pj, ins.dstadr)
 
+class arg_s(assy.Arg_dst):
+	def __init__(self, pj, ins):
+		x = ins.im.F_i
+		l = []
+		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
+		if ins.mne[-1] == "S":
+			r[6] = "U"
+		if ins.mne[-1] == "U":
+			r[6] = "S"
+		for i in r:
+			if x & 1:
+				l.append(i)
+			x >>= 1
+		if ins.mne[:3] == "PSH":
+			l = reversed(l)
+		self.s = ",".join(l)
+		
+	def render(self, pj):
+		return self.s
+
+
 class arg_P(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		if ins.im.F_X == 1:
 			ins.hi += [0,0,0,0,0,0,0,0,1,2,0,0,1,2,0,2][ins.im.F_m]
-			pass
+		if self.ins.im.F_X == 1 and self.ins.im.F_m == 0xf:
+			ins.dstadr = pj.m.bu16(self.ins.hi - 2)
+		super(arg_P, self).__init__(pj, ins.dstadr, "")
 
 	def render(self, pj):
 		r = ["X", "Y", "U", "S"][self.ins.im.F_R]
@@ -323,8 +351,7 @@ class arg_P(assy.Arg_dst):
 		elif self.ins.im.F_m == 0xb:
 			s = r + "+D"
 		elif self.ins.im.F_m == 0xf:
-			o = pj.m.bu16(self.ins.hi - 2)
-			s = "0x%04x" % o
+			s = str(self)	# XXX HACK, FIX
 		else:
 			s = "<%d,%s,%d,0x%x>XXXIDX" % (
 				self.ins.im.F_X,
@@ -352,11 +379,14 @@ class arg_t(object):
 		return s
 
 class mc6809(assy.Instree_disass):
-	def __init__(self, mask=0xffff):
+	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.it.load_string(mc6809_instructions)
+		if macros:
+			self.it.load_string(mc6809_macro_instructions)
 		self.args.update( {
 			"i":	arg_i,
+			"s":	arg_s,
 			"I":	arg_I,
 			"r":	arg_r,
 			"t":	arg_t,
