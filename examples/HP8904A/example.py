@@ -178,6 +178,8 @@ def symb(pj, cpu):
 		(2, 0x6f60, "0x6f60"),		# @2:72ea -> 2211
 		(2, 0x6fbe, "0x6fbe"),		# @2:735b -> 2213
 		(2, 0x7364, "IRQ_XX3"),
+		(3, 0x4803, "0x4803"),		# @3:4b72 -> 23b0
+		(3, 0x4848, "0x4848"),
 		(3, 0x4b85, "0x4b85"),		# @3:4c51 -> 220f
 		(3, 0x4c26, "IRQ_XX4"),
 		(3, 0x50ce, "0x50ce"),		# @3:52f2 -> 220f
@@ -188,14 +190,14 @@ def symb(pj, cpu):
 		(3, 0x6f80, "0x6f80"),		# @3:7233 -> 220d
 		(3, 0x7246, "IRQ_XX5"),
 		(3, 0x7ac3, "IRQ_XX6"),
-		(3, 0x4803, "0x4803"),		# @3:4b72 -> 23b0
-		(3, 0x4848, "0x4848"),
 		(3, 0x7b7a, "0x7b7a"),
 		(4, 0x89aa, "0x89aa"),
 		(4, 0x8a08, "0x8a08"),
 		(4, 0x8a2f, "0x8a2f"),
 		(4, 0x8b4c, "0x8b4c"),
 		(4, 0x8c14, "0x8c14"),		# @0x8d51,0x8edb -> 220f
+		(4, 0x9da2, "0x9da2"),
+		(4, 0x9e53, "0x9e53"),		# @0x8d51,0x8edb -> 220f
 		(4, 0xa0d4, "0xa0d4"),
 		(4, 0xa23f, "0xa23f"),
 		(4, 0xa3e3, "0xa3e3"),
@@ -219,10 +221,9 @@ def symb(pj, cpu):
 		(4, 0xd2c6, "0xd2c6"),
 		(4, 0xd761, "0xd761"),
 		(4, 0xd781, "0xd781"),
+		(4, 0xd8ea, "DISPLAY"),
 		(4, 0xdae0, "BANKSWITCH"),
 		(4, 0xdb2b, "0xdb2b"),
-		(6, 0x247c, "IRQ_BANK"),
-		(6, 0x247d, "IRQ_VECTOR"),
 		(4, 0xdc7b, "RAM_ROM_TEST"),
 		(4, 0xdc82, "RAM_TEST"),
 		(4, 0xdca9, "ROM_SUM"),
@@ -238,6 +239,8 @@ def symb(pj, cpu):
 		(4, 0xf7ec, "0xf7ec"),
 		(4, 0xf9d4, "0xf9d4"),
 		(4, 0xfd50, "PROLOGUE"),
+		(6, 0x247c, "IRQ_BANK"),
+		(6, 0x247d, "IRQ_VECTOR"),
 	]:
 		if p == pj.pg:
 			assert a >= pj.m.lo and a < pj.m.hi
@@ -421,6 +424,11 @@ def hints(pj, cpu):
 		for a in (0x69a6,):
 			y = data.Txt(pj, a, a + 0x28, label=False)
 			y.compact = True
+		for a in (0x4142,0x4156):
+			y = data.Txt(pj, a, a + 0x14, label=False)
+			y.compact = True
+		for a in range(0x43bc, 0x43f2, 3):
+			data.Const(pj, a, a + 3)
 			
 	if pj.pg == 2:
 		for a in range(0x416b, 0x4193, 10):
@@ -442,6 +450,26 @@ def hints(pj, cpu):
 			l = pj.m.rd(a + 1)
 			data.Dataptr(pj, a + 2, a + 4, pj.m.bu16(a + 2))
 			y = data.Txt(pj, u, u + l, label=False)
+			y.compact = True
+		for a,b in (
+			(0x41a0,40),
+			(0x41c8,0x1a),
+			(0x41e2,40),
+			(0x420a,40),
+			(0x4232,16),
+			(0x4242,16),
+			(0x4252,40),
+		):
+			y = data.Txt(pj, a, a + b, label=False)
+			y.compact = True
+			
+
+	if pj.pg == 4:
+		for a in range(0xee62, 0xee88, 2):
+			u = pj.m.bu16(a)
+			y = data.Dataptr(pj, a, a + 2, u)
+			y = data.Const(pj, u, u + 1)
+			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
 			y.compact = True
 			
 #######################################################################
@@ -467,7 +495,7 @@ def prologues(pj, cpu):
 
 #######################################################################
 
-for pg in range(3, 4):
+for pg in (3,):
 
 	pj,m = setup(pg)
 
@@ -494,7 +522,7 @@ for pg in range(3, 4):
 
 	prologues(pj, cpu)
 
-	if pg not in (0,1,2,3):
+	if pg not in (0,1,2,3,4):
 		discover.Discover(pj, cpu)
 		while do_switch():
 			continue
