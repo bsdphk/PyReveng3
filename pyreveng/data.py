@@ -46,11 +46,16 @@ class Data(job.Leaf):
 		return self.fmt
 
 class Const(Data):
-	def __init__(self, pj, lo, hi):
+	def __init__(self, pj, lo, hi, fmt = None):
 		super(Const, self).__init__(pj, lo, hi, "const")
-		self.typ = None
+		if fmt == None:
+			fmt = "0x%x"
+		l = []
+		for a in range(lo, hi):
+			l.append(fmt % pj.m.rd(a))
+		self.fmt = ",".join(l)
+		self.typ = ".CONST"
 		self.val = None
-		self.fmt = None
 		self.compact = True
 
 	def render(self, pj):
