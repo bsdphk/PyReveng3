@@ -234,6 +234,7 @@ def symb(pj, cpu):
 		(4, 0xe69c, "0xe69c"),
 		(4, 0xe8a7, "0xe8a7"),
 		(4, 0xf02a, "0xf02a"),
+		(4, 0xf044, "0xf044"),
 		(4, 0xf1d9, "0xf1d9"),
 		(4, 0xf3f0, "0xf3f0"),
 		(4, 0xf7ec, "0xf7ec"),
@@ -241,6 +242,8 @@ def symb(pj, cpu):
 		(4, 0xfd50, "PROLOGUE"),
 		(6, 0x247c, "IRQ_BANK"),
 		(6, 0x247d, "IRQ_VECTOR"),
+		(6, 0x3ffc, "OPTIONS"),
+		(6, 0xed11, "blank_line"),
 	]:
 		if p == pj.pg:
 			assert a >= pj.m.lo and a < pj.m.hi
@@ -452,6 +455,7 @@ def hints(pj, cpu):
 			y = data.Txt(pj, u, u + l, label=False)
 			y.compact = True
 		for a,b in (
+			(0x4002,53),
 			(0x41a0,40),
 			(0x41c8,0x1a),
 			(0x41e2,40),
@@ -459,17 +463,81 @@ def hints(pj, cpu):
 			(0x4232,16),
 			(0x4242,16),
 			(0x4252,40),
+			(0x4292,0x1a),
+			(0x42ac,40),
+			(0x42d4,0x1a),
+			(0x42ee,0x1a),
+			(0x4308,40),
+			(0x4330,40),
+			(0x4358,40),
+			(0x4386,0x1a),
+			(0x43a0,12),
+			(0x43ac,40),
+			(0x43d4,40),
+			(0x43fc,0x1a),
+			(0x4416,40),
+			(0x443e,40),
+			(0x4466,6),
+			(0x66fa,16),
+			(0x670a,40),
+			(0x6732,40),
+			(0x675a,40),
+			(0x6782,40),
+			(0x67aa,40),
+			(0x67d2,40),
+			(0x67fa,40),
+			(0x681a,40),
+			(0x6822,40),
 		):
 			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
+
+		for a in range(0x63b2, 0x66fa, 40):
+			y = data.Txt(pj, a, a + 40, label=False)
+			y.compact = True
+
+		a = 0x4c64
+		while a < 0x4dcb:
+			y = data.Txt(pj, a)
+			y.compact = True
+			a = y.hi
+			
+		a = 0x54cf
+		while a < 0x550d:
+			y = data.Txt(pj, a)
+			y.compact = True
+			a = y.hi
+			
+		a = 0x624d
+		while a < 0x63a4:
+			y = data.Txt(pj, a)
+			y.compact = True
+			a = y.hi
 			
 
 	if pj.pg == 4:
+		data.Const(pj, 0xfd6e, 0xfd70)
 		for a in range(0xee62, 0xee88, 2):
 			u = pj.m.bu16(a)
 			y = data.Dataptr(pj, a, a + 2, u)
 			y = data.Const(pj, u, u + 1)
 			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
+			y.compact = True
+		for a in range(0xeeee, 0x0ef0e, 2):
+			u = pj.m.bu16(a)
+			y = data.Dataptr(pj, a, a + 2, u)
+			y = data.Const(pj, u, u + 1)
+			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
+			y.compact = True
+		for a in range(0xef94, 0xf012, 8):
+			y = data.Txt(pj, a, a + 8, label=False)
+			y.compact = True
+
+		for a,b in (
+			(0x8f7c,36),
+			(0xed11,40),
+		):
+			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
 			
 #######################################################################
@@ -495,7 +563,7 @@ def prologues(pj, cpu):
 
 #######################################################################
 
-for pg in (3,):
+for pg in (0,1,2,3,4,):
 
 	pj,m = setup(pg)
 
@@ -503,9 +571,9 @@ for pg in (3,):
 
 	cpu = mc6809.mc6809()
 
-	symb(pj, cpu)
-
 	hints(pj, cpu)
+
+	symb(pj, cpu)
 
 	if pj.pg == 4:
 		lexer(pj)
@@ -543,13 +611,13 @@ if False:
 			super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
 			pj.insert(self)
 
-		def render(self, pj):
-			v = pj.m.bu16(self.lo)
-			l = pj.labels.get(v)
-			if l == None:
-				return ".PTR 0x%x" % v
-			else:
-				return ".PTR %s" % l
+	def render(self, pj):
+		v = pj.m.bu16(self.lo)
+		l = pj.labels.get(v)
+		if l == None:
+			return ".PTR 0x%x" % v
+		else:
+			return ".PTR %s" % l
 
 	def str(lo):
 		l = pj.m.rd(lo)
