@@ -178,8 +178,8 @@ SBCA	P	|1 0 1 0 0 0 1 0|X| R |i| m	|
 SUBD	P	|1 0 1 0 0 0 1 1|X| R |i| m	|
 ANDA	P	|1 0 1 0 0 1 0 0|X| R |i| m	|
 BITA	P	|1 0 1 0 0 1 0 1|X| R |i| m	|
-LDAA	P	|1 0 1 0 0 1 1 0|X| R |i| m	|
-STAA	P	|1 0 1 0 0 1 1 1|X| R |i| m	|
+LDA	P	|1 0 1 0 0 1 1 0|X| R |i| m	|
+STA	P	|1 0 1 0 0 1 1 1|X| R |i| m	|
 EORA	P	|1 0 1 0 1 0 0 0|X| R |i| m	|
 ADCA	P	|1 0 1 0 1 0 0 1|X| R |i| m	|
 ORA 	P	|1 0 1 0 1 0 1 0|X| R |i| m	|
@@ -327,7 +327,7 @@ class arg_P(assy.Arg_dst):
 			o = self.ins.im.F_m
 			if self.ins.im.F_i:
 				o -= 16
-			return("%+d,%s" % (o, r))
+			return("%s%+d" % (r, o))
 
 		if self.ins.im.F_m == 0x0:
 			s = r + "+"
