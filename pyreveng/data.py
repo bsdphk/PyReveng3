@@ -38,11 +38,11 @@ class Data(job.Leaf):
 	def __init__(self, pj, lo, hi, t="data"):
 		super(Data, self).__init__(pj, lo, hi, t)
 		pj.insert(self)
+		self.fmt = None
 
 	def render(self, pj):
-		return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
-
-	def arg_render(self, pj):
+		if self.fmt == None:
+			return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 		return self.fmt
 
 class Const(Data):
