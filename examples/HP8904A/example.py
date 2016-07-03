@@ -27,7 +27,7 @@
 from __future__ import print_function
 
 import os
-from pyreveng import job, mem, listing, data, code, assy, discover
+from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.mc6809 as mc6809
 
 fwd="/critter/Doc/TestAndMeasurement/HP8904A/FW/"
@@ -162,14 +162,14 @@ def symb(pj, cpu):
 		(0, 0x51e3, "0x51e3"),		# @1:55bc -> 2213
 		(0, 0x5253, "0x5253"),		# @0:54d1 -> 2213
 		(0, 0x5d0c, "0x5d0c"),		# @0:54bf -> 220f
-		(1, 0x42d1, "0x42d1"), 		# @1:6cc4
+		(1, 0x42d1, "0x42d1"),		# @1:6cc4
 		(1, 0x444c, "0x444c"),		# @1:6cb1
 		(1, 0x4567, "0x4567"),		# @1:5517
 		(1, 0x4c01, "0x4c01"),		# @1:550b -> 220f
 		(1, 0x5185, "0x5185"),		# @1:5511 -> 2211
 		(1, 0x51e3, "0x51e3"),		# @1:55bf -> 2213
 		(1, 0x55c5, "IRQ_XX1"),
-		(1, 0x7870, "0x7870"),		# @1:79e5 
+		(1, 0x7870, "0x7870"),		# @1:79e5
 		(1, 0x7a81, "IRQ_XX2"),
 		(2, 0x4196, "0x4196"),		# @2:543a
 		(2, 0x642e, "0x642e"),		# @2:6581
@@ -196,8 +196,16 @@ def symb(pj, cpu):
 		(4, 0x8a2f, "0x8a2f"),
 		(4, 0x8b4c, "0x8b4c"),
 		(4, 0x8c14, "0x8c14"),		# @0x8d51,0x8edb -> 220f
+		(4, 0x90c9, "0x90c9"),
+		(4, 0x9a40, "0x9a40"),		# #0x9199
+		(4, 0x9a47, "0x9a48"),		# #0x917a
+		(4, 0x9a4b, "0x9a4b"),		# #0x9189
+		(4, 0x975e, "0x975e"),
+		(4, 0x9b08, "0x9b08"),
+		(4, 0x9b70, "0x9b70"),
 		(4, 0x9da2, "0x9da2"),
 		(4, 0x9e53, "0x9e53"),		# @0x8d51,0x8edb -> 220f
+		(4, 0x9e7a, "0x9e7a"),
 		(4, 0xa0d4, "0xa0d4"),
 		(4, 0xa23f, "0xa23f"),
 		(4, 0xa3e3, "0xa3e3"),
@@ -218,15 +226,25 @@ def symb(pj, cpu):
 		(4, 0xccff, "0xccff"),
 		(4, 0xcd50, "0xcd50"),
 		(4, 0xd022, "0xd022"),
+		(4, 0xd17d, "0xd17d"),
 		(4, 0xd2c6, "0xd2c6"),
-		(4, 0xd761, "0xd761"),
-		(4, 0xd781, "0xd781"),
+		(4, 0xd37d, "NUM="),
+		(4, 0xd3c6, "NUM-"),
+		(4, 0xd392, "NUM+"),
+		(4, 0xd57c, "0xd57c"),
+		(4, 0xd71d, "LCD_WR_CTRL"),
+		(4, 0xd73f, "LCD_WR_DATA"),
+		(4, 0xd761, "LCD_RD_DATA"),
+		(4, 0xd781, "LCD_RD_CTRL"),
+		(4, 0xd7a0, "LCD_DDRAM"),
 		(4, 0xd8ea, "DISPLAY"),
+		(4, 0xd9e6, "LCD_INIT"),
 		(4, 0xdae0, "BANKSWITCH"),
 		(4, 0xdb2b, "0xdb2b"),
 		(4, 0xdc7b, "RAM_ROM_TEST"),
 		(4, 0xdc82, "RAM_TEST"),
 		(4, 0xdca9, "ROM_SUM"),
+		(4, 0xdd1e, "0xdd1e"),
 		(4, 0xdeb6, "0xdeb6"),
 		(4, 0xe029, "0xe029"),
 		(4, 0xe185, "0xe185"),
@@ -240,6 +258,8 @@ def symb(pj, cpu):
 		(4, 0xf7ec, "0xf7ec"),
 		(4, 0xf9d4, "0xf9d4"),
 		(4, 0xfd50, "PROLOGUE"),
+		(6, 0x0300, "LCD_CTL"),
+		(6, 0x0301, "LCD_DATA"),
 		(6, 0x247c, "IRQ_BANK"),
 		(6, 0x247d, "IRQ_VECTOR"),
 		(6, 0x3ffc, "OPTIONS"),
@@ -250,7 +270,7 @@ def symb(pj, cpu):
 			cpu.disass(pj, a)
 		if p == pj.pg or p >= 4:
 			pj.set_label(a, n)
-			
+
 
 #######################################################################
 
@@ -296,24 +316,19 @@ def lexer(pj):
 			if self.f > 0:
 				hi += 1
 			super(lex, self).__init__(pj, lo, hi, "lex")
+			if self.f > 0 and self.pfx in hpib:
+				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
 			if self.f > 0:
-				pj.set_label(self.t, "LEX_" + self.pfx)
+				pj.set_label(self.t, "J_" + self.pfx)
 				cpu.disass(pj, self.t)
 
 		def render(self, pj):
+			s = ".LEX\t\"%s\", " % self.pfx
+			s += "%d, " % pj.m.rd(self.lo + 1)
+			s += pj.render_adr(pj.m.bu16(self.lo + 2))
 			if self.f:
-				s = ".LEX\t\"%s\"\t," % self.pfx
-			else:
-				s = ".lex\t"
-			s += "'%c', %d, 0x%04x" % (
-				pj.m.rd(self.lo),
-				pj.m.rd(self.lo + 1),
-				pj.m.bu16(self.lo + 2))
-			if self.f > 0:
-				s += ",0x%02x" % pj.m.rd(self.lo + 4)
-			if self.pfx in hpib:
-				s += "\t# " + hpib[self.pfx]
+				s += ", 0x%02x" % pj.m.rd(self.lo + 4)
 			return s
 
 	def tx(a, pfx):
@@ -323,13 +338,20 @@ def lexer(pj):
 			a = y.hi
 			if y.f == 0:
 				b = pj.m.bu16(y.lo + 2)
-				tx(b, pfx + "%c" % pj.m.rd(y.lo))
+				p = pfx + "%c" % pj.m.rd(y.lo)
+				pj.set_label(b, "LEX_" + p)
+				tx(b, p)
+		data.Const(pj, a, a + 1)
 
 	pj.set_label(0x9780, "LEXTAB_ALPHABET")
 	n = 65
 	for i in range(0x9780, 0x97b4, 2):
 		data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
 		a = pj.m.bu16(i)
+		if n != 0x5a:
+			pj.set_label(a, "LEX_%c" % n)
+		else:
+			pj.set_label(a, "LEX_NULL")
 		tx(a, "%c" % n)
 		n += 1
 
@@ -411,7 +433,7 @@ def hints(pj, cpu):
 		for a in (0x4027, 0x411b, 0x4143, 0x416b, 0x4193):
 			y = data.Txt(pj, a, a + 0x28, label=False)
 			y.compact = True
-			
+
 		y = data.Txt(pj, 0x41bb, 0x41bb + 12, label=False)
 		y.compact = True
 
@@ -432,7 +454,7 @@ def hints(pj, cpu):
 			y.compact = True
 		for a in range(0x43bc, 0x43f2, 3):
 			data.Const(pj, a, a + 3)
-			
+
 	if pj.pg == 2:
 		for a in range(0x416b, 0x4193, 10):
 			tbl0_0(pj, cpu, a)
@@ -501,19 +523,19 @@ def hints(pj, cpu):
 			y = data.Txt(pj, a)
 			y.compact = True
 			a = y.hi
-			
+
 		a = 0x54cf
 		while a < 0x550d:
 			y = data.Txt(pj, a)
 			y.compact = True
 			a = y.hi
-			
+
 		a = 0x624d
 		while a < 0x63a4:
 			y = data.Txt(pj, a)
 			y.compact = True
 			a = y.hi
-			
+
 
 	if pj.pg == 4:
 		data.Const(pj, 0xfd6e, 0xfd70)
@@ -529,17 +551,43 @@ def hints(pj, cpu):
 			y = data.Const(pj, u, u + 1)
 			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
 			y.compact = True
-		for a in range(0xef94, 0xf012, 8):
-			y = data.Txt(pj, a, a + 8, label=False)
-			y.compact = True
+		for a in range(0xef94, 0xf014, 8):
+			y = data.Const(pj, a, a + 8, fmt="0x%02x")
 
 		for a,b in (
 			(0x8f7c,36),
+			(0x977b, 5),
 			(0xed11,40),
+			(0xea99,0x23),
 		):
 			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
-			
+
+		def char_def(pj, a):
+			for i in range(8):
+				y = data.Data(pj, a + i, a + i + 1)
+				x = pj.m.rd(a + i)
+				y.fmt = ".BITS\t"
+				for j in range(8):
+					if x & 0x80:
+						y.fmt += "#"
+					else:
+						y.fmt += "-"
+					x = x << 1
+
+		l = [ "LCD_CHR_f", "LCD_CHR_1", "LCD_CHR_2", "LCD_CHR_3",
+		      "LCD_CHR_4", "LCD_CHR_oe", "LCD_CHR_mu", "LCD_CHR_is", ]
+		for a in range(0xea15, 0xea4e, 8):
+			pj.set_label(a, l.pop(0))
+			char_def(pj, a)
+
+		data.Const(pj, 0x929d, 0x929d + 8)
+		data.Const(pj, 0x9777, 0x9777 + 4)
+		data.Const(pj, 0xdd73, 0xdd9d)
+
+
+
+
 #######################################################################
 # Function prologues
 
@@ -563,7 +611,7 @@ def prologues(pj, cpu):
 
 #######################################################################
 
-for pg in (0,1,2,3,4,):
+for pg in (0,1,2,3,4):
 
 	pj,m = setup(pg)
 
@@ -590,285 +638,14 @@ for pg in (0,1,2,3,4,):
 
 	prologues(pj, cpu)
 
-	if pg not in (0,1,2,3,4):
-		discover.Discover(pj, cpu)
-		while do_switch():
-			continue
-		prologues(pj, cpu)
-		while pj.run():
-			pass
-
 	code.lcmt_flows(pj)
 
 	listing.Listing(pj)
 
-if False:
+	import example2
 
-	##############
+	example2.analyse(pj)
 
-	class ptr(job.Leaf):
-		def __init__(self, pj, adr):
-			super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
-			pj.insert(self)
+	pj.name = pj.name + "_A"
 
-	def render(self, pj):
-		v = pj.m.bu16(self.lo)
-		l = pj.labels.get(v)
-		if l == None:
-			return ".PTR 0x%x" % v
-		else:
-			return ".PTR %s" % l
-
-	def str(lo):
-		l = pj.m.rd(lo)
-		y = data.Txt(pj, lo + 1, lo + l + 1, label=False)
-		
-
-	def strtable(lo, hi):
-		for a in range(lo, hi, 2):
-			ptr(pj, a)
-			v = pj.m.bu16(a)
-			str(v)
-
-	for i,j in (
-		(0x8f7c, 35),
-		(0xea71, 40),
-		(0xea99, 40),
-		(0xeac1, 35),
-		(0xeaf1, 40),
-		(0xeb19, 40),
-		(0xeb41, 40),
-		(0xeb69, 40),
-		(0xeb91, 40),
-		(0xebb9, 21),
-		(0xebce, 21),
-		(0xebe3, 40),
-		(0xec0b, 40),
-		(0xec33, 40),
-		(0xec5b, 14),
-		(0xec69, 14),
-		(0xec77, 14),
-		(0xec85, 60),
-		(0xecc1, 40),
-		(0xece9, 40),
-		(0xed11, 40),
-		(0xed39, 40),
-		(0xed61, 40),
-		(0xedcf, 40),
-		(0xedf7, 40),
-		(0xee1f, 40),
-		):
-		continue
-		y = data.Txt(pj, i, i + j, label=False)
-		y.compact = True
-
-	strtable(0xee62, 0xee88)
-	strtable(0xeeee, 0xef0e)
-
-	for i in range(0xef94, 0xf014, 8):
-		data.Data(pj, i, i + 8)
-
-	#############################
-
-	# Function pointer written into 0x2213
-	cpu.disass(pj, 0xc239)
-
-	# Function pointers written into 0x220d
-	for i in (0xa0d4, 0xa23f, 0xf1d9, 0xf3f0, 0xf9d4):
-		cpu.disass(pj, i)
-
-	# Function pointers written into 0x220f
-	for i in (0x8c14, ):
-		cpu.disass(pj, i)
-
-	# Function called through pointer
-	cpu.disass(pj, 0x9a40)
-
-	# Random
-	cpu.disass(pj, 0x975e)
-	cpu.disass(pj, 0x9b08)
-	cpu.disass(pj, 0xfe53)
-
-
-	while pj.run():
-		pass
-
-	#############################
-
-	def spot():
-
-		for lo,hi in pj.gaps():
-			print("R %x %x" % (lo, hi))
-			for i in range(lo, hi):
-				if pj.m.rd(i) != 0xfc:
-					continue
-				if pj.m.rd(i + 3) != 0x17:
-					continue
-				x = pj.m.bu16(i + 4)
-				t = (i + x + 6) & 0xffff
-				if t != 0xfd50:
-					continue
-				print("Spotting %04x" % i)
-				cpu.disass(pj, i)
-				while pj.run():
-					pass
-				do_switch()
-				return (1)
-		return (0)
-
-
-	#############################
-	# PG 0
-	if pj.pg == 0:
-		print("================ PG#0 ======================")
-
-	#############################
-	# PG 3
-	if pj.pg == 3:
-		print("================ PG#3 ======================")
-		for i,j in (
-			(0x4002, 53),
-			(0x4466, 6),
-			):
-			y = data.Txt(pj, i, i + j, label=False)
-			y.compact = True
-		for i in range(0x7349, 0x7445, 4):
-			data.Data(pj, i, i + 4)
-			x = pj.m.rd(i)
-			y = pj.m.rd(i + 1)
-			z = pj.m.bu16(i + 2)
-			j = data.Txt(pj, z, z + y, label=False)
-			j.compact = True
-		cpu.disass(pj, 0x4b1e)
-		cpu.disass(pj, 0x500e)
-		cpu.disass(pj, 0x50ce)
-		cpu.disass(pj, 0x5298)
-		cpu.disass(pj, 0x5517)
-		cpu.disass(pj, 0x7ac6)
-		data.Txt(pj, 0x54cf)
-
-		for i in range(16):
-			a = 0x63da + 40 * i
-			j = data.Txt(pj, a, a + 40, label=False)
-			j.compact = True
-		for i in range(0x624d,0x63a4, 8):
-			j = data.Txt(pj, i, label=False)
-			j.compact = True
-		for i in range(0x4c64,0x4dcb, 9):
-			j = data.Txt(pj, i, label=False)
-			j.compact = True
-
-		for i in range(0x4178, 0x41a0, 10):
-			ptr(pj, i+0)
-			cpu.codeptr(pj, i+2)
-			cpu.codeptr(pj, i+4)
-			cpu.codeptr(pj, i+6)
-			cpu.codeptr(pj, i+8)
-			u = pj.m.bu16(i)
-			x = data.Txt(pj, u, u + 40, label=False)
-			x.compact = True
-			x = data.Txt(pj, u + 40, u + 80, label=False)
-			x.compact = True
-
-	if True:
-		while spot() > 0:
-			continue
-
-	#############################
-
-	while pj.run():
-		pass
-
-	#############################
-	# 0xd8a5 is display function
-	# 0xd8ea is display function
-	pj.set_label(0xd8e5, "SHOW1")
-	pj.set_label(0xd8ea, "SHOW2")
-	pj.set_label(0xc285, "MEMCPY")
-
-	strmatch = [
-	   [ 0xc285, 6, 0x10, 2, 4, 0xc6, 5,
-		"LDY-LDB-SEX-TFR-LDD-PSHS-LBSR" ],
-	   [ 0xd8ea, 9, 0xce, 1, 3, 0xc6, 4,
-		"LDU-LDB-SEX-TFR-CLRB-SEX-TFR-LDD-PSHS-LBSR" ],
-	   [ 0xd8ea, 9, 0xce, 1, 3, 0xc6, 4,
-		"LDU-LDB-SEX-TFR-LDB-SEX-TFR-LDD-PSHS-LBSR" ],
-	   [ 0xd8a5, 9, 0xce, 1, 3, 0xc6, 4,
-		"LDU-LDB-SEX-TFR-LDB-SEX-TFR-LDD-PSHS-LBSR" ],
-	   [ 0xd8a5, 9, 0xce, 1, 3, 0xc6, 4,
-		"LDU-LDB-SEX-TFR-CLRB-SEX-TFR-LDD-PSHS-LBSR" ],
-	]
-
-	for i in pj:
-		if i.tag != "mc6809":
-			continue
-		for t in strmatch:
-			if i.dstadr != t[0]:
-				continue
-			l = [i]
-			s = i.mne
-			for j in range(t[1]):
-				x = pj.t.find_hi(l[0].lo)
-				assert len(x) == 1
-				l.insert(0, x[0])
-				s = x[0].mne + "-" + s
-			if t[7] != s:
-				print("#0 %x %x" % (i.lo, i.dstadr))
-				print("  ", s)
-				print("  ", t)
-				continue
-			if pj.m.rd(l[0].lo) != t[2]:
-				print("#1 %x %x" % (i.lo, i.dstadr))
-				print("  ", s)
-				print("  ", t)
-				continue
-			if pj.m.rd(l[0].lo + t[4]) != t[5]:
-				print("#2 %x %x" % (i.lo, i.dstadr))
-				print("  ", s)
-				print("  ", t)
-				continue
-			x = pj.m.bu16(l[0].lo + t[3])
-			if x < 0x4000:
-				continue
-			y = pj.m.rd(l[0].lo + t[6])
-			z = data.Txt(pj, x, x + y, label=False)
-			z.compact = True
-			l[0].lcmt += '"' + z.txt + '"\n'
-			print("S %04x %02x - %04x %04x - " % (x, y, l[0].lo, i.dstadr) + s)
-
-	for i in []:
-		if i.tag != "mc6809":
-			continue
-		if i.dstadr != 0xd8ea and i.dstadr != 0xd8a5:
-			continue
-		l = [i]
-		s = i.mne
-		for j in range(9):
-			x = pj.t.find_hi(l[0].lo)
-			assert len(x) == 1
-			l.insert(0, x[0])
-			s = x[0].mne + "-" + s
-		if pj.m.rd(l[0].lo) != 0xce:
-			continue
-		if pj.m.rd(l[0].lo + 3) != 0xc6:
-			continue
-		x = pj.m.bu16(l[0].lo + 1)
-		y = pj.m.rd(l[0].lo + 4)
-		if x < 0x4000:
-			continue
-		if i.dstadr == 0xd8ea and \
-		    ( s == "LDU-LDB-SEX-TFR-CLRB-SEX-TFR-LDD-PSHS-LBSR" or \
-		    s == "LDU-LDB-SEX-TFR-LDB-SEX-TFR-LDD-PSHS-LBSR" ):
-			pass
-		elif i.dstadr == 0xd8a5 and \
-		    ( s == "LDU-LDB-SEX-TFR-LDB-SEX-TFR-LDD-PSHS-LBSR" or \
-		    s == "LDU-LDB-SEX-TFR-CLRB-SEX-TFR-LDD-PSHS-LBSR" ):
-			pass
-		else:
-			print("?? %04x" % l[0].lo, "%04x" % i.dstadr, s, l[-1].hi - l[0].lo)
-			continue
-		#print("S %04x %02x - %04x %04x - " % (x, y, l[0].lo, i.dstadr) + s)
-		y = data.Txt(pj, x, x + y, label=False)
-		y.compact = True
-		l[0].lcmt += '"' + y.txt + '"\n'
-
+	listing.Listing(pj)
