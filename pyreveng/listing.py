@@ -42,7 +42,6 @@ class Render_mem(object):
 		self.dpct = "%" + "0%d" % len(j) + fmt
 		self.undef = "-" * len(j)
 		self.space = " " * len(j)
-		#OE: Fix for python 3.X - use // instead of /
 		self.aspace = " " * (pj.m.bits//8)
 
 		if ncol != None:
