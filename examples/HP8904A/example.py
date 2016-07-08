@@ -55,6 +55,8 @@ def setup(pg=4):
 
 #######################################################################
 
+keys = {}
+
 hpib = {
 	"AHR":	"Amplitude Hop",
 	"DPE":	"Digital Port",
@@ -209,8 +211,7 @@ def symb(pj, cpu):
 		(2, 0x6ab8, "DSEQ_STOP"),
 
 		(3, 0x471c, "ROM_CHECK"),
-		(3, 0x4803, "0x4803"),		# @3:4b72 -> 23b0
-		(3, 0x4848, "0x4848"),
+		(3, 0x4803, "KEY_TEST_KEYS"),	# @3:4b72 -> 23b0
 		(3, 0x4b1e, "KEYBOARD_CHECK"),
 		(3, 0x4b85, "0x4b85"),		# @3:4c51 -> 220f
 		(3, 0x4c26, "APP_DIAG"),
@@ -234,7 +235,14 @@ def symb(pj, cpu):
 		(4, 0x8a08, "SET_MENU"),
 		(4, 0x8a2f, "0x8a2f"),
 		(4, 0x8b4c, "MENU_EXIT"),
+		(4, 0x8b63, "SHOW_MAIN_MENU"),
 		(4, 0x8c14, "0x8c14"),		# @0x8d51,0x8edb -> 220f
+		(4, 0x8c44, "main_menu_nop"),
+		(4, 0x8c20, "main_menu_0x10"),
+		(4, 0x8c2d, "main_menu_f1"),
+		(4, 0x8c47, "main_menu_f3"),
+		(4, 0x8c5e, "main_menu_next"),
+		(4, 0x8c83, "main_menu_prev"),
 		(4, 0x90c9, "0x90c9"),
 		(4, 0x9a40, "0x9a40"),		# #0x9199
 		(4, 0x9a47, "0x9a48"),		# #0x917a
@@ -250,6 +258,7 @@ def symb(pj, cpu):
 		(4, 0xa3e3, "0xa3e3"),
 		(4, 0xaba9, "0xaba9"),
 		(4, 0xabef, "0xabef"),
+		(4, 0xae22, "non_func_key"),
 		(4, 0xb8ad, "0xb8ad"),
 		(4, 0xb8cc, "0xb8cc"),
 		(4, 0xc1e3, "0xc1e3"),
@@ -310,6 +319,8 @@ def symb(pj, cpu):
 		(6, 0x247b, "CUR_BANK"),
 		(6, 0x247c, "APP_BANK"),
 		(6, 0x247d, "APP_VECTOR"),
+		(6, 0x24dc, "KEY_PRESSED"),
+		(6, 0x3fa1, "PREV_KEY"),
 		(6, 0x3ffc, "OPTIONS"),
 		(6, 0xed11, "blank_line"),
 	]:
@@ -617,6 +628,18 @@ def hints(pj, cpu):
 			y.compact = True
 			a = y.hi
 
+		n = 0
+		for a in range(0x4a3f, 0x4aad, 2):
+			y = pj.m.bu16(a)
+			assert pj.m.rd(y) == 0xcc
+			x = pj.m.bu16(y + 1)
+			z = pj.t.find_lo(x)
+			t = z[0].txt[:-4].strip().replace(" ","_")
+			pj.set_label(a, "k_0x%02x" % n)
+			pj.set_label(y, "test_key_" + t)
+			keys[n] = t
+			n += 1
+
 
 	if pj.pg == 4:
 		data.Const(pj, 0xfd6e, 0xfd70)
@@ -686,6 +709,15 @@ def hints(pj, cpu):
 		for a in (0xea55, 0xea58, 0xea5f, 0xea62, 0xea65,
 		    0xea68, 0xea6b, 0xea6e):
 			Num(pj, a)
+
+		n = 1
+		for a in range(0xae3d, 0xaea5, 2):
+			print("%x -> " % a + keys[n])
+			pj.set_label(a, "K_" + keys[n])
+			u = pj.m.bu16(a)
+			if u != 0xae22:
+				pj.set_label(u, "key_" + keys[n])
+			n += 1
 
 
 #######################################################################
