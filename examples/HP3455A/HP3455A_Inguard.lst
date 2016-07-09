@@ -1,0 +1,600 @@
+;-------------------------------------------------------------------------------
+;HP 3455A inguard ROM
+;
+;The nanoprocessor takes two clocks per instruction.
+;The clock runs at 819.2 kHz if 50Hz line frequency is selected
+;and 983.04 kHz for 60Hz line frequency.
+;
+;The internal power line cycle counter is 256 times a 32 instruction loop
+;per PLC, i.e. 256*32*2/983040 giving 16.67 ms for 60Hz.
+;
+;The startup code is at 0x0FD
+;
+;DEV1 bits:        REG3 bits:
+;0x20    LNRF      0   Autocal LNRF and HPRF only
+;0x10    HPRF      1   8 PLC
+;0x08    HAZ       2   Autocal - no input to AtoD
+;0x04    HPRS      3
+;0x02    LNRS      4   Set device latches to values from outguard
+;0x01    LVIN      5
+;Note all device output is inverted in hardware, so the complement must be written to DEV1
+;-------------------------------------------------------------------------------
+000  a2           |    |		CBN	BIT2
+001  79           |y   |		STA	REG9
+002  7b           |{   |		STA	REG11
+003  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0x6
+004  80 3c        | <  |		JMP	START_AUTOZERO	       ; Use existing settings
+                        					       ; Flow > 0x3c
+006  d3 fc        |    |		STR	REG3,#0xfc	       ; Default Control Bits
+008  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0xb
+009  80 32        | 2  |		JMP	SET_LATCHES	       ; Use default settings
+                        					       ; Flow > 0x32
+00b  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+00d  73           |s   |		STA	REG3
+00e  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+010  78           |x   |		STA	REG8
+011  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+013  79           |y   |		STA	REG9
+014  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+016  7a           |z   |		STA	REG10
+017  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+019  7b           |{   |		STA	REG11
+01a  89 d7        |    |		JSB	READ_OUTGUARD	       ; Flow C 0x1d7
+01c  7c           ||   |		STA	REG12
+01d  67           |g   |		LDA	REG7		       ; Calculated parity
+                        	WAIT_CLOCK_LOW:
+01e  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0x21
+01f  80 1e        |    |		JMP	WAIT_CLOCK_LOW	       ; Flow > 0x1e
+                        	WAIT_CLOCK_HIGH:
+021  19           |    |		SFS	DCTL1		       ; Flow > cc=FS 0x24
+022  80 21        | !  |		JMP	WAIT_CLOCK_HIGH	       ; Flow > 0x21
+024  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0x27
+025  00           |    |		INB
+026  5f           |_   |		NOP
+027  30           |0   |		SBZ	BIT0		       ; Flow > cc=BZ 0x2a
+                        	PARITY_ERROR:
+028  80 28        | (  |		JMP	PARITY_ERROR	       ; Flow > 0x28
+                        	WAIT_CLOCK_LOW2:
+02a  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0x2d
+02b  80 2a        | *  |		JMP	WAIT_CLOCK_LOW2	       ; Flow > 0x2a
+02d  2b           |+   |		STC	DCTL3
+02e  63           |c   |		LDA	REG3
+02f  14           |    |		SBS	BIT4		       ; Flow > cc=BS 0x32
+030  80 3c        | <  |		JMP	START_AUTOZERO	       ; Flow > 0x3c
+                        	SET_LATCHES:
+032  68           |h   |		LDA	REG8
+033  50           |P   |		OTA	DEV0
+034  69           |i   |		LDA	REG9
+035  52           |R   |		OTA	DEV2
+036  6a           |j   |		LDA	REG10
+037  53           |S   |		OTA	DEV3
+038  6b           |k   |		LDA	REG11
+039  54           |T   |		OTA	DEV4
+03a  6c           |l   |		LDA	REG12
+03b  55           |U   |		OTA	DEV5
+;-------------------------------------------------------------------------------
+;AtoD Auto-Zero
+;0x14 = HAZ on, everything else off
+;AUTOZERO_LOOP is 16 instructions per iteration
+;-------------------------------------------------------------------------------
+                        	START_AUTOZERO:
+03c  c1 14        |    |		OTR	DEV1,#0x14	       ; HAZ on
+                        	AUTOZERO_LOOP:
+03e  89 cb        |    |		JSB	INC_PLCCTR	       ; 1..11 instructions; loop is 16 instr. per iteration
+                        					       ; Flow C 0x1cb
+040  66           |f   |		LDA	REG6
+041  00           |    |		INB
+042  76           |v   |		STA	REG6
+043  17           |    |		SBS	BIT7		       ; Flow > cc=BS 0x46
+044  80 3e        | >  |		JMP	AUTOZERO_LOOP	       ; Flow > 0x3e
+046  04           |    |		CLA			       ; Initialize (zero) the count
+047  78           |x   |		STA	REG8
+048  79           |y   |		STA	REG9
+049  7c           ||   |		STA	REG12
+04a  7d           |}   |		STA	REG13
+04b  72           |r   |		STA	REG2
+                        	SET_LVIN:
+04c  df 1d        |    |		STR	REG15,#0x1d	       ; LVIN on
+04e  d0 08        |    |		STR	REG0,#0x8
+050  63           |c   |		LDA	REG3
+051  11           |    |		SBS	BIT1		       ; Flow > cc=BS 0x54
+                        	SET_1PLC:
+052  d0 01        |    |		STR	REG0,#0x1
+054  30           |0   |		SBZ	BIT0		       ; Flow > cc=BZ 0x57
+                        	SET_LNRF_HPRF:
+055  df 2c        | ,  |		STR	REG15,#0x2c	       ; LNRF,HPRF on
+057  12           |    |		SBS	BIT2		       ; Flow > cc=BS 0x5a
+                        	SET_LVIN_OFF:
+058  df 1c        |    |		STR	REG15,#0x1c	       ; All AtoD inputs off
+;-------------------------------------------------------------------------------
+;Main Integration Loop
+;
+;Register usage:
+;REG0			# PLCs
+;REG2			AtoD autocal counter
+;REG3			Control bits from Outguard
+;REG5			AtoD device bits for discharge during integration
+;REG7			Discharge during integration counter
+;REG9:REG8		PLC counter (REG9 has PLCs elapsed)
+;REG15			AtoD device bits
+;REG13:REG12:REG11	Count
+;
+;These device control bits are used as temporary flags.  It is assumed that
+;the outguard doesn't drive them and doesn't look at them during integration.
+;
+;DCTL0	Tentative sign of result is valid
+;DCTL3	Tentative sign of result
+;
+;DCTL3 is set during integration when the count is zero.  Should the input voltage
+;change such that the sign of the voltage on the integration capacitor changes
+;and the magnitude is greater than 10V, then DCTL0 is cleared to indicate the
+;sign is potentially invalid and the count should be decremented during the current
+;discharge period.  Given the approximately 80 times multiplication factor between input
+;voltage and voltage on the integration capacitor, it wouldn't require much reverse
+;voltage for very long for this to happen.
+;
+;DEV1 is written by the second instruction of each loop/sub-loop.
+;(This fact is used by the PLC counter.)
+;Each loop or sub-loop during integration is exactly 32 instructions
+;The count is shifted left by 3 after integration
+;During fast rundown, each loop is exactly 4 instructions and
+;during slow rundown, each loop is exactly 2 instructions
+;REG11 is set during slow rundown, REG13:REG12 are used during integration and fast rundown
+;The doubling of the count rate and inherent 8 bit shift give the 128:1 weighting between
+;fast and slow rundown.
+;-------------------------------------------------------------------------------
+                        	INTEGRATE_LOOP:
+05a  6f           |o   |		LDA	REG15
+05b  51           |Q   |		OTA	DEV1
+05c  63           |c   |		LDA	REG3
+05d  30           |0   |		SBZ	BIT0		       ; Flow > cc=BZ 0x60
+05e  80 6d        | m  |		JMP	ATOD_AUTOCAL	       ; Flow > 0x6d
+;-------------------------------------------------------------------------------
+;Select discharge type
+;
+;This code assumes that if DCTL0 (0DETECT) is zero, then DCTL2 is set.
+;The instruction counts and control bits in REG5 will be wrong otherwise.
+;DCTL2 was initialized to 1 and does not appear to change during the integration phase.
+;-------------------------------------------------------------------------------
+060  6f           |o   |		LDA	REG15
+061  3d           |=   |		SFZ	DCTL5		       ; Flow > cc=FZ 0x64
+062  a4           |    |		CBN	BIT4		       ; HPRF
+063  1a           |    |		SFS	DCTL2		       ; Flow > cc=FS 0x66
+064  25           |%   |		SBN	BIT5		       ; LNRF
+065  5f           |_   |		NOP
+066  75           |u   |		STA	REG5
+067  04           |    |		CLA
+                        	INIT_DISCHARGE_COUNT:
+068  23           |#   |		SBN	BIT3
+069  01           |    |		DEB
+06a  77           |w   |		STA	REG7		       ; REG7 = 7
+06b  80 7c        | |  |		JMP	INTEGRATE_LOOP_NEXT    ; Flow > 0x7c
+                        	ATOD_AUTOCAL:
+06d  62           |b   |		LDA	REG2
+06e  00           |    |		INB
+06f  72           |r   |		STA	REG2
+070  13           |    |		SBS	BIT3		       ; Flow > cc=BS 0x73
+071  80 68        | h  |		JMP	INIT_DISCHARGE_COUNT   ; Flow > 0x68
+073  6f           |o   |		LDA	REG15
+074  34           |4   |		SBZ	BIT4		       ; Flow > cc=BZ 0x77
+                        	SET_LNRF_HPRF2:
+075  df 2c        | ,  |		STR	REG15,#0x2c	       ; LNRF,HPRF on
+077  14           |    |		SBS	BIT4		       ; Flow > cc=BS 0x7a
+                        	SET_LVIN_OFF2:
+078  df 1c        |    |		STR	REG15,#0x1c	       ; All AtoD inputs off
+07a  d2 00        |    |		STR	REG2,#0x0
+                        	INTEGRATE_LOOP_NEXT:
+07c  89 cb        |    |		JSB	INC_PLCCTR	       ; Flow C 0x1cb
+07e  88 fa        |    |		JSB	DELAY3		       ; Flow C 0xfa
+080  0e           |    |		SNE			       ; Flow > cc=NE 0x83
+                        	GOTO_RUNDOWN1:
+081  80 88        |    |		JMP	GOTO_RUNDOWN2	       ; Flow > 0x88
+083  3c           |<   |		SFZ	DCTL4		       ; Flow > cc=FZ 0x86
+084  80 8b        |    |		JMP	OVER10V		       ; Flow > 0x8b
+086  80 5a        | Z  |		JMP	INTEGRATE_LOOP	       ; Flow > 0x5a
+                        	GOTO_RUNDOWN2:
+088  5f           |_   |		NOP			       ; Maintain 32 instr. between writes to DEV1
+089  81 4a        | J  |		JMP	RUNDOWN		       ; Flow > 0x14a
+;-------------------------------------------------------------------------------
+;Start discharge during integration
+;
+;The loop initialization code assumes that there will be no overflow of REG12
+;when it increments it.  This is usually true since this loop will increment
+;the count by 8 each time it runs, so we won't hit a count of 255 here.
+;However, if the input sign changes, with the count at a multiple of 256,
+;we will decrement the counter and miss the underflow!
+;REG12 overflow IS handled in the loop itself.
+;This loop runs for (8 * 32 * 2) clock periods or about 0.5ms.  This will reduce
+;the magnitude of voltage on the integration capacitor by about 6.1V (1mA from a 0.082uF
+;capacitor for 0.5ms).
+;
+;Note that the 0V detect signal was used to set up REG5 and is also used in
+;CHECK_RESULT_SIGN to determine whether we will increment of decrement the count.
+;Since we are over 10V here, there is no chance it changed inbetween.
+;-------------------------------------------------------------------------------
+                        	OVER10V:
+08b  65           |e   |		LDA	REG5
+08c  51           |Q   |		OTA	DEV1
+08d  89 ab        |    |		JSB	CHECK_RESULT_SIGN      ; Flow C 0x1ab
+08f  6c           |l   |		LDA	REG12
+090  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0x93
+091  00           |    |		INB
+092  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0x95
+093  01           |    |		DEB
+094  5f           |_   |		NOP
+095  7c           ||   |		STA	REG12
+096  89 cb        |    |		JSB	INC_PLCCTR	       ; Flow C 0x1cb
+098  5f           |_   |		NOP
+099  0e           |    |		SNE			       ; Flow > cc=NE 0x9c
+09a  81 4a        | J  |		JMP	RUNDOWN		       ; Flow > 0x14a
+                        	DISCHARGE_DURING_INTEGRATE:
+09c  5f           |_   |		NOP
+09d  b5           |    |		CLE
+09e  6c           |l   |		LDA	REG12		       ; Inc/dec count as appropriate
+09f  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0xa2
+0a0  00           |    |		INB
+0a1  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0xa4
+0a2  01           |    |		DEB
+0a3  5f           |_   |		NOP
+0a4  7c           ||   |		STA	REG12
+0a5  6d           |m   |		LDA	REG13
+0a6  1f           |    |		SES			       ; Flow > cc=ES 0xa9
+0a7  80 be        |    |		JMP	NO_CARRY	       ; Flow > 0xbe
+0a9  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0xac
+0aa  00           |    |		INB
+0ab  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0xae
+0ac  01           |    |		DEB
+                        	DISCHARGE_DURING_INTEGRATE2:
+0ad  5f           |_   |		NOP
+0ae  b5           |    |		CLE
+0af  7d           |}   |		STA	REG13
+0b0  67           |g   |		LDA	REG7
+0b1  01           |    |		DEB
+0b2  77           |w   |		STA	REG7
+0b3  89 cb        |    |		JSB	INC_PLCCTR	       ; Flow C 0x1cb
+0b5  0e           |    |		SNE			       ; Flow > cc=NE 0xb8
+0b6  80 81        |    |		JMP	GOTO_RUNDOWN1	       ; Flow > 0x81
+0b8  67           |g   |		LDA	REG7
+0b9  0b           |    |		SAZ			       ; Flow > cc=AZ 0xbc
+0ba  80 9c        |    |		JMP	DISCHARGE_DURING_INTEGRATE; Flow > 0x9c
+0bc  80 5a        | Z  |		JMP	INTEGRATE_LOOP	       ; Flow > 0x5a
+                        	NO_CARRY:
+0be  80 ad        |    |		JMP	DISCHARGE_DURING_INTEGRATE2; Flow > 0xad
+                        	OUTPUT_NEXT_BYTE:
+0c0  d1 00        |    |		STR	REG1,#0x0
+0c2  78           |x   |		STA	REG8
+                        	OUTPUT_BIT:
+0c3  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0xc6
+0c4  80 c3        |    |		JMP	OUTPUT_BIT	       ; Flow > 0xc3
+0c6  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0xc9
+0c7  81 36        | 6  |		JMP	OUTPUT_TO_OUTGUARD     ; Flow > 0x136
+                        	OUTPUT_FIRST_BYTE:
+0c9  aa           |    |		CLC	DCTL2
+                        	WAIT_CLOCK_HIGH2:
+0ca  19           |    |		SFS	DCTL1		       ; Flow > cc=FS 0xcd
+0cb  80 ca        |    |		JMP	WAIT_CLOCK_HIGH2       ; Flow > 0xca
+0cd  ab           |    |		CLC	DCTL3
+0ce  61           |a   |		LDA	REG1
+0cf  13           |    |		SBS	BIT3		       ; Flow > cc=BS 0xd2
+0d0  80 d5        |    |		JMP	SET_OUTPUT_BIT	       ; Flow > 0xd5
+0d2  2a           |*   |		STC	DCTL2
+0d3  67           |g   |		LDA	REG7
+0d4  78           |x   |		STA	REG8
+                        	SET_OUTPUT_BIT:
+0d5  68           |h   |		LDA	REG8
+0d6  30           |0   |		SBZ	BIT0		       ; Flow > cc=BZ 0xd9
+0d7  2b           |+   |		STC	DCTL3
+0d8  5f           |_   |		NOP
+0d9  06           |    |		RSA
+0da  78           |x   |		STA	REG8
+0db  67           |g   |		LDA	REG7
+0dc  3b           |;   |		SFZ	DCTL3		       ; Flow > cc=FZ 0xdf
+0dd  00           |    |		INB
+0de  77           |w   |		STA	REG7
+0df  61           |a   |		LDA	REG1
+0e0  00           |    |		INB
+0e1  71           |q   |		STA	REG1
+0e2  3a           |:   |		SFZ	DCTL2		       ; Flow > cc=FZ 0xe5
+0e3  81 45        | E  |		JMP	RESTART_OUTPUT	       ; Flow > 0x145
+0e5  13           |    |		SBS	BIT3		       ; Flow > cc=BS 0xe8
+0e6  80 c3        |    |		JMP	OUTPUT_BIT	       ; Flow > 0xc3
+0e8  b8           |    |		RTS			       ; Flow R
+                        	PATCH_0E9:
+0e9  b5           |    |		CLE
+0ea  05           |    |		CMA
+0eb  7d           |}   |		STA	REG13
+0ec  6c           |l   |		LDA	REG12
+0ed  05           |    |		CMA
+0ee  00           |    |		INB
+0ef  7c           ||   |		STA	REG12
+0f0  3b           |;   |		SFZ	DCTL3		       ; Flow > cc=FZ 0xf3
+0f1  ab           |    |		CLC	DCTL3
+0f2  3b           |;   |		SFZ	DCTL3		       ; Flow > cc=FZ 0xf5
+0f3  2b           |+   |		STC	DCTL3
+0f4  5f           |_   |		NOP
+0f5  28           |(   |		STC	DCTL0
+0f6  b8           |    |		RTS			       ; Flow R
+0f7  5f           |_   |		NOP
+0f8  5f           |_   |		NOP
+0f9  5f           |_   |		NOP
+0fa  5f           |_   |	DELAY3:	NOP
+0fb  5f           |_   |	DELAY2:	NOP
+0fc  b8           |    |		RTS			       ; Flow R
+0fd  81 f0        |    |		JMP	STARTUP		       ; Flow > 0x1f0
+;-------------------------------------------------------------------------------
+;Interrupt Handler
+;
+;The interrupt breaks the slow rundown loop which was accumulating the count in A.
+;The slow rundown count is saved in REG11 and added to/subtracted from the
+;rest of the count in REG13:REG12.
+;The rundown is stopped and auto-zero started immediately.
+;-------------------------------------------------------------------------------
+                        	INTERRUPT:
+0ff  c1 14        |    |		OTR	DEV1,#0x14	       ; Stops rundown and sets HAZ
+101  7b           |{   |		STA	REG11
+102  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0x105
+103  81 10        |    |		JMP	SIGNS_DIFFERENT	       ; Flow > 0x110
+105  6c           |l   |		LDA	REG12
+106  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x109
+107  b5           |    |		CLE
+108  00           |    |		INB
+109  7c           ||   |		STA	REG12
+10a  6d           |m   |		LDA	REG13
+10b  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x10e
+10c  b5           |    |		CLE
+10d  00           |    |		INB
+10e  81 31        | 1  |		JMP	LOC_131		       ; Flow > 0x131
+                        	SIGNS_DIFFERENT:
+110  0b           |    |		SAZ			       ; Flow > cc=AZ 0x113
+111  81 18        |    |		JMP	SUBTRACT_SLOW_COUNT    ; Flow > 0x118
+113  1f           |    |		SES			       ; Flow > cc=ES 0x116
+114  81 30        | 0  |		JMP	LOC_130		       ; Flow > 0x130
+116  b5           |    |		CLE
+117  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x11a
+                        	SUBTRACT_SLOW_COUNT:
+118  05           |    |		CMA
+119  00           |    |		INB
+11a  7b           |{   |		STA	REG11
+11b  6c           |l   |		LDA	REG12
+11c  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x11f
+11d  b5           |    |		CLE
+11e  01           |    |		DEB
+11f  01           |    |		DEB
+120  7c           ||   |		STA	REG12
+121  6d           |m   |		LDA	REG13
+122  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x125
+123  b5           |    |		CLE
+124  01           |    |		DEB
+125  1f           |    |		SES			       ; Flow > cc=ES 0x128
+126  81 31        | 1  |		JMP	LOC_131		       ; Flow > 0x131
+128  88 e9        |    |		JSB	PATCH_0E9	       ; Flow C 0xe9
+12a  01           |    |		DEB
+12b  7c           ||   |		STA	REG12
+12c  6b           |k   |		LDA	REG11
+12d  05           |    |		CMA
+12e  00           |    |		INB
+12f  7b           |{   |		STA	REG11
+                        	LOC_130:
+130  6d           |m   |		LDA	REG13
+                        	LOC_131:
+131  1b           |    |		SFS	DCTL3		       ; Flow > cc=FS 0x134
+132  27           |'   |		SBN	BIT7		       ; Result is negative
+133  5f           |_   |		NOP
+134  7d           |}   |		STA	REG13
+135  28           |(   |		STC	DCTL0
+                        	OUTPUT_TO_OUTGUARD:
+136  04           |    |		CLA
+137  71           |q   |		STA	REG1
+138  77           |w   |		STA	REG7
+139  6b           |k   |		LDA	REG11
+13a  78           |x   |		STA	REG8
+13b  88 c9        |    |		JSB	OUTPUT_FIRST_BYTE      ; Flow C 0xc9
+13d  6c           |l   |		LDA	REG12
+13e  88 c0        |    |		JSB	OUTPUT_NEXT_BYTE       ; Flow C 0xc0
+140  6d           |m   |		LDA	REG13
+141  88 c0        |    |		JSB	OUTPUT_NEXT_BYTE       ; Flow C 0xc0
+143  80 c3        |    |		JMP	OUTPUT_BIT	       ; Flow > 0xc3
+                        	RESTART_OUTPUT:
+145  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0x148
+146  81 45        | E  |		JMP	RESTART_OUTPUT	       ; Flow > 0x145
+148  81 36        | 6  |		JMP	OUTPUT_TO_OUTGUARD     ; Flow > 0x136
+;-------------------------------------------------------------------------------
+;Stop integrating the input and start the rundown
+;
+;First, counts accumulated during the integration phase are multiplied by 8.
+;This is because each count represented 32 instruction periods and in the fast
+;rundown phase, each count represents 4 instruction periods.
+;It's possible the rundown during integration overshot 0V, so the counts here
+;may need subtracting from the count, hence the two loops, one that increments
+;and one that decrements.
+;-------------------------------------------------------------------------------
+                        	RUNDOWN:
+14a  c1 1c        |    |		OTR	DEV1,#0x1c	       ; Set Integrator to 'Hold'
+14c  b5           |    |		CLE
+14d  6d           |m   |		LDA	REG13
+14e  23           |#   |		SBN	BIT3
+14f  07           |    |	MUL8:	LSA
+150  7d           |}   |		STA	REG13
+151  6c           |l   |		LDA	REG12
+152  37           |7   |		SBZ	BIT7		       ; Flow > cc=BZ 0x155
+153  b4           |    |		STE
+154  5f           |_   |		NOP
+155  07           |    |		LSA
+156  7c           ||   |		STA	REG12
+157  6d           |m   |		LDA	REG13
+158  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x15b
+159  20           |    |		SBN	BIT0
+15a  b5           |    |		CLE
+15b  16           |    |		SBS	BIT6		       ; Flow > cc=BS 0x15e
+15c  81 4f        | O  |		JMP	MUL8		       ; Flow > 0x14f
+15e  a6           |    |		CBN	BIT6
+15f  7d           |}   |		STA	REG13
+160  89 ab        |    |		JSB	CHECK_RESULT_SIGN      ; Flow C 0x1ab
+162  1e           |    |		SFS	DCTL6		       ; Flow > cc=FS 0x165
+163  81 9b        |    |		JMP	SLOW_RUNDOWN	       ; Flow > 0x19b
+165  6c           |l   |		LDA	REG12
+166  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0x169
+167  81 7f        |    |		JMP	FI_LNRF		       ; Flow > 0x17f
+169  3d           |=   |		SFZ	DCTL5		       ; Flow > cc=FZ 0x16c
+16a  81 77        | w  |		JMP	FD_HPRF		       ; Flow > 0x177
+                        	FD_LNRF:
+16c  c1 3c        | <  |		OTR	DEV1,#0x3c	       ; LNRF on
+                        	FAST_DECREMENT_LOOP:
+16e  5f           |_   |		NOP
+16f  01           |    |	FDL2:	DEB
+170  3e           |>   |		SFZ	DCTL6		       ; Flow > cc=FZ 0x173
+171  81 6e        | n  |		JMP	FAST_DECREMENT_LOOP    ; Flow > 0x16e
+173  c1 1c        |    |		OTR	DEV1,#0x1c	       ; Set Integrator to 'Hold'
+175  81 8b        |    |		JMP	END_FAST_RUNDOWN       ; Flow > 0x18b
+                        	FD_HPRF:
+177  c1 0c        |    |		OTR	DEV1,#0xc	       ; HPRF on
+179  81 6f        | o  |		JMP	FDL2		       ; Flow > 0x16f
+                        	FI_HPRF:
+17b  c1 0c        |    |		OTR	DEV1,#0xc	       ; HPRF on
+17d  81 85        |    |		JMP	FIL2		       ; Flow > 0x185
+                        	FI_LNRF:
+17f  3d           |=   |		SFZ	DCTL5		       ; Flow > cc=FZ 0x182
+180  81 7b        | {  |		JMP	FI_HPRF		       ; Flow > 0x17b
+182  c1 3c        | <  |		OTR	DEV1,#0x3c	       ; LNRF on
+                        	FAST_INCREMENT_LOOP:
+184  5f           |_   |		NOP
+185  00           |    |	FIL2:	INB
+186  3e           |>   |		SFZ	DCTL6		       ; Flow > cc=FZ 0x189
+187  81 84        |    |		JMP	FAST_INCREMENT_LOOP    ; Flow > 0x184
+189  c1 1c        |    |		OTR	DEV1,#0x1c	       ; Set Integrator to 'Hold'
+                        	END_FAST_RUNDOWN:
+18b  7c           ||   |		STA	REG12
+18c  6d           |m   |		LDA	REG13
+18d  1f           |    |		SES			       ; Flow > cc=ES 0x190
+18e  81 96        |    |		JMP	FR_NO_OVERFLOW	       ; Flow > 0x196
+190  b5           |    |		CLE
+191  38           |8   |		SFZ	DCTL0		       ; Flow > cc=FZ 0x194
+192  00           |    |		INB
+193  00           |    |		INB
+194  01           |    |		DEB
+195  7d           |}   |		STA	REG13
+                        	FR_NO_OVERFLOW:
+196  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x199
+197  88 e9        |    |		JSB	PATCH_0E9	       ; Flow C 0xe9
+199  89 ab        |    |		JSB	CHECK_RESULT_SIGN      ; Flow C 0x1ab
+;-------------------------------------------------------------------------------
+;Slow Rundown
+;
+;In the slow rundown, counts represent 2 instruction periods.  This, along with the
+;fact that the current count is effectively shifted left by 8 bits when the slow
+;count is concatenated gives the 128:1 weighting.
+;Again, the fast rundown might have overshot 0V, so the direction of the rundown
+;must be set accordingly.  The interrupt is armed to fire when 0VDETECT changes -
+;It's the only way you can increment a counter and conditionally loop with two instructions
+;(it took four instructions per iteration during the fast rundown).
+;-------------------------------------------------------------------------------
+                        	SLOW_RUNDOWN:
+19b  56           |V   |		OTA	DEV6		       ; Arm interrupt on 0VDETECT change
+19c  04           |    |		CLA
+19d  2f           |/   |		ENI
+19e  1d           |    |		SFS	DCTL5		       ; Flow > cc=FS 0x1a1
+19f  81 a5        |    |		JMP	SR_LNRS		       ; Flow > 0x1a5
+                        	SR_HPRS:
+1a1  c1 18        |    |		OTR	DEV1,#0x18	       ; HPRS on
+1a3  81 a8        |    |		JMP	SLOW_RUNDOWN_LOOP      ; Flow > 0x1a8
+                        	SR_LNRS:
+1a5  c1 1e        |    |		OTR	DEV1,#0x1e	       ; LNRS on
+1a7  5f           |_   |		NOP
+                        	SLOW_RUNDOWN_LOOP:
+1a8  00           |    |		INB			       ; Loop is broken by interrupt
+1a9  81 a8        |    |		JMP	SLOW_RUNDOWN_LOOP      ; Flow > 0x1a8
+                        	CHECK_RESULT_SIGN:
+1ab  6c           |l   |		LDA	REG12
+1ac  0b           |    |		SAZ			       ; Flow > cc=AZ 0x1af
+1ad  81 bb        |    |		JMP	LAB_1BB		       ; Flow > 0x1bb
+1af  6d           |m   |		LDA	REG13
+1b0  0b           |    |		SAZ			       ; Flow > cc=AZ 0x1b3
+1b1  81 bd        |    |		JMP	LAB_1BD		       ; Flow > 0x1bd
+1b3  1d           |    |		SFS	DCTL5		       ; Flow > cc=FS 0x1b6
+1b4  2b           |+   |		STC	DCTL3		       ; Result so far is positive
+                        					       ; Result so far is negative
+1b5  1b           |    |		SFS	DCTL3		       ; Flow > cc=FS 0x1b8
+1b6  ab           |    |		CLC	DCTL3
+1b7  5f           |_   |		NOP
+1b8  28           |(   |		STC	DCTL0
+1b9  80 fb        |    |		JMP	DELAY2		       ; Flow > 0xfb
+                        	LAB_1BB:
+1bb  5f           |_   |		NOP
+1bc  5f           |_   |		NOP
+                        	LAB_1BD:
+1bd  1b           |    |		SFS	DCTL3		       ; Flow > cc=FS 0x1c0
+1be  81 c5        |    |		JMP	LAB_1C5		       ; Flow > 0x1c5
+1c0  1d           |    |		SFS	DCTL5		       ; Flow > cc=FS 0x1c3
+1c1  81 c6        |    |		JMP	LAB_1C6		       ; Flow > 0x1c6
+1c3  81 c8        |    |		JMP	LAB_1C8		       ; Flow > 0x1c8
+                        	LAB_1C5:
+1c5  3d           |=   |		SFZ	DCTL5		       ; Flow > cc=FZ 0x1c8
+                        	LAB_1C6:
+1c6  28           |(   |		STC	DCTL0
+1c7  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0x1ca
+                        	LAB_1C8:
+1c8  a8           |    |		CLC	DCTL0
+1c9  5f           |_   |		NOP
+1ca  b8           |    |		RTS			       ; Flow R
+;-------------------------------------------------------------------------------
+;Increment the PLC Counter
+;
+;This is called every 32 instructions during integration, hence every 64 clocks.
+;(256 * 64 * clock period) is one PLC, so the high byte of the counter (REG9) ends
+;up with the number of PLCs elapsed since the counter was zeroed.
+;REG9 is returned in the accumulator.
+;-------------------------------------------------------------------------------
+                        	INC_PLCCTR:
+1cb  b5           |    |		CLE
+1cc  68           |h   |		LDA	REG8
+1cd  00           |    |		INB
+1ce  78           |x   |		STA	REG8
+1cf  69           |i   |		LDA	REG9
+1d0  1f           |    |		SES			       ; Flow > cc=ES 0x1d3
+1d1  5f           |_   |		NOP
+1d2  3f           |?   |		SEZ			       ; Flow > cc=EZ 0x1d5
+1d3  00           |    |		INB
+1d4  b5           |    |		CLE
+1d5  79           |y   |		STA	REG9
+1d6  b8           |    |		RTS			       ; Flow R
+                        	READ_OUTGUARD:
+1d7  04           |    |		CLA
+1d8  26           |&   |		SBN	BIT6
+                        	RO_LOOP:
+1d9  39           |9   |		SFZ	DCTL1		       ; Flow > cc=FZ 0x1dc
+1da  81 d9        |    |		JMP	RO_LOOP		       ; Flow > 0x1d9
+1dc  ab           |    |		CLC	DCTL3
+                        	RO_WAIT_CLOCK:
+1dd  19           |    |		SFS	DCTL1		       ; Flow > cc=FS 0x1e0
+1de  81 dd        |    |		JMP	RO_WAIT_CLOCK	       ; Flow > 0x1dd
+1e0  27           |'   |		SBN	BIT7
+1e1  18           |    |		SFS	DCTL0		       ; Flow > cc=FS 0x1e4
+1e2  81 ea        |    |		JMP	RO_ZERO_BIT	       ; Flow > 0x1ea
+1e4  a7           |    |		CBN	BIT7
+1e5  74           |t   |		STA	REG4
+1e6  67           |g   |		LDA	REG7
+1e7  00           |    |		INB
+1e8  77           |w   |		STA	REG7
+1e9  64           |d   |		LDA	REG4
+                        	RO_ZERO_BIT:
+1ea  06           |    |		RSA
+1eb  30           |0   |		SBZ	BIT0		       ; Flow > cc=BZ 0x1ee
+1ec  06           |    |		RSA
+1ed  b8           |    |		RTS			       ; Flow R
+1ee  81 d9        |    |		JMP	RO_LOOP		       ; Flow > 0x1d9
+                        	STARTUP:
+1f0  c1 14        |    |		OTR	DEV1,#0x14
+1f2  2b           |+   |		STC	DCTL3
+1f3  29           |)   |		STC	DCTL1
+1f4  2c           |,   |		STC	DCTL4
+1f5  2d           |-   |		STC	DCTL5
+1f6  2e           |.   |		STC	DCTL6
+1f7  28           |(   |		STC	DCTL0
+1f8  04           |    |		CLA
+1f9  77           |w   |		STA	REG7
+1fa  76           |v   |		STA	REG6
+1fb  78           |x   |		STA	REG8
+1fc  2a           |*   |		STC	DCTL2
+1fd  05           |    |		CMA
+1fe  7a           |z   |		STA	REG10
+1ff  7c           ||   |		STA	REG12
