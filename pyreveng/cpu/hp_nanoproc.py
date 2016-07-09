@@ -83,16 +83,18 @@ LDA	reg		|0 1 1 0| reg   |
 STA	reg		|0 1 1 1| reg   |
 JMP	adrl,>J		|1 0 0 0|0| ahi | alo		|
 JSB	adrl,>C		|1 0 0 0|1| ahi | alo		|
-JMP	iA,>J		|1 0 0 1|0 0 0 0|
+RTI	-		|1 0 0 1|0 0 0 0|		RTI, no ENI
+JAI	-		|1 0 0 1|0| ahi |		JMP indirect indexed
 JMP	dA,>J		|1 0 0 1|0 1 1 1|
 CBN	bno		|1 0 1 0|0| bno |		Clear A.bit
 CLC	dctl		|1 0 1 0|1| dctl|
 DSI	-		|1 0 1 0|1 1 1 1|		Disable Irq
-RTS	>R		|1 0 1 1 1 0 0 0|
-RTI	-		|1 0 1 1 0 0 0 1|
-STE	-		|1 0 1 1 0 1 0 0|		Set E
-CLE	-		|1 0 1 1 0 1 0 1|		Clear E
-LD 	reg,imm		|1 1 0 0| reg   | imm		|
+RTS	>R		|1 0 1 1|1|0 0 0|
+JAS	-		|1 0 1 1|1| ahi |		JSB indirect indexed
+RTE	-		|1 0 1 1|0|0 0 1|		RTI and ENI
+STE	-		|1 0 1 1|0|1 0 0|		Set E
+CLE	-		|1 0 1 1|0|1 0 1|		Clear E
+OTR 	dev,imm		|1 1 0 0| dev   | imm		|
 LDR	imm		|1 1 0 0|1 1 1 1| imm		|
 STR	reg,imm		|1 1 0 1| reg   | imm		|
 """
