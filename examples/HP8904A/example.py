@@ -231,6 +231,7 @@ def symb(pj, cpu):
 		(3, 0x7ac3, "APP_XX6"),
 		(3, 0x7b7a, "0x7b7a"),
 
+		(4, 0x83a0, "MAIN"),
 		(4, 0x89aa, "0x89aa"),
 		(4, 0x8a08, "SET_MENU"),
 		(4, 0x8a2f, "0x8a2f"),
@@ -256,8 +257,8 @@ def symb(pj, cpu):
 		(4, 0xa0d4, "0xa0d4"),
 		(4, 0xa23f, "0xa23f"),
 		(4, 0xa3e3, "0xa3e3"),
-		(4, 0xaba9, "0xaba9"),
-		(4, 0xabef, "0xabef"),
+		(4, 0xaba9, "DISPLAY_DEST"),
+		(4, 0xabef, "DISPLAY_UNIT"),
 		(4, 0xae22, "non_func_key"),
 		(4, 0xb8ad, "0xb8ad"),
 		(4, 0xb8cc, "0xb8cc"),
@@ -265,13 +266,17 @@ def symb(pj, cpu):
 		(4, 0xc239, "NULL"),
 		(4, 0xc242, "MEMCMP"),
 		(4, 0xc285, "MEMCPY"),
+		(4, 0xc2c4, "CLEAR_NVRAM"),
+		(4, 0xc36e, "CHECK_NVRAM"),
+		(4, 0xc3fe, "RAISE_ERROR"),
 		(4, 0xc418, "0xc418"),
 		(4, 0xc7b0, "0xc7b0"),
 		(4, 0xc855, "0xc855"),
 		(4, 0xc885, "0xc885"),
 		(4, 0xc973, "0xc973"),
 		(4, 0xcb10, "0xcb10"),
-		(4, 0xcc09, "0xcc09"),
+		(4, 0xcba6, "BYTE2HEX"),
+		(4, 0xcc09, "WORD2HEX"),
 		(4, 0xccb5, "0xccb5"),
 		(4, 0xccff, "0xccff"),
 		(4, 0xcd50, "0xcd50"),
@@ -287,6 +292,8 @@ def symb(pj, cpu):
 		(4, 0xd761, "LCD_RD_DATA"),
 		(4, 0xd781, "LCD_RD_CTRL"),
 		(4, 0xd7a0, "LCD_DDRAM"),
+		(4, 0xd7be, "LCD_CURSOR"),
+		(4, 0xd841, "LCD_DEF_CHAR"),
 		(4, 0xd8ea, "DISPLAY"),
 		(4, 0xd989, "DISPLAY2L"),
 		(4, 0xd9e6, "LCD_INIT"),
@@ -308,21 +315,42 @@ def symb(pj, cpu):
 		(4, 0xf3f0, "0xf3f0"),
 		(4, 0xf7ec, "0xf7ec"),
 		(4, 0xf9d4, "0xf9d4"),
+		(4, 0xfcea, "ARRAY_INDEX"),
 		(4, 0xfd50, "PROLOGUE"),
+		(4, 0xfd80, "D=B+A"),
+		(4, 0xfd8f, "D=B-A"),
+		(4, 0xfd9e, "B=A<<B"),
+		(4, 0xfdb6, "B=CC:Z"),
+		(4, 0xffa4, "D=X<<B"),
+		(4, 0xffc0, "ret_0"),
+		(4, 0xffc6, "ret_1"),
+
+		(5, 0xee62, "dest_strings"),
+		(5, 0xeeee, "unit_strings"),
+		(5, 0xed11, "blank_line"),
 
 		(6, 0x0300, "LCD_CTL"),
 		(6, 0x0301, "LCD_DATA"),
 		(6, 0x2223, "MAIN_MENU_LAST_PG"),
+		(6, 0x23dd, "NVRAM_CHECK_STATUS"),
+		(6, 0x242a, "cursor-state"),
 		(6, 0x2240, "MENU_PTR"),
 		(6, 0x2245, "MAIN_MENU_CUR_PG"),
 		(6, 0x2242, "MENU_CNT"),
+		(6, 0x23be, "Array*35_idx"),
 		(6, 0x247b, "CUR_BANK"),
 		(6, 0x247c, "APP_BANK"),
 		(6, 0x247d, "APP_VECTOR"),
 		(6, 0x24dc, "KEY_PRESSED"),
+		(6, 0x24f4, "Array*35_idx"),
+		(6, 0x24f5, "Array*35"),
+		(6, 0x2581, "Array*15"),
+		(6, 0x268f, "Array_Save_Recall_(12*425)"),
+		(6, 0x3c05, "Array*4_idx"),
+		(6, 0x3c10, "Array*4"),
+		(6, 0x3c50, "Array*3"),
 		(6, 0x3fa1, "PREV_KEY"),
 		(6, 0x3ffc, "OPTIONS"),
-		(6, 0xed11, "blank_line"),
 	]:
 		if p == pj.pg:
 			assert a >= pj.m.lo and a < pj.m.hi
@@ -527,8 +555,18 @@ def hints(pj, cpu):
 		for a in range(0x404f,0x4053,2):
 			cpu.codeptr(pj, a)
 
-		for a in (0x4027, 0x411b, 0x4143, 0x416b, 0x4193):
-			y = data.Txt(pj, a, a + 0x28, label=False)
+		for a,b in (
+			(0x4027, 0x28),
+			(0x411b, 0x28),
+			(0x4143, 0x28),
+			(0x416b, 0x28),
+			(0x4193, 0x28),
+			(0x4391, 0x04),
+			(0x4395, 0x0f),
+			(0x43a4, 0x0c),
+			(0x43b0, 0x0d)
+		):
+			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
 
 		y = data.Txt(pj, 0x41bb, 0x41bb + 12, label=False)
@@ -781,3 +819,10 @@ for pg in (0,1,2,3,4):
 	pj.name = pj.name + "_A"
 
 	listing.Listing(pj)
+
+#######################################################################
+# fcea is array index multiplicator
+#	A is always 0x01
+#	X points to six bytes: {00 01 00 00 xx xx} where xxxx is stride
+#	Stack contains base + index
+#	result in X
