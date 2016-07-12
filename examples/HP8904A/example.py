@@ -810,13 +810,13 @@ for pg in (0,1,2,3,4):
 
 	code.lcmt_flows(pj)
 
-	listing.Listing(pj)
+	# listing.Listing(pj)
 
-	import example2
+	import decompile
 
-	example2.analyse(pj)
+	decompile.analyse(pj)
 
-	pj.name = pj.name + "_A"
+	# pj.name = pj.name + "_A"
 
 	listing.Listing(pj)
 
