@@ -38,21 +38,21 @@ from pyreveng import mem, assy, data
 mc6809_instructions = """
 NEG	-	|0 0 0 0 0 0 0 0|
 
-LBRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
-LBHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
-LBLS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 1| R1		| R2		|
-LBCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		|
-LBCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		|
-LBNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		|
-LBEQ	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 1| R1		| R2		|
-LBVC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 0| R1		| R2		|
-LBVS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 1| R1		| R2		|
-LBPL	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 0| R1		| R2		|
-LBMI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 1| R1		| R2		|
-LBGE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 0| R1		| R2		|
-LBLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 1| R1		| R2		|
-LBGT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 0| R1		| R2		|
-LBLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 1| R1		| R2		|
+BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
+BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
+BLS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 1| R1		| R2		|
+BCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		|
+BCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		|
+BNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		|
+BEQ	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 1| R1		| R2		|
+BVC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 0| R1		| R2		|
+BVS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 1| R1		| R2		|
+BPL	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 0| R1		| R2		|
+BMI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 1| R1		| R2		|
+BGE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 0| R1		| R2		|
+BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 1| R1		| R2		|
+BGT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 0| R1		| R2		|
+BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 1| R1		| R2		|
 
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
 LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		|
@@ -66,8 +66,8 @@ STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| E1		| E2		|
 LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
-LBRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2 		|
-LBSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2 		|
+BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2 		|
+BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2 		|
 DAA 	-	|0 0 0 1 1 0 0 1|
 ORCC	i	|0 0 0 1 1 0 1 0| i		|
 ANDCC	i	|0 0 0 1 1 1 0 0| i		|
@@ -258,6 +258,8 @@ STU	E	|1 1 1 1 1 1 1 1| E1		| E2		|
 mc6809_macro_instructions = """
 LDD	i	|1 1 0 0 0 1 1 0| i		|0 0 0 1 1 1 0 1|
 CLRD	-	|0 1 0 1 1 1 1 1|0 0 0 1 1 1 0 1|
+ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		|
+ORD	I	|1 0 0 0 1 0 1 0| I1		|1 1 0 0 1 0 1 0| I2		|
 """
 
 class arg_i(object):
@@ -396,9 +398,6 @@ class mc6809(assy.Instree_disass):
 			"R":	arg_R,
 		})
 		self.mask = mask
-
-	def init_ins(self, pj, ins):
-		ins.idx = "X"
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
