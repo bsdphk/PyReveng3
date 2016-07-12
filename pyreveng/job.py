@@ -76,6 +76,11 @@ class Job(object):
 		self.labels = dict()
 		self.block_comments = dict()
 		self.comment_prefix = ";"
+		# Banks are valid but presently unavailable memory ranges
+		# such as overlay areas in bank-switching.
+		# use as:  pj.banks.append([0x1000, 0x2000])
+		# This supresses WARNING about todo's into these banks
+		self.banks = []
 
 	def set_label(self, adr, lbl):
 		self.labels[adr] = lbl
@@ -129,11 +134,14 @@ class Job(object):
 
 	def todo(self, adr, func):
 		assert type(adr) == int
-		if adr < self.m.lo or adr >= self.m.hi:
-			print("WARNING: Ignoring todo at illegal address " +
-			    self.afmt(adr), func)
+		if adr >= self.m.lo and adr < self.m.hi:
+			self.dolist.append((adr, func))
 			return
-		self.dolist.append((adr, func))
+		for lo,hi in self.banks:
+			if adr >= lo and adr < hi:
+				return
+		print("WARNING: Ignoring todo at illegal address " +
+		    self.afmt(adr), func)
 
 	def run(self):
 		rv = False
