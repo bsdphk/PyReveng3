@@ -28,7 +28,7 @@ from __future__ import print_function
 
 import os
 from pyreveng import job, mem, listing, data, code, assy
-import pyreveng.cpu.mc6809 as mc6809
+import decompile
 
 fwd="/critter/Doc/TestAndMeasurement/HP8904A/FW/"
 
@@ -36,7 +36,7 @@ fwd="/critter/Doc/TestAndMeasurement/HP8904A/FW/"
 # The HP8904A has five memory pages, four of which occupy the same
 # address space.  We analyse them separately.
 
-def setup(pg=4):
+def setup(pg):
 	if pg < 4:
 		m = mem.byte_mem(0x4000, 0x8000)
 		fi = open(fwd + "/08904-87008.hex")
@@ -51,7 +51,31 @@ def setup(pg=4):
 
 	pj = job.Job(m, "HP8904A_pg%d" % pg)
 	pj.pg = pg
+	pj.banks.append([0x4000,0x100000])
 	return pj,m
+
+#######################################################################
+# Collect error strings from pg=3
+
+def collect_errors():
+	pj,m = setup(3)
+	a = 0x7348
+	n = m.rd(a)
+	a += 1
+	print(n)
+	e = {}
+	for i in range(n):
+		x = m.rd(a)
+		a += 1
+		l = m.rd(a)
+		a += 1
+		p = m.bu16(a)
+		a += 2
+		y1 = data.Txt(pj, p, p + l, label=False)
+		e[x] = y1.txt
+	return e
+
+errors = collect_errors()
 
 #######################################################################
 
@@ -168,8 +192,8 @@ def symb(pj, cpu):
 		(0, 0x5253, "0x5253"),		# @0:54d1 -> 2213
 		(0, 0x5d0c, "0x5d0c"),		# @0:54bf -> 220f
 
-		(1, 0x42d1, "0x42d1"),		# @1:6cc4
-		(1, 0x444c, "0x444c"),		# @1:6cb1
+		(1, 0x42d1, "NMI_0x42d1"),	# @1:6cc4
+		(1, 0x444c, "NMI_0x444c"),	# @1:6cb1
 		(1, 0x4567, "0x4567"),		# @1:5517
 		(1, 0x4c01, "0x4c01"),		# @1:550b -> 220f
 		(1, 0x5185, "0x5185"),		# @1:5511 -> 2211
@@ -190,7 +214,7 @@ def symb(pj, cpu):
 		(1, 0x4aa2, "TSEQ_SINGLE"),
 		(1, 0x4ab9, "TSEQ_STOP"),
 
-		(2, 0x4196, "0x4196"),		# @2:543a
+		(2, 0x4196, "NMI_0x4196"),	# @2:543a
 		(2, 0x642e, "0x642e"),		# @2:6581
 		(2, 0x6646, "0x6646"),		# @2:72f0
 		(2, 0x6ad0, "0x6ad0"),		# @2:72e4 -> 220f
@@ -228,7 +252,7 @@ def symb(pj, cpu):
 		(3, 0x6d64, "0x6d64"),		# @3:6f6d -> 220d
 		(3, 0x6f80, "0x6f80"),		# @3:7233 -> 220d
 		(3, 0x7246, "APP_XX5"),
-		(3, 0x7ac3, "APP_XX6"),
+		(3, 0x7ac3, "APP_ERR"),
 		(3, 0x7b7a, "0x7b7a"),
 
 		(4, 0x83a0, "MAIN"),
@@ -309,8 +333,10 @@ def symb(pj, cpu):
 		(4, 0xe319, "0xe319"),
 		(4, 0xe69c, "0xe69c"),
 		(4, 0xe8a7, "0xe8a7"),
-		(4, 0xf02a, "0xf02a"),
-		(4, 0xf044, "0xf044"),
+		(4, 0xf02a, "SET_NMI_VEC"),
+		(4, 0xf044, "SET_FIRQ_VEC"),
+		(4, 0xf0a1, "HANDLE_FIRQ"),
+		(4, 0xf154, "HANDLE_IRQ"),
 		(4, 0xf1d9, "0xf1d9"),
 		(4, 0xf3f0, "0xf3f0"),
 		(4, 0xf7ec, "0xf7ec"),
@@ -331,16 +357,22 @@ def symb(pj, cpu):
 
 		(6, 0x0300, "LCD_CTL"),
 		(6, 0x0301, "LCD_DATA"),
+		# 0x2204:0x0001, "IRQ happened"
 		(6, 0x2223, "MAIN_MENU_LAST_PG"),
 		(6, 0x23dd, "NVRAM_CHECK_STATUS"),
+		(6, 0x23de, "ERROR_CODE"),
 		(6, 0x242a, "cursor-state"),
 		(6, 0x2240, "MENU_PTR"),
 		(6, 0x2245, "MAIN_MENU_CUR_PG"),
 		(6, 0x2242, "MENU_CNT"),
 		(6, 0x23be, "Array*35_idx"),
+		(6, 0x23df, "ERRMSG_LEN"),
+		(6, 0x23e0, "ERRMSG_BUF"),
 		(6, 0x247b, "CUR_BANK"),
 		(6, 0x247c, "APP_BANK"),
 		(6, 0x247d, "APP_VECTOR"),
+		(6, 0x24d8, "NMIVEC"),
+		(6, 0x24da, "FIRQVEC"),
 		(6, 0x24dc, "KEY_PRESSED"),
 		(6, 0x24f4, "Array*35_idx"),
 		(6, 0x24f5, "Array*35"),
@@ -446,37 +478,6 @@ def lexer(pj):
 	tx(0x9a22, "")
 
 #######################################################################
-# Switch statements
-
-def do_switch():
-	retval=False
-	for i in pj:
-		if i.tag != "mc6809":
-			continue
-		if pj.m.bu16(i.lo) != 0x6e9b:
-			continue
-		for j in pj.gaps():
-			if j[0] == i.hi:
-				break
-		if j[0] != i.hi:
-			continue
-		print("SWITCH", i, "%04x-%04x" % (j[0], j[1]))
-		retval=True
-		for k in range(j[0], j[1], 2):
-			# print("  %04x" % k)
-			x = pj.t.find_lo(k)
-			if len(x) > 0:
-				break
-			x = pj.m.bu16(k)
-			i.add_flow(pj, ">JC", "EQ", x, i.lang)
-			cpu.disass(pj, x)
-			while pj.run():
-				pass
-		for l in range(j[0], k + 2, 2):
-			cpu.codeptr(pj, l)
-	return retval
-
-#######################################################################
 
 class Num(data.Data):
 	def __init__(self, pj, lo):
@@ -484,6 +485,7 @@ class Num(data.Data):
 		a = pj.m.rd(lo) << 16
 		a += pj.m.rd(lo + 1) << 8
 		a += pj.m.rd(lo + 2)
+		self.val = a
 		self.fmt = ".NUM\t%d" % a
 		pj.set_label(lo, "N%d" % a)
 
@@ -524,6 +526,69 @@ def Menu(pj, cpu, a, nm):
 		MenuPage(pj, cpu, a + i * 10)
 
 #######################################################################
+# Markup RAISE 
+
+def error_arg(pj, dst, arg, errors):
+	for i in pj:
+		if type(i) != decompile.Call or i.dst != dst:
+			continue
+		if i.args[arg][0] != "#":
+			continue
+		n = int(i.args[arg][1:], 16)
+		if n in errors:
+			i.lcmt += '"%s"\n' % errors[n]
+
+#######################################################################
+# Markup Number arguments
+
+def num_arg(pj, dst, arg):
+	for i in pj:
+		if type(i) != decompile.Call or i.dst != dst:
+			continue
+		if i.args[arg][:3] != "#0x":
+			continue
+		n = int(i.args[arg][1:], 16)
+		if n < pj.m.lo or n >= pj.m.hi:
+			continue
+		j = pj.t.find_lo(n)
+		print("NUM", "%04x" % n, i, i.args, j)
+		if len(j) == 0:
+			j.append(Num(pj, n))
+		i.args[arg] = "NUM(%d)" % j[0].val
+
+#######################################################################
+# String+length args
+
+arg_strings = set()
+
+def str_len_args(pj, dst, args, argl):
+	for i in pj:
+		if type(i) != decompile.Call or i.dst != dst:
+			continue
+		if i.args[args][:3] != "#0x":
+			continue
+		if argl >= 0 and i.args[argl][:3] != "#0x":
+			continue
+		s = int(i.args[args][1:],16)
+		if s < pj.m.lo or s >= pj.m.hi:
+			continue
+		if argl < 0:
+			l = -argl
+		else:
+			l = int(i.args[argl][1:],16)
+		print("SL", "%04x" % s, l, i, i.args)
+		j = pj.t.find_lo(s)
+		if len(j) == 0:
+			y = data.Txt(pj, s, s + l)
+			y.compact = True
+			j.append(y)
+			print("SLN", y.txt)
+			arg_strings.add(s)
+		elif s not in arg_strings:
+			print("SLX", pj.pg, "%04x" % j[0].lo, j[0].txt)
+		i.lcmt += '"%s"\n' % j[0].txt
+
+#######################################################################
 
 def hints(pj, cpu):
 
@@ -534,12 +599,20 @@ def hints(pj, cpu):
 		data.Const(pj, 0x4003, 0x4004)
 
 		# @0x8954
-		for a in range(0x4004,0x4008,2):
+		for a,n in [
+		    [ 0x4008, "START_TONE_APP" ],
+		    [ 0x400a, "START_DTMF_APP" ],
+		    [ 0x400c, "START_DSEQ_APP" ],
+		    [ 0x4022, "START_DIAG_APP" ],
+		    [ 0x4024, "START_XX5_APP" ],
+		    [ 0x404f, "START_ERR_APP" ],
+		]:
 			cpu.codeptr(pj, a)
+			u = pj.m.bu16(a)
+			pj.set_label(u, n.lower())
+			pj.set_label(a, n)
 
-		# @0x8960
-		for a in range(0x4008,0x4018,2):
-			cpu.codeptr(pj, a)
+		cpu.codeptr(pj, 0x4004)
 
 		for a in range(0x4018, 0x4022, 2):
 			y = data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
@@ -547,9 +620,6 @@ def hints(pj, cpu):
 			y = data.Txt(pj, u, u + 40, label=False)
 			y.compact = True
 
-		# @8e1a, @8f08
-		for a in range(0x4022,0x4026,2):
-			cpu.codeptr(pj, a)
 
 		# @0xc4a5, @0xc318
 		for a in range(0x404f,0x4053,2):
@@ -564,7 +634,11 @@ def hints(pj, cpu):
 			(0x4391, 0x04),
 			(0x4395, 0x0f),
 			(0x43a4, 0x0c),
-			(0x43b0, 0x0d)
+			(0x43b0, 0x0d),
+			(0x5cce, 0x1),
+			(0x5cd0, 0x1),
+			(0x5cd2, 0x1),
+			(0x5cd4, 0x1),
 		):
 			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
@@ -577,8 +651,12 @@ def hints(pj, cpu):
 		Menu(pj, cpu, 0x416b, "TONEMENU")
 		Menu(pj, cpu, 0x4234, "DTMFMENU")
 
-		for a in (0x69a6,):
-			y = data.Txt(pj, a, a + 0x28, label=False)
+		for a,n in (
+		    (0x5609, 7),
+		    (0x69a6, 0x28),
+		    (0x69d1, 5),
+		):
+			y = data.Txt(pj, a, a + n, label=False)
 			y.compact = True
 		for a in (0x4142,0x4156):
 			y = data.Txt(pj, a, a + 0x14, label=False)
@@ -586,12 +664,25 @@ def hints(pj, cpu):
 		for a in range(0x43bc, 0x43f2, 3):
 			data.Const(pj, a, a + 3)
 
+		Num(pj, 0x4262)
+		Num(pj, 0x4265)
+
 	if pj.pg == 2:
 		Menu(pj, cpu, 0x416b, "DSEQMENU")
 		for a in range(0x4245, 0x4255, 2):
 			cpu.codeptr(pj, a)
 		for a in range(0x4330, 0x4340, 2):
 			cpu.codeptr(pj, a)
+		for a,b in (
+			(0x5144,20),
+			(0x5159,20),
+			(0x516f,3),
+			(0x5173,3),
+			(0x5177,3),
+			(0x517b,5),
+		):
+			y = data.Txt(pj, a, a + b, label=False)
+			y.compact = True
 
 	if pj.pg == 3:
 		Menu(pj, cpu, 0x4178, "DIAGMENU")
@@ -608,43 +699,14 @@ def hints(pj, cpu):
 			y.compact = True
 		for a,b in (
 			(0x4002,53),
-			(0x41a0,40),
-			(0x41c8,0x1a),
-			(0x41e2,40),
-			(0x420a,40),
-			(0x4232,16),
-			(0x4242,16),
-			(0x4252,40),
-			(0x4292,0x1a),
-			(0x42ac,40),
-			(0x42d4,0x1a),
-			(0x42ee,0x1a),
-			(0x4308,40),
-			(0x4330,40),
-			(0x4358,40),
-			(0x4386,0x1a),
-			(0x43a0,12),
-			(0x43ac,40),
-			(0x43d4,40),
-			(0x43fc,0x1a),
-			(0x4416,40),
-			(0x443e,40),
 			(0x4466,6),
-			(0x66fa,16),
-			(0x670a,40),
-			(0x6732,40),
-			(0x675a,40),
-			(0x6782,40),
-			(0x67aa,40),
-			(0x67d2,40),
-			(0x67fa,40),
-			(0x681a,40),
-			(0x6822,40),
+			(0x7339,3),
+			(0x733d,3),
 		):
 			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
 
-		for a in range(0x63b2, 0x66fa, 40):
+		for a in range(0x63da, 0x665a, 40):
 			y = data.Txt(pj, a, a + 40, label=False)
 			y.compact = True
 
@@ -677,6 +739,8 @@ def hints(pj, cpu):
 			pj.set_label(y, "test_key_" + t)
 			keys[n] = t
 			n += 1
+
+		Num(pj, 0x684a)
 
 
 	if pj.pg == 4:
@@ -741,13 +805,6 @@ def hints(pj, cpu):
 		for a in range(0xed89, 0xedcf, 5):
 			data.Const(pj, a, a + 5, "0x%02x")
 
-		for a in range(0xee47, 0xee62, 3):
-			Num(pj, a)
-
-		for a in (0xea55, 0xea58, 0xea5f, 0xea62, 0xea65,
-		    0xea68, 0xea6b, 0xea6e):
-			Num(pj, a)
-
 		n = 1
 		for a in range(0xae3d, 0xaea5, 2):
 			print("%x -> " % a + keys[n])
@@ -757,27 +814,12 @@ def hints(pj, cpu):
 				pj.set_label(u, "key_" + keys[n])
 			n += 1
 
-
-#######################################################################
-# Function prologues
-
-def prologues(pj, cpu):
-	for i in pj:
-		if i.tag != "mc6809":
-			continue
-		if i.dstadr != 0xfd50:
-			continue
-		j = pj.t.find_hi(i.lo)
-		if len(j) == 0:
-			print("NO PROLOGUE %04x" % i.lo, i)
-			continue
-		if pj.m.rd(j[0].lo) == 0xfc:
-			j[0].mne="ldd__"
-			u = pj.m.bu16(j[0].lo + 1)
-			v = pj.m.bu16(u)
-			j[0].mne="ldd__%d" % v
-			data.Const(pj, u, u + 1)
-			data.Const(pj, u + 1, u + 2)
+		Num(pj, 0xea55)
+		Num(pj, 0xea6e)
+		Num(pj, 0xea65)
+		Num(pj, 0xea6b)
+		Num(pj, 0xea62)
+		Num(pj, 0xea68)
 
 #######################################################################
 
@@ -787,7 +829,9 @@ for pg in (0,1,2,3,4):
 
 	romsum(pj)
 
-	cpu = mc6809.mc6809()
+	decompile.setup(pj)
+
+	cpu = decompile.mc6809a()
 
 	hints(pj, cpu)
 
@@ -800,23 +844,27 @@ for pg in (0,1,2,3,4):
 	while pj.run():
 		pass
 
-	while do_switch():
-		continue
+	decompile.analyse(pj, cpu)
 
 	while pj.run():
 		pass
 
-	prologues(pj, cpu)
+	error_arg(pj, 0xc3fe, 0, errors)
+	num_arg(pj, 0xd37d, 0)
+	num_arg(pj, 0xd37d, 1)
+	num_arg(pj, 0xd392, 1)
+	num_arg(pj, 0xd392, 2)
+	num_arg(pj, 0xd3c6, 1)
+	num_arg(pj, 0xd3c6, 2)
+
+	str_len_args(pj, 0xd8ea, 0, 1)	
+	str_len_args(pj, 0xd8a5, 0, 1)	
+	if pj.pg == 2:
+		str_len_args(pj, 0x44ee, 1, 2)	
+
+	decompile.mopup(pj, cpu)
 
 	code.lcmt_flows(pj)
-
-	# listing.Listing(pj)
-
-	import decompile
-
-	decompile.analyse(pj)
-
-	# pj.name = pj.name + "_A"
 
 	listing.Listing(pj)
 
