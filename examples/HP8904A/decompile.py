@@ -30,47 +30,25 @@ import os
 from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.mc6809 as mc6809
 
-def func_display(pj, args):
-	if args[0][:3] != "#0x":
-		return
-	if args[1][:3] != "#0x":
-		return
-	s = int(args[0][3:], 16)
-	l = int(args[1][3:], 16)
-	if s < pj.m.lo or s >= pj.m.hi:
-		return
-	i = pj.t.find_lo(s)
-	print("DD %04x %02x" % (s, l), i)
-	y = data.Txt(pj, s, s + l, label=False)
-	y.compact = True
-	args[0] = '"' + y.txt + '"'
-
-func_handler = {
-"DISPLAY":	func_display,
-"0xd8a5":	func_display,
-}
-
 class Call(code.Code):
 	def __init__(self, pj, lo, hi, lang, dst, args):
 		super(Call, self).__init__(pj, lo, hi, lang)
 		self.dst = dst
-		self.args = args
+		self.args = list(reversed(args))
 		self.compact = True
-		i = func_handler.get(dst)
-		if i != None:
-			i(pj, args)
 		pj.insert(self)
 		self.add_flow(pj, "C", True, dst, lang)
 
 	def render(self, pj):
 		s = "CALL\t" + pj.render_adr(self.dst) + "("
 		l = []
-		for i in self.args:
+		l.append('/%d/' % int(self.args[0][1:], 16))
+		for i in self.args[1:]:
 			if i.find(",") != -1:
 				l.append("(" + i + ")")
 			else:
 				l.append(i)
-		s += ",".join(l) + ")"
+		s += ", ".join(l) + ")"
 		return s
 
 def assemble_call(pj, a0, a1, arg_bytes):
@@ -165,7 +143,7 @@ def setup(pj):
 class arg_E(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		u = (ins.im.F_E1 << 8) | ins.im.F_E2
-		if ins.mne[0] != "J" and u >= pj.m.lo and u < pj.m.hi:
+		if ins.mne[:2] == "LD" and u >= pj.m.lo and u < pj.m.hi:
 			v = pj.m.bu16(u)
 			ins.dstadr = v
 			super(arg_E, self).__init__(pj, ins.dstadr, "#")
@@ -347,7 +325,7 @@ def analyse_array(pj, cpu, i):
 	assert u2 == 0
 	l[w].lcmt += "Array Index, stride %d\n" % u3
 	a = "%s*%d" % (l[1].mne[-1],u3)
-	y = Call(pj, l[w].lo, i.hi, l[w].lang, i.dstadr, ["U", a])
+	y = Call(pj, l[w].lo, i.hi, l[w].lang, i.dstadr, ["U", a, "#0x0"])
 
 #######################################################################
 #
@@ -404,7 +382,9 @@ def mopup(pj, cpu):
 			if i == b:
 				b += 1
 				continue
-			data.Const(pj, a, b)
+			y = data.Const(pj, a, b)
+			y.typ = ".COMP"
+			print(y)
 			a = i;
 			b = i + 1
 		y = data.Const(pj, a, b)

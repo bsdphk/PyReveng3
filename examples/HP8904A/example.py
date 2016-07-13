@@ -79,7 +79,25 @@ errors = collect_errors()
 
 #######################################################################
 
-keys = {}
+def collect_keys():
+	keys = {}
+	pj,m = setup(3)
+	n = 0
+	for a in range(0x4a3f, 0x4aad, 2):
+		y = pj.m.bu16(a)
+		assert pj.m.rd(y) == 0xcc
+		x = pj.m.bu16(y + 1)
+		y = data.Txt(pj, x, x + 9)
+		t = y.txt[:-4].strip().replace(" ","_")
+		pj.set_label(a, "k_0x%02x" % n)
+		pj.set_label(y, "test_key_" + t)
+		keys[n] = t
+		n += 1
+	return keys
+
+keys = collect_keys()
+
+#######################################################################
 
 hpib = {
 	"AHR":	"Amplitude Hop",
@@ -184,106 +202,144 @@ hpib = {
 
 def symb(pj, cpu):
 	for p,a,n in [
+		(0, 0x4003, "OPT1_LAST_MAIN_MENU_PAGE"),
 		(0, 0x4018, "MAIN_MENUS"),
 		(0, 0x43bd, "HOP_RAM_ADRS"),
 		(0, 0x4908, "HOP_CFG"),
 		(0, 0x4ed8, "0x4ed8"),		# @0:54cb -> 3b85
 		(0, 0x51e3, "0x51e3"),		# @1:55bc -> 2213
-		(0, 0x5253, "0x5253"),		# @0:54d1 -> 2213
-		(0, 0x5d0c, "0x5d0c"),		# @0:54bf -> 220f
+		(0, 0x5253, "APP_CHAN_FINI"),	# @0:54d1 -> 2213
+		(0, 0x528f, "APP_CHAN_INIT"),	# @0:54d1 -> 2213
+		(0, 0x5d0c, "APP_CHAN_KEYBOARD"),
 
 		(1, 0x42d1, "NMI_0x42d1"),	# @1:6cc4
 		(1, 0x444c, "NMI_0x444c"),	# @1:6cb1
 		(1, 0x4567, "0x4567"),		# @1:5517
-		(1, 0x4c01, "0x4c01"),		# @1:550b -> 220f
-		(1, 0x5185, "0x5185"),		# @1:5511 -> 2211
-		(1, 0x51e3, "0x51e3"),		# @1:55bf -> 2213
-		(1, 0x55c5, "APP_TONE"),
-		(1, 0x7870, "0x7870"),		# @1:79e5
-		(1, 0x7a81, "APP_DTMF"),
 		(1, 0x47fa, "TONE_NBR"),
 		(1, 0x4842, "TONE_ON_TIME"),
-		(1, 0x492c, "TONE_F3"),
 		(1, 0x4860, "TONE_OFF_TIME"),
-		(1, 0x71b4, "TSEQ_INDEX"),
-		(1, 0x726a, "TSEQ_HEX"),
-		(1, 0x7203, "TSEQ_EDIT"),
-		(1, 0x71de, "TSEQ_END"),
+		(1, 0x492c, "TONE_F3"),
 		(1, 0x49ee, "TSEQ_NBR"),
 		(1, 0x4a19, "TSEQ_CONT"),
 		(1, 0x4aa2, "TSEQ_SINGLE"),
 		(1, 0x4ab9, "TSEQ_STOP"),
+		(1, 0x4c01, "KEYBOARD_0x4c01"),		# @1:550b -> 220f
+		(1, 0x5185, "0x5185"),		# @1:5511 -> 2211
+		(1, 0x51e3, "APPFINI_0x51e3"),	# @1:55bf -> 2213
+		(1, 0x55c5, "APP_TONE"),
+		(1, 0x71b4, "TSEQ_INDEX"),
+		(1, 0x71de, "TSEQ_END"),
+		(1, 0x7203, "TSEQ_EDIT"),
+		(1, 0x726a, "TSEQ_HEX"),
+		(1, 0x7870, "0x7870"),		# @1:79e5
+		(1, 0x7a81, "APP_DTMF"),
 
 		(2, 0x4196, "NMI_0x4196"),	# @2:543a
-		(2, 0x642e, "0x642e"),		# @2:6581
-		(2, 0x6646, "0x6646"),		# @2:72f0
-		(2, 0x6ad0, "0x6ad0"),		# @2:72e4 -> 220f
-		(2, 0x6f60, "0x6f60"),		# @2:72ea -> 2211
-		(2, 0x6fbe, "0x6fbe"),		# @2:735b -> 2213
-		(2, 0x7364, "APP_DSEQ"),
-		(2, 0x689b, "DSEQ_BASE"),
-		(2, 0x6940, "DSEQ_ON_LEVEL"),
-		(2, 0x6917, "DSEQ_PERIOD"),
-		(2, 0x6976, "DSEQ_OFF_LEVEL"),
 		(2, 0x5b24, "DSEQ_INDEX"),
 		(2, 0x5b4e, "DSEQ_END"),
-		(2, 0x5bda, "DSEQ_HEX"),
 		(2, 0x5b73, "DSEQ_EDIT"),
+		(2, 0x5bda, "DSEQ_HEX"),
+		(2, 0x642e, "0x642e"),		# @2:6581
+		(2, 0x6646, "0x6646"),		# @2:72f0
+		(2, 0x689b, "DSEQ_BASE"),
+		(2, 0x6917, "DSEQ_PERIOD"),
+		(2, 0x6940, "DSEQ_ON_LEVEL"),
+		(2, 0x6976, "DSEQ_OFF_LEVEL"),
 		(2, 0x69ed, "DSEQ_BIT"),
 		(2, 0x6a18, "DSEQ_CONT"),
 		(2, 0x6aa1, "DSEQ_SINGLE"),
 		(2, 0x6ab8, "DSEQ_STOP"),
+		(2, 0x6ad0, "KEYBOARD_0x6ad0"),		# @2:72e4 -> 220f
+		(2, 0x6f60, "0x6f60"),		# @2:72ea -> 2211
+		(2, 0x6fbe, "APPFINI_0x6fbe"),		# @2:735b -> 2213
+		(2, 0x7364, "APP_DSEQ"),
 
 		(3, 0x471c, "ROM_CHECK"),
 		(3, 0x4803, "KEY_TEST_KEYS"),	# @3:4b72 -> 23b0
 		(3, 0x4b1e, "KEYBOARD_CHECK"),
-		(3, 0x4b85, "0x4b85"),		# @3:4c51 -> 220f
+		(3, 0x4b85, "DIAG_KEYBOARD"),
 		(3, 0x4c26, "APP_DIAG"),
 		(3, 0x4dcf, "RAM_CHECK"),
 		(3, 0x4ef7, "LCD_CHECK"),
-		(3, 0x50ce, "0x50ce"),		# @3:52f2 -> 220f
+		(3, 0x4ff4, "MEM_ACCESS_SET_DEV"),
+		(3, 0x50ce, "MEM_ACCESS_KEYBOARD"),
+		(3, 0x51f3, "mem_access_up"),
+		(3, 0x5108, "mem_access_down"),
+		(3, 0x511c, "mem_access_next"),
+		(3, 0x513a, "mem_access_prev"),
 		(3, 0x5298, "MEM_ACCESS"),
 		(3, 0x530f, "PLL_CHECK"),
-		(3, 0x5914, "0x5914"),		# @3:5f7f -> 220f
+		(3, 0x5517, "SHOW_REGNAME"),
+		(3, 0x5914, "COWCHIP_KEYBOARD"),
 		(3, 0x5ec8, "MANUAL_COWCHIP"),
-		(3, 0x5f96, "0x5f96"),		# @3:6230
+		(3, 0x5a23, "cowchip_next"),
+		(3, 0x5a5b, "cowchip_prev"),
+		(3, 0x5f96, "MEMORY_KEYBOARD"),
 		(3, 0x61bb, "MANUAL_MEMORY"),
-		(3, 0x6a25, "0x6a25"),		# @3:7323 -> 220d
-		(3, 0x6d64, "0x6d64"),		# @3:6f6d -> 220d
-		(3, 0x6f80, "0x6f80"),		# @3:7233 -> 220d
+		(3, 0x6a25, "KEYPAD_0x6a25"),
+		(3, 0x6d64, "INSCODE_KEYPAD"),
+		(3, 0x6f80, "SERIAL_KEYPAD"),
 		(3, 0x7246, "APP_XX5"),
 		(3, 0x7ac3, "APP_ERR"),
 		(3, 0x7b7a, "0x7b7a"),
 
+		(4, 0x8000, "SERNO_OPTS"),
+		(4, 0x80d2, "LCD_SERNO_OPTS"),
 		(4, 0x83a0, "MAIN"),
+		(4, 0x8939, "CONFIG_MAIN_MENU"),
 		(4, 0x89aa, "0x89aa"),
 		(4, 0x8a08, "SET_MENU"),
 		(4, 0x8a2f, "0x8a2f"),
+		(4, 0x8ad0, "DO_KEYPRESS"),
+		(4, 0x8aea, "START_APP"),
 		(4, 0x8b4c, "MENU_EXIT"),
 		(4, 0x8b63, "SHOW_MAIN_MENU"),
-		(4, 0x8c14, "0x8c14"),		# @0x8d51,0x8edb -> 220f
-		(4, 0x8c44, "main_menu_nop"),
-		(4, 0x8c20, "main_menu_0x10"),
+		(4, 0x8c14, "MAIN_KEYBOARD"),		# @0x8d51,0x8edb -> 220f
+		(4, 0x8c20, "main_menu_err"),
 		(4, 0x8c2d, "main_menu_f1"),
+		(4, 0x8c44, "main_menu_nop"),
 		(4, 0x8c47, "main_menu_f3"),
 		(4, 0x8c5e, "main_menu_next"),
 		(4, 0x8c83, "main_menu_prev"),
 		(4, 0x90c9, "0x90c9"),
-		(4, 0x9a40, "0x9a40"),		# #0x9199
-		(4, 0x9a47, "0x9a48"),		# #0x917a
-		(4, 0x9a4b, "0x9a4b"),		# #0x9189
 		(4, 0x975e, "0x975e"),
+		(4, 0x9a37, "INIT_LEDS"),
+		(4, 0x9a40, "LEDS____0___*"),
+		(4, 0x9a43, "LEDS____0___"),
+		(4, 0x9a47, "LEDS_____0__"),
+		(4, 0x9a4b, "LEDS______0_"),
+		(4, 0x9a4f, "LEDS_______0"),
+		(4, 0x9a53, "LEDS___0____"),
+		(4, 0x9a57, "LEDS__0_____"),
+		(4, 0x9a5b, "LEDS____1___*"),
+		(4, 0x9a5e, "LEDS____1___"),
+		(4, 0x9a62, "LEDS_____1__"),
+		(4, 0x9a66, "LEDS______1_"),
+		(4, 0x9a6a, "LEDS_______1"),
+		(4, 0x9a6e, "LEDS___1____"),
+		(4, 0x9a72, "LEDS__1_____"),
+		(4, 0x9a76, "LEDS__111111"),
+		(4, 0x9a7d, "LEDS__000000"),
 		(4, 0x9b08, "0x9b08"),
 		(4, 0x9b70, "0x9b70"),
 		(4, 0x9da2, "0x9da2"),
 		(4, 0x9e53, "0x9e53"),		# @0x8d51,0x8edb -> 220f
 		(4, 0x9e7a, "0x9e7a"),
-		(4, 0xa0d4, "0xa0d4"),
-		(4, 0xa23f, "0xa23f"),
+		(4, 0x9ffe, "HPIB_SEND"),
+		(4, 0xa0d4, "KEYPAD_0xa0d4"),
+		(4, 0xa23f, "KEYPAD_0xa23f"),
+		(4, 0xa30e, "HPIB_HP"),
+		(4, 0xa3a0, "HPIB_ID"),
+		(4, 0xa3c6, "HPIB_ST_ID"),
 		(4, 0xa3e3, "0xa3e3"),
 		(4, 0xaba9, "DISPLAY_DEST"),
 		(4, 0xabef, "DISPLAY_UNIT"),
+		(4, 0xac35, "NP_INIT"),
+		(4, 0xad4d, "KEY_TRANSLATE"),
 		(4, 0xae22, "non_func_key"),
+		(4, 0xb3c2, "KEY_EVENT"),
+		(4, 0xb646, "RESET_OUTPUTS"),
+		(4, 0xb852, "COUNT_OUTPUTS"),
 		(4, 0xb8ad, "0xb8ad"),
 		(4, 0xb8cc, "0xb8cc"),
 		(4, 0xc1e3, "0xc1e3"),
@@ -293,24 +349,33 @@ def symb(pj, cpu):
 		(4, 0xc2c4, "CLEAR_NVRAM"),
 		(4, 0xc36e, "CHECK_NVRAM"),
 		(4, 0xc3fe, "RAISE_ERROR"),
-		(4, 0xc418, "0xc418"),
+		(4, 0xc418, "SHOW_CLR_ERROR"),
 		(4, 0xc7b0, "0xc7b0"),
 		(4, 0xc855, "0xc855"),
 		(4, 0xc885, "0xc885"),
 		(4, 0xc973, "0xc973"),
+		(4, 0xc912, "WORD2ASC"),
+		(4, 0xc9d1, "BYTE2ASC"),
+		(4, 0xca8f, "NUM2ASC"),
 		(4, 0xcb10, "0xcb10"),
 		(4, 0xcba6, "BYTE2HEX"),
 		(4, 0xcc09, "WORD2HEX"),
 		(4, 0xccb5, "0xccb5"),
-		(4, 0xccff, "0xccff"),
+		(4, 0xccff, "ZERO_SUPRESS"),
 		(4, 0xcd50, "0xcd50"),
 		(4, 0xd022, "0xd022"),
 		(4, 0xd17d, "0xd17d"),
 		(4, 0xd2c6, "0xd2c6"),
-		(4, 0xd37d, "NUM="),
-		(4, 0xd3c6, "NUM-"),
-		(4, 0xd392, "NUM+"),
+		(4, 0xd303, "MUL32"),
+		(4, 0xd37d, "NUM_SET"),
+		(4, 0xd392, "NUM_ADD"),
+		(4, 0xd3c6, "NUM_SUB"),
 		(4, 0xd57c, "0xd57c"),
+		(4, 0xd596, "INIT_PTM"),
+		(4, 0xd5f1, "PTM_DISABLE_IRQ"),
+		(4, 0xd640, "DELAY"),
+		(4, 0xd670, "SLEEP"),
+		(4, 0xd6c8, "BEEP"),
 		(4, 0xd71d, "LCD_WR_CTRL"),
 		(4, 0xd73f, "LCD_WR_DATA"),
 		(4, 0xd761, "LCD_RD_DATA"),
@@ -318,11 +383,16 @@ def symb(pj, cpu):
 		(4, 0xd7a0, "LCD_DDRAM"),
 		(4, 0xd7be, "LCD_CURSOR"),
 		(4, 0xd841, "LCD_DEF_CHAR"),
+		(4, 0xd8a5, "LCD_SHOW"),
 		(4, 0xd8ea, "DISPLAY"),
 		(4, 0xd989, "DISPLAY2L"),
+		(4, 0xd9c6, "LCD_AS_MIRROR"),
 		(4, 0xd9e6, "LCD_INIT"),
 		(4, 0xdae0, "BANKSWITCH"),
 		(4, 0xdb2b, "CALL_BANK"),
+		(4, 0xdb5c, "BACKLIGHT_ON"),
+		(4, 0xdb7d, "BACKLIGHT_OFF"),
+		(4, 0xdba1, "OUTPUT_AND_OR"),
 		(4, 0xdc7b, "RAM_ROM_TEST"),
 		(4, 0xdc82, "RAM_TEST"),
 		(4, 0xdca9, "ROM_SUM"),
@@ -336,17 +406,19 @@ def symb(pj, cpu):
 		(4, 0xf02a, "SET_NMI_VEC"),
 		(4, 0xf044, "SET_FIRQ_VEC"),
 		(4, 0xf0a1, "HANDLE_FIRQ"),
+		(4, 0xf05e, "PTM_IRQ"),
 		(4, 0xf154, "HANDLE_IRQ"),
-		(4, 0xf1d9, "0xf1d9"),
-		(4, 0xf3f0, "0xf3f0"),
+		(4, 0xf1d9, "KEYPAD_0xf1d9"),
+		(4, 0xf3f0, "KEYPAD_0xf3f0"),
 		(4, 0xf7ec, "0xf7ec"),
-		(4, 0xf9d4, "0xf9d4"),
+		(4, 0xf9d4, "KEYPAD_0xf9d4"),
 		(4, 0xfcea, "ARRAY_INDEX"),
 		(4, 0xfd50, "PROLOGUE"),
-		(4, 0xfd80, "D=B+A"),
-		(4, 0xfd8f, "D=B-A"),
+		(4, 0xfd80, "D=A+B"),
+		(4, 0xfd8f, "D=A-B"),
 		(4, 0xfd9e, "B=A<<B"),
 		(4, 0xfdb6, "B=CC:Z"),
+		(4, 0xfe5f, "B=A/B"),
 		(4, 0xffa4, "D=X<<B"),
 		(4, 0xffc0, "ret_0"),
 		(4, 0xffc6, "ret_1"),
@@ -355,12 +427,41 @@ def symb(pj, cpu):
 		(5, 0xeeee, "unit_strings"),
 		(5, 0xed11, "blank_line"),
 
+		(6, 0x0100, "SERVICE_SWITCH"),
+		(6, 0x0200, "NSMIC"),
 		(6, 0x0300, "LCD_CTL"),
 		(6, 0x0301, "LCD_DATA"),
+		(6, 0x0400, "HPIB"),
+		(6, 0x0900, "LEDS"),
+		(6, 0x0b00, "HOPLATCH"),
+		(6, 0x0c00, "OUTPUT_1"),
+		(6, 0x0d00, "OUTPUT_2"),
+		(6, 0x0e00, "OUTPUT_3"),
+		(6, 0x0f00, "OUTPUT_4"),
+		(6, 0x1000, "PTM_0"),
+		(6, 0x1001, "PTM_1"),
+		(6, 0x1002, "PTM_TIMER1"),
+		(6, 0x1004, "PTM_TIMER2"),
+		(6, 0x1006, "PTM_TIMER3"),
 		# 0x2204:0x0001, "IRQ happened"
+		# 0x2204:0x0080, "backlight on"
+		(6, 0x220d, "APP_KEYPAD"),
+		(6, 0x220f, "APP_KEYBOARD"),
+		(6, 0x2213, "APP_FINI"),
+		(6, 0x2217, "KEYPRESS"),
+		(6, 0x2219, "MAIN_MENU_APPNO"),
 		(6, 0x2223, "MAIN_MENU_LAST_PG"),
+		(6, 0x2224, "MAIN_MENU_APPTBL"),
+		(6, 0x23b2, "N_OUTPUTS"),
 		(6, 0x23dd, "NVRAM_CHECK_STATUS"),
 		(6, 0x23de, "ERROR_CODE"),
+		(6, 0x2420, "LEDS_COPY"),
+		(6, 0x2421, "PTM_CR1_COPY"),
+		(6, 0x2422, "PTM_CR2_COPY"),
+		(6, 0x2423, "PTM_CR3_COPY"),
+		(6, 0x2424, "PTM_TIMER1_COPY"),
+		(6, 0x2426, "PTM_TIMER2_COPY"),
+		(6, 0x2428, "PTM_TIMER3_COPY"),
 		(6, 0x242a, "cursor-state"),
 		(6, 0x2240, "MENU_PTR"),
 		(6, 0x2245, "MAIN_MENU_CUR_PG"),
@@ -368,12 +469,15 @@ def symb(pj, cpu):
 		(6, 0x23be, "Array*35_idx"),
 		(6, 0x23df, "ERRMSG_LEN"),
 		(6, 0x23e0, "ERRMSG_BUF"),
+		(6, 0x242b, "LCD_MIRROR"),
 		(6, 0x247b, "CUR_BANK"),
 		(6, 0x247c, "APP_BANK"),
 		(6, 0x247d, "APP_VECTOR"),
 		(6, 0x24d8, "NMIVEC"),
 		(6, 0x24da, "FIRQVEC"),
 		(6, 0x24dc, "KEY_PRESSED"),
+		(6, 0x24e6, "CURR_APP"),
+		(6, 0x24f0, "OUTPUT_COPY[4]"),
 		(6, 0x24f4, "Array*35_idx"),
 		(6, 0x24f5, "Array*35"),
 		(6, 0x2581, "Array*15"),
@@ -382,6 +486,11 @@ def symb(pj, cpu):
 		(6, 0x3c10, "Array*4"),
 		(6, 0x3c50, "Array*3"),
 		(6, 0x3fa1, "PREV_KEY"),
+		(6, 0x3fa9, "mem_access_device"),
+		(6, 0x3faa, "mem_access_max"),
+		(6, 0x3fab, "mem_access_base"),
+		(6, 0x3fad, "mem_access_ptr"),
+		(6, 0x3faf, "mem_access_name"),
 		(6, 0x3ffc, "OPTIONS"),
 	]:
 		if p == pj.pg:
@@ -438,9 +547,15 @@ def lexer(pj):
 			if self.f > 0 and self.pfx in hpib:
 				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
-			if self.f > 0:
+			if self.f > 0 and self.t not in pj.labels:
 				pj.set_label(self.t, "J_" + self.pfx)
 				cpu.disass(pj, self.t)
+				h = hpib.get(self.pfx)
+				if h == None:
+					h = "UNDOC!"
+				y=pj.t.find_lo(self.t)
+				assert len(y) == 1
+				y[0].lcmt += "HPIB: " + h + "\n"
 
 		def render(self, pj):
 			s = ".LEX\t\"%s\", " % self.pfx
@@ -613,6 +728,9 @@ def hints(pj, cpu):
 			pj.set_label(a, n)
 
 		cpu.codeptr(pj, 0x4004)
+		cpu.codeptr(pj, 0x4006)
+		for a in range(0x400e, 0x4018, 2):
+			cpu.codeptr(pj, a)
 
 		for a in range(0x4018, 0x4022, 2):
 			y = data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
@@ -702,6 +820,7 @@ def hints(pj, cpu):
 			(0x4466,6),
 			(0x7339,3),
 			(0x733d,3),
+			(0x550f,2),
 		):
 			y = data.Txt(pj, a, a + b, label=False)
 			y.compact = True
@@ -728,17 +847,13 @@ def hints(pj, cpu):
 			y.compact = True
 			a = y.hi
 
-		n = 0
 		for a in range(0x4a3f, 0x4aad, 2):
 			y = pj.m.bu16(a)
 			assert pj.m.rd(y) == 0xcc
 			x = pj.m.bu16(y + 1)
 			z = pj.t.find_lo(x)
 			t = z[0].txt[:-4].strip().replace(" ","_")
-			pj.set_label(a, "k_0x%02x" % n)
 			pj.set_label(y, "test_key_" + t)
-			keys[n] = t
-			n += 1
 
 		Num(pj, 0x684a)
 
@@ -765,7 +880,6 @@ def hints(pj, cpu):
 			(0x977b, 5),
 			(0xed11,40),
 			(0xea99,0x23),
-			(0xeae4,13),
 			(0xeb41,40),
 			(0xeb69,40),
 			(0xec5b,14),
@@ -808,7 +922,6 @@ def hints(pj, cpu):
 		n = 1
 		for a in range(0xae3d, 0xaea5, 2):
 			print("%x -> " % a + keys[n])
-			pj.set_label(a, "K_" + keys[n])
 			u = pj.m.bu16(a)
 			if u != 0xae22:
 				pj.set_label(u, "key_" + keys[n])
@@ -820,6 +933,8 @@ def hints(pj, cpu):
 		Num(pj, 0xea6b)
 		Num(pj, 0xea62)
 		Num(pj, 0xea68)
+		for a in range(0xee4a,0xee62, 3):
+			Num(pj,a)
 
 #######################################################################
 
@@ -849,24 +964,26 @@ for pg in (0,1,2,3,4):
 	while pj.run():
 		pass
 
-	error_arg(pj, 0xc3fe, 0, errors)
-	num_arg(pj, 0xd37d, 0)
+	str_len_args(pj, 0xd8a5, 3, 2)	
+	str_len_args(pj, 0x9ffe, 1, 2)	
+	error_arg(pj, 0xc3fe, 1, errors)
 	num_arg(pj, 0xd37d, 1)
+	num_arg(pj, 0xd37d, 2)
 	num_arg(pj, 0xd392, 1)
 	num_arg(pj, 0xd392, 2)
 	num_arg(pj, 0xd3c6, 1)
 	num_arg(pj, 0xd3c6, 2)
-
-	str_len_args(pj, 0xd8ea, 0, 1)	
-	str_len_args(pj, 0xd8a5, 0, 1)	
+	str_len_args(pj, 0xd8ea, 3, 2)	
 	if pj.pg == 2:
-		str_len_args(pj, 0x44ee, 1, 2)	
+		str_len_args(pj, 0x44ee, 3, 2)	
 
 	decompile.mopup(pj, cpu)
 
 	code.lcmt_flows(pj)
 
 	listing.Listing(pj)
+
+print(keys)
 
 #######################################################################
 # fcea is array index multiplicator
