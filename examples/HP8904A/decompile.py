@@ -384,7 +384,6 @@ def mopup(pj, cpu):
 				continue
 			y = data.Const(pj, a, b)
 			y.typ = ".COMP"
-			print(y)
 			a = i;
 			b = i + 1
 		y = data.Const(pj, a, b)

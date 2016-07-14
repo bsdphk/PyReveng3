@@ -62,7 +62,6 @@ def collect_errors():
 	a = 0x7348
 	n = m.rd(a)
 	a += 1
-	print(n)
 	e = {}
 	for i in range(n):
 		x = m.rd(a)
@@ -78,6 +77,7 @@ def collect_errors():
 errors = collect_errors()
 
 #######################################################################
+# 
 
 def collect_keys():
 	keys = {}
@@ -95,7 +95,67 @@ def collect_keys():
 		n += 1
 	return keys
 
-keys = collect_keys()
+if False:
+	# This gets us the un-shifted name twice
+	keys = collect_keys()
+
+keys = {
+	0x00:	"NOKEY",
+	0x01:	"local",
+	0x02:	"f1",
+	0x03:	"phase",
+	0x04:	"waveform",
+	0x05:	"ampl",
+	0x06:	"freq",
+	0x07:	"shift",
+	0x08:	"f2",
+	0x09:	"-",
+	0x0a:	"7",
+	0x0b:	"4",
+	0x0c:	"1",
+	0x0d:	"inc_set",
+	0x0e:	"last",
+	0x0f:	"0",
+	0x10:	"8",
+	0x11:	"5",
+	0x12:	"2",
+	0x13:	"up_arrow",
+	0x14:	"next",
+	0x15:	".",
+	0x16:	"9",
+	0x17:	"6",
+	0x18:	"3",
+	0x19:	"dn_arrow",
+	0x1a:	"f3",
+	0x1b:	"enter",
+	0x1c:	"deg",
+	0x1d:	"Hz",
+	0x1e:	"kHz",
+	0x1f:	"bkspace",
+	0x20:	"f4",
+	0x21:	"SPARE0",
+	0x22:	"SPARE1",
+	0x23:	"SPARE2",
+	0x24:	"SPARE3",
+	0x25:	"float",
+	0x26:	"output",
+	0x27:	"adrs",
+	0x28:	"filter",
+	0x29:	"service",
+	0x2a:	"destn",
+	0x2b:	"inc_set",
+	0x2c:	"main",
+	0x2d:	"save",
+	0x2e:	"special",
+	0x2f:	"recall",
+	0x30:	"preset",
+	0x31:	"ph_reset",
+	0x32:	"shift_f2",
+	0x33:	"shift_f4",
+	0x34:	"end",
+	0x35:	"INVALID",
+	0x36:	"DOUBLE",
+}
 
 #######################################################################
 
@@ -332,6 +392,9 @@ def symb(pj, cpu):
 		(4, 0xa3a0, "HPIB_ID"),
 		(4, 0xa3c6, "HPIB_ST_ID"),
 		(4, 0xa3e3, "0xa3e3"),
+		(4, 0xa9a2, "KBD_SENSE"),
+		(4, 0xaae8, "XLATE_KEYPRESS"),
+		(4, 0xab7a, "GETKEY"),
 		(4, 0xaba9, "DISPLAY_DEST"),
 		(4, 0xabef, "DISPLAY_UNIT"),
 		(4, 0xac35, "NP_INIT"),
@@ -403,6 +466,7 @@ def symb(pj, cpu):
 		(4, 0xe319, "0xe319"),
 		(4, 0xe69c, "0xe69c"),
 		(4, 0xe8a7, "0xe8a7"),
+		(4, 0xef4a, "KEY_XLATE_TAB"),
 		(4, 0xf02a, "SET_NMI_VEC"),
 		(4, 0xf044, "SET_FIRQ_VEC"),
 		(4, 0xf0a1, "HANDLE_FIRQ"),
@@ -431,8 +495,17 @@ def symb(pj, cpu):
 		(6, 0x0200, "NSMIC"),
 		(6, 0x0300, "LCD_CTL"),
 		(6, 0x0301, "LCD_DATA"),
-		(6, 0x0400, "HPIB"),
+		(6, 0x0400, "HPIB_0"),
+		(6, 0x0401, "HPIB_1"),
+		(6, 0x0402, "HPIB_2"),
+		(6, 0x0403, "HPIB_3"),
+		(6, 0x0404, "HPIB_4"),
+		(6, 0x0405, "HPIB_5"),
+		(6, 0x0406, "HPIB_6"),
+		(6, 0x0407, "HPIB_7"),
+		(6, 0x0600, "IO_600"),
 		(6, 0x0900, "LEDS"),
+		(6, 0x0a00, "KBDSCAN"),
 		(6, 0x0b00, "HOPLATCH"),
 		(6, 0x0c00, "OUTPUT_1"),
 		(6, 0x0d00, "OUTPUT_2"),
@@ -443,6 +516,7 @@ def symb(pj, cpu):
 		(6, 0x1002, "PTM_TIMER1"),
 		(6, 0x1004, "PTM_TIMER2"),
 		(6, 0x1006, "PTM_TIMER3"),
+		# 0x2202:0x0001, "shift pressed"
 		# 0x2204:0x0001, "IRQ happened"
 		# 0x2204:0x0080, "backlight on"
 		(6, 0x220d, "APP_KEYPAD"),
@@ -469,6 +543,7 @@ def symb(pj, cpu):
 		(6, 0x23be, "Array*35_idx"),
 		(6, 0x23df, "ERRMSG_LEN"),
 		(6, 0x23e0, "ERRMSG_BUF"),
+		(6, 0x241f, "KBDSCAN_COPY"),
 		(6, 0x242b, "LCD_MIRROR"),
 		(6, 0x247b, "CUR_BANK"),
 		(6, 0x247c, "APP_BANK"),
@@ -936,6 +1011,12 @@ def hints(pj, cpu):
 		for a in range(0xee4a,0xee62, 3):
 			Num(pj,a)
 
+		for a in range(0xef4a, 0xef94, 2):
+			y = data.Const(pj, a, a + 2, fmt="0x%02x")
+			i = keys.get(pj.m.rd(a))
+			j = keys.get(pj.m.rd(a + 1))
+			y.lcmt += "%8s | %-8s\n" % (i, j) 
+
 #######################################################################
 
 for pg in (0,1,2,3,4):
@@ -982,8 +1063,6 @@ for pg in (0,1,2,3,4):
 	code.lcmt_flows(pj)
 
 	listing.Listing(pj)
-
-print(keys)
 
 #######################################################################
 # fcea is array index multiplicator
