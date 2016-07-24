@@ -36,7 +36,18 @@ from __future__ import print_function
 from pyreveng import mem, assy, data
 
 mc6809_instructions = """
-NEG	-	|0 0 0 0 0 0 0 0|
+NEG	-	|0 0 0 0 0 0 0 0| d		|
+COM	d	|0 0 0 0 0 0 1 1| d		|
+LSR	d	|0 0 0 0 0 1 0 0| d		|
+ROR	d	|0 0 0 0 0 1 1 0| d		|
+ASR	d	|0 0 0 0 0 1 1 1| d		|
+ASL	d	|0 0 0 0 1 0 0 0| d		|
+ROL	d	|0 0 0 0 1 0 0 1| d		|
+DEC	d	|0 0 0 0 1 0 1 0| d		|
+INC	d	|0 0 0 0 1 1 0 0| d		|
+TST	d	|0 0 0 0 1 1 0 1| d		|
+JMP	d,>J	|0 0 0 0 1 1 1 0| d		|
+CLR	d	|0 0 0 0 1 1 1 1| d		|
 
 BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
 BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
@@ -55,7 +66,14 @@ BGT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 0| R1		| R2		|
 BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 1| R1		| R2		|
 
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
+CMPY    I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 0 0| I1		| I2		|
 LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		|
+
+CMPD	d	|0 0 0 1 0 0 0 0|1 0 0 1 0 0 1 1| d		|
+CMPY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 0 0| d		|
+LDY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 0| d		|
+STY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 1| d		|
+
 CMPD    P	|0 0 0 1 0 0 0 0|1 0 1 0 0 0 1 1|X| R |i| m     |
 LDY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 0|X| R |i| m     |
 STY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 1|X| R |i| m     |
@@ -63,7 +81,23 @@ CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| E1		| E2		|
 CMPY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 0 0| E1		| E2		|
 LDY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 0| E1		| E2		|
 STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| E1		| E2		|
+
 LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		|
+
+LDS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 0| d		|
+STS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 1| d		|
+
+LDS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 0|X| R |i| m     |
+STS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 1|X| R |i| m     |
+
+CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
+CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
+CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
+CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
+CMPU	P	|0 0 0 1 0 0 0 1|1 0 1 0 0 0 1 1|X| R |i| m     |
+CMPS	P	|0 0 0 1 0 0 0 1|1 0 1 0 1 1 0 0|X| R |i| m     |
+CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| E1		| E2		|
+CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| E1		| E2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
 BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2 		|
@@ -154,7 +188,7 @@ ROL	E	|0 1 1 1 1 0 0 1| E1		| E2		|
 DEC	E	|0 1 1 1 1 0 1 0| E1		| E2		|
 INC	E	|0 1 1 1 1 1 0 0| E1		| E2		|
 TST	E	|0 1 1 1 1 1 0 1| E1		| E2		|
-JMP	E	|0 1 1 1 1 1 1 0| E1		| E2		|
+JMP	E,>J	|0 1 1 1 1 1 1 0| E1		| E2		|
 CLR	E	|0 1 1 1 1 1 1 1| E1		| E2		|
 
 SUBA	i	|1 0 0 0 0 0 0 0| i		|
@@ -171,6 +205,23 @@ ADDA	i	|1 0 0 0 1 0 1 1| i		|
 CMPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		|
 LDX	I	|1 0 0 0 1 1 1 0| I1		| I2		|
+
+SUBA	d	|1 0 0 1 0 0 0 0| d		|
+CMPA	d	|1 0 0 1 0 0 0 1| d		|
+SBCA	d	|1 0 0 1 0 0 1 0| d		|
+SUBD	d	|1 0 0 1 0 0 1 1| d		|
+ANDA	d	|1 0 0 1 0 1 0 0| d		|
+BITA	d	|1 0 0 1 0 1 0 1| d		|
+LDA	d	|1 0 0 1 0 1 1 0| d		|
+STA	d	|1 0 0 1 0 1 1 1| d		|
+EORA	d	|1 0 0 1 1 0 0 0| d		|
+ADCA	d	|1 0 0 1 1 0 0 1| d		|
+ORA	d	|1 0 0 1 1 0 1 0| d		|
+ADDA	d	|1 0 0 1 1 0 1 1| d		|
+CMPX	d	|1 0 0 1 1 1 0 0| d		|
+JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
+LDX	d	|1 0 0 1 1 1 1 0| d		|
+STX	d	|1 0 0 1 1 1 1 1| d		|
 
 SUBA	P	|1 0 1 0 0 0 0 0|X| R |i| m	|
 CMPA	P	|1 0 1 0 0 0 0 1|X| R |i| m	|
@@ -219,6 +270,23 @@ ORB 	i	|1 1 0 0 1 0 1 0| i		|
 ADDB	i	|1 1 0 0 1 0 1 1| i		|
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
 LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		|
+
+SUBB	d	|1 1 0 1 0 0 0 0| d		|
+CMPB	d	|1 1 0 1 0 0 0 1| d		|
+SBCB	d	|1 1 0 1 0 0 1 0| d		|
+ADDD	d	|1 1 0 1 0 0 1 1| d		|
+ANDB	d	|1 1 0 1 0 1 0 0| d		|
+BITB	d	|1 1 0 1 0 1 0 1| d		|
+LDB	d	|1 1 0 1 0 1 1 0| d		|
+STB	d	|1 1 0 1 0 1 1 1| d		|
+EORB	d	|1 1 0 1 1 0 0 0| d		|
+ADCB	d	|1 1 0 1 1 0 0 1| d		|
+ORB	d	|1 1 0 1 1 0 1 0| d		|
+ADDB	d	|1 1 0 1 1 0 1 1| d		|
+LDD	d	|1 1 0 1 1 1 0 0| d		|
+STD	d	|1 1 0 1 1 1 0 1| d		|
+LDU	d	|1 1 0 1 1 1 1 0| d		|
+STU	d	|1 1 0 1 1 1 1 1| d		|
 
 SUBB	P	|1 1 1 0 0 0 0 0|X| R |i| m     |
 CMPB	P	|1 1 1 0 0 0 0 1|X| R |i| m     |
@@ -270,6 +338,13 @@ class arg_i(object):
 
 	def render(self, pj):
 		return "#0x%02x" % self.val
+
+class arg_d(object):
+	def __init__(self, pj, ins):
+		self.val = ins.im.F_d
+
+	def render(self, pj):
+		return "$0x%02x" % self.val
 
 class arg_I(assy.Arg_dst):
 	def __init__(self, pj, ins):
@@ -390,6 +465,7 @@ class mc6809(assy.Instree_disass):
 		if macros:
 			self.it.load_string(mc6809_macro_instructions)
 		self.args.update( {
+			"d":	arg_d,
 			"i":	arg_i,
 			"s":	arg_s,
 			"I":	arg_I,
