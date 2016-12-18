@@ -55,31 +55,126 @@ token = {
 err = {
 }
 
+#		6624		6626
+kbd_tbl = {
+	0x01:	[ '9',		'9' ],
+	0x02:	[ '.',		'.' ],
+	0x03:	[ 'enter',	'enter' ],
+	0x04:	[ '6',		'6' ],
+
+	0x05:	[ 'meter',	'range' ],
+	0x06:	[ 'rcl',	'rcl' ],
+	0x07:	[ 'unmask',	'ocp' ],
+	0x08:	[ 'addr',	'addr' ],
+
+	0x09:	[ '7',		'7' ],
+	0x0a:	[ '0',		'0' ],
+	0x0b:	[ '2',		'2' ],
+	0x0c:	[ '4',		'4' ],
+
+	0x0d:	[ 'output>',	'output>' ],
+	0x0e:	[ 'on_off',	'on_off' ],
+	0x0f:	[ '1',		'1' ],
+	0x10:	[ 'vset',	'vset' ],
+
+	0x11:	[ None,		None ],
+	0x12:	[ 'sto',	'sto' ],
+	0x13:	[ 'err',	'err' ],
+	0x14:	[ 'lcl',	'lcl' ],
+
+	0x15:	[ 'ovset',	'V_up' ],
+	0x16:	[ 'fault',	'reset' ],
+	0x17:	[ 'ocp',	'I_up' ],
+	0x18:	[ 'dly',	'ovset' ],
+
+	0x19:	[ '<output',	'<output' ],
+	0x1a:	[ 'ocrst',	'I_dn' ],
+	0x1b:	[ 'iset',	'iset' ],
+	0x1c:	[ 'ovrst',	'V_dn' ],
+
+	0x1d:	[ '8',		'8' ],
+	0x1e:	[ 'backsp',	'backsp' ],
+	0x1f:	[ '3',		'3' ],
+	0x20:	[ '5',		'5' ],
+}
+
+for i in range(1,33):
+	s = "%02x" % i
+	a = pj.m.rd(0x87f0+i-1)
+	b = pj.m.rd(0x87d0+i-1)
+	s += "   "
+	s += " %x" % a
+	s += " %04x" % pj.m.bu16(0x87b2 + a * 2)
+	s += " %-10s" % kbd_tbl[i][0]
+	s += "   "
+	s += " %x" % b
+	s += " %04x" % pj.m.bu16(0x87b2 + b * 2)
+	s += " %-10s" % kbd_tbl[i][1]
+	print(s)
+
 def softlbl(a,n):
 	if a not in pj.labels:
 		pj.set_label(a, n)
 
 for a,n in (
+	(0x002b, "display_chan"),
 	(0x0085, "n_chan"),
 	(0x0086, "model_desc_ptr"),
 	(0x038f, "B_flag1"),
 	(0x0390, "B_flag2"),
 	(0x01bc, "cal_lock_flag"),
-	(0x1000, "gpib"),
+	(0x1000, "i8291_data"),
+	(0x1001, "i8291_intrrupt1"),
+	(0x1002, "i8291_intrrupt2"),
+	(0x1003, "i8291_spoll"),
+	(0x1004, "i8291_addressed"),
+	(0x1005, "i8291_cmd_aux"),
+	(0x1006, "i8291_addr1"),
+	(0x1007, "i8291_addr2_eos"),
 	(0x2000, "slv_force"),
 	(0x3000, "slv_sense"),
 	(0x4000, "dip_kbd_sense"),
 	(0x5000, "kbd_dsply_scan"),
+	(0x8236, "task__display"),
+	(0x84e3, "i8291_init"),
 	(0x8465, "MSG(X)"),
-	(0x8775, "task_keyboard"),
+	(0x8824, "HP6626_func_01_key"),
+	(0x8860, "HP6624_func_01_key"),
+	(0x8775, "task__keyboard"),
+	(0x87d0, "HP6626_keytbl"),
+	(0x87f0, "HP6624_keytbl"),
 	(0x88b6, "GETKEY"),
-	(0x8c1a, "key_03_LCL"),
+	(0x897f, "key_08_METER"),
+	(0x89d5, "key_01_func"),
+	(0x8992, "key_06_ENTER"),
+	(0x89c0, "key_05_BS"),
+	(0x8bb0, "key_09_output_control"),
+	(0x8c1a, "key_04_LCL"),
+	(0x8a2b, "key_03_OUTPUT_SELECT"),
+	(0x8a81, "key_02_digit"),
+	(0x8acd, "key_07_PERIOD"),
+	(0x8bfa, "key_09_output_ONOFF"),
+	(0x8c05, "key_09_output_OCP_UNMASK"),
+	(0x8c40, "key_0e_RANGE"),
+	(0x8cb3, "key_0a_V_UP"),
+	(0x8d05, "key_0b_V_DOWN"),
+	(0x8dce, "key_0c_I_UP"),
+	(0x8e32, "key_0d_I_DOWN"),
 	(0x91d7, "ERR=A"),
 	(0x93f7, "err_NUMBER_RANGE"),
 	(0x9463, "Get_Chan"),
+	(0x9468, "Chan_Nr_Check"),
 	(0x99d5, "cmd_A"),
 	(0x99d9, "cmd_B"),
 	(0x99dd, "cmd_S"),
+	(0x9acb, "func_09_output_OCRST"),
+	(0x9b4a, "func_09_output_OVRST"),
+	(0x9b21, "get_chan"),
+	(0x9ea6, "put_char"),
+	(0x9ead, "put_CRNL"),
+	(0x9ebc, "reset_outbuf"),
+	(0x9ec4, "put_string"),
+	(0x9ed2, "put_digits"),
 	(0xa14b, "cmd_ID"),
 	(0xaaf9, "Get_Nbr"),
 	(0xb00b, "Output_40W20V_1"),
@@ -107,6 +202,9 @@ for a,n in (
 	(0xb476, "Config_Model"),
 	(0xb4c5, "ERR_NO_MODEL"),
 	(0xb5ca, "special_model"),
+	(0xb7c4, "tx_slave"),
+	(0xb873, "rx_slave_byte"),
+	(0xbacc, "yield"),
 	(0xbade, "EE_Write_Word"),
 	(0xbae9, "EE_Write_Byte"),
 	(0xbb1e, "I2C_Ready"),
@@ -128,18 +226,25 @@ for a,n in (
 	(0xc5cf, "cmd_CMODE"),
 	(0xc62f, "err_CAL_LOCKED"),
 	(0xc637, "err_STORE_LIMIT"),
+	(0xcb22, "ROMSUM"),
+	(0xce80, "task_setup"),
+	(0xcea5, "task_switch"),
+	(0xceb7, "task__vimes"),
+	(0xd448, "init_slavetbl"),
 	):
 	pj.set_label(a, n)
 
 data.Const(pj, 0x8000, 0x8002)
-data.Const(pj, 0xd472, 0xd47a)
+
+pj.set_label(0xd472, "chan_ptr")
+for a in range(0xd472, 0xd47a, 2):
+	data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
 
 for a,b in (
 	(0x8002, 0x802a),
 	(0x827b, 0x8287),
 	):
 	y = data.Txt(pj, a, b)
-	y.compact = True
 
 for a in (
 	0x849b,
@@ -156,7 +261,6 @@ for a in (
 	0xd262,
 	):
 	y = data.Txt(pj, a, a + 12)
-	y.compact = True
 
 for a in (
 	0xa183,
@@ -165,29 +269,23 @@ for a in (
 	0xa198,
 	0xaffe,
 	):
-	data.Const(pj, a, a + 1)
-	y = data.Txt(pj, a + 1, a + 1 + pj.m.rd(a))
-	y.compact = True
+	y = data.Txt(pj, a, pfx=1)
 
 n = 0
 for a in range(0x8ec2, 0x9036, 12):
 	y = data.Txt(pj, a, a + 12)
 	err[n] = y.txt
 	n += 1
-	y.compact = True
 
 a = 0xa225
 nn = 7
 while a < 0xa370:
-	data.Const(pj, a, a + 1)
 	b = pj.m.rd(a)
 	if b == 0:
 		break
-	y = data.Txt(pj, a + 1, a + 1 + b)
-	# print("0x%02x" % nn, y.txt)
+	y = data.Txt(pj, a, pfx=1)
 	token[nn] = y.txt
-	y.compact = True
-	a += 1 + b
+	a = y.hi
 	nn += 1
 
 print("NN", nn)
@@ -197,21 +295,21 @@ for a in range(0x87d0, 0x8810, 8):
 
 def t1(a):
 	while True:
-		y = data.Txt(pj, a)
-		y.compact = True
-		a = y.hi
-		cpu.codeptr(pj, a)
-		# data.Const(pj, a, a + 2)
-		a += 2
 		data.Const(pj, a, a + 1)
 		if pj.m.rd(a) == 0:
-			return a + 1
+			return;
 		a += 1
+		y = data.Txt(pj, a)
+		a = y.hi
+		cpu.codeptr(pj, a)
+		z = pj.m.bu16(a)
+		pj.set_label(z, "func_" + y.txt)
+		a += 2
 
-t1(0x8825)
-t1(0x8861)
+t1(0x8824)
+t1(0x8860)
 
-n = 0
+n = 1
 for a in range(0x87b4, 0x87d0, 2):
 	x = pj.m.bu16(a)
 	softlbl(x, "key_%02x_%04x" % (n, x))
@@ -235,7 +333,7 @@ class tt_5(data.Data):
 		s = ".TT5\t"
 		t = pj.m.rd(self.lo)
 		if t in token:
-			s += token[t] + ", "
+			s += (token[t] + ", ").ljust(8)
 		else:
 			s += "T%02x, " % t
 		s += "0x%02x, " % pj.m.rd(self.lo + 1)
@@ -283,9 +381,11 @@ for a in range(0xb7ac, 0xb7c4, 2):
 
 # Task or coroutine table
 for a in range(0xce62, 0xce80, 6):
+	data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
 	z = pj.m.bu16(a + 2)
 	softlbl(z, "task_%04x" % z)
 	cpu.codeptr(pj, a + 2)
+	data.Dataptr(pj, a + 4, a + 6, pj.m.bu16(a + 4))
 	
 
 cpu.disass(pj, 0x8631)

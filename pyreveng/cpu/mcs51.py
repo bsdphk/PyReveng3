@@ -38,7 +38,7 @@ from pyreveng import instree, assy
 mcs51_instructions = """
 
 #			|. . . . . . . .|. . . . . . . .|
-ACALL	a11,>C	| ahi |1 0 0 0 1| alo		|
+ACALL	a11,>C		| ahi |1 0 0 0 1| alo		|
 
 ADD	A,Rn		|0 0 1 0 1| rn  |
 ADD	A,adir		|0 0 1 0 0 1 0 1| adir		|

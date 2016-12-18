@@ -80,53 +80,54 @@ class Dataptr(Data):
 	def render(self, pj):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
+def stringify(pj, lo, len=None, term=0):
+	s = ""
+	l = ""
+	while True:
+		x = pj.m.rd(lo)
+		lo += 1
+		if len == None and x == term:
+			return lo,s,l
+		if x > 32 and x < 127:
+			s += "%c" % x
+			l += "%c" % x
+		elif x == 32:
+			s += " "
+		elif x == 10:
+			s += "\\n"
+			l += "NL"
+		elif x == 13:
+			s += "\\r"
+			l += "CR"
+		else:
+			s += "\\x%02x" % x
+			l += "%%%02x" % x
+		if len != None:
+			len -= 1
+			if len == 0:
+				return lo,s,l
+
 class Txt(Data):
-	def __init__(self, pj, lo, hi=None, label=True):
-		s = ""
-		a = lo
-		while True:
-			if hi != None and a == hi:
-				break
-			x = pj.m.rd(a)
-			a += 1
-			if x >= 32 and x < 127:
-				s += "%c" % x
-			elif x == 10:
-				s += "\\n"
-			elif x == 13:
-				s += "\\r"
-			else:
-				s += "\\x%02x" % x
-			if hi == None and x == 0:
-				break
-		if hi == None:
-			hi = a
+	def __init__(self, pj, lo, hi=None, label=True, term=0, pfx=None):
+		self.pre = ""
+		if pfx == 1:
+			x = pj.m.rd(lo)
+			self.pre = '%d,' % x
+			hi,s,l = stringify(pj, lo + 1, len=x)
+		elif hi == None:
+			hi,s,l = stringify(pj, lo, term=term)
+		else:
+			hi,s,l = stringify(pj, lo, hi - lo, term=term)
 
 		super(Txt, self).__init__(pj, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"
-		t = "t_"
-		j = 0
-		while j < len(s):
-			i = s[j]
-			if s[j:j+2] == "\\r":
-				t += "CR"
-				j += 1
-			elif s[j:j+2] == "\\n":
-				t += "NL"
-				j += 1
-			elif i.isalpha() or i.isdigit():
-				t += i
-			elif i.isspace() and (len(t) == 0 or t[-1] != "_"):
-				t += "_"
-			if len(t) > 8:
-				break
-			j += 1
 		if label:
-			pj.set_label(lo, t)
+			pj.set_label(lo, "t_" + l.strip())
+		self.compact = True
 
 	def render(self, pj):
-		return ".TXT\t'" + self.txt + "'"
+		return ".TXT\t" + self.pre + "'" + self.txt + "'"
 
 	def arg_render(self, pj):
 		return "'" + self.txt + "'"
