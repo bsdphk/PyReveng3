@@ -27,10 +27,12 @@ Complete & usable disassemblers
   * examples/HP5370/example_hp5359b.py
  * MC68HC11
   * examples/PL99/example.py
-
 * Intel MCS4
  * 4004
   * examples/Micrologic_ML200/example.py
+* Intel MCS48
+ * 8748
+  * examples/HP1345A/example.py
 * Intel MCS51
  * mcs51
  * i8032
