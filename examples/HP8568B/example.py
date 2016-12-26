@@ -193,25 +193,6 @@ if True:
 	data.Const(pj, 0x19856, 0x19857)
 
 	#######################################################################
-
-	cmds = {
-		0x13572:	"DISPOSE",
-		0x14f98:	"AUNITS",
-		0x172b0:	"TWNDOW",
-	}
-
-	n = 0
-	for a in range(0x196b6, 0x19826, 4):
-		x = m.bu32(a)
-		pj.todo(x, cpu.disass)
-		data.Codeptr(pj, a, a + 4, x)
-		y = cmds.get(x)
-		if y == None:
-			y = "CMD_%d" % n
-		pj.set_label(x, y)
-		n += 1
-		
-	#######################################################################
 	# 0ee98  00 01 93 be
 	# 0eeaa  00 01 93 da  |    |
 	# 0ee8e  00 01 da ee  |    |
@@ -224,11 +205,96 @@ if True:
 	pj.todo(0x01906, cpu.disass)
 	pj.todo(0x02dee, cpu.disass)
 	pj.todo(0x02df4, cpu.disass)
+	pj.todo(0x03412, cpu.disass)
 	pj.todo(0x11e74, cpu.disass)
 
 	pj.todo(0x3292, cpu.disass)	# 0x3284
 
 	#######################################################################
+	pj.set_label(0x193be, "HASHPTR")
+	for a in range(0x193be, 0x193da, 2):
+		y = data.Const(pj, a, a + 2)
+		y.fmt = "%d" % pj.m.bu16(a)
+
+	print("HASHPTR %d" % ((0x193da-0x193be)/2))
+
+	#######################################################################
+
+	pj.set_label(0x193da, "OLDCMDS")
+	for a in range(0x193da, 0x194b2, 2):
+		data.Txt(pj, a, a + 2, label=False)
+	print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
+
+	#######################################################################
+	pj.set_label(0x194b2, "KEYTAB")
+	for a in range(0x194b2, 0x1951e, 1):
+		y = data.Const(pj, a, a + 1, fmt="0x%02x")
+	print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
+
+	#######################################################################
+	pj.set_label(0x1951e, "IMEDBITS")
+	for a in range(0x1951e, 0x1952c, 1):
+		y = data.Const(pj, a, a + 1, fmt="0x%02x")
+	print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
+
+	#######################################################################
+	pj.set_label(0x1952c, "SFLGVAL")
+	for a in range(0x1952c, 0x195c4, 2):
+		y = data.Const(pj, a, a + 4)
+		y.fmt = "0x%08x" % pj.m.bu32(a)
+	print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
+
+	#######################################################################
+	pj.set_label(0x195c4, "PARMTYPE")
+	for a in range(0x195c4, 0x196b6, 1):
+		y = data.Const(pj, a, a + 1, fmt="0x%02x")
+	print("PARMTYPE %d" % ((0x196b6-0x195c4)/1))
+
+	#######################################################################
+	#######################################################################
+
+	lcmds = [
+		"MKPK", "MKREAD", "MKTRACE", "MKTYPE", "MKOFF", "MKMIN",
+		"MKCONT", "BLANK", "CLRW", "MXMH", "TRDSP",
+		"TRMATH", "TRSTAT", "VIEW", "MOV", "ADD",
+		"AVG", "CONCAT", "DIV", "TRCLOG", "TRCEXP",
+		"MIN", "MPY", "MXM", "SMOOTH", "SUB",
+		"SQR", "XCH", "FFT", "FFTKNL", "FFTMPY",
+		"FFTCNV", "TWNDOW", "TRGRAPH", "COMPRESS",
+		"PDA", "PDF", "PEAKS", "PWRBW", "MEAN",
+		"VARIANCE", "STDEV", "SUM", "SUMSQR",
+		"RMS", "PLOT", "ONEOS", "ONSWP", "DSPLY",
+		"VARDEF", "TRDEF", "DISPOSE",
+		"?KEYDEF",
+		"?FUNCDEF", "?KEYEXC", "?AUNITS", "?CTA",
+		"?CTM", "?DONE", "?ERR", "OP",
+		"?TEXT", "?CLRAVG", "?MDU", "?DET", "?TM",
+		"?MEM", "ID", "?RQS", "?SRQ", "?VBO",
+		"?BRD", "?BWR", "?MRD", "?MWR", "?MRDB",
+		"?MWRB", "?MBRD", "?MBWR",
+	]
+
+	pj.set_label(0x196b6, "PRCADRS")
+	n = 0
+	for a in range(0x196b6, 0x19826, 4):
+		x = m.bu32(a)
+		pj.todo(x, cpu.disass)
+		data.Codeptr(pj, a, a + 4, x)
+		if n < len(lcmds):
+			y = lcmds[n]
+		else:
+			y = "CMD_"
+		y += "(0x%02x)" % n
+		pj.set_label(x, y)
+		n += 1
+	print("PRCADRS %d" % ((0x19826-0x196b6)/4))
+
+	#######################################################################
+	pj.set_label(0x19826, "PFXSCALE")
+	for a in range(0x19826, 0x19853, 1):
+		y = data.Const(pj, a, a + 1, fmt="0x%02x")
+	print("PFXSCALE %d" % ((0x19853-0x19826)/1))
+
 
 else: 
 	y = cpu.disass(pj, 0xda1e)
@@ -278,6 +344,14 @@ pj.set_label(0x693a, "MODEL")
 
 pj.set_label(0x17e9e, "PL_MOVE")
 pj.set_label(0x17eac, "PL_LINE")
+pj.set_label(0x033fc, "SHOW_CHAR")
+pj.set_label(0x03412, "SHOW_SEMI")
+pj.set_label(0x0341a, "SHOW_COMMA")
+pj.set_label(0x03422, "SHOW_CRNL")
+pj.set_label(0x03428, "SHOW_NL")
+pj.set_label(0x03430, "SHOW_MINUS")
+pj.set_label(0x03438, "SHOW_2CHAR")
+pj.set_label(0x03498, "SHOW_INT")
 pj.set_label(0x0693c, "MSG_ADR_X_Y")
 pj.set_label(0x06a2c, "MSG_TXT")
 pj.set_label(0x03906, "2DISPLAY")
