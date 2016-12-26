@@ -133,6 +133,14 @@ class Arg(object):
 	def __init__(self, pj):
 		self.pj = pj
 
+class Arg_verbatim(Arg):
+	def __init__(self, pj, txt):
+		super(Arg_verbatim, self).__init__(pj)
+		self.txt = txt
+
+	def __str__(self):
+		return self.txt
+
 class Arg_dst(Arg):
 	def __init__(self, pj, dst, pfx="", sfx=""):
 		super(Arg_dst, self).__init__(pj)
