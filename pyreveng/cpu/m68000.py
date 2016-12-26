@@ -37,241 +37,243 @@ from pyreveng import mem, assy, data
 m68000_instructions = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
-aBCD            B,Dy,Dx         0000    |1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |       
-ABCD            B,-(Ay),-(Ax)   0000    |1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |       
+aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |	
+ABCD		B,-(Ay),-(Ax)	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |	
 # 108/4-4
-ADD             Z,Dn,ea         037d    |1 1 0 1| Dn  |1| sz| eam | ear |
-ADD             Z,ea,Dn         1f7d    |1 1 0 1| Dn  |0| sz| eam | ear |
+ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| eam | ear |
+ADD		Z,ea,Dn		1f7d	|1 1 0 1| Dn  |0| sz| eam | ear |
 # 111/4-7
-ADDA            W,ea,An         1f7f    |1 1 0 1| An  |0 1 1| eam | ear |
-ADDA            L,ea,An         1f7f    |1 1 0 1| An  |1 1 1| eam | ear |
+ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| eam | ear |
+ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| eam | ear |
 # 113/4-9
-ADDI            Z,data,ea       037d    |0 0 0 0 0 1 1 0| sz| eam | ear |
+ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| eam | ear |
 # 115/4-11
 # FIX ADDQ.B ->An sounds bogus, and unreferenced '*' footnote indicates not available
-ADDQ            Z,const,ea      037d    |0 1 0 1|const|0| sz| eam | ear |
+ADDQ		Z,const,ea	037d	|0 1 0 1|const|0| sz| eam | ear |
 # 117/4-13
 # Collision with ADDA.L
-ADDX            Z,Dy,Dx         0000    |1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
-ADDX            B,-(Ay),-(Ax)   0000    |1 1 0 1| Ax  |1|0 0|0 0|1| Ay  |
-ADDX            W,-(Ay),-(Ax)   0000    |1 1 0 1| Ax  |1|0 1|0 0|1| Ay  |
-ADDX            L,-(Ay),-(Ax)   0000    |1 1 0 1| Ax  |1|1 0|0 0|1| Ay  |
+ADDX		B,Dy,Dx		0000	|1 1 0 1| Dx  |1|0 0|0 0|0| Dy  |
+ADDX		W,Dy,Dx		0000	|1 1 0 1| Dx  |1|0 1|0 0|0| Dy  |
+ADDX		L,Dy,Dx		0000	|1 1 0 1| Dx  |1|1 0|0 0|0| Dy  |
+ADDX		B,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|0 0|0 0|1| Ay  |
+ADDX		W,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|0 1|0 0|1| Ay  |
+ADDX		L,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|1 0|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
-AND             Z,ea,Dn         1f7d    |1 1 0 0| Dn  |0| sz| eam | ear |
-AND             Z,Dn,ea         037c    |1 1 0 0| Dn  |1| sz| eam | ear |
+AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| eam | ear |
+AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| eam | ear |
 # 122/4-18
-ANDI            Z,data,ea       037d    |0 0 0 0 0 0 1 0| sz| eam | ear |
+ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| eam | ear |
 # 124/4-20
-ANDI            B,const,CCR     0000    |0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const         |
+ANDI		B,const,CCR	0000	|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const		|
 # 125/4-21
-ASL             Z,Dx,Dy         0000    |1 1 1 0| Dx  |1| sz|1|0 0| Dy  |
-ASR             Z,Dx,Dy         0000    |1 1 1 0| Dx  |0| sz|1|0 0| Dy  |
-ASL             Z,rot,Dn        0000    |1 1 1 0|  rot|1| sz|0|0 0| Dn  |
-ASR             Z,rot,Dn        0000    |1 1 1 0|  rot|0| sz|0|0 0| Dn  |
-aSL             W,ea            037c    |1 1 1 0|0 0 0|1|1 1| eam | ear |
-aSR             W,ea            037c    |1 1 1 0|0 0 0|0|1 1| eam | ear |
+ASL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 0| Dy  |
+ASR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 0| Dy  |
+ASL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|0 0| Dn  |
+ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  |
+aSL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| eam | ear |
+aSR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| eam | ear |
 # 129/4-25
-B               cc,#dst,>JC     0000    |0 1 1 0| cc    | disp8         |
+B		cc,#dst,>JC	0000	|0 1 1 0| cc    | disp8		|
 # 131/4-27
-bCHG            B,Dn,ea         037c    |0 0 0 0| Dn  |1 0 1| eam | ear |
-BCHG            L,Dx,Dy         0000    |0 0 0 0| Dx  |1 0 1|0 0 0| Dy  |
-BCHG            B,bn,ea         037c    |0 0 0 0|1 0 0|0 0 1| eam | ear |0 0 0 0|0 0 0 0| bn            |
-BCHG            L,bn,Dn         0000    |0 0 0 0|1 0 0|0 0 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn            |
+bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| eam | ear |
+BCHG		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 1|0 0 0| Dy  |
+BCHG		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 1| eam | ear |0 0 0 0|0 0 0 0| bn		|
+BCHG		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 134/4-30
-BCLR            B,Dn,ea         037c    |0 0 0 0| Dn  |1 1 0| eam | ear |
-BCLR            L,Dx,Dy         0000    |0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
-BCLR            B,bn,ea         037c    |0 0 0 0|1 0 0|0 1 0| eam | ear |0 0 0 0|0 0 0 0| bn            |
-BCLR            L,bn,Dn         0000    |0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn            |
+BCLR		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 0| eam | ear |
+BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
+BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| eam | ear |0 0 0 0|0 0 0 0| bn		|
+BCLR		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 159/4-55
-BRA             #dst,>J         0000    |0 1 1 0|0 0 0 0| disp8         |
+BRA		#dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
 # 160/4-56
-BSET            B,Dn,ea         037c    |0 0 0 0| Dn  |1 1 1| eam | ear |
-BSET            L,Dx,Dy         0000    |0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
-BSET            B,bn,ea         037c    |0 0 0 0|1 0 0|0 1 1| eam | ear |0 0 0 0|0 0 0 0| bn            |
-BSET            L,bn,Dn         0000    |0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn            |
+BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| eam | ear |
+BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
+BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| eam | ear |0 0 0 0|0 0 0 0| bn		|
+BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 163/4-59
-BSR             #dst,>C         0000    |0 1 1 0|0 0 0 1| disp8         |
+BSR		#dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
 # 165/4-61
-BTST            B,Dn,ea         037c    |0 0 0 0| Dn  |1 0 0| eam | ear |
-BTST            L,Dx,Dy         0000    |0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
-BTST            B,bn,ea         037c    |0 0 0 0|1 0 0|0 0 0| eam | ear |0 0 0 0|0 0 0 0| bn            |
-BTST            L,bn,Dn         0000    |0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn            |
+BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| eam | ear |
+BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
+BTST		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 0| eam | ear |0 0 0 0|0 0 0 0| bn		|
+BTST		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 173/4-69
-cHK             W,ea,Dn         1f7d    |0 1 0 0| Dn  |1 1|0| eam | ear |
-CHK             L,ea,Dn         1f7d    |0 1 0 0| Dn  |1 0|0| eam | ear |
+cHK		W,ea,Dn		1f7d	|0 1 0 0| Dn  |1 1|0| eam | ear |
+CHK		L,ea,Dn		1f7d	|0 1 0 0| Dn  |1 0|0| eam | ear |
 # 177/4-73
-CLR             Z,ea            037d    |0 1 0 0|0 0 1 0| sz| eam | ear |
+CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| eam | ear |
 # 179/4-75
-CMP             Z,ea,Dn         1f7f    |1 0 1 1| Dn  |0| sz| eam | ear |
+CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| eam | ear |
 # 181/4-77
-CMPA            W,ea,An         1f7f    |1 0 1 1| An  |0|1 1| eam | ear |
-CMPA            L,ea,An         1f7f    |1 0 1 1| An  |1 1 1| eam | ear |
+CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| eam | ear |
+CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| eam | ear |
 # 183/4-79
-CMPI            Z,data,ea       0f7d    |0 0 0 0|1 1 0 0| sz| eam | ear |
+CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| eam | ear |
 # 185/4-81
-# Collision with CMPA.L
-CMPM            B,(Ay)+,(Ax)+   0000    |1 0 1 1| Ax  |1|0 0|0 0 1| Ay  |
-CMPM            W,(Ay)+,(Ax)+   0000    |1 0 1 1| Ax  |1|0 1|0 0 1| Ay  |
-CMPM            L,(Ay)+,(Ax)+   0000    |1 0 1 1| Ax  |1|1 0|0 0 1| Ay  |
+CMPM		B,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 0|0 0 1| Ay  |
+CMPM		W,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 1|0 0 1| Ay  |
+CMPM		L,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|1 0|0 0 1| Ay  |
 # 194/4-90
-DB              cc,Dn,disp16,>JC        0000    |0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16                        |
+DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			|
 # 196/4-92
-DIVS            W,ea,Dn         1f7d    |1 0 0 0| Dn  |1 1 1| eam | ear |
+DIVS		W,ea,Dn		1f7d	|1 0 0 0| Dn  |1 1 1| eam | ear |
 # 201/4-97
-DIVU            W,ea,Dn         1f7d    |1 0 0 0| Dn  |0 1 1| eam | ear |
+DIVU		W,ea,Dn		1f7d	|1 0 0 0| Dn  |0 1 1| eam | ear |
 # 204/4-100
-EOR             Z,Dn,ea         037d    |1 0 1 1| Dn  |1| sz| eam | ear |
+EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| eam | ear |
 # 206/4-102
-EORI            Z,data,ea       037d    |0 0 0 0|1 0 1 0| sz| eam | ear |
+EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| eam | ear |
 # 208/4-104
-eORI            B,const,CCR     0000    |0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const         |
+eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
-EXG             L,Dx,Dy         0000    |1 1 0 0| Dx  |1|0 1 0 0 0| Dy  |
-EXG             L,Ax,Ay         0000    |1 1 0 0| Ax  |1|0 1 0 0 1| Ay  |
-EXG             L,Dx,Ay         0000    |1 1 0 0| Dx  |1|1 0 0 0 1| Ay  |
+EXG		L,Dx,Dy		0000	|1 1 0 0| Dx  |1|0 1 0 0 0| Dy  |
+EXG		L,Ax,Ay		0000	|1 1 0 0| Ax  |1|0 1 0 0 1| Ay  |
+EXG		L,Dx,Ay		0000	|1 1 0 0| Dx  |1|1 0 0 0 1| Ay  |
 # 210/4-106
-EXTB            W,Dn            0000    |0 1 0 0|1 0 0|0 1 0|0 0 0| Dn  |
-EXTW            L,Dn            0000    |0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  |
-EXTB            L,Dn            0000    |0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  |
+EXTB		W,Dn		0000	|0 1 0 0|1 0 0|0 1 0|0 0 0| Dn  |
+EXTW		L,Dn		0000	|0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  |
+EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  |
 # 211/4-107
-iLLEGAL         -               0000    |0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
+iLLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
 # 212/4-108
-JMP             ea,>J           0f64    |0 1 0 0|1 1 1 0|1 1| eam | ear |
+JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| eam | ear |
 # 213/4-109
-JSR             ea,>C           0f64    |0 1 0 0|1 1 1 0|1 0| eam | ear |
+JSR		ea,>C		0f64	|0 1 0 0|1 1 1 0|1 0| eam | ear |
 # 214/4-110
-LEA             L,ea,An         0f64    |0 1 0 0| An  |1 1 1| eam | ear |
+LEA		L,ea,An		0f64	|0 1 0 0| An  |1 1 1| eam | ear |
 # 215/4-111
-LINK            W,An,word       0000    |0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word                          |
+LINK		W,An,word	0000	|0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word				|
 # 217/4-113
-LSL             Z,Dx,Dy         0000    |1 1 1 0| Dx  |1| sz|1|0 1| Dy  |
-LSR             Z,Dx,Dy         0000    |1 1 1 0| Dx  |0| sz|1|0 1| Dy  |
-LSL             Z,rot,Dn        0000    |1 1 1 0|  rot|1| sz|0|0 1| Dn  |
-LSR             Z,rot,Dn        0000    |1 1 1 0|  rot|0| sz|0|0 1| Dn  |
-lSL             W,ea            037c    |1 1 1 0|0 0 1|1|1 1| eam | ear |
-LSR             W,ea            037c    |1 1 1 0|0 0 1|0|1 1| eam | ear |
+LSL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 1| Dy  |
+LSR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 1| Dy  |
+LSL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|0 1| Dn  |
+LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  |
+lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| eam | ear |
+LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| eam | ear |
 # 220/4-116 NB! Not the usual BWL encoding
-MOVE            B,ea,ead        1f7f    |0 0|0 1|earx |eamx | eam | ear |
-MOVE            L,ea,ead        1f7f    |0 0|1 0|earx |eamx | eam | ear |
-MOVE            W,ea,ead        1f7f    |0 0|1 1|earx |eamx | eam | ear |
+MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | eam | ear |
+MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | eam | ear |
+MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | eam | ear |
 # 223/4-119
-MOVEA           W,ea,An         1f7f    |0 0|1 1| An  |0 0 1| eam | ear |
-MOVEA           L,ea,An         1f7f    |0 0|1 0| An  |0 0 1| eam | ear |
+MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| eam | ear |
+MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| eam | ear |
 # 225/4-121
-MOVE            W,CCR,ea        037d    |0 1 0 0|0 0 1|0 1 1| eam | ear |
+MOVE		W,CCR,ea	037d	|0 1 0 0|0 0 1|0 1 1| eam | ear |
 # 227/4-123
-MOVE            W,ea,CCR        1f7d    |0 1 0 0|0 1 0|0 1 1| eam | ear |
+MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| eam | ear |
 # 229/4-125
-MOVE            W,SR,ea         037d    |0 1 0 0|0 0 0|0 1 1| eam | ear |
+MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| eam | ear |
 # 232/4-128
 # XXX: is the 'rrlist' really correct ? (GNU::binutils says so)
-MOVEM           W,rlist,ea      0374    |0 1 0 0|1 0 0|0 1 0| eam | ear | rlist                         |
-MOVEM           L,rrlist,ea     0374    |0 1 0 0|1 0 0|0 1 1| eam | ear | rrlist                        |
-MOVEM           W,ea,rlist      0f6c    |0 1 0 0|1 1 0|0 1 0| eam | ear | rlist                         |
-MOVEM           L,ea,rlist      0f6c    |0 1 0 0|1 1 0|0 1 1| eam | ear | rlist                         |
+MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| eam | ear | rlist				|
+MOVEM		L,rrlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| eam | ear | rrlist			|
+MOVEM		W,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 0| eam | ear | rlist				|
+MOVEM		L,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 1| eam | ear | rlist				|
 # 235/4-131
-MOVEP           W,Dn,An+disp16  0000    |0 0 0 0| Dn  |1|1 0|0 0 1| An  | disp16                        |
-MOVEP           L,Dn,An+disp16  0000    |0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16                        |
-MOVEP           W,An+disp16,Dn  0000    |0 0 0 0| Dn  |1|0 0|0 0 1| An  | disp16                        |
-MOVEP           L,An+disp16,Dn  0000    |0 0 0 0| Dn  |1|0 1|0 0 1| An  | disp16                        |
+MOVEP		W,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 0|0 0 1| An  | disp16			|
+MOVEP		L,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16			|
+MOVEP		W,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 0|0 0 1| An  | disp16			|
+MOVEP		L,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 1|0 0 1| An  | disp16			|
 # 238/4-134
-MOVEQ           L,data8,Dn      0000    |0 1 1 1| Dn  |0| data8         |
+MOVEQ		L,data8,Dn	0000	|0 1 1 1| Dn  |0| data8		|
 # 239/4-135
-MULS            W,ea,Dn         1f7d    |1 1 0 0| Dn  |1 1 1| eam | ear |
+MULS		W,ea,Dn		1f7d	|1 1 0 0| Dn  |1 1 1| eam | ear |
 # 243/4-139
-MULU            W,ea,Dn         1f7d    |1 1 0 0| Dn  |0 1 1| eam | ear |
+MULU		W,ea,Dn		1f7d	|1 1 0 0| Dn  |0 1 1| eam | ear |
 # 245/4-141
-NBCD            B,ea            037d    |0 1 0 0|1 0 0|0 0 0| eam | ear |
+NBCD		B,ea		037d	|0 1 0 0|1 0 0|0 0 0| eam | ear |
 # 247/4-143
-NEG             Z,ea            037d    |0 1 0 0|0 1 0|0| sz| eam | ear |
+NEG		Z,ea		037d	|0 1 0 0|0 1 0|0| sz| eam | ear |
 # 249/4-146
-NEGX            Z,ea            037d    |0 1 0 0|0 0 0|0| sz| eam | ear |
+NEGX		Z,ea		037d	|0 1 0 0|0 0 0|0| sz| eam | ear |
 # 251/4-147
-NOP             -               0000    |0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1|
+NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1|
 # 252/4-148
-NOT             Z,ea            037d    |0 1 0 0|0 1 1|0| sz| eam | ear |
+NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| eam | ear |
 # 254/4-150
-OR              Z,ea,Dn         1f7d    |1 0 0 0| Dn  |0| sz| eam | ear |
-OR              Z,Dn,ea         037c    |1 0 0 0| Dn  |1| sz| eam | ear |
+OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| eam | ear |
+OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| eam | ear |
 # 257/4-153
-ORI             Z,data,ea       037d    |0 0 0 0|0 0 0 0| sz| eam | ear |
+ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| eam | ear |
 # 259/4-155
-ORI             word,CCR        0000    |0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word          |
+ORI		word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		|
 # 263/4-159
-PEA             L,ea            0f64    |0 1 0 0|1 0 0|0 0 1| eam | ear |
+PEA		L,ea		0f64	|0 1 0 0|1 0 0|0 0 1| eam | ear |
 # 264/4-160
-ROL             Z,Dx,Dy         0000    |1 1 1 0| Dx  |1| sz|1|1 1| Dy  |
-ROR             Z,Dx,Dy         0000    |1 1 1 0| Dx  |0| sz|1|1 1| Dy  |
-ROL             Z,rot,Dn        0000    |1 1 1 0|  rot|1| sz|0|1 1| Dn  |
-ROR             Z,rot,Dn        0000    |1 1 1 0|  rot|0| sz|0|1 1| Dn  |
-rOL             W,ea            037c    |1 1 1 0|0 1 1|1|1 1| eam | ear |
-rOR             W,ea            037c    |1 1 1 0|0 1 1|0|1 1| eam | ear |
+ROL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 1| Dy  |
+ROR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 1| Dy  |
+ROL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|1 1| Dn  |
+ROR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|1 1| Dn  |
+rOL		W,ea		037c	|1 1 1 0|0 1 1|1|1 1| eam | ear |
+rOR		W,ea		037c	|1 1 1 0|0 1 1|0|1 1| eam | ear |
 # 267/4-163
-rOXL            Z,Dx,Dy         0000    |1 1 1 0| Dx  |1| sz|1|1 0| Dy  |
-rOXR            Z,Dx,Dy         0000    |1 1 1 0| Dx  |0| sz|1|1 0| Dy  |
-ROXL            Z,rot,Dn        0000    |1 1 1 0|  rot|1| sz|0|1 0| Dn  |
-ROXR            Z,rot,Dn        0000    |1 1 1 0|  rot|0| sz|0|1 0| Dn  |
-rOXL            W,ea            037c    |1 1 1 0|0 1 0|1|1 1| eam | ear |
-rOXR            W,ea            037c    |1 1 1 0|0 1 0|0|1 1| eam | ear |
+rOXL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 0| Dy  |
+rOXR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 0| Dy  |
+ROXL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|1 0| Dn  |
+ROXR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|1 0| Dn  |
+rOXL		W,ea		037c	|1 1 1 0|0 1 0|1|1 1| eam | ear |
+rOXR		W,ea		037c	|1 1 1 0|0 1 0|0|1 1| eam | ear |
 # 272/4-168
-RTR             -               0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
+RTR		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
 # 273/4-169
-RTS             >R              0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1|
+RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1|
 # 274/4-170
-sBCD            B,Dx,Dy         0000    |1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
-SBCD            B,-(Ax),-(Ay)   0000    |1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
+sBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
+SBCD		B,-(Ax),-(Ay)	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
 # 276/4-172
-S               cc,B,ea         037d    |0 1 0 1| cc    |1 1| eam | ear |
+S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| eam | ear |
 # 278/4-174
-SUB             Z,ea,Dn         1f7f    |1 0 0 1| Dn  |0| sz| eam | ear |
-SUB             Z,Dn,ea         037c    |1 0 0 1| Dn  |1| sz| eam | ear |
+SUB		Z,ea,Dn		1f7f	|1 0 0 1| Dn  |0| sz| eam | ear |
+SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| eam | ear |
 # 281/4-177
-SUBA            W,ea,An         1f7f    |1 0 0 1| An  |0 1 1| eam | ear |
-SUBA            L,ea,An         1f7f    |1 0 0 1| An  |1 1 1| eam | ear |
+SUBA		W,ea,An		1f7f	|1 0 0 1| An  |0 1 1| eam | ear |
+SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| eam | ear |
 # 283/4-179
-SUBI            Z,data,ea       037d    |0 0 0 0|0 1 0 0| sz| eam | ear |
+SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| eam | ear |
 # 285/4-181
-SUBQ            Z,const,ea      037d    |0 1 0 1|const|1| sz| eam | ear |
+SUBQ		Z,const,ea	037d	|0 1 0 1|const|1| sz| eam | ear |
 # 287/4-183
-# Collision with SUBA.L
-sUBX            Z,Dx,Dy         0000    |1 0 0 1| Dy  |1| sz|0 0|0| Dx  |
-sUBX            Z,-(Ax),-(Ay)   0000    |1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
+SUBX		B,Dx,Dy		0000	|1 0 0 1| Dy  |1|0 0|0 0|0| Dx  |
+SUBX		W,Dx,Dy		0000	|1 0 0 1| Dy  |1|0 1|0 0|0| Dx  |
+SUBX		L,Dx,Dy		0000	|1 0 0 1| Dy  |1|1 0|0 0|0| Dx  |
+SUBX		B,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|0 0|0 0|1| Ax  |
+SUBX		W,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|0 1|0 0|1| Ax  |
+SUBX		L,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|1 0|0 0|1| Ax  |
 # 289/4-185
-SWAP            W,Dn            0000    |0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
+SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
 # 290/4-186
-tAS             B,ea            037d    |0 1 0 0|1 0 1 0|1 1| eam | ear |
+tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| eam | ear |
 # 292/4-188
-TRAP            #vect           0000    |0 1 0 0|1 1 1 0|0 1 0 0| #vect |
+TRAP		#vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| #vect |
 # 295/4-191
-tRAPV           -               0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
+tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
-TST             Z,ea            1f7f    |0 1 0 0|1 0 1 0| sz| eam | ear |
+TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| eam | ear |
 # 298/4-194
-UNLK            An              0000    |0 1 0 0|1 1 1 0|0 1 0 1|1| An  |
+UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  |
 # 456/6-2
-ANDI            W,word,SR       0000    |0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word                          |
+ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 464/6-10
-eORI            W,word,SR       0000    |0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word                          |
+eORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 473/6-19
-MOVE            W,ea,SR         1f7d    |0 1 0 0|0 1 1 0|1 1| eam | ear |
+MOVE		W,ea,SR		1f7d	|0 1 0 0|0 1 1 0|1 1| eam | ear |
 # 475/6-21
-MOVE            L,An,USP        0000    |0 1 0 0|1 1 1 0|0 1 1 0|0| An  |
-MOVE            L,USP,An        0000    |0 1 0 0|1 1 1 0|0 1 1 0|1| An  |
+MOVE		L,An,USP	0000	|0 1 0 0|1 1 1 0|0 1 1 0|0| An  |
+MOVE		L,USP,An	0000	|0 1 0 0|1 1 1 0|0 1 1 0|1| An  |
 # 481/6-27
-ORI             W,word,SR       0000    |0 0 0 0|0 0 0 0|0 1 1 1|1 1 0 0| word                          |
+ORI		W,word,SR	0000	|0 0 0 0|0 0 0 0|0 1 1 1|1 1 0 0| word				|
 # 537/6-83
-RESET           -               0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 0 0 0|
+RESET		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 0 0|
 # 538/6-84
-RTE             >R              0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 1|
+RTE		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 1|
 # 539/6-85
-STOP            word            0000    |0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 0| word                          |
+STOP		word		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 0| word				|
 # ...
 # 539/6-85
-#               src,dst         ea      |_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
-
+#		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 """
-
 # p3-19/90
 cond_code = (
 	"T",  "F",  "HI", "LS", "CC", "CS", "NE", "EQ",
@@ -432,17 +434,17 @@ def arg_eax(pj, ins, eam, ear):
 		if o & 0x8000:
 			o |= 0xffff0000L
 		ins.dstadr = o
-		return assy.Arg_verbatim(pj, "0x%08x" % o)
+		return assy.Arg_dst(pj, o)
 	if eax == 0x0200:
 		o = pj.m.bu32(ins.hi)
 		ins.hi += 4
 		ins.dstadr = o
-		return assy.Arg_verbatim(pj, "0x%08x" % o)
+		return assy.Arg_dst(pj, o)
 	if eax == 0x0400:
 		o = ins.hi + pj.m.bs16(ins.hi)
 		ins.hi += 2
 		ins.dstadr = o
-		return assy.Arg_verbatim(pj, "#0x%08x" % o)
+		return assy.Arg_dst(pj, o)
 	#print(ins, ins.im)
 	if eax == 0x1000 and ins.sz == 1:
 		ins.hi += 2

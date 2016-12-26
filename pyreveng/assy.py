@@ -81,8 +81,8 @@ class Instree_assy(Assy):
 					continue
 				x = lang.args.get(j)
 				if x == None:
-					print("Ignoring argument",
-					    j, "in", lang.name, i)
+					print("@0x%x Ignoring argument" %
+					    self.lo, j, "in", lang.name, i)
 					self.oper.append("?" + j + "?")
 				elif type(x) == str:
 					self.oper.append(x)

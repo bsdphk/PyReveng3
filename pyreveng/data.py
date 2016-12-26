@@ -46,13 +46,15 @@ class Data(job.Leaf):
 		return self.fmt
 
 class Const(Data):
-	def __init__(self, pj, lo, hi, fmt = None):
+	def __init__(self, pj, lo, hi, fmt = None, func = None, size=1):
 		super(Const, self).__init__(pj, lo, hi, "const")
+		if func == None:
+			func = pj.m.rd
 		if fmt == None:
 			fmt = "0x%x"
 		l = []
-		for a in range(lo, hi):
-			l.append(fmt % pj.m.rd(a))
+		for a in range(lo, hi, size):
+			l.append(fmt % func(a))
 		self.fmt = ",".join(l)
 		self.typ = ".CONST"
 		self.val = None
@@ -108,7 +110,7 @@ def stringify(pj, lo, len=None, term=0):
 				return lo,s,l
 
 class Txt(Data):
-	def __init__(self, pj, lo, hi=None, label=True, term=0, pfx=None):
+	def __init__(self, pj, lo, hi=None, label=True, term=0, pfx=None, align=2):
 		self.pre = ""
 		if pfx == 1:
 			x = pj.m.rd(lo)
@@ -119,6 +121,8 @@ class Txt(Data):
 		else:
 			hi,s,l = stringify(pj, lo, hi - lo, term=term)
 
+		while hi % align:
+			hi += 1
 		super(Txt, self).__init__(pj, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"

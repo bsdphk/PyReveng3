@@ -23,12 +23,40 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
+#
+# Patent
+# 4,244,024  Object code listing for 'A' CPU.
+#	     IO-map, display microcode
+#
+# 4,253,152  Looks identical to 4,244,024, different pagination
+#
+# 4,257,104  Looks identical to 4,253,152, different pagination
+#
+# 4.264,958  Refers to 4,253,152 for "computer printout"
+#
+# 4,649,496  Wheelgol excerpts (typeset):
+#	     Appendix I:  mkrsave, nxtpk, mkpk, mkasrch, slft, srgt,
+#	     		  setavoid, newmrkrs, 
+#	     Appendix II: sertrcad, loadtrc, mkrtrc, mkrad, mkrspot,
+#			  mkrdout, mkron, doeos, domrkr, newcmd,
+#			  oldcmd, trcadrs, dostring, dosoftkey ...
+# 
+# 4,660,150  Wheelgol excerpts (tty):
+#	     same as 4,649,496 ?
+#######################################################################
+# 4,244,024
+#	pg 248 ln 2363 -> 0x7366
+#	pg 262 ln 3700 -> 0x4fac
+#	pg 272 ln 4631 -> 0x54b0
+#	pg 280 ln 5392 -> 0x7e86
+
 
 from __future__ import print_function
 
 import os
 from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.m68000 as m68000
+import pyreveng.cpu.hp85662a as hp85662a
 
 m = mem.byte_mem(0x0, 0x20000)
 m.load_binfile(first = 0x00000, step = 0x2, filename="85680-80116.BIN")
@@ -130,31 +158,72 @@ if True:
 		for a in range(b, e, 4):
 			x = m.bu32(a)
 			data.Dataptr(pj, a, a + 4, x)
-			data.Txt(pj, x, pfx=1)
+			data.Txt(pj, x, pfx=1, align=2)
 
 	#######################################################################
 
 
 	for a in (
-		0xe2fa,
-		0xe308,
-		0xe318,
+		0x0e2fa,
+		0x0e308,
+		0x0e318,
+		0x12986,
+		0x12988,
+		0x1298c,
+		0x12990,
+		0x1694e,
+		0x16954,
+		0x1873e,
+		0x1874a,
+		0x18756,
+		0x18762,
 	):
-		y = data.Txt(pj, a, pfx=1)
+		y = data.Txt(pj, a, pfx=1, align=2)
 
 	#######################################################################
 
-	a = 0x693c
-	while a < 0x6a2c:
-		x = pj.m.bu16(a)
-		y = pj.m.bu16(a + 2)
-		z = pj.m.bu16(a + 4)
-		w = data.Const(pj, a, a + 6)
-		w.fmt = "0x%04x, 0x%04x, 0x%04x" % (x, y, z)
-		print(a, w.fmt)
-		a += 6
+	pj.set_label(0x0693c, "MSG_ADR_X_Y")
+	for a in range(0x693c, 0x6a2c, 6):
+		data.Const(pj, a, a+6, "0x%04x", pj.m.bu16, 2)
 
 	#######################################################################
+
+	pj.set_label(0x6b84, "G_CTRL")
+	pj.set_label(0x6ba8, "G_CENTER")
+	pj.set_label(0x6bcc, "G_MARKER")
+	pj.set_label(0x6be2, "G_DSP_LINE")
+	pj.set_label(0x6bf8, "G_GRATICULE")
+	pj.set_label(0x6c4c, "G_HP_LOGO")
+	pj.set_label(0x6c5e, "G_ACT_FUNC")
+
+	a = 0x6b84
+
+	dsp = hp85662a.hp85662a()
+	while a < 0x6c98:
+		x = pj.m.bs16(a)
+		if x < 0:
+			y = data.Data(pj, a, a + 2)
+			y.fmt = ".DSPLOC\t0x%04x" % -x
+			y.lcmt = "adr=%d" % -x
+			dsp = hp85662a.hp85662a()
+		else:
+			y = dsp.disass(pj, a)
+		a = y.hi
+
+	#######################################################################
+
+	pj.set_label(0x0e3be, "UNITS")
+	for a in range(0x0e3be, 0x0e3d4, 2):
+		data.Txt(pj, a, a + 2, label=False)
+
+	#######################################################################
+
+	a = 0x18c3a
+	y = data.Txt(pj, a, 0x18c5f, align=2)
+
+	#######################################################################
+
+	fns = {}
 
 	class tbl1(data.Data):
 		def __init__(self, pj, lo):
@@ -165,7 +234,6 @@ if True:
 				if x <= 0x20 or x > 0x7e or x == 0x40:
 					break
 				hi += 1
-			print(t, "%x" % lo, "%x" % hi)
 			a,b,c = data.stringify(pj, lo, hi - lo)
 			t += "'" + b + "',"
 			while len(t) < 12:
@@ -173,6 +241,11 @@ if True:
 			
 			if hi & 1:
 				hi += 1
+
+			x = pj.m.bu16(hi + 2)
+			if x < 242:
+				pj.set_label(0x195c4 + x, "P_" + b)
+				fns[pj.m.rd(0x195c4 + x)] = b
 
 			s = ""
 			for x in range(3):
@@ -199,6 +272,19 @@ if True:
 	#######################################################################
 	# Orphans ?
 
+	pj.todo(0x01b88, cpu.disass)
+	pj.todo(0x01b8e, cpu.disass)
+	pj.todo(0x01b94, cpu.disass)
+	pj.todo(0x01b9a, cpu.disass)
+	pj.todo(0x01b9e, cpu.disass)
+	pj.todo(0x01ba2, cpu.disass)
+	pj.todo(0x01ba8, cpu.disass)
+	pj.todo(0x01c76, cpu.disass)
+	pj.todo(0x01c82, cpu.disass)
+	pj.todo(0x01c90, cpu.disass)
+	pj.todo(0x01cd2, cpu.disass)
+	pj.todo(0x01d14, cpu.disass)
+
 	pj.todo(0x01578, cpu.disass)
 	pj.todo(0x01594, cpu.disass)
 	pj.todo(0x0171a, cpu.disass)
@@ -211,6 +297,13 @@ if True:
 	pj.todo(0x3292, cpu.disass)	# 0x3284
 
 	#######################################################################
+	# pat 4,244,024 pg 262 lin 3700
+
+	pj.set_label(0x4fac, "SCANTAB")
+	for a in range(0x4fac, 0x4fec, 2):
+		y = data.Const(pj, a, a+2, "0x%04x", pj.m.bu16, 2)
+
+	#######################################################################
 	pj.set_label(0x193be, "HASHPTR")
 	for a in range(0x193be, 0x193da, 2):
 		y = data.Const(pj, a, a + 2)
@@ -221,8 +314,20 @@ if True:
 	#######################################################################
 
 	pj.set_label(0x193da, "OLDCMDS")
+	n = 0
 	for a in range(0x193da, 0x194b2, 2):
-		data.Txt(pj, a, a + 2, label=False)
+		y = data.Txt(pj, a, a + 2, label=False, align=2)
+		cmd = pj.m.bu16(a)
+		y.lcmt += " n=%d" % n
+		imm = (pj.m.rd(0x1951e + (n >> 3)) >> (n & 7)) & 1
+		y.lcmt += " imm=%d" % imm
+		if not imm:
+			svfi = pj.m.rd(0x194b2 + n)
+			y.lcmt += " svfi=%d" % svfi
+			svf = pj.m.bu32(0x1952c + svfi * 2)
+			y.lcmt += " svf=0x%08x" % svf
+		n += 1
+		
 	print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
 
 	#######################################################################
@@ -253,35 +358,14 @@ if True:
 	#######################################################################
 	#######################################################################
 
-	lcmds = [
-		"MKPK", "MKREAD", "MKTRACE", "MKTYPE", "MKOFF", "MKMIN",
-		"MKCONT", "BLANK", "CLRW", "MXMH", "TRDSP",
-		"TRMATH", "TRSTAT", "VIEW", "MOV", "ADD",
-		"AVG", "CONCAT", "DIV", "TRCLOG", "TRCEXP",
-		"MIN", "MPY", "MXM", "SMOOTH", "SUB",
-		"SQR", "XCH", "FFT", "FFTKNL", "FFTMPY",
-		"FFTCNV", "TWNDOW", "TRGRAPH", "COMPRESS",
-		"PDA", "PDF", "PEAKS", "PWRBW", "MEAN",
-		"VARIANCE", "STDEV", "SUM", "SUMSQR",
-		"RMS", "PLOT", "ONEOS", "ONSWP", "DSPLY",
-		"VARDEF", "TRDEF", "DISPOSE",
-		"?KEYDEF",
-		"?FUNCDEF", "?KEYEXC", "?AUNITS", "?CTA",
-		"?CTM", "?DONE", "?ERR", "OP",
-		"?TEXT", "?CLRAVG", "?MDU", "?DET", "?TM",
-		"?MEM", "ID", "?RQS", "?SRQ", "?VBO",
-		"?BRD", "?BWR", "?MRD", "?MWR", "?MRDB",
-		"?MWRB", "?MBRD", "?MBWR",
-	]
-
 	pj.set_label(0x196b6, "PRCADRS")
 	n = 0
 	for a in range(0x196b6, 0x19826, 4):
 		x = m.bu32(a)
 		pj.todo(x, cpu.disass)
 		data.Codeptr(pj, a, a + 4, x)
-		if n < len(lcmds):
-			y = lcmds[n]
+		if n in fns:
+			y = fns[n]
 		else:
 			y = "CMD_"
 		y += "(0x%02x)" % n
@@ -315,7 +399,7 @@ for i in pj.t:
 		y = y[0]
 		if y.mne != "PEA.L":
 			continue
-		z = data.Txt(pj, y.dstadr, pfx=1)
+		z = data.Txt(pj, y.dstadr, pfx=1, align=2)
 		y.lcmt = "'" + z.txt + "'"
 	if i.dstadr in (0xe718, 0x3456, 0x6ce0):
 		y = pj.t.find_hi(i.lo)
@@ -325,7 +409,7 @@ for i in pj.t:
 		if pj.m.bu16(y.lo) != 0x203c:
 			continue
 		a = pj.m.bu32(y.lo + 2)
-		z = data.Txt(pj, a, pfx=1)
+		z = data.Txt(pj, a, pfx=1, align=2)
 		y.lcmt = "'" + z.txt + "'"
 		if i.dstadr == 0xe718:
 			w = pj.t.find_hi(y.lo)
@@ -334,7 +418,7 @@ for i in pj.t:
 			w = w[0]
 			if w.mne != "PEA.L":
 				continue
-			z = data.Txt(pj, w.dstadr, pfx=1)
+			z = data.Txt(pj, w.dstadr, pfx=1, align=2)
 			w.lcmt = "'" + z.txt + "'"
 
 y = data.Const(pj, 0x693a, 0x693c, "%d")
@@ -342,6 +426,11 @@ y.fmt = "%d" % pj.m.bu16(y.lo)
 pj.set_label(0x693a, "MODEL")
 
 
+pj.set_label(0x01b48, "BCD_NEG8")
+pj.set_label(0x01b72, "BCD_ADD8")
+pj.set_label(0x01cb0, "BCD_SUB8")
+pj.set_label(0x02f38, "CASE")
+pj.set_label(0x0ee6a, "OLDCMD")
 pj.set_label(0x17e9e, "PL_MOVE")
 pj.set_label(0x17eac, "PL_LINE")
 pj.set_label(0x033fc, "SHOW_CHAR")
@@ -352,14 +441,24 @@ pj.set_label(0x03428, "SHOW_NL")
 pj.set_label(0x03430, "SHOW_MINUS")
 pj.set_label(0x03438, "SHOW_2CHAR")
 pj.set_label(0x03498, "SHOW_INT")
-pj.set_label(0x0693c, "MSG_ADR_X_Y")
 pj.set_label(0x06a2c, "MSG_TXT")
 pj.set_label(0x03906, "2DISPLAY")
 pj.set_label(0x06d20, "SHOW_MSG")
 pj.set_label(0x06ce0, "SHOW_TXT")
 pj.set_label(0x06cf2, "SHOW_CRNL")
+pj.set_label(0x07b4e, "FILL_DISPLAY")
 
-pj.set_label(0xffffc044, "display_data")
+pj.set_label(0xffffc030, "freqcnt_ctrl")
+pj.set_label(0xffffc032, "freqcnt_msb")
+pj.set_label(0xffffc034, "freqcnt_lsb")
+
+pj.set_label(0xffffc040, "display_address")
+pj.set_label(0xffffc042, "display_rd_store")
+pj.set_label(0xffffc044, "display_wr_store")
+pj.set_label(0xffffc048, "display_wr_off")
+pj.set_label(0xffffc04a, "display_rd_scan")
+pj.set_label(0xffffc04c, "display_wr_marker")
+pj.set_label(0xffffc04e, "display_wr_scan")
 pj.set_label(0xffffc0e1, "display_status")
 
 
