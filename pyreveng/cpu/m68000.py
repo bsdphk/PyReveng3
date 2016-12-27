@@ -166,9 +166,8 @@ MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| eam | ear |
 # 229/4-125
 MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| eam | ear |
 # 232/4-128
-# XXX: is the 'rrlist' really correct ? (GNU::binutils says so)
 MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| eam | ear | rlist				|
-MOVEM		L,rrlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| eam | ear | rrlist			|
+MOVEM		L,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| eam | ear | rlist				|
 MOVEM		W,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 0| eam | ear | rlist				|
 MOVEM		L,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 1| eam | ear | rlist				|
 # 235/4-131
@@ -470,21 +469,18 @@ def arg_L(pj, ins):
 def arg_rlist(pj, ins):
 	v = ins.im.F_rlist
 	l = []
-	for r in ("A", "D"):
-		for n in range(0,8):
-			if v & 0x0001:
-				l.append(r + "%d" % n)
-			v >>= 1
-	return "+".join(l)
-
-def arg_rrlist(pj, ins):
-	v = ins.im.F_rrlist
-	l = []
-	for r in ("D", "A"):
-		for n in range(7,-1,-1):
-			if v & 0x0001:
-				l.append(r + "%d" % n)
-			v >>= 1
+	if ins.im.F_eam == 4:
+		for r in ("A", "D"):
+			for n in range(7,-1,-1):
+				if v & 0x0001:
+					l.append(r + "%d" % n)
+				v >>= 1
+	else:
+		for r in ("D", "A"):
+			for n in range(0,8):
+				if v & 0x0001:
+					l.append(r + "%d" % n)
+				v >>= 1
 	return "+".join(l)
 
 def arg_rot(pj, ins):
@@ -549,7 +545,6 @@ class m68000(assy.Instree_disass):
 			'L':		arg_L,
 			'rlist':	arg_rlist,
 			'rot':		arg_rot,
-			'rrlist':	arg_rrlist,
 			'SR':		'SR',
 			'USP':		'USP',
 			'#vect':	arg_vect,
