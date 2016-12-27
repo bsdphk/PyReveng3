@@ -68,46 +68,70 @@ pj = job.Job(m, "HP8568B")
 
 cpu = m68000.m68000()
 
+#######################################################################
+
 post_arg = {
-	0x1bc8:	1,
-	0x1bcc:	1,
-	0x1bd0:	1,
-	0x1bdc:	1,
-	0x1be0:	1,
-	0x1c56:	1,
-	0x1c5a:	1,
-	0x1c7a:	1,
-	0x1c7e:	1,
-	0x1c88:	1,
-	0x1c8c:	1,
-	0x1ccc:	1,
-	0x2218:	1,
-	0x238e:	1,
-	0x239a:	1,
-	0x23f6:	1,
-	0x2402:	1,
-	0x24ac:	1,
-	0x24b8:	1,
-	0x25c8:	1,
-	0x25fa:	1,
-	0x27ee:	1,
-	0x2862:	1,
-	0x28c2:	1,
-	0x28ce:	1,
-	0x297c:	1,
-	0x2982:	1,
-	0x2988:	1,
-	0x29ba: 1,
-	0x29c6: 1,
-	0x29ea: 1,
-	0x29f6: 1,
-	0x2a02: 1,
-	0x2a0e: 1,
-	0x2a34: 1,
-	0x2a6e: 1,
-	0x2b08: 1,
-	0x2b14: 1,
+	0x1bc8: 1, 0x1bcc: 1, 0x1bd0: 1, 0x1bdc: 1, 0x1be0: 1, 0x1c56: 1,
+	0x1c5a: 1, 0x1c7a: 1, 0x1c7e: 1, 0x1c88: 1, 0x1c8c: 1, 0x1ccc: 1,
+	0x2218: 1, 0x238e: 1, 0x239a: 1, 0x23f6: 1, 0x2402: 1, 0x24ac: 1,
+	0x24b8: 1, 0x25c8: 1, 0x25fa: 1, 0x27ee: 1, 0x2862: 1, 0x28c2: 1,
+	0x28ce: 1, 0x297c: 1, 0x2982: 1, 0x2988: 1, 0x29ba: 1, 0x29c6: 1,
+	0x29ea: 1, 0x29f6: 1, 0x2a02: 1, 0x2a0e: 1, 0x2a34: 1, 0x2a6e: 1,
+	0x2b08: 1, 0x2b14: 1,
 }
+
+def flow_post_arg(pj, ins):
+	z = post_arg.get(ins.dstadr)
+	if z != None:
+		ins.hi += 2 * z
+		ins.flow_out.pop(-1)
+		ins.add_flow(pj, True)
+
+cpu.flow_check.append(flow_post_arg)
+
+#######################################################################
+
+switches = {
+	0xa5de: { },
+	0xb5ec: { },
+	0x807e: { },
+}
+
+def flow_switch(pj, ins):
+	if ins.dstadr != 0x2f38:
+		return
+	ins.flow_out.pop(0)
+	ins.add_flow(pj, ">", "?", ins.hi)
+	pj.set_label(ins.hi, "break_%04x" % ins.lo)
+
+	y = data.Const(pj, ins.lo - 2, ins.lo)
+	ncase = pj.m.bu16(ins.lo - 2)
+	y.typ = ".NCASE"
+	y.fmt = "%d" % ncase
+	cs = switches.get(ins.lo)
+	if cs == None:
+		cs = {}
+	a = ins.lo - 2
+	for i in range(ncase):
+		a -= 2
+		ct = cs.get(i)
+		if ct == None:
+			ct = "_%d" % i
+
+		w = data.Const(pj, a, a + 2)
+		z = pj.m.bs16(a)
+		w.typ = ".CASE"
+		w.fmt = "0x%x, %d" % (i,z)
+
+		w.fmt += ", 0x%04x" % (ins.hi + z)
+		ins.add_flow(pj, ">", "0x%x" % i, ins.hi + z)
+		if z < 0:
+			pj.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
+
+cpu.flow_check.append(flow_switch)
+pj.todo(0x2f38, cpu.disass)
+
+#######################################################################
 
 keyboard = (
 	# Row, Column, Text
@@ -203,62 +227,18 @@ keyboard = (
 
 keynos = {}
 
-cases = {
-	0xa5de: { },
-	0xb5ec: { },
-	0x807e: { },
-}
-
 for r,c,t in keyboard:
 	n = 0x20 + r * 8 + c
 	# if n >= 0x20 and n < 0x41:
-	#	cases[0x807e][(n - 0x20)/3] = "KEY_%02x_" % n + t
+	#	switches[0x807e][(n - 0x20)/3] = "KEY_%02x_" % n + t
 	if n >= 0x41 and n < 0x5e:
-		cases[0xa5de][n - 0x41] = "KEY_%02x_" % n + t
+		switches[0xa5de][n - 0x41] = "KEY_%02x_" % n + t
 	if n >= 0x61 and n < 0x80:
-		cases[0xb5ec][n - 0x61] = "KEY_%02x_" % n + t
+		switches[0xb5ec][n - 0x61] = "KEY_%02x_" % n + t
 	keynos[n] = t
-	print("KEY %02x %s" % (n, t))
-
-class cx(m68000.m68000):
-
-	def decode(self, pj, adr):
-		y = super(cx, self).decode(pj, adr)
-		if y == None:
-			return y
-		z = post_arg.get(y.dstadr)
-		if z != None:
-			y.hi += 2 * z
-			y.flow_out.pop(-1)
-			y.add_flow(pj, True)
-		if y.dstadr == 0x2f38:
-			data.Const(pj, y.lo - 2, y.lo, "%d", pj.m.bs16, 2)
-			x = pj.m.bu16(y.lo - 2)
-			cs = cases.get(y.lo)
-			if cs == None:
-				cs = {}
-			for i in range(x):
-				ct = cs.get(i)
-				if ct == None:
-					ct = "_%d" % i
-				a = y.lo - 4 - 2 * i
-				z = pj.m.bs16(a)
-				w = data.Const(pj, a, a + 2, "%d", pj.m.bs16, 2)
-				if z < 0:
-					w.fmt += " -> 0x%04x" % (y.hi + z)
-					pj.todo(y.hi + z, self.disass)
-					pj.set_label(y.hi + z, ".case_%04x_%s" %
-					    (y.lo, ct))
-				
-			
-			
-		return y
-
-cpu = cx()
+	# print("KEY %02x %s" % (n, t))
 
 #######################################################################
-
-fns = {}
 
 class params(data.Const):
 	def __init__(self, pj, nm, i, j):
@@ -330,9 +310,6 @@ class mnem(data.Data):
 		if (self.c >> 8) == 0x30:
 			pp = params(pj, b, self.b, self.a >> 8)
 			fi = pp.funcidx()
-			if fi not in fns:
-				fns[fi] = []
-			fns[fi].append(b)
 			t += " (" + pp.summ() + ")"
 
 		self.fmt = t
@@ -583,7 +560,7 @@ pj.set_label(0x693a, "MODEL")
 pj.set_label(0x01b48, "BCD_NEG8")
 pj.set_label(0x01b72, "BCD_ADD8")
 pj.set_label(0x01cb0, "BCD_SUB8")
-pj.set_label(0x02f38, "CASE")
+pj.set_label(0x02f38, "SWITCH")
 pj.set_label(0x033fc, "SHOW_CHAR")
 pj.set_label(0x03412, "SHOW_SEMI")
 pj.set_label(0x0341a, "SHOW_COMMA")
