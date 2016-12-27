@@ -535,20 +535,62 @@ class m68000(assy.Instree_disass):
 			'Z':		arg_Z,
 		})
 
-	def ptr(self, pj, a):
-		x = pj.m.bu32(a)
-		data.Codeptr(pj, a, a + 4, x)
-		pj.todo(x, self.disass)
-
 	def set_adr_mask(self, a):
 		self.amask = a
 
+	def vector_name(self, v):
+		n = {
+			1: "RESET",
+			2: "BUS_ERROR",
+			3: "ADDRESS_ERROR",
+			4: "ILLEGAL_INSTRUCTION",
+			5: "ZERO_DIVIDE",
+			6: "CHK",
+			7: "TRAPV",
+			8: "PRIV_VIOLATION",
+			9: "TRACE",
+			10: "LINE_A",
+			11: "LINE_F",
+			15: "UNINIT_VEC",
+			24: "SPURIOUS_IRQ",
+		}.get(v)
+		if n != None:
+			return "VECTOR_" + n
+		if v >= 25 and v <= 31:
+			return "VECTOR_IRQ_LEVEL_%d" % (v - 24)
+		if v >= 32 and v <= 47:
+			return "VECTOR_TRAP_%d" % (v - 32)
+		return "VECTOR_%d" % v
+
 	def vectors(self, pj, hi = 0x400):
+		y = data.Const(pj, 0, 4, "0x%08x", pj.m.bu32, 4)
+		y.lcmt = "Reset SP"
+		vn = {}
+		vi = {}
 		a = 0x4
 		while a < hi:
 			x = pj.m.bu32(a)
+			if x not in vn:
+				vi[x] = self.disass(pj, x)
+				vn[x] = []
+			vn[x].append(a >> 2)
 			if x > a and x not in (0, 0xffffffff):
-				self.ptr(pj, a)
+				y = data.Codeptr(pj, a, a + 4, x)
+			else:
+				y = data.Const(pj, a, a + 4,
+				    "0x%04x", pj.m.bu32, 4)
+			y.lcmt = self.vector_name(a >> 2)
 			hi = min(hi, x)
 			a += 4
-
+		mv = 0
+		for i in vn:
+			for v in vn[i]:
+				k = self.vector_name(v)
+				vi[i].lcmt += "--> " + k + "\n"
+				
+			if len(vn[i]) == 1:
+				k = self.vector_name(vn[i][0])
+				pj.set_label(i, k)
+			else:
+				pj.set_label(i, "VECTORS_%d" % mv)
+				mv += 1
