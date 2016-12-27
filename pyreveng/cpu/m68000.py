@@ -23,6 +23,8 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
+#
+# Ideas:  "DEFAULT_VECTOR" to target having most vectors pointed at it
 
 """
 Disassembler for M68000 familiy CPUs.
@@ -37,8 +39,8 @@ from pyreveng import mem, assy, data
 m68000_instructions = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
-aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |	
-ABCD		B,-(Ay),-(Ax)	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |	
+aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
+ABCD		B,-(Ay),-(Ax)	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
 # 108/4-4
 ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| eam | ear |
 ADD		Z,ea,Dn		1f7d	|1 1 0 1| Dn  |0| sz| eam | ear |
@@ -268,7 +270,7 @@ RESET		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 0 0|
 # 538/6-84
 RTE		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 1|
 # 539/6-85
-STOP		word		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 0| word				|
+STOP		word,>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 0| word				|
 # ...
 # 539/6-85
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -373,7 +375,7 @@ def arg_eaxt(pj, ins, ref):
 	ew = pj.m.bu16(ins.hi)
 	ins.hi += 2
 
-	if ew == 0x8000:
+	if ew & 0x8000:
 		reg = "+A"
 	else:
 		reg = "+D"
@@ -605,7 +607,7 @@ class m68000(assy.Instree_disass):
 			for v in vn[i]:
 				k = self.vector_name(v)
 				vi[i].lcmt += "--> " + k + "\n"
-				
+
 			if len(vn[i]) == 1:
 				k = self.vector_name(vn[i][0])
 				pj.set_label(i, k)
