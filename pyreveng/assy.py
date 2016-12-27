@@ -123,7 +123,7 @@ class Instree_disass(code.Decode):
 			return None
 		y = Instree_assy(pj, l, self)
 		for i in self.flow_check:
-			i(y)
+			i(pj, y)
 		return y
 
 
