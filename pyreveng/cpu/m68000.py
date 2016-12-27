@@ -467,6 +467,26 @@ def arg_L(pj, ins):
 	ins.sz = 4
 	ins.mne += ".L"
 
+def arg_rlist(pj, ins):
+	v = ins.im.F_rlist
+	l = []
+	for r in ("A", "D"):
+		for n in range(0,8):
+			if v & 0x0001:
+				l.append(r + "%d" % n)
+			v >>= 1
+	return "+".join(l)
+
+def arg_rrlist(pj, ins):
+	v = ins.im.F_rrlist
+	l = []
+	for r in ("D", "A"):
+		for n in range(7,-1,-1):
+			if v & 0x0001:
+				l.append(r + "%d" % n)
+			v >>= 1
+	return "+".join(l)
+
 def arg_rot(pj, ins):
 	return assy.Arg_verbatim(pj, "#0x%x" % ins.im.F_rot)
 
@@ -527,9 +547,9 @@ class m68000(assy.Instree_disass):
 			'ea':		arg_ea,
 			'ead':		arg_ead,
 			'L':		arg_L,
-			'rlist':	'<rlist>',
+			'rlist':	arg_rlist,
 			'rot':		arg_rot,
-			'rrlist':	'<rrlist>',
+			'rrlist':	arg_rrlist,
 			'SR':		'SR',
 			'USP':		'USP',
 			'#vect':	arg_vect,
