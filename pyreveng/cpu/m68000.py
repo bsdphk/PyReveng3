@@ -246,7 +246,7 @@ SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
 # 290/4-186
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| eam | ear |
 # 292/4-188
-TRAP		#vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| #vect |
+TRAP		#vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 # 295/4-191
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
@@ -470,6 +470,9 @@ def arg_L(pj, ins):
 def arg_rot(pj, ins):
 	return assy.Arg_verbatim(pj, "#0x%x" % ins.im.F_rot)
 
+def arg_vect(pj, ins):
+	return assy.Arg_verbatim(pj, "#%d" % ins.im.F_vect)
+
 def arg_W(pj, ins):
 	ins.sz = 2
 	ins.mne += ".W"
@@ -529,7 +532,7 @@ class m68000(assy.Instree_disass):
 			'rrlist':	'<rrlist>',
 			'SR':		'SR',
 			'USP':		'USP',
-			'#vect':	'<vect>',
+			'#vect':	arg_vect,
 			'W':		arg_W,
 			'word':		arg_word,
 			'Z':		arg_Z,
