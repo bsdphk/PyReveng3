@@ -32,6 +32,8 @@ from __future__ import print_function
 
 from . import job
 
+import struct
+
 #######################################################################
 
 class Data(job.Leaf):
@@ -62,6 +64,24 @@ class Const(Data):
 
 	def render(self, pj):
 		return self.typ + "\t" + self.fmt
+
+class Pstruct(Data):
+	''' Uses python struct.* to untangle data '''
+	def __init__(self, pj, lo, spec, fmt = None, typ = ".PSTRUCT"):
+		hi = lo + struct.calcsize(spec)
+		super(Pstruct, self).__init__(pj, lo, hi, "const")
+		l = []
+		for i in range(lo, hi):
+			l.append(pj.m.rd(i))
+		self.data = struct.unpack(spec, bytearray(l))
+		self.spec = spec
+		self.fmt = fmt
+		self.typ = typ
+
+	def render(self, pj):
+		if self.fmt != None:
+			return self.typ + "\t" + self.fmt % self.data
+		return self.typ + "\t" + self.spec + " = " + str(self.data)
 
 class Codeptr(Data):
 	def __init__(self, pj, lo, hi, dst):
