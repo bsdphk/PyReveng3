@@ -64,37 +64,156 @@ m.load_binfile(first = 0x00001, step = 0x2, filename="85680-80115.BIN")
 m.load_binfile(first = 0x10000, step = 0x2, filename="85680-80114.BIN")
 m.load_binfile(first = 0x10001, step = 0x2, filename="85680-80113.BIN")
 
+# Checum EPROMS
+# See 00e9e/ROMSUM
+s = [0xff, 0xff, 0xff, 0xff]
+for a in range(32768):
+	s[0] += m.rd(a * 2)
+	s[1] += m.rd(a * 2 + 1)
+	s[2] += m.rd(a * 2 + 65536)
+	s[3] += m.rd(a * 2 + 65536 + 1)
+for i in s:
+	assert i & 0xff == 0
+
 pj = job.Job(m, "HP8568B")
 
 cpu = m68000.m68000()
 
 #######################################################################
 
+# Where ?
+# y = data.Const(pj, 0xfffe, 0x10000)
+# pj.set_label(y.lo, "eprom_lo_chksum")
+y = data.Const(pj, 0x19854, 0x19856)
+pj.set_label(y.lo, "eprom_hi_chksum")
+
+#######################################################################
+
+def data_double(pj, a):
+	return data.Pstruct(pj, a, ">d", "%g", ".DOUBLE")
+
+def data_float(pj, a):
+	y = data.Data(pj, a, a + 4)
+	x = pj.m.bu32(a)
+	e = x & 0xff
+	if e & 0x80:
+		e -= 0x100
+	m = x >> 8
+	s = m >> 23
+	m &= 0x7fffff
+	y.val = m * (2.0 ** (e - 22.0))
+	if s:
+		y.val *= -1
+	y.fmt = ".FLOAT\t%g" % y.val
+	y.lcmt = "s=%d m=0x%06x e=%d" % (s,m,e)
+	return y
+
+#######################################################################
+# Functions taking arguments after call instruction
+
 post_arg = {
-	0x1bc8: 1, 0x1bcc: 1, 0x1bd0: 1, 0x1bdc: 1, 0x1be0: 1, 0x1c56: 1,
-	0x1c5a: 1, 0x1c7a: 1, 0x1c7e: 1, 0x1c88: 1, 0x1c8c: 1, 0x1ccc: 1,
-	0x2218: 1, 0x238e: 1, 0x239a: 1, 0x23f6: 1, 0x2402: 1, 0x24ac: 1,
-	0x24b8: 1, 0x25c8: 1, 0x25fa: 1, 0x27ee: 1, 0x2862: 1, 0x28c2: 1,
-	0x28ce: 1, 0x297c: 1, 0x2982: 1, 0x2988: 1, 0x29ba: 1, 0x29c6: 1,
-	0x29ea: 1, 0x29f6: 1, 0x2a02: 1, 0x2a0e: 1, 0x2a34: 1, 0x2a6e: 1,
-	0x2b08: 1, 0x2b14: 1,
+	0x1bc8: ("drel", "D0+D1"),
+	0x1bcc: ("dabs",   "D0+D1"),
+	0x1bd0: ("dA6rel", "D0+D1"),
+	0x1bdc: ("D0+D1", "dabs"),
+	0x1be0: ("D0+D1", "dA6rel"),
+	0x1c56: ("dabs", "FPXXX"),
+	0x1c5a: ("dA6rel", "FPXXX"),
+	0x1c7a: ("dabs", "FPXXX"),
+	0x1c7e: ("dA6rel", "FPXXX"),
+	0x1c88: ("drel", "FPXXX"),
+	0x1c8c: ("dabs", "FPXXX"),
+	0x1ccc: ("dabs", "FPXXX"),
+	0x2218: (),
+	0x238e: ("drel", "FPXXX"),
+	0x239a: ("dA6rel", "FPXXX"),
+	0x23f6: ("drel", "FPXXX"),
+	0x2402: ("D0+D1", "dA6rel"),
+	0x24ac: ("drel", "FPXXX"),
+	0x24b8: ("dA6rel", "FPXXX"),
+	0x24c4: ("drel", "FPXXX"),
+	0x25b0: ("drel", "FPXXX"),
+	0x25c8: ("drel", "FPXXX"),
+	0x25fa: ("dA6rel", "FPXXX"),
+	0x27ee: ("lrel", "FPXXX"),
+
+	0x2862: ("lrel", "LFXXX"),
+	0x28c2: ("lrel", "LFXXX"),
+	0x28ce: ("fabs", "LFXXX"),
+	0x297c: ("fA6rel", "LFXXX"),
+	0x2982: ("fabs", "LFXXX"),
+	0x2988: ("frel", "FFXXX"),
+	0x29ba: ("fA6rel", "LFXXX"),
+	0x29c6: ("frel", "FFXXX"),
+	0x29ea: ("fA6rel", "LFXXX"),
+	0x29f6: ("frel", "FFXXX"),
+	0x2a02: ("fA6rel", "LFXXX"),
+	0x2a0e: ("frel", "FFXXX"),
+	0x2a34: ("frel", "FFXXX"),
+	0x2a6e: ("frel", "FFXXX"),
+	0x2b08: ("fA6rel", "LFXXX"),
+	0x2b14: ("frel", "FFXXX"),
+	0x2b2c: ("frel", "FFXXX"),
 }
 
 def flow_post_arg(pj, ins):
 	z = post_arg.get(ins.dstadr)
-	if z != None:
-		ins.hi += 2 * z
-		ins.flow_out.pop(-1)
-		ins.add_flow(pj, True)
+	if z == None:
+		return
+	ins.flow_out.pop(-1)
+	if len(z) == 0:
+		a = data.Pstruct(pj, ins.hi, ">h", "%d", ".INFIX").hi
+		ins.add_flow(pj, ">", True, a)
+		return
+	l = []
+	for i in z:
+		if i[1:] == "A6rel":
+			r = pj.m.bs16(ins.hi)
+			ins.hi += 2
+			if r < 0:
+				l.append("(A6-0x%x)" % -r)
+			else:
+				l.append("(A6+0x%x)" % r)
+		elif i[1:] == "abs":
+			r = pj.m.bu16(ins.hi)
+			if r & 0x8000:
+				r |= 0xffff0000
+			ins.hi += 2
+			l.append("0x%08x" % r)
+		elif i == "drel":
+			r = ins.hi + pj.m.bs16(ins.hi)
+			ins.hi += 2
+			ins.lcmt += " @0x%x\n" % r
+			y = data_double(pj, r)
+			l.append("%g" % y.data[0])
+		elif i == "lrel":
+			r = ins.hi + pj.m.bs16(ins.hi)
+			ins.hi += 2
+			ins.lcmt += " @0x%x\n" % r
+			y = data.Pstruct(pj, r, ">L", "%d", ".LONG")
+			l.append("%d" % y.data[0])
+		elif i == "frel":
+			r = ins.hi + pj.m.bs16(ins.hi)
+			ins.hi += 2
+			ins.lcmt += " @0x%x\n" % r
+			y = data_float(pj, r)
+			l.append("%g" % y.val)
+		else:
+			l.append(i)
+	ins.oper.append("(" + ",".join(l) + ")")
+	ins.add_flow(pj, True, True, ins.hi)
 
 cpu.flow_check.append(flow_post_arg)
 
 #######################################################################
 
 switches = {
-	0xa5de: { },
-	0xb5ec: { },
-	0x807e: { },
+	0x13624: {
+		0: "ALL",
+		1: "ONEOS",
+		2: "ONSWP",
+		3: "TRMATH",
+	},
 }
 
 def flow_switch(pj, ins):
@@ -226,23 +345,16 @@ keyboard = (
 )
 
 keynos = {}
-
 for r,c,t in keyboard:
 	n = 0x20 + r * 8 + c
-	# if n >= 0x20 and n < 0x41:
-	#	switches[0x807e][(n - 0x20)/3] = "KEY_%02x_" % n + t
-	if n >= 0x41 and n < 0x5e:
-		switches[0xa5de][n - 0x41] = "KEY_%02x_" % n + t
-	if n >= 0x61 and n < 0x80:
-		switches[0xb5ec][n - 0x61] = "KEY_%02x_" % n + t
 	keynos[n] = t
-	# print("KEY %02x %s" % (n, t))
+
 
 #######################################################################
 
-class params(data.Const):
+class params(data.Data):
 	def __init__(self, pj, nm, i, j):
-		self.pj = pj
+		self.nm = nm
 		self.b = 0x195c4
 		self.i = i
 		self.j = j
@@ -250,7 +362,6 @@ class params(data.Const):
 		self.args = []
 		for a in range(j):
 			self.args.append(pj.m.rd(self.b + i + 1 + a))
-		pj.set_label(self.b + i, "P_" + nm)
 		super(params, self).__init__(pj, self.b + i, self.b + i + 1 + j)
 
 		self.fp = 0x196b6 + self.fi * 4
@@ -258,6 +369,13 @@ class params(data.Const):
 		pj.todo(self.fa, cpu.disass)
 		data.Codeptr(pj, self.fp, self.fp + 4, self.fa)
 		pj.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
+
+	def render(self, pj):
+		t = ".PARAM\t"
+		t += "func=%d" % self.fi
+		t += " call=%s" % self.nm 
+		t += "(" + self.summ() + ")"
+		return t
 
 	def summ(self):
 		t = []
@@ -277,44 +395,153 @@ class params(data.Const):
 	def funcidx(self):
 		return self.fi
 
-mnems = { }
-
 class mnem(data.Data):
-	def __init__(self, pj, lo):
-		t = ".MNE\t"
-		hi = lo
-		while True:
-			x = pj.m.rd(hi)
-			if x <= 0x20 or x > 0x7e or x == 0x40:
-				break
-			hi += 1
-		a,b,c = data.stringify(pj, lo, hi - lo)
-		t += "'" + b + "',"
-		while len(t) < 16:
-			t += " "
-		
-		if hi & 1:
-			hi += 1
+	def __init__(self, pj, hi):
+		lo = hi
+		lo -= 2
+		self.c = pj.m.bu16(lo)
+		lo -= 2
+		self.b = pj.m.bu16(lo)
+		lo -= 2
+		self.a = pj.m.bu16(lo)
 
-		self.a = pj.m.bu16(hi)
-		self.b = pj.m.bu16(hi + 2)
-		self.c = pj.m.bu16(hi + 4)
-		hi += 6
+		self.len = self.c & 0xfff
+		self.type = self.c >> 12
 
+		lo -= (self.len + 1) & 0xffe
 		super(mnem, self).__init__(pj, lo, hi)
 
-		t += "0x%04x" % self.a
-		t += ",0x%04x" % self.b
-		t += ",0x%04x" % self.c
 
-		if (self.c >> 8) == 0x30:
-			pp = params(pj, b, self.b, self.a >> 8)
-			fi = pp.funcidx()
-			t += " (" + pp.summ() + ")"
-
-		self.fmt = t
 		self.compact = True
-		mnems[b] = self
+
+		a,b,c = data.stringify(pj, self.lo, self.len)
+		self.string = b
+
+		self.hash = 0
+		for i in bytearray(self.string):
+			self.hash += i
+		self.hash %= 13
+
+		self.pp = None
+		self.args = None
+
+		if self.type == 3:
+			self.pp = params(pj, self.string, self.b, self.a >> 8)
+		if self.type == 1:
+			if self.b not in keynos:
+				keynos[self.b] = "CMD_" + self.string
+
+
+	def render(self, pj):
+		t = ".MNEM\t"
+		t += "0x%04x" % self.a
+		t += ", 0x%04x" % self.b
+		t += ", 0x%x" % self.type
+		t += ", len=0x%03x" % self.len
+		t += ", hash=%2d" % self.hash
+		t += ", '" + self.string + "'"
+		return t
+
+if True:
+	pj.set_label(0x18c3a, "MNETABLE")
+	a = 0x193a0
+	while a > 0x18c3a:
+		y = mnem(pj, a)
+		x = pj.m.bu16(y.lo - 2)
+		a = y.lo
+
+#######################################################################
+
+class oldcmd(data.Data):
+	def __init__(self, pj, lo, n):
+		super(oldcmd, self).__init__(pj, lo, lo + 2)
+		x,self.name,y = data.stringify(pj, self.lo, 2)
+
+		self.key = pj.m.rd(0x194b2 + n)
+		self.imm = (pj.m.rd(0x1951e + (n >> 3)) >> (n & 7)) & 1
+		if not self.imm:
+			self.svf1 = pj.m.bu16(0x1952c + self.key * 4)
+			self.svf2 = pj.m.bu16(0x1952c + self.key * 4 + 2)
+			if not self.svf2 in keynos:
+				keynos[self.svf2] = "CMD_" + self.name
+
+	def render(self, pj):
+		t = ".OLDCMD\t"
+		t += "'" + self.name + "'"
+		t += " imm=%x" % self.imm
+		t += " key=%02x" % self.key
+		if self.imm and self.key in keynos:
+			t += " ('" + keynos[self.key] + "')"
+		if not self.imm:
+			t += " svf=0x%04x,0x%04x" % (self.svf1, self.svf2)
+			t += " xxx=%02x" % (self.svf1 & 0x1e)
+		return t
+
+if True:
+	pj.set_label(0x193da, "OLDCMDS")
+	n = 0
+	for a in range(0x193da, 0x194b2, 2):
+		y = oldcmd(pj, a, n)
+		n += 1
+	print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
+
+	pj.set_label(0x194b2, "KEYTAB")
+	for a in range(0x194b2, 0x1951e, 8):
+		y = data.Const(pj, a, min(a + 8, 0x1951e), fmt="0x%02x")
+	print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
+
+	pj.set_label(0x1951e, "IMEDBITS")
+	for a in range(0x1951e, 0x1952c, 8):
+		y = data.Const(pj, a, min(a + 8, 0x1952c), fmt="0x%02x")
+	print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
+
+	pj.set_label(0x1952c, "SFLGVAL")
+	for a in range(0x1952c, 0x195c4, 16):
+		y = data.Const(pj, a, min(a + 16, 0x195c4),
+		    "0x%08x", pj.m.bu32, 4)
+	print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
+
+#######################################################################
+
+switches[0x09ae8] = {}
+switches[0x09d78] = {}
+switches[0x0a5de] = {}
+switches[0x0af5c] = {}
+switches[0x0b5ec] = {}
+switches[0x0bb4e] = {}
+switches[0x0bd5a] = {}
+switches[0x0bd6e] = {
+	0: "KEYS_00_1f",
+	1: "KEYS_20_3f",
+	2: "KEYS_40_5f",
+	3: "KEYS_60_7f",
+	4: "KEYS_80_9f",
+	5: "KEYS_a0_bf",
+}
+
+for n in keynos:
+	t = keynos[n]
+	print("KEY_%02x" % n, t)
+	if n < 0x20:
+		switches[0x9ae8][n] = "KEY_%02x_" % n + t
+	if n >= 0x20 and n < 0x30:
+		switches[0x9d78][n - 0x20] = "KEY_%02x_" % n + t
+	if n >= 0x40 and n < 0x60:
+		switches[0xa5de][n - 0x41] = "KEY_%02x_" % n + t
+		switches[0xaf5c][n - 0x41] = "KEY_S%02x_KS%c_" % (n, n) + t
+	if n >= 0x60 and n < 0x80:
+		switches[0xb5ec][n - 0x61] = "KEY_%02x_" % n + t
+		switches[0xbb4e][n - 0x60] = "KEY_S%02x_KS%c_" % (n, n) + t
+	if n >= 0xa0 and n <= 0xbf:
+		switches[0xbd5a][n - 0xa0] = "KEY_%02x_" % n + t
+
+if True:
+	for b,e in (
+		( 0x0e750, 0x0e778),
+		( 0x15ca4, 0x15cb4),
+	):
+		for a in range(b, e, 8):
+			data_double(pj, a)
 
 #######################################################################
 
@@ -344,6 +571,8 @@ if True:
 			data.Dataptr(pj, a, a + 4, x)
 			data.Txt(pj, x, pfx=1, align=2)
 
+	data.Txt(pj, 0x15dfc, pfx=1, align=2)
+
 	#######################################################################
 
 
@@ -359,6 +588,11 @@ if True:
 		0x16954,
 	):
 		y = data.Txt(pj, a, pfx=1, align=2)
+
+	#######################################################################
+
+	data.Dataptr(pj, 0xe39a, 0xe39a + 4, pj.m.bu32(0xe39a))
+
 
 	#######################################################################
 
@@ -397,51 +631,36 @@ if True:
 		data.Txt(pj, a, a + 2, label=False)
 
 	#######################################################################
-
-	a = 0x18c3a
-	y = data.Txt(pj, a, 0x18c5f, align=2)
-
-	#######################################################################
-
-	a = 0x18d24
-	while a < 0x19398:
-		y = mnem(pj, a)
-		a = y.hi
-
-	#######################################################################
-
-	data.Const(pj, 0x19856, 0x19857)
-
-	#######################################################################
 	# 0ee98  00 01 93 be
 	# 0eeaa  00 01 93 da  |    |
 	# 0ee8e  00 01 da ee  |    |
 	#######################################################################
 	# Orphans ?
 
-	pj.todo(0x01b88, cpu.disass)
-	pj.todo(0x01b8e, cpu.disass)
-	pj.todo(0x01b94, cpu.disass)
-	pj.todo(0x01b9a, cpu.disass)
-	pj.todo(0x01b9e, cpu.disass)
-	pj.todo(0x01ba2, cpu.disass)
-	pj.todo(0x01ba8, cpu.disass)
-	pj.todo(0x01c76, cpu.disass)
-	pj.todo(0x01c82, cpu.disass)
-	pj.todo(0x01c90, cpu.disass)
-	pj.todo(0x01cd2, cpu.disass)
-	pj.todo(0x01d14, cpu.disass)
+	if False:
+		pj.todo(0x01b88, cpu.disass)
+		pj.todo(0x01b8e, cpu.disass)
+		pj.todo(0x01b94, cpu.disass)
+		pj.todo(0x01b9a, cpu.disass)
+		pj.todo(0x01b9e, cpu.disass)
+		pj.todo(0x01ba2, cpu.disass)
+		pj.todo(0x01ba8, cpu.disass)
+		pj.todo(0x01c76, cpu.disass)
+		pj.todo(0x01c82, cpu.disass)
+		pj.todo(0x01c90, cpu.disass)
+		pj.todo(0x01cd2, cpu.disass)
+		pj.todo(0x01d14, cpu.disass)
 
-	pj.todo(0x01578, cpu.disass)
-	pj.todo(0x01594, cpu.disass)
-	pj.todo(0x0171a, cpu.disass)
-	pj.todo(0x01906, cpu.disass)
-	pj.todo(0x02dee, cpu.disass)
-	pj.todo(0x02df4, cpu.disass)
-	pj.todo(0x03412, cpu.disass)
+		pj.todo(0x01578, cpu.disass)
+		pj.todo(0x01594, cpu.disass)
+		pj.todo(0x0171a, cpu.disass)
+		pj.todo(0x01906, cpu.disass)
+		pj.todo(0x02dee, cpu.disass)
+		pj.todo(0x02df4, cpu.disass)
+		pj.todo(0x03412, cpu.disass)
+		pj.todo(0x11e74, cpu.disass)
+
 	pj.todo(0x0df5e, cpu.disass) # Arg to 0x802
-	pj.todo(0x11e74, cpu.disass)
-
 	pj.todo(0x3292, cpu.disass)	# 0x3284
 
 	#######################################################################
@@ -452,56 +671,13 @@ if True:
 		y = data.Const(pj, a, a+2, "0x%04x", pj.m.bu16, 2)
 
 	#######################################################################
-	pj.set_label(0x193be, "HASHPTR")
-	for a in range(0x193be, 0x193da, 2):
-		y = data.Const(pj, a, a + 2)
-		y.fmt = "%d" % pj.m.bu16(a)
 
-	print("HASHPTR %d" % ((0x193da-0x193be)/2))
+	y = data.Const(pj, 0x193a2, 0x193be, "%d", pj.m.bu16, 2)
+	pj.set_label(y.lo, "HASHPTR2")
+	y = data.Const(pj, 0x193be, 0x193da, "%d", pj.m.bu16, 2)
+	pj.set_label(y.lo, "HASHPTR")
 
-	#######################################################################
 
-	pj.set_label(0x193da, "OLDCMDS")
-	n = 0
-	for a in range(0x193da, 0x194b2, 2):
-		y = data.Txt(pj, a, a + 2, label=False, align=2)
-		cmd = pj.m.bu16(a)
-		y.lcmt += " n=%03d" % n
-		y.lcmt += " n=0x%02x" % n
-		k = pj.m.rd(0x194b2 + n)
-		y.lcmt += " key=%02x" % k
-		if k in keynos:
-			y.lcmt += " ('" + keynos[k] + "')"
-		
-		imm = (pj.m.rd(0x1951e + (n >> 3)) >> (n & 7)) & 1
-		y.lcmt += " imm=%d" % imm
-		if not imm:
-			svfi = pj.m.rd(0x194b2 + n)
-			y.lcmt += " svfi=%d" % svfi
-			svf = pj.m.bu32(0x1952c + svfi * 2)
-			y.lcmt += " svf=0x%08x" % svf
-		n += 1
-		
-	print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
-
-	#######################################################################
-	pj.set_label(0x194b2, "KEYTAB")
-	for a in range(0x194b2, 0x1951e, 1):
-		y = data.Const(pj, a, a + 1, fmt="0x%02x")
-	print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
-
-	#######################################################################
-	pj.set_label(0x1951e, "IMEDBITS")
-	for a in range(0x1951e, 0x1952c, 1):
-		y = data.Const(pj, a, a + 1, fmt="0x%02x")
-	print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
-
-	#######################################################################
-	pj.set_label(0x1952c, "SFLGVAL")
-	for a in range(0x1952c, 0x195c4, 2):
-		y = data.Const(pj, a, a + 4)
-		y.fmt = "0x%08x" % pj.m.bu32(a)
-	print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
 
 	#######################################################################
 	pj.set_label(0x19826, "PFXSCALE")
@@ -522,6 +698,21 @@ while pj.run():
 for i in pj.t:
 	if i.tag != "m68000":
 		continue
+	if i.dstadr in (0x940c, 0xed54):
+		y = pj.t.find_hi(i.lo)
+		if len(y) != 1:
+			continue
+		y = y[0]
+		if pj.m.rd(y.lo) == 0x70:
+			k = pj.m.rd(y.lo + 1)
+		elif pj.m.bu16(y.lo) == 0x103c:
+			k = pj.m.bu16(y.lo + 2)
+		else:
+			continue
+		if not k in keynos:
+			continue
+		y.oper[1].txt = "#KEY_" + keynos[k]
+		
 	if i.dstadr in (0xe4e8,):
 		y = pj.t.find_hi(i.lo)
 		if len(y) != 1:
@@ -551,16 +742,34 @@ for i in pj.t:
 			z = data.Txt(pj, w.dstadr, pfx=1, align=2)
 			w.lcmt = "'" + z.txt + "'"
 
-y = data.Const(pj, 0x693a, 0x693c, "%d")
-y.fmt = "%d" % pj.m.bu16(y.lo)
-pj.set_label(0x6936, "REVISION")
-pj.set_label(0x693a, "MODEL")
+y = data.Const(pj, 0x693a, 0x693c, "%d", pj.m.bu16, 2)
 
-
+pj.set_label(0x009b8, "RESET")
+pj.set_label(0x00c2e, "SELFTEST")
+pj.set_label(0x00d7a, "CPUTEST_FAIL")
+pj.set_label(0x00e9a, "epromsize")
+y = data.Const(pj, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
+pj.set_label(0x00e9e, "ROMSUM")
+pj.set_label(0x00ec0, "ROMTEST")
+pj.set_label(0x01bc8, "FD_CMP")
+pj.set_label(0x01bcc, "FD_CMP")
+pj.set_label(0x01bd0, "FD_CMP")
+pj.set_label(0x01bdc, "FD_CMP")
+pj.set_label(0x01be0, "FD_CMP")
+pj.set_label(0x01be6, "FD_CMP(R0+R1,R2+R3)")
+pj.set_label(0x01bea, "FD_CMP(R2+R3,R0+R1)")
+pj.set_label(0x01c14, "fpd_rel")
+pj.set_label(0x01c28, "fpd_abs")
+pj.set_label(0x01c3c, "fpd_a6rel")
 pj.set_label(0x01b48, "BCD_NEG8")
 pj.set_label(0x01b72, "BCD_ADD8")
 pj.set_label(0x01cb0, "BCD_SUB8")
+pj.set_label(0x023ec, "FD_ABS(R2+R3)")
+pj.set_label(0x0287e, "fpl_a6rel")
+pj.set_label(0x02892, "fpl_abs")
+pj.set_label(0x028a4, "fpl_rel")
 pj.set_label(0x02f38, "SWITCH")
+pj.set_label(0x0320e, "BZERO(PTR,INT)")
 pj.set_label(0x033fc, "SHOW_CHAR")
 pj.set_label(0x03412, "SHOW_SEMI")
 pj.set_label(0x0341a, "SHOW_COMMA")
@@ -572,13 +781,24 @@ pj.set_label(0x03498, "SHOW_INT")
 pj.set_label(0x03958, "SHOW_TXT_AT(ADR,STR)")
 pj.set_label(0x03906, "2DISPLAY")
 pj.set_label(0x039b0, "SHOW_WORD(INT)")
+pj.set_label(0x06936, "REVISION")
+pj.set_label(0x0693a, "MODEL")
 pj.set_label(0x06a2c, "MSG_TXT")
 pj.set_label(0x06ce0, "SHOW_TXT(STR)")
 pj.set_label(0x06cf2, "SHOW_CRNL")
+pj.set_label(0x06cfc, "SET_IF_LEDS(INT)")
 pj.set_label(0x06d20, "SHOW_MSG")
 pj.set_label(0x07b4e, "FILL_DISPLAY")
-pj.set_label(0x0940c, "EXEC_KEY(INT)")
-pj.set_label(0x0ee6a, "OLDCMD")
+pj.set_label(0x0940c, "EXEC(INT KEY)")
+pj.set_label(0x0e39a, "VAR_HEAD")
+pj.set_label(0x0ed54, "EXEC2(INT KEY)")
+pj.set_label(0x0eddc, "SEARCH(NAMLEN.W, CHAIN.L, HASH.L, NAME.L)")
+pj.set_label(0x0ee6a, "FIND_OLDCMD(INT)")
+pj.set_label(0x0f72c, "NAME2TRACE")
+pj.set_label(0x0a986, "CALIBRATING")
+pj.set_label(0x0aa7a, "AUTOCAL")
+pj.set_label(0x13092, "WHICH(PTR TABLE, STR KEY, INT N)")
+pj.set_label(0x14158, "TRACE_MATH(LONG, INT, STR, STR, STR)")
 pj.set_label(0x17dce, "SHOW_COMMA")
 pj.set_label(0x17e9e, "PL_MOVE")
 pj.set_label(0x17eac, "PL_LINE")
@@ -597,13 +817,14 @@ pj.set_label(0x17eac, "PL_LINE")
 # 0xffff0027
 # 0xffff0035
 
-# 0xffff4000
-# 0xffff4001
-# 0xffff4002
-# 0xffff4004
-# 0xffff4005
-# 0xffff4006
-# 0xffff4007
+#pj.set_label(0xffff4000, "PIT_PGCR")
+#pj.set_label(0xffff4002, "PIT_PSRR")
+#pj.set_label(0xffff4004, "PIT_PADDR")
+#pj.set_label(0xffff4006, "PIT_PBDDR")
+#pj.set_label(0xffff4008, "PIT_PCDDR")
+
+#pj.set_label(0xffff4010, "PIT_PADR")
+#pj.set_label(0xffff4012, "PIT_PBDR")
 
 # 0xffff8000
 
@@ -619,7 +840,7 @@ pj.set_label(0x17eac, "PL_LINE")
 # 0xffffa6c6
 # 0xffffa6ca
 # 0xffffa6ce
-# 0xffffa6d2
+pj.set_label(0xffffa6d2, "ram_var_hash")
 # 0xffffa6ec
 # 0xffffa6f0
 # 0xffffa6f2
@@ -674,9 +895,8 @@ pj.set_label(0x17eac, "PL_LINE")
 # 0xffffaa2d
 # 0xffffaa34
 # 0xffffaa38
-pj.set_label(0xffffaa3c, "ram_fp_led")
-# 0xffffaa3d
-# 0xffffaa3e
+pj.set_label(0xffffaa3c, "ram_rf_fp_leds")
+pj.set_label(0xffffaa3e, "ram_if_fp_leds")
 # 0xffffaa3f
 # 0xffffaa40
 # 0xffffaa41
@@ -836,8 +1056,8 @@ pj.set_label(0xffffaaf8, "ram_kbd_row")
 # 0xffffbfdf
 # 0xffffbfe0
 # 0xffffbfe1
-pj.set_label(0xffffbfe2, "hpib_address")
-pj.set_label(0xffffbfe3, "not_hpib_address")
+pj.set_label(0xffffbfe2, "ram_hpib_address")
+pj.set_label(0xffffbfe3, "ram_not_hpib_address")
 # 0xffffbfe4
 # 0xffffbfe5
 # 0xffffbfe6
@@ -853,7 +1073,22 @@ pj.set_label(0xffffbfe3, "not_hpib_address")
 # 0xffffbffd
 # 0xffffbffe
 
-# BOTTOM
+
+# I/O Decoding on A15
+#####################
+# 0x...00 BIO - BOTTOM/RF
+# 0x...20 DBCLK      #2
+# 0x...40 TIO - TOP/IF
+# 0x...64 LDBTEST    #7
+# 0x...80 LHPIB
+# 0x...a4 LDBTEST    #7
+# 0x...c0 LBUS
+# 0x...e0 HPIBSW     #1
+# 0x...e4 LATR       #5
+
+
+# BIO/BOTTOM/RF
+###############
 # 0xffffc000
 # 0xffffc002
 # 0xffffc006
@@ -863,7 +1098,7 @@ pj.set_label(0xffffbfe3, "not_hpib_address")
 # 0xffffc00e
 
 # A12
-pj.set_label(0xffffc010, "rf_fp_led")
+pj.set_label(0xffffc010, "rf_fp_leds")
 pj.set_label(0xffffc012, "rf_kbd_row")
 pj.set_label(0xffffc014, "rf_kbd_col")
 pj.set_label(0xffffc016, "rf_rtg")
@@ -872,37 +1107,37 @@ pj.set_label(0xffffc01a, "rf_phase_lock")
 pj.set_label(0xffffc01c, "rf_249_lock")
 pj.set_label(0xffffc01e, "rf_attn")
 
-# 0xffffc020
-# 0xffffc022
-# 0xffffc025
+# A15
+pj.set_label(0xffffc020, "dbus_test_0")
+pj.set_label(0xffffc022, "dbus_test_2")
+pj.set_label(0xffffc025, "dbus_test_5")
 
 # A17
 pj.set_label(0xffffc028, "freqcnt_ctrl")	# octal 24 = 0x14 *2= 0x28
 pj.set_label(0xffffc02a, "freqcnt_msb")
 pj.set_label(0xffffc02c, "freqcnt_lsb")
 
-# TOP
+# TIO/TOP/IF
+############
 pj.set_label(0xffffc040, "display_address")
 pj.set_label(0xffffc042, "display_rd_store")
 pj.set_label(0xffffc044, "display_wr_store")
-
 # 0xffffc046
-
 pj.set_label(0xffffc048, "display_wr_off")
 pj.set_label(0xffffc04a, "display_rd_scan")
-
 # 0xffffc04b
-
 pj.set_label(0xffffc04c, "display_wr_marker")
 pj.set_label(0xffffc04e, "display_wr_scan")
 
-# 0xffffc064
-# 0xffffc066
-# 0xffffc068
-# 0xffffc06a
-# 0xffffc06c
+# SWEEP
+pj.set_label(0xffffc064, "sweep_high_ctrl")
+pj.set_label(0xffffc066, "sweep_time")
+# 0xffffc068					# Bogus, nothing connceted
+# 0xffffc06a					# Bogus, nothing connected
+pj.set_label(0xffffc06c, "if_fp_leds")
 
-# HPIB
+# HPIB 
+######
 # 0xffffc081
 # 0xffffc083
 # 0xffffc085
@@ -913,13 +1148,44 @@ pj.set_label(0xffffc04e, "display_wr_scan")
 # 0xffffc08f
 
 # LBUS
-# 0xffffc0e0
+######
 
-pj.set_label(0xffffc0e1, "display_status")
+# 0xffffc0e0 ?
 
-# 0xffffc0e5
+# HPIBSW
+pj.set_label(0xffffc0e1, "adrsw_srq_display_ready")
+
+pj.set_label(0xffffc0e5, "latr_test")
+
+#######################################################################
+
+nondisc = {
+	0x14ce:	0,
+}
+
+while True:
+	l = []
+	for b,e in pj.gaps():
+		if b in nondisc:
+			continue
+		if e - b < 2:
+			continue
+		if pj.m.bu16(b) in (0x4eb8, 0x4e56):
+			l.append(b)
+		elif pj.m.rd(b) in (0x61,):
+			l.append(b)
+	print(l)
+	for i in l:
+		y = cpu.disass(pj, i)
+		y.lcmt = "DISCOVER - "
+	while pj.run():
+		pass
+	if len(l) == 0:
+		break
+
+#######################################################################
 
 
 code.lcmt_flows(pj)
 
-listing.Listing(pj)
+listing.Listing(pj, ncol=8)
