@@ -55,7 +55,7 @@ cmds = {
 "KS=":	("Factor preselector setting", "Resolution of marker FreqCnt"),
 "KS(":	"Locks save registers",
 "KS)":	"Unlocks save registers",
-#"KS??"	"XXX see DW"
+"KS|":	"See DW",
 "KS>":	(None, "Preamp gain input2"),
 "KS<":	(None, "Preamp gain input1"),
 "KS#":	("YTX self heating correction off", None),

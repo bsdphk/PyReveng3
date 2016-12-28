@@ -58,6 +58,8 @@ from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.m68000 as m68000
 import pyreveng.cpu.hp85662a as hp85662a
 
+import hp856x_cmds
+
 m = mem.byte_mem(0x0, 0x20000)
 m.load_binfile(first = 0x00000, step = 0x2, filename="85680-80116.BIN")
 m.load_binfile(first = 0x00001, step = 0x2, filename="85680-80115.BIN")
@@ -77,7 +79,27 @@ for i in s:
 
 pj = job.Job(m, "HP8568B")
 
-cpu = m68000.m68000()
+class mycpu(m68000.m68000):
+	def __init__(self):
+		super(mycpu, self).__init__()
+
+	def macro(self, nm, l):
+		s = nm + " - "
+		for i in l:
+			if i == " ":
+				continue
+			j = int(i, 16)
+			s += "|%d %d %d %d" % (
+				(j >> 3) & 1,
+				(j >> 2) & 1,
+				(j >> 1) & 1,
+				(j >> 0) & 1
+			)
+		s += "|\n"
+		self.it.load_string(s)
+
+cpu = mycpu()
+cpu.macro("DISPLAY_READY()", "0838 0007 c0e1 66f8")
 
 #######################################################################
 
@@ -522,16 +544,22 @@ switches[0x0bd6e] = {
 for n in keynos:
 	t = keynos[n]
 	print("KEY_%02x" % n, t)
+	sk = "KS%c" % n
+	ksk = hp856x_cmds.cmds.get(sk)
+	if ksk != None and type(ksk) != str:
+		ksk = ksk[1]
+	if ksk == None:
+		ksk = "==" + t
 	if n < 0x20:
 		switches[0x9ae8][n] = "KEY_%02x_" % n + t
 	if n >= 0x20 and n < 0x30:
 		switches[0x9d78][n - 0x20] = "KEY_%02x_" % n + t
 	if n >= 0x40 and n < 0x60:
 		switches[0xa5de][n - 0x41] = "KEY_%02x_" % n + t
-		switches[0xaf5c][n - 0x41] = "KEY_S%02x_KS%c_" % (n, n) + t
+		switches[0xaf5c][n - 0x41] = "KEY_S%02x_KS%c_" % (n, n) + ksk
 	if n >= 0x60 and n < 0x80:
 		switches[0xb5ec][n - 0x61] = "KEY_%02x_" % n + t
-		switches[0xbb4e][n - 0x60] = "KEY_S%02x_KS%c_" % (n, n) + t
+		switches[0xbb4e][n - 0x60] = "KEY_S%02x_KS%c_" % (n, n) + ksk
 	if n >= 0xa0 and n <= 0xbf:
 		switches[0xbd5a][n - 0xa0] = "KEY_%02x_" % n + t
 
@@ -660,6 +688,9 @@ if True:
 		pj.todo(0x03412, cpu.disass)
 		pj.todo(0x11e74, cpu.disass)
 
+	# filled in 0xffffabd2
+	pj.todo(0x0ed98, cpu.disass)
+
 	pj.todo(0x0df5e, cpu.disass) # Arg to 0x802
 	pj.todo(0x3292, cpu.disass)	# 0x3284
 
@@ -778,8 +809,9 @@ pj.set_label(0x03428, "SHOW_NL")
 pj.set_label(0x03430, "SHOW_MINUS")
 pj.set_label(0x03438, "SHOW_2CHAR")
 pj.set_label(0x03498, "SHOW_INT")
+pj.set_label(0x03932, "DISP_RD(INT ADR)")
 pj.set_label(0x03958, "SHOW_TXT_AT(ADR,STR)")
-pj.set_label(0x03906, "2DISPLAY")
+pj.set_label(0x03906, "DISP_WR(INT ADR, INT DATA)")
 pj.set_label(0x039b0, "SHOW_WORD(INT)")
 pj.set_label(0x06936, "REVISION")
 pj.set_label(0x0693a, "MODEL")
@@ -788,6 +820,7 @@ pj.set_label(0x06ce0, "SHOW_TXT(STR)")
 pj.set_label(0x06cf2, "SHOW_CRNL")
 pj.set_label(0x06cfc, "SET_IF_LEDS(INT)")
 pj.set_label(0x06d20, "SHOW_MSG")
+pj.set_label(0x070be, "UPD_DETECTOR")
 pj.set_label(0x07b4e, "FILL_DISPLAY")
 pj.set_label(0x0940c, "EXEC(INT KEY)")
 pj.set_label(0x0e39a, "VAR_HEAD")
@@ -898,7 +931,7 @@ pj.set_label(0xffffa6d2, "ram_var_hash")
 pj.set_label(0xffffaa3c, "ram_rf_fp_leds")
 pj.set_label(0xffffaa3e, "ram_if_fp_leds")
 # 0xffffaa3f
-# 0xffffaa40
+# 0xffffaa40	if_scale_gain copy
 # 0xffffaa41
 # 0xffffaa42
 # 0xffffaa44
@@ -998,7 +1031,7 @@ pj.set_label(0xffffaaf8, "ram_kbd_row")
 # 0xffffabc8
 # 0xffffabce
 # 0xffffabd0
-# 0xffffabd2
+pj.set_label(0xffffabd2, "func_ptr+a6+a7")
 # 0xffffabd6
 # 0xffffabda
 # 0xffffabde
