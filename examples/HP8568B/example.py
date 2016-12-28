@@ -1089,22 +1089,22 @@ pj.set_label(0xffffbfe3, "ram_not_hpib_address")
 
 # BIO/BOTTOM/RF
 ###############
-# 0xffffc000
-# 0xffffc002
-# 0xffffc006
-# 0xffffc008
-# 0xffffc00a
-# 0xffffc00c
-# 0xffffc00e
+pj.set_label(0xffffc000, "rf_50vto_lo_dac")
+pj.set_label(0xffffc002, "rf_50vto_hi_dac")
+pj.set_label(0xffffc006, "rf_yig_dac")
+pj.set_label(0xffffc008, "rf_scan_atten_vto")
+pj.set_label(0xffffc00a, "rf_scantime")
+pj.set_label(0xffffc00c, "rf_yig_lock_scan")
+pj.set_label(0xffffc00e, "rf_scan_mode")
 
 # A12
 pj.set_label(0xffffc010, "rf_fp_leds")
 pj.set_label(0xffffc012, "rf_kbd_row")
 pj.set_label(0xffffc014, "rf_kbd_col")
-pj.set_label(0xffffc016, "rf_rtg")
-pj.set_label(0xffffc018, "rf_service_req")
+pj.set_label(0xffffc016, "rf_rpg")
+pj.set_label(0xffffc018, "rf_srq_resets")
 pj.set_label(0xffffc01a, "rf_phase_lock")
-pj.set_label(0xffffc01c, "rf_249_lock")
+pj.set_label(0xffffc01c, "rf_245_lock")
 pj.set_label(0xffffc01e, "rf_attn")
 
 # A15
@@ -1113,27 +1113,34 @@ pj.set_label(0xffffc022, "dbus_test_2")
 pj.set_label(0xffffc025, "dbus_test_5")
 
 # A17
-pj.set_label(0xffffc028, "freqcnt_ctrl")	# octal 24 = 0x14 *2= 0x28
-pj.set_label(0xffffc02a, "freqcnt_msb")
-pj.set_label(0xffffc02c, "freqcnt_lsb")
+pj.set_label(0xffffc028, "rf_freqcnt_ctrl")
+pj.set_label(0xffffc02a, "rf_freqcnt_msb")
+pj.set_label(0xffffc02c, "rf_freqcnt_lsb")
+
+#
+pj.set_label(0xffffc030, "rf_inputs_atten_20")
+pj.set_label(0xffffc032, "rf_vunit_atten_30")
+pj.set_label(0xffffc034, "rf_atten_40")
+pj.set_label(0xffffc034, "rf_atten_50")
+pj.set_label(0xffffc034, "rf_atten_60")
+pj.set_label(0xffffc034, "rf_atten_70")
 
 # TIO/TOP/IF
 ############
 pj.set_label(0xffffc040, "display_address")
 pj.set_label(0xffffc042, "display_rd_store")
 pj.set_label(0xffffc044, "display_wr_store")
-# 0xffffc046
-pj.set_label(0xffffc048, "display_wr_off")
+pj.set_label(0xffffc046, "display_wr_offset")
+pj.set_label(0xffffc048, "display_control")
 pj.set_label(0xffffc04a, "display_rd_scan")
-# 0xffffc04b
 pj.set_label(0xffffc04c, "display_wr_marker")
 pj.set_label(0xffffc04e, "display_wr_scan")
 
 # SWEEP
-pj.set_label(0xffffc064, "sweep_high_ctrl")
-pj.set_label(0xffffc066, "sweep_time")
-# 0xffffc068					# Bogus, nothing connceted
-# 0xffffc06a					# Bogus, nothing connected
+pj.set_label(0xffffc064, "if_sweep_src_trig")
+pj.set_label(0xffffc066, "if_sweep_time")
+pj.set_label(0xffffc068, "if_scale_gain")
+pj.set_label(0xffffc06a, "if_bw_fine")
 pj.set_label(0xffffc06c, "if_fp_leds")
 
 # HPIB 
