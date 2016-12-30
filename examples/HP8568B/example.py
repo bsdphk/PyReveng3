@@ -134,61 +134,75 @@ def data_float(pj, a):
 # Functions taking arguments after call instruction
 
 post_arg = {
-	0x1bc8: ("drel", "D0+D1"),
-	0x1bcc: ("dabs",   "D0+D1"),
-	0x1bd0: ("dA6rel", "D0+D1"),
-	0x1bdc: ("D0+D1", "dabs"),
-	0x1be0: ("D0+D1", "dA6rel"),
-	0x1c56: ("dabs", "FPXXX"),
-	0x1c5a: ("dA6rel", "FPXXX"),
-	0x1c7a: ("dabs", "FPXXX"),
-	0x1c7e: ("dA6rel", "FPXXX"),
-	0x1c88: ("drel", "FPXXX"),
-	0x1c8c: ("dabs", "FPXXX"),
-	0x1ccc: ("dabs", "FPXXX"),
-	0x2218: (),
-	0x238e: ("drel", "FPXXX"),
-	0x239a: ("dA6rel", "FPXXX"),
-	0x23f6: ("drel", "FPXXX"),
-	0x2402: ("D0+D1", "dA6rel"),
-	0x24ac: ("drel", "FPXXX"),
-	0x24b8: ("dA6rel", "FPXXX"),
-	0x24c4: ("drel", "FPXXX"),
-	0x25b0: ("drel", "FPXXX"),
-	0x25c8: ("drel", "FPXXX"),
-	0x25fa: ("dA6rel", "FPXXX"),
-	0x27ee: ("lrel", "FPXXX"),
+	0x1bc8: ("BCD_CMP",	"brel",	"D01"),
+	0x1bcc: ("BCD_CMP",	"babs",	"D01"),
+	0x1bd0: ("BCD_CMP",	"bA6rel", "D01"),
+	0x1bdc: ("BCD_CMP",	"D01",	"babs"),
+	0x1be0: ("BCD_CMP",	"D01",	"bA6rel"),
 
-	0x2862: ("lrel", "LFXXX"),
-	0x28c2: ("lrel", "LFXXX"),
-	0x28ce: ("fabs", "LFXXX"),
-	0x297c: ("fA6rel", "LFXXX"),
-	0x2982: ("fabs", "LFXXX"),
-	0x2988: ("frel", "FFXXX"),
-	0x29ba: ("fA6rel", "LFXXX"),
-	0x29c6: ("frel", "FFXXX"),
-	0x29ea: ("fA6rel", "LFXXX"),
-	0x29f6: ("frel", "FFXXX"),
-	0x2a02: ("fA6rel", "LFXXX"),
-	0x2a0e: ("frel", "FFXXX"),
-	0x2a34: ("frel", "FFXXX"),
-	0x2a6e: ("frel", "FFXXX"),
-	0x2b08: ("fA6rel", "LFXXX"),
-	0x2b14: ("frel", "FFXXX"),
-	0x2b2c: ("frel", "FFXXX"),
+	0x1c52: ("BCD_ADD",	"brel",	"D01"),
+	0x1c56: ("BCD_ADD",	"babs",	"D01"),
+	0x1c5a: ("BCD_ADD",	"bA6rel",	"D01"),
+	0x1c5e: ("BCD_ADD",	"???",	"D01"),
+
+	0x1c76: ("BCD_SUB",	"brel", "D01"),
+	0x1c7a: ("BCD_SUB",	"babs", "D01"),
+	0x1c7e: ("BCD_SUB",	"bA6rel", "D01"),
+
+	0x1c88: ("BCD_SUB",	"brel", "D01"),
+	0x1c8c: ("BCD_SUB",	"babs", "D01"),
+	0x1c90: ("BCD_SUB",	"bA6rel", "D01"),
+
+	0x1ccc: ("",	"dabs", "FPXXX"),
+	0x2218: ("BCD_LD_D01", "bcd"),
+	0x223c: ("BCD_LD_D23", "bcd"),
+	0x238e: ("",	"drel", "FPXXX"),
+	0x239a: ("",	"dA6rel", "FPXXX"),
+	0x23f6: ("",	"drel", "FPXXX"),
+	0x2402: ("",	"D0+D1", "dA6rel"),
+	0x24ac: ("",	"drel", "FPXXX"),
+	0x24b8: ("",	"dA6rel", "FPXXX"),
+	0x24c4: ("",	"drel", "FPXXX"),
+	0x25b0: ("",	"drel", "FPXXX"),
+	0x25c8: ("",	"drel", "FPXXX"),
+	0x25fa: ("",	"dA6rel", "FPXXX"),
+	0x27ee: ("",	"lrel", "FPXXX"),
+
+	0x2862: ("",	"lrel", "LFXXX"),
+	0x28c2: ("",	"lrel", "LFXXX"),
+	0x28ce: ("",	"fabs", "LFXXX"),
+	0x297c: ("",	"fA6rel", "LFXXX"),
+	0x2982: ("",	"fabs", "LFXXX"),
+	0x2988: ("",	"frel", "FFXXX"),
+	0x29ba: ("",	"fA6rel", "LFXXX"),
+	0x29c6: ("",	"frel", "FFXXX"),
+	0x29ea: ("",	"fA6rel", "LFXXX"),
+	0x29f6: ("",	"frel", "FFXXX"),
+	0x2a02: ("",	"fA6rel", "LFXXX"),
+	0x2a0e: ("",	"frel", "FFXXX"),
+	0x2a34: ("",	"frel", "FFXXX"),
+	0x2a6e: ("",	"frel", "FFXXX"),
+	0x2b08: ("",	"fA6rel", "LFXXX"),
+	0x2b14: ("",	"frel", "FFXXX"),
+	0x2b2c: ("",	"frel", "FFXXX"),
 }
+
+for i in post_arg:
+	j = post_arg[i]
+	if len(j) > 0 and j[0] != "":
+		pj.set_label(i, j[0])
 
 def flow_post_arg(pj, ins):
 	z = post_arg.get(ins.dstadr)
 	if z == None:
 		return
 	ins.flow_out.pop(-1)
-	if len(z) == 0:
+	if len(z) <= 1:
 		a = data.Pstruct(pj, ins.hi, ">h", "%d", ".INFIX").hi
 		ins.add_flow(pj, ">", True, a)
 		return
 	l = []
-	for i in z:
+	for i in z[1:]:
 		if i[1:] == "A6rel":
 			r = pj.m.bs16(ins.hi)
 			ins.hi += 2
@@ -208,6 +222,12 @@ def flow_post_arg(pj, ins):
 			ins.lcmt += " @0x%x\n" % r
 			y = data_double(pj, r)
 			l.append("%g" % y.data[0])
+		elif i == "brel":
+			r = ins.hi + pj.m.bs16(ins.hi)
+			ins.hi += 2
+			ins.lcmt += " @0x%x\n" % r
+			y = data.Pstruct(pj, r, ">Q", "%x", ".BCD")
+			l.append("%x" % y.data[0])
 		elif i == "lrel":
 			r = ins.hi + pj.m.bs16(ins.hi)
 			ins.hi += 2
@@ -220,6 +240,11 @@ def flow_post_arg(pj, ins):
 			ins.lcmt += " @0x%x\n" % r
 			y = data_float(pj, r)
 			l.append("%g" % y.val)
+		elif i == "bcd":
+			r = pj.m.bu16(ins.hi)
+			y = data.Pstruct(pj, ins.hi, ">H", "%x", ".BCD")
+			l.append("%04x" % r)
+			ins.hi += 2
 		else:
 			l.append(i)
 	ins.oper.append("(" + ",".join(l) + ")")
@@ -621,6 +646,9 @@ if True:
 
 	data.Dataptr(pj, 0xe39a, 0xe39a + 4, pj.m.bu32(0xe39a))
 
+	data.Const(pj, 0x2140, 0x2148, "%d", pj.m.bu64, 8)
+	data.Const(pj, 0x2148, 0x214c, "%d", pj.m.bu32, 4)
+
 
 	#######################################################################
 
@@ -687,6 +715,9 @@ if True:
 		pj.todo(0x02df4, cpu.disass)
 		pj.todo(0x03412, cpu.disass)
 		pj.todo(0x11e74, cpu.disass)
+
+	# from 0x2272
+	pj.todo(0x2282, cpu.disass)
 
 	# filled in 0xffffabd2
 	pj.todo(0x0ed98, cpu.disass)
@@ -782,23 +813,30 @@ pj.set_label(0x00e9a, "epromsize")
 y = data.Const(pj, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
 pj.set_label(0x00e9e, "ROMSUM")
 pj.set_label(0x00ec0, "ROMTEST")
-pj.set_label(0x01bc8, "FD_CMP")
-pj.set_label(0x01bcc, "FD_CMP")
-pj.set_label(0x01bd0, "FD_CMP")
-pj.set_label(0x01bdc, "FD_CMP")
-pj.set_label(0x01be0, "FD_CMP")
-pj.set_label(0x01be6, "FD_CMP(R0+R1,R2+R3)")
-pj.set_label(0x01bea, "FD_CMP(R2+R3,R0+R1)")
-pj.set_label(0x01c14, "fpd_rel")
-pj.set_label(0x01c28, "fpd_abs")
-pj.set_label(0x01c3c, "fpd_a6rel")
-pj.set_label(0x01b48, "BCD_NEG8")
-pj.set_label(0x01b72, "BCD_ADD8")
-pj.set_label(0x01cb0, "BCD_SUB8")
+pj.set_label(0x01be6, "BCD_CMP(R01,R23)")
+pj.set_label(0x01bea, "BCD_CMP(R23,R01)")
+pj.set_label(0x01c00, "stk2_64")
+pj.set_label(0x01c14, "rel_64")
+pj.set_label(0x01c28, "abs_64")
+pj.set_label(0x01c3c, "loc_64")
+pj.set_label(0x01b48, "BCD_NEG8(&A0)")
+pj.set_label(0x01b62, "BCD_NEG(D23)")
+pj.set_label(0x01b72, "BCD_ADD8(&A0,&A1)")
+pj.set_label(0x01c60, "BCD_ADD(D01, D23)")
+pj.set_label(0x01c98, "BCD_SUBR(D23, D01(order?)")
+pj.set_label(0x01c9c, "BCD_SUB(D01, D23(order?)")
+pj.set_label(0x01cb0, "BCD_SUB8(&A0,&A1)")
+pj.set_label(0x0214c, "BCD_MUL5(D01)")
+pj.set_label(0x0217e, "BCD_MUL3(D01)")
+pj.set_label(0x0218c, "BCD_MUL6(D01)")
+pj.set_label(0x021be, "BCD_MUL8(D01)")
+pj.set_label(0x021c0, "BCD_MUL4(D01)")
+pj.set_label(0x021c4, "BCD_MUL2(D01)")
+pj.set_label(0x021f6, "BCD_DIV2(D01)")
 pj.set_label(0x023ec, "FD_ABS(R2+R3)")
-pj.set_label(0x0287e, "fpl_a6rel")
-pj.set_label(0x02892, "fpl_abs")
-pj.set_label(0x028a4, "fpl_rel")
+pj.set_label(0x0287e, "rel_32")
+pj.set_label(0x02892, "abs_32")
+pj.set_label(0x028a4, "loc_32")
 pj.set_label(0x02f38, "SWITCH")
 pj.set_label(0x0320e, "BZERO(PTR,INT)")
 pj.set_label(0x033fc, "SHOW_CHAR")
@@ -1199,29 +1237,49 @@ pj.set_label(0xffffc0e5, "latr_test")
 
 #######################################################################
 
-nondisc = {
-	0x14ce:	0,
-}
+if False:
+	for a in (
+		0x01298,
+		0x013a8,
+		0x013d8,
+		0x013de,
+		0x013e4,
+		0x01e12,
+		0x01e94,
+		0x0217e,
+		0x0218c,
+		0x02194,
+		0x021a8,
+		0x02268,
+		0x02282,
+		# 0x022ea,
+	):
+		y = cpu.disass(pj, a)
+		y.lcmt = "ORPHAN - "
 
-while True:
-	l = []
-	for b,e in pj.gaps():
-		if b in nondisc:
-			continue
-		if e - b < 2:
-			continue
-		if pj.m.bu16(b) in (0x4eb8, 0x4e56):
-			l.append(b)
-		elif pj.m.rd(b) in (0x61,):
-			l.append(b)
-	print(l)
-	for i in l:
-		y = cpu.disass(pj, i)
-		y.lcmt = "DISCOVER - "
-	while pj.run():
-		pass
-	if len(l) == 0:
-		break
+	nondisc = {
+		0x14ce:	0,
+	}
+
+	while True:
+		l = []
+		for b,e in pj.gaps():
+			if b in nondisc:
+				continue
+			if e - b < 2:
+				continue
+			if pj.m.bu16(b) in (0x4eb8, 0x4e56):
+				l.append(b)
+			elif pj.m.rd(b) in (0x61,):
+				l.append(b)
+		print(l)
+		for i in l:
+			y = cpu.disass(pj, i)
+			y.lcmt = "DISCOVER - "
+		while pj.run():
+			pass
+		if len(l) == 0:
+			break
 
 #######################################################################
 
