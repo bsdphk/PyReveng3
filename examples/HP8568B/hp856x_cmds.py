@@ -68,4 +68,5 @@ cmds = {
 "KS}":	"Write display in binary (DA prefix)",
 "KS~":	"Return every Nth value of trace (O1|O2|O3|O4+DA prefix)",
 "KS\177":	"Display write binary with length (DA prefix)",
+"OL":	"Returns the coded instrument state information in 80 8-bit bytes",
 }

@@ -130,6 +130,9 @@ def data_float(pj, a):
 	y.lcmt = "s=%d m=0x%06x e=%d" % (s,m,e)
 	return y
 
+def data_bcd(pj, a):
+	return data.Pstruct(pj, a, ">Q", "%016x", ".BCD")
+
 #######################################################################
 # Functions taking arguments after call instruction
 
@@ -143,7 +146,7 @@ post_arg = {
 	0x1c52: ("BCD_ADD",	"brel",	"D01"),
 	0x1c56: ("BCD_ADD",	"babs",	"D01"),
 	0x1c5a: ("BCD_ADD",	"bA6rel",	"D01"),
-	0x1c5e: ("BCD_ADD",	"???",	"D01"),
+	0x1c5e: ("BCD_ADD",	"stk",	"D01"),
 
 	0x1c76: ("BCD_SUB",	"brel", "D01"),
 	0x1c7a: ("BCD_SUB",	"babs", "D01"),
@@ -226,7 +229,7 @@ def flow_post_arg(pj, ins):
 			r = ins.hi + pj.m.bs16(ins.hi)
 			ins.hi += 2
 			ins.lcmt += " @0x%x\n" % r
-			y = data.Pstruct(pj, r, ">Q", "%x", ".BCD")
+			y = data_bcd(pj, r);
 			l.append("%x" % y.data[0])
 		elif i == "lrel":
 			r = ins.hi + pj.m.bs16(ins.hi)
@@ -649,6 +652,28 @@ if True:
 	data.Const(pj, 0x2140, 0x2148, "%d", pj.m.bu64, 8)
 	data.Const(pj, 0x2148, 0x214c, "%d", pj.m.bu32, 4)
 
+	for a in (
+		0x0645e,
+		0x06476,
+		0x0647e,
+		0x0648a,
+		0x06492,
+		0x0649a,
+		0x064a6,
+		0x064be,
+		0x0e2c4,
+		0x0e2d4,
+		0x0e2cc,
+		0x0e32a,
+		0x0e332,
+		0x0e37c,
+		0x0e384,
+		0x128ca,
+		0x15da0,
+	):
+		y = data_bcd(pj, a)
+		pj.set_label(a, "BCD_%x" % y.data[0])
+
 
 	#######################################################################
 
@@ -811,11 +836,16 @@ pj.set_label(0x00c2e, "SELFTEST")
 pj.set_label(0x00d7a, "CPUTEST_FAIL")
 pj.set_label(0x00e9a, "epromsize")
 y = data.Const(pj, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
+pj.set_label(0x00ef2, "ramaddress")
+y = data.Const(pj, 0x00ef2, 0x00efe, "0x%08x", pj.m.bu32, 4)
 pj.set_label(0x00e9e, "ROMSUM")
 pj.set_label(0x00ec0, "ROMTEST")
+pj.set_label(0x01ae2, "BCD_FMT(BCD, PTR)")
+pj.set_label(0x01b34, "BCD_ABS(BCD)")
+pj.set_label(0x01b38, "BCD_NEG(BCD)")
 pj.set_label(0x01be6, "BCD_CMP(R01,R23)")
 pj.set_label(0x01bea, "BCD_CMP(R23,R01)")
-pj.set_label(0x01c00, "stk2_64")
+pj.set_label(0x01c00, "stk_64")
 pj.set_label(0x01c14, "rel_64")
 pj.set_label(0x01c28, "abs_64")
 pj.set_label(0x01c3c, "loc_64")
@@ -833,6 +863,8 @@ pj.set_label(0x021be, "BCD_MUL8(D01)")
 pj.set_label(0x021c0, "BCD_MUL4(D01)")
 pj.set_label(0x021c4, "BCD_MUL2(D01)")
 pj.set_label(0x021f6, "BCD_DIV2(D01)")
+pj.set_label(0x02224, "BCD_LD(D0.W)")
+pj.set_label(0x0222c, "BCD_LD(D0.L)")
 pj.set_label(0x023ec, "FD_ABS(R2+R3)")
 pj.set_label(0x0287e, "rel_32")
 pj.set_label(0x02892, "abs_32")
@@ -860,6 +892,7 @@ pj.set_label(0x06cfc, "SET_IF_LEDS(INT)")
 pj.set_label(0x06d20, "SHOW_MSG")
 pj.set_label(0x070be, "UPD_DETECTOR")
 pj.set_label(0x07b4e, "FILL_DISPLAY")
+pj.set_label(0x08164, "SHOW_CR[NL]")
 pj.set_label(0x0940c, "EXEC(INT KEY)")
 pj.set_label(0x0e39a, "VAR_HEAD")
 pj.set_label(0x0ed54, "EXEC2(INT KEY)")
@@ -962,9 +995,9 @@ pj.set_label(0xffffa6d2, "ram_var_hash")
 # 0xffffaa28
 # 0xffffaa29
 # 0xffffaa2a
-# 0xffffaa2c
+pj.set_label(0xffffaa2c, "ram_center_freq")
 # 0xffffaa2d
-# 0xffffaa34
+pj.set_label(0xffffaa34, "ram_freq_span")
 # 0xffffaa38
 pj.set_label(0xffffaa3c, "ram_rf_fp_leds")
 pj.set_label(0xffffaa3e, "ram_if_fp_leds")
@@ -1251,9 +1284,8 @@ if False:
 		0x02194,
 		0x021a8,
 		0x02268,
-		0x02282,
-		# 0x022ea,
 	):
+		print("ORPHAN %x" % a)
 		y = cpu.disass(pj, a)
 		y.lcmt = "ORPHAN - "
 
