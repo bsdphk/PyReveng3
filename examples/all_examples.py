@@ -28,6 +28,8 @@
 Run all examples
 """
 
+from __future__ import print_function
+
 import glob
 
 l = glob.glob("*/example*.py")

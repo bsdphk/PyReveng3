@@ -927,8 +927,9 @@ def hints(pj, cpu):
 			assert pj.m.rd(y) == 0xcc
 			x = pj.m.bu16(y + 1)
 			z = pj.t.find_lo(x)
-			t = z[0].txt[:-4].strip().replace(" ","_")
-			pj.set_label(y, "test_key_" + t)
+			if len(z) > 0:
+				t = z[0].txt[:-4].strip().replace(" ","_")
+				pj.set_label(y, "test_key_" + t)
 
 		Num(pj, 0x684a)
 

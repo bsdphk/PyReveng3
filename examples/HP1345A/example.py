@@ -37,7 +37,7 @@ fw="01347-80010.bin"
 
 def setup():
 	m = mem.byte_mem(0x0, 0x400)
-	m.load_binfile(0x0, 1, fw)
+	m.load_binfile(0x0, 1, os.path.join(os.path.dirname(__file__), fw))
 
 	pj = job.Job(m, "HP1345A")
 	cpu = mcs48.i8748()

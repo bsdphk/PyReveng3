@@ -81,10 +81,14 @@ class mycpu(m68000.m68000):
 
 def setup():
 	m = mem.byte_mem(0x0, 0x20000)
-	m.load_binfile(first = 0x00000, step = 0x2, filename="85680-80116.BIN")
-	m.load_binfile(first = 0x00001, step = 0x2, filename="85680-80115.BIN")
-	m.load_binfile(first = 0x10000, step = 0x2, filename="85680-80114.BIN")
-	m.load_binfile(first = 0x10001, step = 0x2, filename="85680-80113.BIN")
+	for b,n in (
+		(0x00000, "85680-80116.BIN"),
+		(0x00001, "85680-80115.BIN"),
+		(0x10000, "85680-80114.BIN"),
+		(0x10001, "85680-80113.BIN"),
+	):
+		m.load_binfile(first = b, step = 0x2,
+		    filename=os.path.join(os.path.dirname(__file__), n))
 
 	# Checum EPROMS
 	# See 00e9e/ROMSUM

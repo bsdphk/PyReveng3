@@ -100,7 +100,7 @@ def task(pj, cx):
 		0x936:	"i",
 	}
 
-	def inline_args(ins):
+	def inline_args(pj, ins):
 		for f in ins.flow_out:
 			i = i_args.get(f.to)
 			if i == None:

@@ -229,7 +229,7 @@ def task(pj, cx):
 		pj.set_label(a, "MSG_" + t)
 
 	#######################################################################
-	def post_arg_func(ins):
+	def post_arg_func(pj, ins):
 		post_arg_funcs = {
 			0xb80c:		"WB",
 			0xb821:		"WB",
@@ -269,7 +269,7 @@ def task(pj, cx):
 	cx.flow_check.append(post_arg_func)
 	#######################################################################
 
-	def bogo_flow(ins):
+	def bogo_flow(pj, ins):
 		for f in ins.flow_out:
 			if f.to == None:
 				pass
