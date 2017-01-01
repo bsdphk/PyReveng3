@@ -40,47 +40,55 @@ def setup():
 	m.load_binfile(0x0, 1, fw)
 
 	pj = job.Job(m, "HP1345A")
-	return pj,m
+	cpu = mcs48.i8748()
+	return pj,cpu
 
 #######################################################################
 
-pj,m = setup()
-cpu = mcs48.i8748()
-gpu = hp1345a.hp1345a()
+def task(pj, cx):
+	cpu = mcs48.i8748()
+	gpu = hp1345a.hp1345a()
 
-pj.set_label(0x00a, "reset")
-pj.set_label(0x010, "int")
-pj.set_label(0x014, "tint")
-pj.set_label(0x017, "RESET_TIMER")
-pj.set_label(0x01d, "R1d")
-pj.set_label(0x032, "MEMTST")
-pj.set_label(0x048, "048")
-pj.set_label(0x06e, "06e")
-pj.set_label(0x0a1, "Ra1")
-pj.set_label(0x0ac, "0ac")
-pj.set_label(0x0c2, "0c2")
-pj.set_label(0x0d2, "0d2")
-pj.set_label(0x0d6, "0d6")
-pj.set_label(0x0de, "0de")
-pj.set_label(0x0ea, "0ea")
-pj.set_label(0x100, "ALIGN")
-pj.set_label(0x200, "ALIGN2")
-pj.set_label(0x300, "FOCUS")
+	pj.set_label(0x00a, "reset")
+	pj.set_label(0x010, "int")
+	pj.set_label(0x014, "tint")
+	pj.set_label(0x017, "RESET_TIMER")
+	pj.set_label(0x01d, "R1d")
+	pj.set_label(0x032, "MEMTST")
+	pj.set_label(0x048, "048")
+	pj.set_label(0x06e, "06e")
+	pj.set_label(0x0a1, "Ra1")
+	pj.set_label(0x0ac, "0ac")
+	pj.set_label(0x0c2, "0c2")
+	pj.set_label(0x0d2, "0d2")
+	pj.set_label(0x0d6, "0d6")
+	pj.set_label(0x0de, "0de")
+	pj.set_label(0x0ea, "0ea")
+	pj.set_label(0x100, "ALIGN")
+	pj.set_label(0x200, "ALIGN2")
+	pj.set_label(0x300, "FOCUS")
 
-cpu.vectors(pj)
+	cpu.vectors(pj)
 
-while pj.run():
-	pass
+	while pj.run():
+		pass
 
-for a in range(0x122, 0x200, 2):
-	gpu.disass(pj, a)
+	for a in range(0x122, 0x200, 2):
+		gpu.disass(pj, a)
 
-for a in range(0x222, 0x2c8, 2):
-	gpu.disass(pj, a)
+	for a in range(0x222, 0x2c8, 2):
+		gpu.disass(pj, a)
 
-for a in range(0x31e,0x400, 2):
-	gpu.disass(pj, a)
+	for a in range(0x31e,0x400, 2):
+		gpu.disass(pj, a)
 
-code.lcmt_flows(pj)
+def output(pj):
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol=2)
 
-listing.Listing(pj)
+if __name__ == '__main__':
+	print(__file__)
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
+
