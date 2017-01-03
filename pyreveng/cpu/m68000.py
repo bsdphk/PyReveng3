@@ -48,7 +48,9 @@ ADD		Z,ea,Dn		1f7d	|1 1 0 1| Dn  |0| sz| eam | ear |
 ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| eam | ear |
 ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| eam | ear |
 # 113/4-9
-ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| eam | ear |
+ADDI		B,data,ea	037d	|0 0 0 0 0 1 1 0|0 0| eam | ear |
+ADDI		W,data,ea	037d	|0 0 0 0 0 1 1 0|0 1| eam | ear |
+ADDI		L,data,ea	037d	|0 0 0 0 0 1 1 0|1 0| eam | ear |
 # 115/4-11
 # FIX ADDQ.B ->An sounds bogus, and unreferenced '*' footnote indicates not available
 ADDQ		Z,const,ea	037d	|0 1 0 1|const|0| sz| eam | ear |
@@ -65,7 +67,9 @@ ADDX		L,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|1 0|0 0|1| Ay  |
 AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| eam | ear |
 AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| eam | ear |
 # 122/4-18
-ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| eam | ear |
+ANDI		B,data,ea	037d	|0 0 0 0 0 0 1 0|0 0| eam | ear |
+ANDI		W,data,ea	037d	|0 0 0 0 0 0 1 0|0 1| eam | ear |
+ANDI		L,data,ea	037d	|0 0 0 0 0 0 1 0|1 0| eam | ear |
 # 124/4-20
 ANDI		B,const,CCR	0000	|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const		|
 # 125/4-21
@@ -112,7 +116,9 @@ CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| eam | ear |
 CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| eam | ear |
 CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| eam | ear |
 # 183/4-79
-CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| eam | ear |
+CMPI		B,data,ea	0f7d	|0 0 0 0|1 1 0 0|0 0| eam | ear |
+CMPI		W,data,ea	0f7d	|0 0 0 0|1 1 0 0|0 1| eam | ear |
+CMPI		L,data,ea	0f7d	|0 0 0 0|1 1 0 0|1 0| eam | ear |
 # 185/4-81
 CMPM		B,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 0|0 0 1| Ay  |
 CMPM		W,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 1|0 0 1| Ay  |
@@ -126,7 +132,9 @@ DIVU		W,ea,Dn		1f7d	|1 0 0 0| Dn  |0 1 1| eam | ear |
 # 204/4-100
 EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| eam | ear |
 # 206/4-102
-EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| eam | ear |
+EORI		B,data,ea	037d	|0 0 0 0|1 0 1 0|0 0| eam | ear |
+EORI		W,data,ea	037d	|0 0 0 0|1 0 1 0|0 1| eam | ear |
+EORI		L,data,ea	037d	|0 0 0 0|1 0 1 0|1 0| eam | ear |
 # 208/4-104
 eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
@@ -197,7 +205,9 @@ NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| eam | ear |
 OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| eam | ear |
 OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| eam | ear |
 # 257/4-153
-ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| eam | ear |
+ORI		B,data,ea	037d	|0 0 0 0|0 0 0 0|0 0| eam | ear |
+ORI		W,data,ea	037d	|0 0 0 0|0 0 0 0|0 1| eam | ear |
+ORI		L,data,ea	037d	|0 0 0 0|0 0 0 0|1 0| eam | ear |
 # 259/4-155
 ORI		word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		|
 # 263/4-159
@@ -232,7 +242,9 @@ SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| eam | ear |
 SUBA		W,ea,An		1f7f	|1 0 0 1| An  |0 1 1| eam | ear |
 SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| eam | ear |
 # 283/4-179
-SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| eam | ear |
+SUBI		B,data,ea	037d	|0 0 0 0|0 1 0 0|0 0| eam | ear |
+SUBI		W,data,ea	037d	|0 0 0 0|0 1 0 0|0 1| eam | ear |
+SUBI		L,data,ea	037d	|0 0 0 0|0 1 0 0|1 0| eam | ear |
 # 285/4-181
 SUBQ		Z,const,ea	037d	|0 1 0 1|const|1| sz| eam | ear |
 # 287/4-183
