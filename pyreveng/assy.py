@@ -52,7 +52,6 @@ class Assy(code.Code):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
-		self.fail = False
 
 	def render(self, pj):
 		s = self.mne + "\t"
