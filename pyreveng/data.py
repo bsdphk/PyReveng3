@@ -102,13 +102,15 @@ class Dataptr(Data):
 	def render(self, pj):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
-def stringify(pj, lo, len=None, term=0):
+def stringify(pj, lo, len=None, term=None):
+	if term == None:
+		term = (0,)
 	s = ""
 	l = ""
 	while True:
 		x = pj.m.rd(lo)
 		lo += 1
-		if len == None and x == term:
+		if len == None and x in term:
 			return lo,s,l
 		if x > 32 and x < 127:
 			s += "%c" % x
@@ -130,7 +132,7 @@ def stringify(pj, lo, len=None, term=0):
 				return lo,s,l
 
 class Txt(Data):
-	def __init__(self, pj, lo, hi=None, label=True, term=0, pfx=None, align=2):
+	def __init__(self, pj, lo, hi=None, label=True, term=None, pfx=None, align=2):
 		self.pre = ""
 		if pfx == 1:
 			x = pj.m.rd(lo)
