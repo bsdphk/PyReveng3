@@ -308,7 +308,7 @@ class instree(object):
 		else:
 			return pj.m.lu16(adr + n * 2)
 
-	def findx(self, pj, adr, lvl, l, r):
+	def dive(self, pj, adr, lvl, l, r):
 		if len(l) <= lvl:
 			b = self.gw(pj, adr, lvl)
 			l.append(b)
@@ -317,9 +317,8 @@ class instree(object):
 
 		for i in r.find(b):
 			if type(i) == insbranch:
-				x = self.findx(pj, adr, lvl + 1, l, i)
-				if x != None:
-					return x
+				for x in self.dive(pj, adr, lvl + 1, l, i):
+					yield x
 				continue
 			for j in range(len(l), len(i.mask)):
 				b = self.gw(pj, adr, j)
@@ -330,14 +329,12 @@ class instree(object):
 					m = False
 					break
 			if m:
-				return i
+				yield i
 
 	def find(self, pj, adr):
 		l = []
-		x = self.findx(pj, adr, 0, l, self.root)
-		if x == None:
-			return None
-		return insmatch(self, x, adr, l)
+		for x in self.dive(pj, adr, 0, l, self.root):
+			yield insmatch(self, x, adr, l)
 
 if __name__ == "__main__":
 	it = instree(8)

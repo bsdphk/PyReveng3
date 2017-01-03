@@ -39,11 +39,20 @@ from . import instree, code
 
 #######################################################################
 
+class Invalid(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
+
+#######################################################################
+
 class Assy(code.Code):
 	def __init__(self, pj, lo, hi, lang):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
+		self.fail = False
 
 	def render(self, pj):
 		s = self.mne + "\t"
@@ -108,22 +117,26 @@ class Instree_disass(code.Decode):
 		self.it = instree.instree(ins_word, mem_word, endian)
 		self.flow_check = []
 
-	def decode(self, pj, adr):
-		l = []
-		a = adr
-		while True:
-			x = self.it.find(pj, a)
-			if x == None:
-				break
+	def decode(self, pj, adr, l = None):
+		if l == None:
+			l = []
+		y = None
+		for x in self.it.find(pj, adr):
 			l.append(x)
+			try:
+				y = Instree_assy(pj, l, self)
+			except Invalid:
+				l.pop(-1)
+				continue
 			if x.spec[0] != "+":
 				break
-			a += x.len
-		if len(l) == 0:
-			return None
-		y = Instree_assy(pj, l, self)
-		for i in self.flow_check:
-			i(pj, y)
+			y = self.decode(pj, adr + x.len, l)
+			if y != None:
+				return y
+			l.pop(-1)
+		if y != None:
+			for i in self.flow_check:
+				i(pj, y)
 		return y
 
 
