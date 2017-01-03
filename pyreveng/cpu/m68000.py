@@ -43,7 +43,7 @@ aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
 ABCD		B,-(Ay),-(Ax)	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
 # 108/4-4
 ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| eam | ear |
-ADD		Z,ea,Dn		1f7d	|1 1 0 1| Dn  |0| sz| eam | ear |
+ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| eam | ear |
 # 111/4-7
 ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| eam | ear |
 ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| eam | ear |
@@ -387,9 +387,13 @@ def arg_eaxt(pj, ins, ref):
 		if d & 0x80:
 			d -= 0x100
 		s = "("
-		if d != 0:
-			s += "#0x%x+" % d
-		s += ref + reg + wl
+		if ref == "PC":
+			s += "#0x%x" % (d + ins.hi)
+		elif d != 0:
+			s += "#0x%x+" % d + ref
+		else:
+			s += ref
+		s += reg + wl
 		if sc > 1:
 			s += "*%d" % sc
 		s += ")"
@@ -441,6 +445,8 @@ def arg_eax(pj, ins, eam, ear):
 		ins.hi += 2
 		ins.dstadr = o
 		return assy.Arg_dst(pj, o)
+	if eax == 0x0800:
+		return arg_eaxt(pj, ins, "PC")
 	if eax == 0x1000 and ins.sz == 1:
 		ins.hi += 2
 		return assy.Arg_verbatim(pj, "#0x%02x" % pj.m.rd(ins.hi-1))
