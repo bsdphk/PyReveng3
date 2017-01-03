@@ -48,28 +48,20 @@ ADD		Z,ea,Dn		1f7d	|1 1 0 1| Dn  |0| sz| eam | ear |
 ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| eam | ear |
 ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| eam | ear |
 # 113/4-9
-ADDI		B,data,ea	037d	|0 0 0 0 0 1 1 0|0 0| eam | ear |
-ADDI		W,data,ea	037d	|0 0 0 0 0 1 1 0|0 1| eam | ear |
-ADDI		L,data,ea	037d	|0 0 0 0 0 1 1 0|1 0| eam | ear |
+ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| eam | ear |
 # 115/4-11
 # FIX ADDQ.B ->An sounds bogus, and unreferenced '*' footnote indicates not available
-ADDQ		Z,const,ea	037d	|0 1 0 1|const|0| sz| eam | ear |
+ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| eam | ear |
 # 117/4-13
 # Collision with ADDA.L
-ADDX		B,Dy,Dx		0000	|1 1 0 1| Dx  |1|0 0|0 0|0| Dy  |
-ADDX		W,Dy,Dx		0000	|1 1 0 1| Dx  |1|0 1|0 0|0| Dy  |
-ADDX		L,Dy,Dx		0000	|1 1 0 1| Dx  |1|1 0|0 0|0| Dy  |
-ADDX		B,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|0 0|0 0|1| Ay  |
-ADDX		W,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|0 1|0 0|1| Ay  |
-ADDX		L,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1|1 0|0 0|1| Ay  |
+ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
+ADDX		Z,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
 AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| eam | ear |
 AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| eam | ear |
 # 122/4-18
-ANDI		B,data,ea	037d	|0 0 0 0 0 0 1 0|0 0| eam | ear |
-ANDI		W,data,ea	037d	|0 0 0 0 0 0 1 0|0 1| eam | ear |
-ANDI		L,data,ea	037d	|0 0 0 0 0 0 1 0|1 0| eam | ear |
+ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| eam | ear |
 # 124/4-20
 ANDI		B,const,CCR	0000	|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const		|
 # 125/4-21
@@ -116,13 +108,9 @@ CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| eam | ear |
 CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| eam | ear |
 CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| eam | ear |
 # 183/4-79
-CMPI		B,data,ea	0f7d	|0 0 0 0|1 1 0 0|0 0| eam | ear |
-CMPI		W,data,ea	0f7d	|0 0 0 0|1 1 0 0|0 1| eam | ear |
-CMPI		L,data,ea	0f7d	|0 0 0 0|1 1 0 0|1 0| eam | ear |
+CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| eam | ear |
 # 185/4-81
-CMPM		B,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 0|0 0 1| Ay  |
-CMPM		W,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|0 1|0 0 1| Ay  |
-CMPM		L,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1|1 0|0 0 1| Ay  |
+CMPM		Z,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
 # 194/4-90
 DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			|
 # 196/4-92
@@ -132,9 +120,7 @@ DIVU		W,ea,Dn		1f7d	|1 0 0 0| Dn  |0 1 1| eam | ear |
 # 204/4-100
 EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| eam | ear |
 # 206/4-102
-EORI		B,data,ea	037d	|0 0 0 0|1 0 1 0|0 0| eam | ear |
-EORI		W,data,ea	037d	|0 0 0 0|1 0 1 0|0 1| eam | ear |
-EORI		L,data,ea	037d	|0 0 0 0|1 0 1 0|1 0| eam | ear |
+EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| eam | ear |
 # 208/4-104
 eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
@@ -205,9 +191,7 @@ NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| eam | ear |
 OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| eam | ear |
 OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| eam | ear |
 # 257/4-153
-ORI		B,data,ea	037d	|0 0 0 0|0 0 0 0|0 0| eam | ear |
-ORI		W,data,ea	037d	|0 0 0 0|0 0 0 0|0 1| eam | ear |
-ORI		L,data,ea	037d	|0 0 0 0|0 0 0 0|1 0| eam | ear |
+ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| eam | ear |
 # 259/4-155
 ORI		word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		|
 # 263/4-159
@@ -242,18 +226,12 @@ SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| eam | ear |
 SUBA		W,ea,An		1f7f	|1 0 0 1| An  |0 1 1| eam | ear |
 SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| eam | ear |
 # 283/4-179
-SUBI		B,data,ea	037d	|0 0 0 0|0 1 0 0|0 0| eam | ear |
-SUBI		W,data,ea	037d	|0 0 0 0|0 1 0 0|0 1| eam | ear |
-SUBI		L,data,ea	037d	|0 0 0 0|0 1 0 0|1 0| eam | ear |
+SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| eam | ear |
 # 285/4-181
-SUBQ		Z,const,ea	037d	|0 1 0 1|const|1| sz| eam | ear |
+SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| eam | ear |
 # 287/4-183
-SUBX		B,Dx,Dy		0000	|1 0 0 1| Dy  |1|0 0|0 0|0| Dx  |
-SUBX		W,Dx,Dy		0000	|1 0 0 1| Dy  |1|0 1|0 0|0| Dx  |
-SUBX		L,Dx,Dy		0000	|1 0 0 1| Dy  |1|1 0|0 0|0| Dx  |
-SUBX		B,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|0 0|0 0|1| Ax  |
-SUBX		W,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|0 1|0 0|1| Ax  |
-SUBX		L,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1|1 0|0 0|1| Ax  |
+SUBX		Z,Dx,Dy		0000	|1 0 0 1| Dy  |1| sz|0 0|0| Dx  |
+SUBX		Z,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
 # 289/4-185
 SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
 # 290/4-186
@@ -402,8 +380,8 @@ def arg_eaxt(pj, ins, ref):
 	sc = 1 << ((ew >> 9) & 3)
 
 	if ew & 0x100:
-		print(ins, "FULL EXT WORD")
-		return "FULL_EXT_WORD"
+		print("0x%x FULL EXT WORD" % ins.lo, ins)
+		raise assy.Invalid("FULL EXT WORD")
 	else:
 		d = ew & 0xff
 		if d & 0x80:
@@ -422,6 +400,11 @@ def arg_eax(pj, ins, eam, ear):
 	eax = 1 << eam
 	if eax > 0x40:
 		eax = 0x100 << ear
+	eamask = int(ins.im.spec.split()[-1], 16)
+	if not eax & eamask:
+		print ("0x%x Wrong EA mode m=%d/r=%d" % (ins.lo, eam, ear))
+		raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
+		    ins.lo, eam, ear))
 	if eax == 0x0001:
 		return assy.Arg_verbatim(pj, "D%d" % ear)
 	if eax == 0x0002:
@@ -458,7 +441,6 @@ def arg_eax(pj, ins, eam, ear):
 		ins.hi += 2
 		ins.dstadr = o
 		return assy.Arg_dst(pj, o)
-	#print(ins, ins.im)
 	if eax == 0x1000 and ins.sz == 1:
 		ins.hi += 2
 		return assy.Arg_verbatim(pj, "#0x%02x" % pj.m.rd(ins.hi-1))
@@ -468,7 +450,8 @@ def arg_eax(pj, ins, eam, ear):
 	if eax == 0x1000 and ins.sz == 4:
 		ins.hi += 4
 		return assy.Arg_verbatim(pj, "#0x%08x" % pj.m.bu32(ins.hi-4))
-	return assy.Arg_verbatim(pj, "EA?%04x" % eax)
+	print("0x%x EA? 0x%04x m=%d/r=%d" % (ins.lo, eax, eam, ear))
+	raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (ins.lo, eax, eam, ear))
 
 def arg_ea(pj, ins):
 	return arg_eax(pj, ins, ins.im.F_eam, ins.im.F_ear)
@@ -512,9 +495,7 @@ def arg_word(pj, ins):
 
 def arg_Z(pj, ins):
 	if ins.im.F_sz == 3:
-		print("F_sz == 3", ins.lim)
-		return
-		assert False
+		raise assy.Invalid('0x%x F_sz == 3' % ins.lo)
 	i,j = [
 		[1, ".B"],
 		[2, ".W"],
@@ -602,15 +583,16 @@ class m68000(assy.Instree_disass):
 		a = 0x4
 		while a < hi:
 			x = pj.m.bu32(a)
-			if x not in vn:
-				vi[x] = self.disass(pj, x)
-				vn[x] = []
-			vn[x].append(a >> 2)
-			if x > a and x not in (0, 0xffffffff):
-				y = data.Codeptr(pj, a, a + 4, x)
-			else:
+			if x in (0x0, 0xffffffff):
 				y = data.Const(pj, a, a + 4,
 				    "0x%04x", pj.m.bu32, 4)
+			else:
+				if x not in vn:
+					vi[x] = self.disass(pj, x)
+					vn[x] = []
+				vn[x].append(a >> 2)
+				if x > a:
+					y = data.Codeptr(pj, a, a + 4, x)
 			y.lcmt = self.vector_name(a >> 2)
 			hi = min(hi, x)
 			a += 4
@@ -618,7 +600,8 @@ class m68000(assy.Instree_disass):
 		for i in vn:
 			for v in vn[i]:
 				k = self.vector_name(v)
-				vi[i].lcmt += "--> " + k + "\n"
+				if vi[i] != None:
+					vi[i].lcmt += "--> " + k + "\n"
 
 			if len(vn[i]) == 1:
 				k = self.vector_name(vn[i][0])
@@ -626,3 +609,14 @@ class m68000(assy.Instree_disass):
 			else:
 				pj.set_label(i, "VECTORS_%d" % mv)
 				mv += 1
+
+	def decodex(self, pj, adr):
+		y = super(m68000, self).decode(pj, adr)
+		if y == None:
+			return y
+		for i in y.im.spec.split()[1].split(","):
+			if i != "ea":
+				continue
+			if arg_ea(pj, y) == None:
+				return None
+		return y
