@@ -388,7 +388,7 @@ def arg_eaxt(pj, ins, ref):
 			d -= 0x100
 		s = "("
 		if ref == "PC":
-			s += "#0x%x" % (d + ins.hi)
+			s += "#0x%x" % (d + ins.hi - 2)
 		elif d != 0:
 			s += "#0x%x+" % d + ref
 		else:
@@ -487,7 +487,10 @@ def arg_rlist(pj, ins):
 	return "+".join(l)
 
 def arg_rot(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%x" % ins.im.F_rot)
+	a = ins.im.F_rot
+	if a == 0:
+		a = 8
+	return assy.Arg_verbatim(pj, "#0x%x" % a)
 
 def arg_vect(pj, ins):
 	return assy.Arg_verbatim(pj, "#%d" % ins.im.F_vect)
