@@ -1,0 +1,42 @@
+# I make no apologies for the choices made here /phk
+
+[MESSAGES CONTROL]
+
+disable=bad-continuation,too-few-public-methods,too-many-arguments,missing-docstring
+
+[BASIC]
+
+# We don't want single letters [glq]
+
+# Naming hint for variable names
+variable-rgx=([a-fh-km-pr-z]|[a-z_][a-z0-9_]{1,30})$
+
+# Regular expression matching correct argument names
+argument-rgx=([a-fh-km-pr-z]|[a-z_][a-z0-9_]{1,30})$
+
+# Regular expression matching correct attribute names
+attr-rgx=([a-fh-km-pr-z]|[a-z_][a-z0-9_]{1,30})$
+
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=78
+
+# Regexp for a line that is allowed to be longer than the limit.
+# ignore-long-lines=^\s*(# )?<?https?://\S+>?$
+
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
+# tab).
+indent-string='\t'
+
+# Number of spaces of indent required inside a hanging  or continued line.
+#indent-after-paren=4
+
+# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
+#expected-line-ending-format=
+
+[REPORTS]
+# Tells whether to display a full report or only the messages
+reports=no
+
