@@ -36,12 +36,12 @@ import sys
 from pyreveng import instree, assy
 
 hp1345a_instructions = """
-_SET	i,l,s,>R	|0 1 1| i | ? | l |0|?| s | ? 	|
-_LOADX	c,>R	|0 0 0 0|p| c			|
-_PLOTY	c,p,>R	|0 0 0 1|p| c			|
-_DX	c,>R	|0 0 1 0|p| c			|
-_GRAPH	c,p,>R	|0 0 1 1|p| c			|
-_CHR	a,t,>R	|0 1 0| s | r |e| t		|
+_SET	i,l,s,>R	|0 1 1| i | ? | l |0|?| s | ?	|
+_LOADX	c,>R		|0 0 0 0|p| c			|
+_PLOTY	c,p,>R		|0 0 0 1|p| c			|
+_DX	c,>R		|0 0 1 0|p| c			|
+_GRAPH	c,p,>R		|0 0 1 1|p| c			|
+_CHR	a,t,>R		|0 1 0| s | r |e| t		|
 """
 
 class arg_adr(assy.Arg_dst):

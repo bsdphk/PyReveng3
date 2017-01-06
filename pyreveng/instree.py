@@ -268,20 +268,21 @@ class Insbranch(object):
 
 class Insmatch(object):
 	def __init__(self, up, il, adr, words):
+		self.il = il
 		self.assy = il.assy
+		self.words = words
 		self.adr = adr
 		self.len = il.words * up.width // up.memwidth
 		for i in il.flds:
-			self.__dict__["F_" + i] = il.get_field(i, words)
+			self.__dict__["F_" + i] = il.get_field(i, self.words)
 
 	def __repr__(self):
 		s = "<InsMatch"
 		s += " @0x%x:" % self.adr
 		s += "0x%x" % (self.adr + self.len)
 		s += " " + " ".join(self.assy)
-		for i in self.__dict__:
-			if i[:2] == "F_":
-				s += " | " + i + "=" + str(self.__dict__[i])
+		for i in self.il.flds:
+			s += " | " + i + "=" + str(self.__dict__["F_" + i])
 		s += ">"
 		return s
 

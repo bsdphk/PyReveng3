@@ -100,9 +100,9 @@ CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| E1		| E2		|
 CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| E1		| E2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
-BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2 		|
-BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2 		|
-DAA 	-	|0 0 0 1 1 0 0 1|
+BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		|
+BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		|
+DAA	-	|0 0 0 1 1 0 0 1|
 ORCC	i	|0 0 0 1 1 0 1 0| i		|
 ANDCC	i	|0 0 0 1 1 1 0 0| i		|
 SEX	-	|0 0 0 1 1 1 0 1|
@@ -138,8 +138,8 @@ RTS	>R	|0 0 1 1 1 0 0 1|
 ABX	-	|0 0 1 1 1 0 1 0|
 RTI	>R	|0 0 1 1 1 0 1 1|
 CWAI	i	|0 0 1 1 1 1 0 0| i		|
-MUL 	-	|0 0 1 1 1 1 0 1|
-SWI 	-	|0 0 1 1 1 1 1 1|
+MUL	-	|0 0 1 1 1 1 0 1|
+SWI	-	|0 0 1 1 1 1 1 1|
 
 NEGA	-	|0 1 0 0 0 0 0 0|
 COMA	-	|0 1 0 0 0 0 1 1|
@@ -200,7 +200,7 @@ BITA	i	|1 0 0 0 0 1 0 1| i		|
 LDA	i	|1 0 0 0 0 1 1 0| i		|
 EORA	i	|1 0 0 0 1 0 0 0| i		|
 ADCA	i	|1 0 0 0 1 0 0 1| i		|
-ORA 	i	|1 0 0 0 1 0 1 0| i		|
+ORA	i	|1 0 0 0 1 0 1 0| i		|
 ADDA	i	|1 0 0 0 1 0 1 1| i		|
 CMPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		|
@@ -233,7 +233,7 @@ LDA	P	|1 0 1 0 0 1 1 0|X| R |i| m	|
 STA	P	|1 0 1 0 0 1 1 1|X| R |i| m	|
 EORA	P	|1 0 1 0 1 0 0 0|X| R |i| m	|
 ADCA	P	|1 0 1 0 1 0 0 1|X| R |i| m	|
-ORA 	P	|1 0 1 0 1 0 1 0|X| R |i| m	|
+ORA	P	|1 0 1 0 1 0 1 0|X| R |i| m	|
 ADDA	P	|1 0 1 0 1 0 1 1|X| R |i| m	|
 CMPX	P	|1 0 1 0 1 1 0 0|X| R |i| m	|
 JSR	P,>C	|1 0 1 0 1 1 0 1|X| R |i| m	|
@@ -263,10 +263,10 @@ SBCB	i	|1 1 0 0 0 0 1 0| i		|
 ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
 ANDB	i	|1 1 0 0 0 1 0 0| i		|
 BITB	i	|1 1 0 0 0 1 0 1| i		|
-LDB 	i	|1 1 0 0 0 1 1 0| i		|
+LDB	i	|1 1 0 0 0 1 1 0| i		|
 EORB	i	|1 1 0 0 1 0 0 0| i		|
 ADCB	i	|1 1 0 0 1 0 0 1| i		|
-ORB 	i	|1 1 0 0 1 0 1 0| i		|
+ORB	i	|1 1 0 0 1 0 1 0| i		|
 ADDB	i	|1 1 0 0 1 0 1 1| i		|
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
 LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		|
@@ -386,7 +386,7 @@ class arg_s(assy.Arg_dst):
 		if ins.mne[:3] == "PSH":
 			l = reversed(l)
 		self.s = ",".join(l)
-		
+
 	def render(self, pj):
 		return self.s
 
@@ -442,7 +442,7 @@ class arg_P(assy.Arg_dst):
 		if self.ins.im.F_i:
 			return "[" + s + "]"
 		return s
-			
+
 class arg_t(object):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_t

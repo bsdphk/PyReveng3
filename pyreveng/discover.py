@@ -111,7 +111,7 @@ class Discover(object):
 			for f in i.flow_out:
 				if f.to in self.code:
 					self.flow_in[f.to].append(f)
-					n += 1 
+					n += 1
 				else:
 					m += 1
 		print("Possible flows", n)

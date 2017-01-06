@@ -94,7 +94,7 @@ JAS	-		|1 0 1 1|1| ahi |		JSB indirect indexed
 RTE	-		|1 0 1 1|0|0 0 1|		RTI and ENI
 STE	-		|1 0 1 1|0|1 0 0|		Set E
 CLE	-		|1 0 1 1|0|1 0 1|		Clear E
-OTR 	dev,imm		|1 1 0 0| dev   | imm		|
+OTR	dev,imm		|1 1 0 0| dev   | imm		|
 LDR	imm		|1 1 0 0|1 1 1 1| imm		|
 STR	reg,imm		|1 1 0 1| reg   | imm		|
 """
@@ -118,7 +118,7 @@ class arg_reg(object):
 
 	def render(self, pj):
 		return self.ins.lang.reg[self.reg]
-		
+
 class arg_bno(object):
 	def __init__(self, pj, ins):
 		self.ins = ins
@@ -126,7 +126,7 @@ class arg_bno(object):
 
 	def render(self, pj):
 		return self.ins.lang.bno[self.bno]
-		
+
 class arg_dctl(object):
 	def __init__(self, pj, ins):
 		self.ins = ins
@@ -134,7 +134,7 @@ class arg_dctl(object):
 
 	def render(self, pj):
 		return self.ins.lang.dctl[self.dctl]
-		
+
 class arg_dev(object):
 	def __init__(self, pj, ins):
 		self.ins = ins
