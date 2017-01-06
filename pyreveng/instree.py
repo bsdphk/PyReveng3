@@ -45,7 +45,8 @@ for documenting CPUs into a skeleton disassembler.
 
 	bit = '?' / '0' / '1'
 
-	hex = 2* ( bit / '2' / '3' / ... 'd' / 'e' / 'f' )
+	hex = 2* ( bit / '2' / '3' / ... 'D' / 'E' / 'F' )
+	# Always upper case, at least two digits
 
 	details = '{' NL anything_really NL '}' NL
 
@@ -72,15 +73,31 @@ def bcount(i):
 	return (((i + (i >> 4) & 0xF0F0F0F) * 0x1010101) & 0xffffffff) >> 24
 
 #######################################################################
-# Parse a "([01x] )*[01x]" string into a mask + bits
+# Parse a "(([01?] )*[01?])(*HEXDIG)" string into a mask + bits
 
 def parse_match(fmt):
+	x = fmt.split()
+	if len(x) == 1 and len(x[0]) > 1:
+		x = x[0]
+		if x.upper() != x:
+			a = -2
+		else:
+			a = -1
+			try:
+				a = int(x, 16)
+			except ValueError:
+				pass
+		if a >= 0:
+			return (
+			    4 * len(x),
+			    (1 << (4 * len(x))) - 1,
+			    a)
 	mask = 0
 	bits = 0
 	width = 0
 	fl = len(fmt)
 	if fl & 1 == 0:
-		return None
+		return None, None, None
 	i = 0
 	while i < fl:
 		mask <<= 1
@@ -91,13 +108,13 @@ def parse_match(fmt):
 		elif fmt[i] == "1":
 			mask |= 1
 			bits |= 1
-		elif fmt[i] == "x":
+		elif fmt[i] == "?":
 			pass
 		else:
-			return None
+			return (fl+1)/2, None, None
 		i += 1
 		if i < fl and fmt[i] != " ":
-			return None
+			return (fl+1)/2, None, None
 		i += 1
 	return (width, mask, bits)
 
@@ -117,26 +134,26 @@ class Insline(object):
 		b = 0
 		f = list()
 		for i in s:
-			w = len(i)
-			if w & 1 == 0:
+			w, fm, fb = parse_match(i)
+			if fm is None and len(i.split()) != 1:
+				raise SyntaxTrouble(assy,
+				    "Multiple words in this field:\n" +
+				    "\t|" + i + "|")
+			if w is None:
 				raise SyntaxTrouble(assy,
 				    "Field from bit %d has a half bit:\n" % b +
-				    "\t%s\n" % bits +
-				    "\t " + ("  " * b) + "^n")
-			w = (w + 1) // 2
+				    "\t|%s|\n" % i)
 			if b // width != (b + w - 1) // width:
 				raise SyntaxTrouble(assy,
 				    "Field from bit %d spans words:\n" % b +
-				    "\t%s\n" % bits +
-				    "\t " + ("  " * b) + "^n")
-			f.append((b, w, i))
+				    "\t|%s|\n" % i)
+			f.append((b, w, i, fm, fb))
 			b += w
 
 		if b % width != 0:
 			raise SyntaxTrouble(assy,
 			    "Missing bits to fill wordsize\n" +
-			    "\t%s\n" % bits +
-			    "\t " + ("  " * b) + "^n")
+			    "\t%s\n" % bits)
 
 		self.width = b
 		self.words = b // width
@@ -145,23 +162,15 @@ class Insline(object):
 		self.bits = [0] * self.words
 		self.flds = dict()
 
-		for b, w, i in f:
-			x = parse_match(i)
+		for b, w, i, fm, fb in f:
 			j = b // width
 			o = (10 * width - (b + w)) % width
 			#print("B", b, "W", w, "I", i, "J", j, "O", o, "X", x)
-			if x is None:
-				k = i.split()
-				if len(k) != 1:
-					raise SyntaxTrouble(assy,
-					    "Multiple words in this field:\n" +
-					    "\t|" + i + "|")
-				self.flds[k[0]] = (j, o, (1 << w) - 1)
+			if fm is None:
+				self.flds[i.split()[0]] = (j, o, (1 << w) - 1)
 			else:
-				assert x[0] == w
-				self.mask[j] |= x[1] << o
-				self.bits[j] |= x[2] << o
-				#print("==" , "J", j, "O", o, "B", b, "X", x)
+				self.mask[j] |= fm << o
+				self.bits[j] |= fb << o
 
 
 	def get_field(self, fld, words):
@@ -201,14 +210,14 @@ class Insbranch(object):
 		self.mask = 0
 		self.wildcard = None
 
-	def insert(self, x):
+	def insert(self, last, x):
 		#print("?  ", self.lvl, "%02x" % self.mask, x)
 		if len(x.mask) == self.lvl:
 			if self.wildcard != None:
-				print("Colliding wildcards:")
-				print("\t" + str(self.wildcard))
-				print("\t" + str(x))
-				assert self.wildcard is None
+				raise SyntaxTrouble(last,
+				    "Colliding entries:\n" +
+				    "\t" + str(self.wildcard) + "\n" +
+				    "\t" + str(x))
 			self.wildcard = x
 			return
 		xm = x.mask[self.lvl]
@@ -221,11 +230,11 @@ class Insbranch(object):
 				return
 			y = d[xb]
 			if isinstance(y, Insbranch):
-				y.insert(x)
+				y.insert(last, x)
 				return
 			z = Insbranch(self.lvl + 1)
-			z.insert(x)
-			z.insert(y)
+			z.insert(last, x)
+			z.insert(last, y)
 			d[xb] = z
 			return
 		d = dict()
@@ -352,7 +361,8 @@ class Instree(object):
 			i = j
 			j = bm.rfind('{')
 			if j == -1:
-				self.root.insert(Insline(self.width, assy, bm))
+				self.root.insert(last,
+				    Insline(self.width, assy, bm))
 				continue
 
 			# Isolate tail-part
@@ -367,7 +377,8 @@ class Instree(object):
 			i = j + 2
 			banned = True
 
-			self.root.insert(Insline(self.width, assy, bm, tail))
+			self.root.insert(last,
+			    Insline(self.width, assy, bm, tail))
 
 		assert i == len(s)
 
@@ -429,11 +440,12 @@ Foo_02b	|1 0 0 0| reg	|x1		|1| imm		|
 Foo_04	|1 0 0 1| reg	| imm		| {
 blabla
 } # Comment
-Foo_03	|0 0|aaa| reg	| imm		| {
+Foo_03	|0 0|aaa| reg   | AB| CD | BC | {
 }
 Foo_01	|1 1 0 0|1 0 0 1| data		|0 0 0 0|foo	| {
 }
 Foo   |0 1 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
+Foo2  |0 ? 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
 #Foo_05	| ca | data		|0 0 0 0|foo	|
 """)
 	it.print()
