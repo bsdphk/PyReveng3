@@ -29,93 +29,114 @@ Instree -- A class for disassembling
 
 This class turns a textual description close to what is typically used
 for documenting CPUs into a skeleton disassembler.
+
+	instree = * (
+		(assypart (wordmap/bitmap) [details]) \
+		('#' comment NL)
+	)
+
+	assypart = * (nonspacenonpipe WSP)
+
+	delim	= ' ' / '|'
+
+	wordmap = '|' *(delim (hex|field)) '|'
+
+	bitmap = '|' bit *(delim (field|bit)) '|'
+
+	bit = '?' / '0' / '1'
+
+	hex = 2* ( bit / '2' / '3' / ... 'd' / 'e' / 'f' )
+
+	details = '{' NL anything_really NL '}' NL
+
+XXX: The details are currently unused.
+
+XXX: wordmap has yet to be implemented
+
 """
 
 from __future__ import print_function
+
+class UsageTrouble(Exception):
+	pass
+
+class SyntaxTrouble(Exception):
+	def __init__(self, last, msg):
+		j = " ".join(last.split())
+		super(SyntaxTrouble, self).__init__(
+		    "\nAfter '%s':\n    %s" % (j, msg))
 
 def bcount(i):
 	i = i - ((i >> 1) & 0x55555555)
 	i = (i & 0x33333333) + ((i >> 2) & 0x33333333)
 	return (((i + (i >> 4) & 0xF0F0F0F) * 0x1010101) & 0xffffffff) >> 24
 
-class InsTreeError(Exception):
-	def __init__(self, reason, diag=None):
-		super(InsTreeError, self).__init__()
-		self.value = reason
-		self.diag = diag
-
-	def __str__(self):
-		s = "InsTree Error:\n"
-		s += self.value
-		if self.diag != None:
-			s += "\n\t" + self.diag
-		return s
-
 #######################################################################
 # Parse a "([01x] )*[01x]" string into a mask + bits
 
-def parse_match(f):
+def parse_match(fmt):
 	mask = 0
 	bits = 0
 	width = 0
-	l = len(f)
-	if l & 1 == 0:
+	fl = len(fmt)
+	if fl & 1 == 0:
 		return None
 	i = 0
-	while i < l:
+	while i < fl:
 		mask <<= 1
 		bits <<= 1
 		width += 1
-		if f[i] == "0":
+		if fmt[i] == "0":
 			mask |= 1
-		elif f[i] == "1":
+		elif fmt[i] == "1":
 			mask |= 1
 			bits |= 1
-		elif f[i] == "x":
+		elif fmt[i] == "x":
 			pass
 		else:
 			return None
 		i += 1
-		if i < l and f[i] != " ":
+		if i < fl and fmt[i] != " ":
 			return None
 		i += 1
 	return (width, mask, bits)
 
 #######################################################################
-# A single line from the specification
+# A single entry from the specification
 
-class insline(object):
-	def __init__(self, line, width):
-		self.line = line
+class Insline(object):
+	def __init__(self, width, assy, bits, details=None):
+		self.assy = assy.split()
+		self.bits = bits
+		self.details = details
 
-		# print("\nLINE", line)
-		s = line.expandtabs().split("|")
+		s = bits.split("|")
+		s.pop(0)
 		s.pop(-1)
-		self.spec = s.pop(0).rstrip()
-		#print("SPEC", self.spec)
 
 		b = 0
-		l = list()
+		f = list()
 		for i in s:
 			w = len(i)
 			if w & 1 == 0:
-				raise InsTreeError(
-				    "Error: Field at bit %d has half bit:\n" % b +
-				    "  %s\n" % line,
-				    "  '%s'" % i)
+				raise SyntaxTrouble(assy,
+				    "Field from bit %d has a half bit:\n" % b +
+				    "\t%s\n" % bits +
+				    "\t " + ("  " * b) + "^n")
 			w = (w + 1) // 2
 			if b // width != (b + w - 1) // width:
-				raise InsTreeError(
-				    "Error: Field at bit %d spans words:\n" % b +
-				    "  %s\n" % line,
-				    "  '%s'" % i)
-			l.append((b, w, i))
+				raise SyntaxTrouble(assy,
+				    "Field from bit %d spans words:\n" % b +
+				    "\t%s\n" % bits +
+				    "\t " + ("  " * b) + "^n")
+			f.append((b, w, i))
 			b += w
 
 		if b % width != 0:
-			raise InsTreeError(
-			    "Error: line not an multiple of width (%d) bits.\n" +
-			    "  %s") % (b, width, str(line))
+			raise SyntaxTrouble(assy,
+			    "Missing bits to fill wordsize\n" +
+			    "\t%s\n" % bits +
+			    "\t " + ("  " * b) + "^n")
 
 		self.width = b
 		self.words = b // width
@@ -124,17 +145,17 @@ class insline(object):
 		self.bits = [0] * self.words
 		self.flds = dict()
 
-		for b, w, i in l:
+		for b, w, i in f:
 			x = parse_match(i)
 			j = b // width
 			o = (10 * width - (b + w)) % width
 			#print("B", b, "W", w, "I", i, "J", j, "O", o, "X", x)
-			if x == None:
+			if x is None:
 				k = i.split()
 				if len(k) != 1:
-					raise InsTreeError(
-					    "Error: multiple words in field: '%s'\n  %s"
-					    % (i, line))
+					raise SyntaxTrouble(assy,
+					    "Multiple words in this field:\n" +
+					    "\t|" + i + "|")
 				self.flds[k[0]] = (j, o, (1 << w) - 1)
 			else:
 				assert x[0] == w
@@ -145,14 +166,16 @@ class insline(object):
 
 	def get_field(self, fld, words):
 		if fld not in self.flds:
-			raise InsTreeError("No such field '%s'\n  %s" % (fld, str(self)))
+			raise UsageTrouble(
+			   "In %s:\n" % self.assy +
+			   "    No field '%s'\n" % fld)
 		x = self.flds[fld]
 		v = (words[x[0]] >> x[1]) & x[2]
 		return v
 
 	def __repr__(self):
 		s = "w%d <" % self.words
-		s += self.spec
+		s += " ".join(self.assy)
 		s += "> <"
 		t = ""
 		for i in range(len(self.mask)):
@@ -171,7 +194,7 @@ class insline(object):
 #######################################################################
 #  Branch-point
 
-class insbranch(object):
+class Insbranch(object):
 	def __init__(self, lvl):
 		self.lvl = lvl
 		self.t = list()
@@ -185,7 +208,7 @@ class insbranch(object):
 				print("Colliding wildcards:")
 				print("\t" + str(self.wildcard))
 				print("\t" + str(x))
-				assert self.wildcard == None
+				assert self.wildcard is None
 			self.wildcard = x
 			return
 		xm = x.mask[self.lvl]
@@ -197,10 +220,10 @@ class insbranch(object):
 				d[xb] = x
 				return
 			y = d[xb]
-			if type(y) == type(self):
+			if isinstance(y, Insbranch):
 				y.insert(x)
 				return
-			z = insbranch(self.lvl + 1)
+			z = Insbranch(self.lvl + 1)
 			z.insert(x)
 			z.insert(y)
 			d[xb] = z
@@ -216,11 +239,11 @@ class insbranch(object):
 		print(pfx, "[%d]" % self.lvl)
 		for i, x in self.t:
 			print(pfx, "    ", "&" + fmt % i)
-			l = x.keys()
-			l.sort()
-			for j in l:
+			a = x.keys()
+			a.sort()
+			for j in a:
 				y = x[j]
-				if type(y) != type(self):
+				if isinstance(y, Insline):
 					print(pfx, "      ", "=" + fmt % j, y)
 				else:
 					print(pfx, "      ", "=" + fmt % j, ":")
@@ -243,11 +266,11 @@ class insbranch(object):
 #######################################################################
 #
 
-class insmatch(object):
-	def __init__(self, it, il, adr, words):
-		self.spec = il.spec
+class Insmatch(object):
+	def __init__(self, up, il, adr, words):
+		self.assy = il.assy
 		self.adr = adr
-		self.len = il.words * it.width // it.memwidth
+		self.len = il.words * up.width // up.memwidth
 		for i in il.flds:
 			self.__dict__["F_" + i] = il.get_field(i, words)
 
@@ -255,45 +278,100 @@ class insmatch(object):
 		s = "<InsMatch"
 		s += " @0x%x:" % self.adr
 		s += "0x%x" % (self.adr + self.len)
-		s += " " + self.spec
+		s += " " + " ".join(self.assy)
 		for i in self.__dict__:
 			if i[:2] == "F_":
 				s += " | " + i + "=" + str(self.__dict__[i])
 		s += ">"
 		return s
 
-class instree(object):
+#######################################################################
+
+class Instree(object):
 	def __init__(self, ins_word=8, mem_word=8, endian=None):
 		self.width = ins_word
 		self.memwidth = mem_word
 		self.endian = endian
 		assert self.width % self.memwidth == 0
-		self.root = insbranch(0)
+		self.root = Insbranch(0)
 		if self.width == self.memwidth:
 			self.gw = self.gw1
 		elif self.width == 16 and self.memwidth == 8:
 			self.gw = self.gw16
 		else:
-			raise InsTreeError(
+			raise UsageTrouble(
 			    "ins_word = %d, mem_word = %d not auto-supported" %
 			    (self.width, self.memwidth))
 
-	def load_file(self, filename):
-		fi = open(filename, "r")
-		for i in fi.readlines():
-			i = i.strip()
-			if i == "" or i[0] == "#":
-				continue
-			self.root.insert(insline(i, self.width))
-		fi.close()
-
 	def load_string(self, s):
-		for i in s.split("\n"):
-			i = i.strip()
-			if i == "" or i[0] == "#":
+		i = 0
+		banned = False
+		s = s.expandtabs()
+		last = ''
+		while i < len(s):
+
+			# Skip whitespace
+			if s[i] in (' ', '\t'):
+				i += 1
 				continue
-			x = insline(i, self.width)
-			self.root.insert(x)
+
+			# Skip comments to NL
+			if s[i] == '#':
+				j = s.find('\n', i)
+				if j == -1:
+					break
+				i = j + 1
+				banned = False
+				continue
+
+			# Skip NL
+			if s[i] in ('\n',):
+				i += 1
+				banned = False
+				continue
+
+			# }-lines cannot contain anything but comments
+			if banned:
+				raise SyntaxTrouble(last,
+				    "}-line can only contain comments")
+
+			# Find the assy part
+			j = s.find('|', i)
+			if j == -1:
+				raise SyntaxTrouble(last,
+				    "no '|' on this line")
+			last = assy = s[i:j].strip()
+			i = j
+			j = s.find('\n', i)
+			if j == -1:
+				j = len(s)
+
+			# find the map part
+			bm = s[i:j]
+			i = j
+			j = bm.rfind('{')
+			if j == -1:
+				self.root.insert(Insline(self.width, assy, bm))
+				continue
+
+			# Isolate tail-part
+			tail = bm[j+1:]
+			bm = bm[:j]
+			if tail.strip() != "":
+				raise SyntaxTrouble(last, "junk after '{'")
+			j = s.find('\n}', i)
+			if j == -1:
+				raise SyntaxTrouble(last, "no }-line found")
+			tail = s[i:j]
+			i = j + 2
+			banned = True
+
+			self.root.insert(Insline(self.width, assy, bm, tail))
+
+		assert i == len(s)
+
+	def load_file(self, filename):
+		self.load_string(open(filename).read())
 
 	def print(self):
 		m = "%0" + "%dx" % ((self.width + 3) // 4)
@@ -308,55 +386,53 @@ class instree(object):
 		else:
 			return pj.m.lu16(adr + n * 2)
 
-	def dive(self, pj, adr, lvl, l, r):
-		if len(l) <= lvl:
+	def dive(self, pj, adr, lvl, v, r):
+		if len(v) <= lvl:
 			b = self.gw(pj, adr, lvl)
-			l.append(b)
+			v.append(b)
 		else:
-			b = l[lvl]
+			b = v[lvl]
 
 		for i in r.find(b):
-			if type(i) == insbranch:
-				for x in self.dive(pj, adr, lvl + 1, l, i):
+			if isinstance(i, Insbranch):
+				for x in self.dive(pj, adr, lvl + 1, v, i):
 					yield x
 				continue
-			for j in range(len(l), len(i.mask)):
+			for j in range(len(v), len(i.mask)):
 				b = self.gw(pj, adr, j)
-				l.append(b)
+				v.append(b)
 			m = True
 			for j in range(lvl, len(i.mask)):
-				if i.mask[j] & l[j] != i.bits[j]:
+				if i.mask[j] & v[j] != i.bits[j]:
 					m = False
 					break
 			if m:
 				yield i
 
 	def find(self, pj, adr):
-		l = []
-		for x in self.dive(pj, adr, 0, l, self.root):
-			yield insmatch(self, x, adr, l)
+		a = []
+		for x in self.dive(pj, adr, 0, a, self.root):
+			yield Insmatch(self, x, adr, a)
+
+#######################################################################
 
 if __name__ == "__main__":
-	it = instree(8)
+
+	it = Instree(8)
 	it.load_string("""
+
+	# This is a comment line
 Foo_00	|1 1 0 0| reg	| imm		|
 Foo_02a	|1 0 0 0| reg	|x1		|0| imm		|
 Foo_02b	|1 0 0 0| reg	|x1		|1| imm		|
-Foo_04	|1 0 0 1| reg	| imm		|
-Foo_03	|0 0|aaa| reg	| imm		|
-Foo_01	|1 1 0 0|1 0 0 0| data		|0 0 0 0|foo	|
+Foo_04	|1 0 0 1| reg	| imm		| {
+blabla
+} # Comment
+Foo_03	|0 0|aaa| reg	| imm		| {
+}
+Foo_01	|1 1 0 0|1 0 0 1| data		|0 0 0 0|foo	| {
+}
+Foo   |0 1 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
+#Foo_05	| ca | data		|0 0 0 0|foo	|
 """)
-	it.print()
-
-	#it = instree(16)
-	#it.load_file("/home/phk/Proj/PyRevEng/PyRevEng/cpus/m68000_instructions.txt")
-	#it.print()
-
-	print("-" * 72)
-	it = instree(8)
-	it.load_string("LJMP pgadr |1 1 0 0 1 0 0 0|0 0 1 1 0| pgno|1 0 0 0|0| ahi | alo           |")
-	it.print()
-	it.load_string("Lc8  bx    |1 1 0 0 1 0 0 0| bx            |")
-	it.print()
-	it.load_string("PGNO bx    |1 1 0 0 1 0 0 0|0 0 1 1 0| bx  |")
 	it.print()

@@ -80,10 +80,10 @@ class Instree_assy(Assy):
 		self.cc = True
 		self.dstadr = None
 		self.lim = lim
-		self.mne = lim[-1].spec.split()[0]
+		self.mne = lim[-1].assy[0]
 		self.oper = list()
 		for self.im in lim:
-			i = self.im.spec.split()
+			i = self.im.assy
 			for j in i[1].split(","):
 				if j == "-":
 					continue
@@ -113,7 +113,7 @@ class Instree_disass(code.Decode):
 		}
 		if mem_word == None:
 			mem_word = ins_word
-		self.it = instree.instree(ins_word, mem_word, endian)
+		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
 
 	def decode(self, pj, adr, l = None):
@@ -127,7 +127,7 @@ class Instree_disass(code.Decode):
 			except Invalid:
 				l.pop(-1)
 				continue
-			if x.spec[0] != "+":
+			if x.assy[0][0] != "+":
 				break
 			y = self.decode(pj, adr + x.len, l)
 			if y != None:

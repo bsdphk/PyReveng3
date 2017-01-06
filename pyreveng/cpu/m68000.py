@@ -404,7 +404,7 @@ def arg_eax(pj, ins, eam, ear):
 	eax = 1 << eam
 	if eax > 0x40:
 		eax = 0x100 << ear
-	eamask = int(ins.im.spec.split()[-1], 16)
+	eamask = int(ins.im.assy[-1], 16)
 	if not eax & eamask:
 		print ("0x%x Wrong EA mode m=%d/r=%d" % (ins.lo, eam, ear))
 		raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
@@ -623,7 +623,7 @@ class m68000(assy.Instree_disass):
 		y = super(m68000, self).decode(pj, adr)
 		if y == None:
 			return y
-		for i in y.im.spec.split()[1].split(","):
+		for i in y.im.assy[1].split(","):
 			if i != "ea":
 				continue
 			if arg_ea(pj, y) == None:
