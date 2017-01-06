@@ -77,10 +77,10 @@ STY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 1| d		|
 CMPD    P	|0 0 0 1 0 0 0 0|1 0 1 0 0 0 1 1|X| R |i| m     |
 LDY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 0|X| R |i| m     |
 STY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 1|X| R |i| m     |
-CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| E1		| E2		|
-CMPY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 0 0| E1		| E2		|
-LDY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 0| E1		| E2		|
-STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| E1		| E2		|
+CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| e1		| e2		|
+CMPY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 0 0| e1		| e2		|
+LDY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 0| e1		| e2		|
+STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| e1		| e2		|
 
 LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		|
 
@@ -96,8 +96,8 @@ CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
 CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
 CMPU	P	|0 0 0 1 0 0 0 1|1 0 1 0 0 0 1 1|X| R |i| m     |
 CMPS	P	|0 0 0 1 0 0 0 1|1 0 1 0 1 1 0 0|X| R |i| m     |
-CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| E1		| E2		|
-CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| E1		| E2		|
+CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| e1		| e2		|
+CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| e1		| e2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
 BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		|
@@ -178,18 +178,18 @@ TST	P	|0 1 1 0 1 1 0 1|X| R |i| m	|
 JMP	P,>J	|0 1 1 0 1 1 1 0|X| R |i| m	|
 CLR	P	|0 1 1 0 1 1 1 1|X| R |i| m	|
 
-NEG	E	|0 1 1 1 0 0 0 0| E1		| E2		|
-COM	E	|0 1 1 1 0 0 1 1| E1		| E2		|
-LSR	E	|0 1 1 1 0 1 0 0| E1		| E2		|
-ROR	E	|0 1 1 1 0 1 1 0| E1		| E2		|
-ASR	E	|0 1 1 1 0 1 1 1| E1		| E2		|
-ASL	E	|0 1 1 1 1 0 0 0| E1		| E2		|
-ROL	E	|0 1 1 1 1 0 0 1| E1		| E2		|
-DEC	E	|0 1 1 1 1 0 1 0| E1		| E2		|
-INC	E	|0 1 1 1 1 1 0 0| E1		| E2		|
-TST	E	|0 1 1 1 1 1 0 1| E1		| E2		|
-JMP	E,>J	|0 1 1 1 1 1 1 0| E1		| E2		|
-CLR	E	|0 1 1 1 1 1 1 1| E1		| E2		|
+NEG	E	|0 1 1 1 0 0 0 0| e1		| e2		|
+COM	E	|0 1 1 1 0 0 1 1| e1		| e2		|
+LSR	E	|0 1 1 1 0 1 0 0| e1		| e2		|
+ROR	E	|0 1 1 1 0 1 1 0| e1		| e2		|
+ASR	E	|0 1 1 1 0 1 1 1| e1		| e2		|
+ASL	E	|0 1 1 1 1 0 0 0| e1		| e2		|
+ROL	E	|0 1 1 1 1 0 0 1| e1		| e2		|
+DEC	E	|0 1 1 1 1 0 1 0| e1		| e2		|
+INC	E	|0 1 1 1 1 1 0 0| e1		| e2		|
+TST	E	|0 1 1 1 1 1 0 1| e1		| e2		|
+JMP	E,>J	|0 1 1 1 1 1 1 0| e1		| e2		|
+CLR	E	|0 1 1 1 1 1 1 1| e1		| e2		|
 
 SUBA	i	|1 0 0 0 0 0 0 0| i		|
 CMPA	i	|1 0 0 0 0 0 0 1| i		|
@@ -240,22 +240,22 @@ JSR	P,>C	|1 0 1 0 1 1 0 1|X| R |i| m	|
 LDX	P	|1 0 1 0 1 1 1 0|X| R |i| m     |
 STX	P	|1 0 1 0 1 1 1 1|X| R |i| m     |
 
-SUBA	E	|1 0 1 1 0 0 0 0| E1		| E2		|
-CMPA	E	|1 0 1 1 0 0 0 1| E1		| E2		|
-SBCA	E	|1 0 1 1 0 0 1 0| E1		| E2		|
-SUBD	E	|1 0 1 1 0 0 1 1| E1		| E2		|
-ANDA	E	|1 0 1 1 0 1 0 0| E1		| E2		|
-BITA	E	|1 0 1 1 0 1 0 1| E1		| E2		|
-LDA	E	|1 0 1 1 0 1 1 0| E1		| E2		|
-STA	E	|1 0 1 1 0 1 1 1| E1		| E2		|
-EORA	E	|1 0 1 1 1 0 0 0| E1		| E2		|
-ADCA	E	|1 0 1 1 1 0 0 1| E1		| E2		|
-ORA	E	|1 0 1 1 1 0 1 0| E1		| E2		|
-ADDA	E	|1 0 1 1 1 0 1 1| E1		| E2		|
-CMPX	E	|1 0 1 1 1 1 0 0| E1		| E2		|
-JSR	E,>C	|1 0 1 1 1 1 0 1| E1		| E2		|
-LDX	E	|1 0 1 1 1 1 1 0| E1		| E2		|
-STX	E	|1 0 1 1 1 1 1 1| E1		| E2		|
+SUBA	E	|1 0 1 1 0 0 0 0| e1		| e2		|
+CMPA	E	|1 0 1 1 0 0 0 1| e1		| e2		|
+SBCA	E	|1 0 1 1 0 0 1 0| e1		| e2		|
+SUBD	E	|1 0 1 1 0 0 1 1| e1		| e2		|
+ANDA	E	|1 0 1 1 0 1 0 0| e1		| e2		|
+BITA	E	|1 0 1 1 0 1 0 1| e1		| e2		|
+LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		|
+STA	E	|1 0 1 1 0 1 1 1| e1		| e2		|
+EORA	E	|1 0 1 1 1 0 0 0| e1		| e2		|
+ADCA	E	|1 0 1 1 1 0 0 1| e1		| e2		|
+ORA	E	|1 0 1 1 1 0 1 0| e1		| e2		|
+ADDA	E	|1 0 1 1 1 0 1 1| e1		| e2		|
+CMPX	E	|1 0 1 1 1 1 0 0| e1		| e2		|
+JSR	E,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
+LDX	E	|1 0 1 1 1 1 1 0| e1		| e2		|
+STX	E	|1 0 1 1 1 1 1 1| e1		| e2		|
 
 SUBB	i	|1 1 0 0 0 0 0 0| i		|
 CMPB	i	|1 1 0 0 0 0 0 1| i		|
@@ -305,22 +305,22 @@ STD	P	|1 1 1 0 1 1 0 1|X| R |i| m     |
 LDU	P	|1 1 1 0 1 1 1 0|X| R |i| m     |
 STU	P	|1 1 1 0 1 1 1 1|X| R |i| m     |
 
-SUBB	E	|1 1 1 1 0 0 0 0| E1		| E2		|
-CMPB	E	|1 1 1 1 0 0 0 1| E1		| E2		|
-SBCB	E	|1 1 1 1 0 0 1 0| E1		| E2		|
-ADDD	E	|1 1 1 1 0 0 1 1| E1		| E2		|
-ANDB	E	|1 1 1 1 0 1 0 0| E1		| E2		|
-BITB	E	|1 1 1 1 0 1 0 1| E1		| E2		|
-LDB	E	|1 1 1 1 0 1 1 0| E1		| E2		|
-STB	E	|1 1 1 1 0 1 1 1| E1		| E2		|
-EORB	E	|1 1 1 1 1 0 0 0| E1		| E2		|
-ADCB	E	|1 1 1 1 1 0 0 1| E1		| E2		|
-ORB	E	|1 1 1 1 1 0 1 0| E1		| E2		|
-ADDB	E	|1 1 1 1 1 0 1 1| E1		| E2		|
-LDD	E	|1 1 1 1 1 1 0 0| E1		| E2		|
-STD	E	|1 1 1 1 1 1 0 1| E1		| E2		|
-LDU	E	|1 1 1 1 1 1 1 0| E1		| E2		|
-STU	E	|1 1 1 1 1 1 1 1| E1		| E2		|
+SUBB	E	|1 1 1 1 0 0 0 0| e1		| e2		|
+CMPB	E	|1 1 1 1 0 0 0 1| e1		| e2		|
+SBCB	E	|1 1 1 1 0 0 1 0| e1		| e2		|
+ADDD	E	|1 1 1 1 0 0 1 1| e1		| e2		|
+ANDB	E	|1 1 1 1 0 1 0 0| e1		| e2		|
+BITB	E	|1 1 1 1 0 1 0 1| e1		| e2		|
+LDB	E	|1 1 1 1 0 1 1 0| e1		| e2		|
+STB	E	|1 1 1 1 0 1 1 1| e1		| e2		|
+EORB	E	|1 1 1 1 1 0 0 0| e1		| e2		|
+ADCB	E	|1 1 1 1 1 0 0 1| e1		| e2		|
+ORB	E	|1 1 1 1 1 0 1 0| e1		| e2		|
+ADDB	E	|1 1 1 1 1 0 1 1| e1		| e2		|
+LDD	E	|1 1 1 1 1 1 0 0| e1		| e2		|
+STD	E	|1 1 1 1 1 1 0 1| e1		| e2		|
+LDU	E	|1 1 1 1 1 1 1 0| e1		| e2		|
+STU	E	|1 1 1 1 1 1 1 1| e1		| e2		|
 """
 
 mc6809_macro_instructions = """
@@ -353,7 +353,7 @@ class arg_I(assy.Arg_dst):
 
 class arg_E(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_E1 << 8) | ins.im.F_E2
+		ins.dstadr = (ins.im.F_e1 << 8) | ins.im.F_e2
 		super(arg_E, self).__init__(pj, ins.dstadr, "")
 
 class arg_r(assy.Arg_dst):
