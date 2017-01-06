@@ -30,9 +30,15 @@ Run all examples
 
 from __future__ import print_function
 
-import glob
+import glob, os
+from pyreveng import code, listing
 
 l = glob.glob("*/example*.py")
+
+try:
+	os.mkdir("_output")
+except:
+	pass
 
 for i in l:
 	j = i.split("/")
@@ -42,4 +48,5 @@ for i in l:
 	y = x.__dict__[k]
 	pj, cx = y.setup()
 	y.task(pj, cx)
-	y.output(pj)
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol = 8, fn = "_output/" + pj.name + ".txt")
