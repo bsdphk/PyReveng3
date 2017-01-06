@@ -37,203 +37,203 @@ from __future__ import print_function
 from pyreveng import mem, assy, data
 
 mc6800_instructions = """
-NOP	-	|0 0 0 0 0 0 0 1|
-TAP	-	|0 0 0 0 0 1 1 0|
-TPA	-	|0 0 0 0 0 1 1 1|
-INX	-	|0 0 0 0 1 0 0 0|
-DEX	-	|0 0 0 0 1 0 0 1|
-CLV	-	|0 0 0 0 1 0 1 0|
-SEV	-	|0 0 0 0 1 0 1 1|
-CLC	-	|0 0 0 0 1 1 0 0|
-SEC	-	|0 0 0 0 1 1 0 1|
-CLI	-	|0 0 0 0 1 1 1 0|
-SEI	-	|0 0 0 0 1 1 1 1|
-SBA	-	|0 0 0 1 0 0 0 0|
-CBA	-	|0 0 0 1 0 0 0 1|
-TAB	-	|0 0 0 1 0 1 1 0|
-TBA	-	|0 0 0 1 0 1 1 1|
-DAA	-	|0 0 0 1 1 0 0 1|
-ABA	-	|0 0 0 1 1 0 1 1|
-BRA	r,>J	|0 0 1 0 0 0 0 0| r		|
-BHI	r,>JC	|0 0 1 0 0 0 1 0| r		|
-BLS	r,>JC	|0 0 1 0 0 0 1 1| r		|
-BCC	r,>JC	|0 0 1 0 0 1 0 0| r		|
-BCS	r,>JC	|0 0 1 0 0 1 0 1| r		|
-BNE	r,>JC	|0 0 1 0 0 1 1 0| r		|
-BEQ	r,>JC	|0 0 1 0 0 1 1 1| r		|
-BVC	r,>JC	|0 0 1 0 1 0 0 0| r		|
-BVS	r,>JC	|0 0 1 0 1 0 0 1| r		|
-BPL	r,>JC	|0 0 1 0 1 0 1 0| r		|
-BMI	r,>JC	|0 0 1 0 1 0 1 1| r		|
-BGE	r,>JC	|0 0 1 0 1 1 0 0| r		|
-BLT	r,>JC	|0 0 1 0 1 1 0 1| r		|
-BGT	r,>JC	|0 0 1 0 1 1 1 0| r		|
-BLE	r,>JC	|0 0 1 0 1 1 1 1| r		|
-TSX	-	|0 0 1 1 0 0 0 0|
-INS	-	|0 0 1 1 0 0 0 1|
-PULA	-	|0 0 1 1 0 0 1 0|
-PULB	-	|0 0 1 1 0 0 1 1|
-DES	-	|0 0 1 1 0 1 0 0|
-TXS	-	|0 0 1 1 0 1 0 1|
-PSHA	-	|0 0 1 1 0 1 1 0|
-PSHB	-	|0 0 1 1 0 1 1 1|
-RTS	>R	|0 0 1 1 1 0 0 1|
-RTI	>R	|0 0 1 1 1 0 1 1|
-WAI	-	|0 0 1 1 1 1 1 0|
-SWI	-	|0 0 1 1 1 1 1 1|
-NEGA	-	|0 1 0 0 0 0 0 0|
-COMA	-	|0 1 0 0 0 0 1 1|
-LSRA	-	|0 1 0 0 0 1 0 0|
-RORA	-	|0 1 0 0 0 1 1 0|
-ASRA	-	|0 1 0 0 0 1 1 1|
-ASLA	-	|0 1 0 0 1 0 0 0|
-ROLA	-	|0 1 0 0 1 0 0 1|
-DECA	-	|0 1 0 0 1 0 1 0|
-INCA	-	|0 1 0 0 1 1 0 0|
-TSTA	-	|0 1 0 0 1 1 0 1|
-CLRA	-	|0 1 0 0 1 1 1 1|
-NEGB	-	|0 1 0 1 0 0 0 0|
-COMB	-	|0 1 0 1 0 0 1 1|
-LSRB	-	|0 1 0 1 0 1 0 0|
-RORB	-	|0 1 0 1 0 1 1 0|
-ASRB	-	|0 1 0 1 0 1 1 1|
-ASLB	-	|0 1 0 1 1 0 0 0|
-ROLB	-	|0 1 0 1 1 0 0 1|
-DECB	-	|0 1 0 1 1 0 1 0|
-INCB	-	|0 1 0 1 1 1 0 0|
-TSTB	-	|0 1 0 1 1 1 0 1|
-CLRB	-	|0 1 0 1 1 1 1 1|
-NEG	x	|0 1 1 0 0 0 0 0| x		|
-COM	x	|0 1 1 0 0 0 1 1| x		|
-LSR	x	|0 1 1 0 0 1 0 0| x		|
-ROR	x	|0 1 1 0 0 1 1 0| x		|
-ASR	x	|0 1 1 0 0 1 1 1| x		|
-ASL	x	|0 1 1 0 1 0 0 0| x		|
-ROL	x	|0 1 1 0 1 0 0 1| x		|
-DEC	x	|0 1 1 0 1 0 1 0| x		|
-INC	x	|0 1 1 0 1 1 0 0| x		|
-TST	x	|0 1 1 0 1 1 0 1| x		|
-JMP	x,>J	|0 1 1 0 1 1 1 0| x		|
-CLR	x	|0 1 1 0 1 1 1 1| x		|
-NEG	e	|0 1 1 1 0 0 0 0| e1		| e2		|
-COM	e	|0 1 1 1 0 0 1 1| e1		| e2		|
-LSR	e	|0 1 1 1 0 1 0 0| e1		| e2		|
-ROR	e	|0 1 1 1 0 1 1 0| e1		| e2		|
-ASR	e	|0 1 1 1 0 1 1 1| e1		| e2		|
-ASL	e	|0 1 1 1 1 0 0 0| e1		| e2		|
-ROL	e	|0 1 1 1 1 0 0 1| e1		| e2		|
-DEC	e	|0 1 1 1 1 0 1 0| e1		| e2		|
-INC	e	|0 1 1 1 1 1 0 0| e1		| e2		|
-TST	e	|0 1 1 1 1 1 0 1| e1		| e2		|
-JMP	e,>J	|0 1 1 1 1 1 1 0| e1		| e2		|
-CLR	e	|0 1 1 1 1 1 1 1| e1		| e2		|
-SUBA	i	|1 0 0 0 0 0 0 0| i		|
-CMPA	i	|1 0 0 0 0 0 0 1| i		|
-SBCA	i	|1 0 0 0 0 0 1 0| i		|
-ANDA	i	|1 0 0 0 0 1 0 0| i		|
-BITA	i	|1 0 0 0 0 1 0 1| i		|
-LDAA	i	|1 0 0 0 0 1 1 0| i		|
-EORA	i	|1 0 0 0 1 0 0 0| i		|
-ADCA	i	|1 0 0 0 1 0 0 1| i		|
-ORAA	i	|1 0 0 0 1 0 1 0| i		|
-ADDA	i	|1 0 0 0 1 0 1 1| i		|
-CPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
-BSR	r,>C	|1 0 0 0 1 1 0 1| r		|
-LDS	I	|1 0 0 0 1 1 1 0| I1		| I2		|
-SUBA	d	|1 0 0 1 0 0 0 0| d		|
-CMPA	d	|1 0 0 1 0 0 0 1| d		|
-SBCA	d	|1 0 0 1 0 0 1 0| d		|
-ANDA	d	|1 0 0 1 0 1 0 0| d		|
-BITA	d	|1 0 0 1 0 1 0 1| d		|
-LDAA	d	|1 0 0 1 0 1 1 0| d		|
-STAA	d	|1 0 0 1 0 1 1 1| d		|
-EORA	d	|1 0 0 1 1 0 0 0| d		|
-ADCA	d	|1 0 0 1 1 0 0 1| d		|
-ORAA	d	|1 0 0 1 1 0 1 0| d		|
-ADDA	d	|1 0 0 1 1 0 1 1| d		|
-CPX	d	|1 0 0 1 1 1 0 0| d		|
-LDS	d	|1 0 0 1 1 1 1 0| d		|
-STS	d	|1 0 0 1 1 1 1 1| d		|
-SUBA	x	|1 0 1 0 0 0 0 0| x		|
-CMPA	x	|1 0 1 0 0 0 0 1| x		|
-SBCA	x	|1 0 1 0 0 0 1 0| x		|
-ANDA	x	|1 0 1 0 0 1 0 0| x		|
-BITA	x	|1 0 1 0 0 1 0 1| x		|
-LDAA	x	|1 0 1 0 0 1 1 0| x		|
-STAA	x	|1 0 1 0 0 1 1 1| x		|
-EORA	x	|1 0 1 0 1 0 0 0| x		|
-ADCA	x	|1 0 1 0 1 0 0 1| x		|
-ORAA	x	|1 0 1 0 1 0 1 0| x		|
-ADDA	x	|1 0 1 0 1 0 1 1| x		|
-CPX	x	|1 0 1 0 1 1 0 0| x		|
-JSR	x,>C	|1 0 1 0 1 1 0 1| x		|
-LDS	x	|1 0 1 0 1 1 1 0| x		|
-STS	x	|1 0 1 0 1 1 1 1| x		|
-SUBA	e	|1 0 1 1 0 0 0 0| e1		| e2		|
-CMPA	e	|1 0 1 1 0 0 0 1| e1		| e2		|
-SBCA	e	|1 0 1 1 0 0 1 0| e1		| e2		|
-ANDA	e	|1 0 1 1 0 1 0 0| e1		| e2		|
-BITA	e	|1 0 1 1 0 1 0 1| e1		| e2		|
-LDAA	e	|1 0 1 1 0 1 1 0| e1		| e2		|
-STAA	e	|1 0 1 1 0 1 1 1| e1		| e2		|
-EORA	e	|1 0 1 1 1 0 0 0| e1		| e2		|
-ADCA	e	|1 0 1 1 1 0 0 1| e1		| e2		|
-ORAA	e	|1 0 1 1 1 0 1 0| e1		| e2		|
-ADDA	e	|1 0 1 1 1 0 1 1| e1		| e2		|
-CPX	e	|1 0 1 1 1 1 0 0| e1		| e2		|
-JSR	e,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
-LDS	e	|1 0 1 1 1 1 1 0| e1		| e2		|
-STS	e	|1 0 1 1 1 1 1 1| e1		| e2		|
-SUBB	i	|1 1 0 0 0 0 0 0| i		|
-CMPB	i	|1 1 0 0 0 0 0 1| i		|
-SBCB	i	|1 1 0 0 0 0 1 0| i		|
-ANDB	i	|1 1 0 0 0 1 0 0| i		|
-BITB	i	|1 1 0 0 0 1 0 1| i		|
-LDAB	i	|1 1 0 0 0 1 1 0| i		|
-EORB	i	|1 1 0 0 1 0 0 0| i		|
-ADCB	i	|1 1 0 0 1 0 0 1| i		|
-ORAB	i	|1 1 0 0 1 0 1 0| i		|
-ADDB	i	|1 1 0 0 1 0 1 1| i		|
-LDX	I	|1 1 0 0 1 1 1 0| I1		| I2		|
-SUBB	d	|1 1 0 1 0 0 0 0| d		|
-CMPB	d	|1 1 0 1 0 0 0 1| d		|
-SBCB	d	|1 1 0 1 0 0 1 0| d		|
-ANDB	d	|1 1 0 1 0 1 0 0| d		|
-BITB	d	|1 1 0 1 0 1 0 1| d		|
-LDAB	d	|1 1 0 1 0 1 1 0| d		|
-STAB	d	|1 1 0 1 0 1 1 1| d		|
-EORB	d	|1 1 0 1 1 0 0 0| d		|
-ADCB	d	|1 1 0 1 1 0 0 1| d		|
-ORAB	d	|1 1 0 1 1 0 1 0| d		|
-ADDB	d	|1 1 0 1 1 0 1 1| d		|
-LDX	d	|1 1 0 1 1 1 1 0| d		|
-STX	d	|1 1 0 1 1 1 1 1| d		|
-SUBB	x	|1 1 1 0 0 0 0 0| x		|
-CMPB	x	|1 1 1 0 0 0 0 1| x		|
-SBCB	x	|1 1 1 0 0 0 1 0| x		|
-ANDB	x	|1 1 1 0 0 1 0 0| x		|
-BITB	x	|1 1 1 0 0 1 0 1| x		|
-LDAB	x	|1 1 1 0 0 1 1 0| x		|
-STAB	x	|1 1 1 0 0 1 1 1| x		|
-EORB	x	|1 1 1 0 1 0 0 0| x		|
-ADCB	x	|1 1 1 0 1 0 0 1| x		|
-ORAB	x	|1 1 1 0 1 0 1 0| x		|
-ADDB	x	|1 1 1 0 1 0 1 1| x		|
-LDX	x	|1 1 1 0 1 1 1 0| x		|
-STX	x	|1 1 1 0 1 1 1 1| x		|
-SUBB	e	|1 1 1 1 0 0 0 0| e1		| e2		|
-CMPB	e	|1 1 1 1 0 0 0 1| e1		| e2		|
-SBCB	e	|1 1 1 1 0 0 1 0| e1		| e2		|
-ANDB	e	|1 1 1 1 0 1 0 0| e1		| e2		|
-BITB	e	|1 1 1 1 0 1 0 1| e1		| e2		|
-LDAB	e	|1 1 1 1 0 1 1 0| e1		| e2		|
-STAB	e	|1 1 1 1 0 1 1 1| e1		| e2		|
-EORB	e	|1 1 1 1 1 0 0 0| e1		| e2		|
-ADCB	e	|1 1 1 1 1 0 0 1| e1		| e2		|
-ORAB	e	|1 1 1 1 1 0 1 0| e1		| e2		|
-ADDB	e	|1 1 1 1 1 0 1 1| e1		| e2		|
-LDX	e	|1 1 1 1 1 1 1 0| e1		| e2		|
-STX	e	|1 1 1 1 1 1 1 1| e1		| e2		|
+NOP	-	|01	|
+TAP	-	|06	|
+TPA	-	|07	|
+INX	-	|08	|
+DEX	-	|09	|
+CLV	-	|0A	|
+SEV	-	|0B	|
+CLC	-	|0C	|
+SEC	-	|0D	|
+CLI	-	|0E	|
+SEI	-	|0F	|
+SBA	-	|10	|
+CBA	-	|11	|
+TAB	-	|16	|
+TBA	-	|17	|
+DAA	-	|19	|
+ABA	-	|1B	|
+BRA	r,>J	|20	| r		|
+BHI	r,>JC	|22	| r		|
+BLS	r,>JC	|23	| r		|
+BCC	r,>JC	|24	| r		|
+BCS	r,>JC	|25	| r		|
+BNE	r,>JC	|26	| r		|
+BEQ	r,>JC	|27	| r		|
+BVC	r,>JC	|28	| r		|
+BVS	r,>JC	|29	| r		|
+BPL	r,>JC	|2A	| r		|
+BMI	r,>JC	|2B	| r		|
+BGE	r,>JC	|2C	| r		|
+BLT	r,>JC	|2D	| r		|
+BGT	r,>JC	|2E	| r		|
+BLE	r,>JC	|2F	| r		|
+TSX	-	|30	|
+INS	-	|31	|
+PULA	-	|32	|
+PULB	-	|33	|
+DES	-	|34	|
+TXS	-	|35	|
+PSHA	-	|36	|
+PSHB	-	|37	|
+RTS	>R	|39	|
+RTI	>R	|3B	|
+WAI	-	|3E	|
+SWI	-	|3F	|
+NEGA	-	|40	|
+COMA	-	|43	|
+LSRA	-	|44	|
+RORA	-	|46	|
+ASRA	-	|47	|
+ASLA	-	|48	|
+ROLA	-	|49	|
+DECA	-	|4A	|
+INCA	-	|4C	|
+TSTA	-	|4D	|
+CLRA	-	|4F	|
+NEGB	-	|50	|
+COMB	-	|53	|
+LSRB	-	|54	|
+RORB	-	|56	|
+ASRB	-	|57	|
+ASLB	-	|58	|
+ROLB	-	|59	|
+DECB	-	|5A	|
+INCB	-	|5C	|
+TSTB	-	|5D	|
+CLRB	-	|5F	|
+NEG	x	|60	| x		|
+COM	x	|63	| x		|
+LSR	x	|64	| x		|
+ROR	x	|66	| x		|
+ASR	x	|67	| x		|
+ASL	x	|68	| x		|
+ROL	x	|69	| x		|
+DEC	x	|6A	| x		|
+INC	x	|6C	| x		|
+TST	x	|6D	| x		|
+JMP	x,>J	|6E	| x		|
+CLR	x	|6F	| x		|
+NEG	e	|70	| e1		| e2		|
+COM	e	|73	| e1		| e2		|
+LSR	e	|74	| e1		| e2		|
+ROR	e	|76	| e1		| e2		|
+ASR	e	|77	| e1		| e2		|
+ASL	e	|78	| e1		| e2		|
+ROL	e	|79	| e1		| e2		|
+DEC	e	|7A	| e1		| e2		|
+INC	e	|7C	| e1		| e2		|
+TST	e	|7D	| e1		| e2		|
+JMP	e,>J	|7E	| e1		| e2		|
+CLR	e	|7F	| e1		| e2		|
+SUBA	i	|80	| i		|
+CMPA	i	|81	| i		|
+SBCA	i	|82	| i		|
+ANDA	i	|84	| i		|
+BITA	i	|85	| i		|
+LDAA	i	|86	| i		|
+EORA	i	|88	| i		|
+ADCA	i	|89	| i		|
+ORAA	i	|8A	| i		|
+ADDA	i	|8B	| i		|
+CPX	I	|8C	| I1		| I2		|
+BSR	r,>C	|8D	| r		|
+LDS	I	|8E	| I1		| I2		|
+SUBA	d	|90	| d		|
+CMPA	d	|91	| d		|
+SBCA	d	|92	| d		|
+ANDA	d	|94	| d		|
+BITA	d	|95	| d		|
+LDAA	d	|96	| d		|
+STAA	d	|97	| d		|
+EORA	d	|98	| d		|
+ADCA	d	|99	| d		|
+ORAA	d	|9A	| d		|
+ADDA	d	|9B	| d		|
+CPX	d	|9C	| d		|
+LDS	d	|9E	| d		|
+STS	d	|9F	| d		|
+SUBA	x	|A0	| x		|
+CMPA	x	|A1	| x		|
+SBCA	x	|A2	| x		|
+ANDA	x	|A4	| x		|
+BITA	x	|A5	| x		|
+LDAA	x	|A6	| x		|
+STAA	x	|A7	| x		|
+EORA	x	|A8	| x		|
+ADCA	x	|A9	| x		|
+ORAA	x	|AA	| x		|
+ADDA	x	|AB	| x		|
+CPX	x	|AC	| x		|
+JSR	x,>C	|AD	| x		|
+LDS	x	|AE	| x		|
+STS	x	|AF	| x		|
+SUBA	e	|B0	| e1		| e2		|
+CMPA	e	|B1	| e1		| e2		|
+SBCA	e	|B2	| e1		| e2		|
+ANDA	e	|B4	| e1		| e2		|
+BITA	e	|B5	| e1		| e2		|
+LDAA	e	|B6	| e1		| e2		|
+STAA	e	|B7	| e1		| e2		|
+EORA	e	|B8	| e1		| e2		|
+ADCA	e	|B9	| e1		| e2		|
+ORAA	e	|BA	| e1		| e2		|
+ADDA	e	|BB	| e1		| e2		|
+CPX	e	|BC	| e1		| e2		|
+JSR	e,>C	|BD	| e1		| e2		|
+LDS	e	|BE	| e1		| e2		|
+STS	e	|BF	| e1		| e2		|
+SUBB	i	|C0	| i		|
+CMPB	i	|C1	| i		|
+SBCB	i	|C2	| i		|
+ANDB	i	|C4	| i		|
+BITB	i	|C5	| i		|
+LDAB	i	|C6	| i		|
+EORB	i	|C8	| i		|
+ADCB	i	|C9	| i		|
+ORAB	i	|CA	| i		|
+ADDB	i	|CB	| i		|
+LDX	I	|CE	| I1		| I2		|
+SUBB	d	|D0	| d		|
+CMPB	d	|D1	| d		|
+SBCB	d	|D2	| d		|
+ANDB	d	|D4	| d		|
+BITB	d	|D5	| d		|
+LDAB	d	|D6	| d		|
+STAB	d	|D7	| d		|
+EORB	d	|D8	| d		|
+ADCB	d	|D9	| d		|
+ORAB	d	|DA	| d		|
+ADDB	d	|DB	| d		|
+LDX	d	|DE	| d		|
+STX	d	|DF	| d		|
+SUBB	x	|E0	| x		|
+CMPB	x	|E1	| x		|
+SBCB	x	|E2	| x		|
+ANDB	x	|E4	| x		|
+BITB	x	|E5	| x		|
+LDAB	x	|E6	| x		|
+STAB	x	|E7	| x		|
+EORB	x	|E8	| x		|
+ADCB	x	|E9	| x		|
+ORAB	x	|EA	| x		|
+ADDB	x	|EB	| x		|
+LDX	x	|EE	| x		|
+STX	x	|EF	| x		|
+SUBB	e	|F0	| e1		| e2		|
+CMPB	e	|F1	| e1		| e2		|
+SBCB	e	|F2	| e1		| e2		|
+ANDB	e	|F4	| e1		| e2		|
+BITB	e	|F5	| e1		| e2		|
+LDAB	e	|F6	| e1		| e2		|
+STAB	e	|F7	| e1		| e2		|
+EORB	e	|F8	| e1		| e2		|
+ADCB	e	|F9	| e1		| e2		|
+ORAB	e	|FA	| e1		| e2		|
+ADDB	e	|FB	| e1		| e2		|
+LDX	e	|FE	| e1		| e2		|
+STX	e	|FF	| e1		| e2		|
 """
 
 def arg_d(pj, ins):
@@ -299,63 +299,63 @@ class mc6800(assy.Instree_disass):
 			adr += 2
 
 mc68hc11_instructions = """
-IDIV	-		|0 0 0 0 0 0 1 0|
-FDIV	-		|0 0 0 0 0 0 1 1|
-LSRD	-		|0 0 0 0 0 1 0 0|
-ASLD	-		|0 0 0 0 0 1 0 1|
+IDIV	-		|02	|
+FDIV	-		|03	|
+LSRD	-		|04	|
+ASLD	-		|05	|
 
-+	Y		|0 0 0 1 1 0 0 0|
++	Y		|18	|
 
-BRSET	d,i,r,>C	|0 0 0 1 0 0 1 0| d		| i		| r		|
-BRCLR	d,i,r,>C	|0 0 0 1 0 0 1 1| d		| i		| r		|
-BSET	d,i		|0 0 0 1 0 1 0 0| d		| i		|
-BCLR	d,i		|0 0 0 1 0 1 0 1| d		| i		|
+BRSET	d,i,r,>C	|12	| d		| i		| r		|
+BRCLR	d,i,r,>C	|13	| d		| i		| r		|
+BSET	d,i		|14	| d		| i		|
+BCLR	d,i		|15	| d		| i		|
 
-CPD	I		|0 0 0 1 1 0 1 0|1 0 0 0 0 0 1 1| I1		| I2		|
-CPD	d		|0 0 0 1 1 0 1 0|1 0 0 1 0 0 1 1| d		|
-CPD	x		|0 0 0 1 1 0 1 0|1 0 1 0 0 0 1 1| x		|
-CPD	e		|0 0 0 1 1 0 1 0|1 0 1 1 0 0 1 1| e1		| e2		|
-CPD	y		|1 1 0 0 1 1 0 1|1 0 1 0 0 0 1 1| y		|
+CPD	I		|1A	|83	| I1		| I2		|
+CPD	d		|1A	|93	| d		|
+CPD	x		|1A	|A3	| x		|
+CPD	e		|1A	|B3	| e1		| e2		|
+CPD	y		|CD	|A3	| y		|
 
-LDY	x		|0 0 0 1 1 0 1 0|1 1 1 0 1 1 1 0| x		|
-STY	x		|0 0 0 1 1 0 1 0|1 1 1 0 1 1 1 1| x		|
+LDY	x		|1A	|EE	| x		|
+STY	x		|1A	|EF	| x		|
 
-LDX	y		|1 1 0 0 1 1 0 1|1 1 1 0 1 1 1 0| y		|
-STX	y		|1 1 0 0 1 1 0 1|1 1 1 0 1 1 1 1| y		|
+LDX	y		|CD	|EE	| y		|
+STX	y		|CD	|EF	| y		|
 
 
-BSET	x,i		|0 0 0 1 1 1 0 0| x		| i		|
-BCLR	x,i		|0 0 0 1 1 1 0 1| x		| i		|
-BRSET	x,i,r,>C	|0 0 0 1 1 1 1 0| x		| i		| r		|
-BRCLR	x,i,r,>C	|0 0 0 1 1 1 1 1| x		| i		| r		|
+BSET	x,i		|1C	| x		| i		|
+BCLR	x,i		|1D	| x		| i		|
+BRSET	x,i,r,>C	|1E	| x		| i		| r		|
+BRCLR	x,i,r,>C	|1F	| x		| i		| r		|
 
-ABX	-		|0 0 1 1 1 0 1 0|
+ABX	-		|3A	|
 
-PSHX	-		|0 0 1 1 1 1 0 0|
-MUL	-		|0 0 1 1 1 1 0 1|
+PSHX	-		|3C	|
+MUL	-		|3D	|
 
-PULX	-		|0 0 1 1 1 0 0 0|
+PULX	-		|38	|
 
-SUBD	I		|1 0 0 0 0 0 1 1| I1		| I2		|
-SUBD	d		|1 0 0 1 0 0 1 1| d		|
-SUBD	x		|1 0 1 0 0 0 1 1| x		|
-SUBD	e		|1 0 1 1 0 0 1 1| e1		| e2		|
+SUBD	I		|83	| I1		| I2		|
+SUBD	d		|93	| d		|
+SUBD	x		|A3	| x		|
+SUBD	e		|B3	| e1		| e2		|
 
-ADDD	I		|1 1 0 0 0 0 1 1| I1		| I2		|
-ADDD	d		|1 1 0 1 0 0 1 1| d		|
-ADDD	x		|1 1 1 0 0 0 1 1| x		|
-ADDD	e		|1 1 1 1 0 0 1 1| e1		| e2		|
+ADDD	I		|C3	| I1		| I2		|
+ADDD	d		|D3	| d		|
+ADDD	x		|E3	| x		|
+ADDD	e		|F3	| e1		| e2		|
 
-XGDX	-		|1 0 0 0 1 1 1 1|
+XGDX	-		|8F	|
 
-LDD	I		|1 1 0 0 1 1 0 0| I1		| I2		|
-LDD	d		|1 1 0 1 1 1 0 0| d		|
-LDD	x		|1 1 1 0 1 1 0 0| x		|
-LDD	e		|1 1 1 1 1 1 0 0| e1		| e2		|
+LDD	I		|CC	| I1		| I2		|
+LDD	d		|DC	| d		|
+LDD	x		|EC	| x		|
+LDD	e		|FC	| e1		| e2		|
 
-STD	d		|1 1 0 1 1 1 0 1| d		|
-STD	x		|1 1 1 0 1 1 0 1| x		|
-STD	e		|1 1 1 1 1 1 0 1| e1		| e2		|
+STD	d		|DD	| d		|
+STD	x		|ED	| x		|
+STD	e		|FD	| e1		| e2		|
 
 """
 
