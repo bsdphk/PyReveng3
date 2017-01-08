@@ -354,7 +354,7 @@ wreg = ["%ax","%cx","%dx","%bx","%sp","%bp","%si","%di"]
 breg = ["%al","%cl","%dl","%bl","%ah","%ch","%dh","%bh"]
 ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di","%si","%di","%bp","%bx"]
 
-class arg_i1(object):
+class arg_i1(assy.Arg):
 	""" Immediate 8 bit """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_i1
@@ -362,7 +362,7 @@ class arg_i1(object):
 	def render(self, pj):
 		return "#0x%02x" % self.value
 
-class arg_i2(object):
+class arg_i2(assy.Arg):
 	""" Immediate 16 bit """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_i1 | ins.im.F_i2 << 8
@@ -370,7 +370,7 @@ class arg_i2(object):
 	def render(self, pj):
 		return "#0x%04x" % self.value
 
-class arg_da(object):
+class arg_da(assy.Arg):
 	""" Direct address """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_alo | ins.im.F_ahi << 8
@@ -421,7 +421,7 @@ def arg_ss(pj, ins):
 def arg_ds(pj, ins):
 	ins.seg = "%ds:"
 
-class arg_ea(object):
+class arg_ea(assy.Arg):
 	""" Effective address """
 	def __init__(self, pj, ins):
 		self.im = ins.im

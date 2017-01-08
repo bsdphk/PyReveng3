@@ -261,7 +261,7 @@ def task(pj, cpu):
 				ins.hi += 2
 			else:
 				l.append(i)
-		ins.oper.append("(" + ",".join(l) + ")")
+		ins.oper.append(assy.Arg_verbatim(pj, "(" + ",".join(l) + ")"))
 		ins.add_flow(pj, True, True, ins.hi)
 
 	cpu.flow_check.append(flow_post_arg)
@@ -809,7 +809,7 @@ def task(pj, cpu):
 				continue
 			if not k in keynos:
 				continue
-			y.oper[1].txt = "#KEY_" + keynos[k]
+			y.oper[0].txt = "#KEY_" + keynos[k]
 			
 		if i.dstadr in (0xe4e8,):
 			y = pj.t.find_hi(i.lo)

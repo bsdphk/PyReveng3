@@ -99,7 +99,7 @@ LDR	imm		|1 1 0 0|1 1 1 1| imm		|
 STR	reg,imm		|1 1 0 1| reg   | imm		|
 """
 
-class arg_imm(object):
+class arg_imm(assy.Arg):
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_imm
 
@@ -111,7 +111,7 @@ class arg_adrl(assy.Arg_dst):
 		ins.dstadr = (ins.lo & 0xf800) | (ins.im.F_ahi<<8) | ins.im.F_alo
 		super(arg_adrl, self).__init__(pj, ins.dstadr)
 
-class arg_reg(object):
+class arg_reg(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.reg = ins.im.F_reg
@@ -119,7 +119,7 @@ class arg_reg(object):
 	def render(self, pj):
 		return self.ins.lang.reg[self.reg]
 
-class arg_bno(object):
+class arg_bno(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.bno = ins.im.F_bno
@@ -127,7 +127,7 @@ class arg_bno(object):
 	def render(self, pj):
 		return self.ins.lang.bno[self.bno]
 
-class arg_dctl(object):
+class arg_dctl(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.dctl = ins.im.F_dctl
@@ -135,7 +135,7 @@ class arg_dctl(object):
 	def render(self, pj):
 		return self.ins.lang.dctl[self.dctl]
 
-class arg_dev(object):
+class arg_dev(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.dev = ins.im.F_dev
@@ -143,7 +143,7 @@ class arg_dev(object):
 	def render(self, pj):
 		return self.ins.lang.dev[self.dev]
 
-class arg_iA(object):
+class arg_iA(assy.Arg):
 	def __init__(self, pj, ins):
 		ins.dstadr = None
 		self.ins = ins
@@ -151,7 +151,7 @@ class arg_iA(object):
 	def render(self, pj):
 		return "(0x%x+A)" % (self.ins.lo & 0xf800)
 
-class arg_dA(object):
+class arg_dA(assy.Arg):
 	def __init__(self, pj, ins):
 		ins.dstadr = None
 		self.ins = ins
@@ -205,7 +205,7 @@ class arg_pgadr(assy.Arg_dst):
 		ins.dstadr |= (ins.im.F_ahi<<8) | ins.im.F_alo
 		super(arg_pgadr, self).__init__(pj, ins.dstadr)
 
-class arg_mctl(object):
+class arg_mctl(assy.Arg):
 	def __init__(self, pj, ins):
 		self.mctl = ins.im.F_mctl
 		self.ins = ins

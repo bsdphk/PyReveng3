@@ -90,7 +90,7 @@ def arg_data(pj, ins):
 def arg_d(pj, ins):
 	return assy.Arg_imm(pj, ins.im.F_d, 4)
 
-class arg_cc(object):
+class arg_cc(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.cc = ins.im.F_cc

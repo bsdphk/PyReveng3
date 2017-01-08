@@ -332,14 +332,14 @@ CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1|
 CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
 """
 
-class arg_i(object):
+class arg_i(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_i
 
 	def render(self, pj):
 		return "#0x%02x" % self.val
 
-class arg_d(object):
+class arg_d(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_d
 
@@ -443,7 +443,7 @@ class arg_P(assy.Arg_dst):
 			return "[" + s + "]"
 		return s
 
-class arg_t(object):
+class arg_t(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_t
 

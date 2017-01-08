@@ -177,6 +177,10 @@ class Decode(object):
 			print(pj.afmt(adr) + ": disass(%s) failed" % self.name)
 		else:
 			assert isinstance(x, Code)
+			self.commit(pj, x)
 			x.commit(pj)
 			pj.insert(x)
 		return x
+
+	def commit(self, pj, leaf):
+		return

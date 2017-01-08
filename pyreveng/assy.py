@@ -40,10 +40,10 @@ from . import instree, code
 #######################################################################
 
 class Invalid(Exception):
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		return repr(self.value)
+	pass
+
+class Wrong(Exception):
+	pass
 
 #######################################################################
 
@@ -55,20 +55,20 @@ class Assy(code.Code):
 
 	def render(self, pj):
 		s = self.mne + "\t"
-		t = ""
+		l = []
 		for i in self.oper:
-			if i == None:
+			if i is None:
 				continue
-			s += t
-			t = ","
-			if type(i) == str:
-				s += i
-				continue
-			try:
-				s += i.render(pj)
-			except AttributeError:
-				s += str(i)
-		return s
+			if not isinstance(i, Arg):
+				print(self)
+				print(self.lim)
+				print(self.lang)
+				print(self.mne)
+				print(self.oper)
+				raise Wrong("Not Arg, type '%s', str '%s'" %
+				    (str(type(i)), str(i)))
+			l.append(i.render(pj))
+		return s + ",".join(l)
 
 #######################################################################
 
@@ -85,17 +85,26 @@ class Instree_assy(Assy):
 		for self.im in lim:
 			i = self.im.assy
 			for j in i[1].split(","):
-				if j == "-":
-					continue
 				x = lang.args.get(j)
 				if x == None:
-					print("@0x%x Ignoring argument" %
-					    self.lo, j, "in", lang.name, i)
-					self.oper.append("?" + j + "?")
-				elif type(x) == str:
-					self.oper.append(x)
-				else:
-					self.oper.append(x(pj, self))
+					if j == "-":
+						continue
+					x = "?" + j + "?"
+					print("ERROR: ARG <%s> not translated" % j)
+				if type(x) != str:
+					x = x(pj, self)
+				if type(x) == str:
+					x = Arg_verbatim(pj, x)
+				if x == None:
+					continue
+				if not isinstance(x, Arg):
+					print(self)
+					print(lim)
+					print(lang)
+					raise Wrong("Not Arg, type '%s', str '%s'" %
+					    (str(type(x)), str(x)))
+				self.oper.append(x)
+
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
 
@@ -105,6 +114,7 @@ class Instree_disass(code.Decode):
 	def __init__(self, name, ins_word=8, mem_word=None, endian=None):
 		super(Instree_disass, self).__init__(name)
 		self.args = {
+			"-":	None,
 			">R":	Arg_flow_return,
 			">RC":	Arg_flow_return_cond,
 			">J":	Arg_flow_jmp,
@@ -131,7 +141,7 @@ class Instree_disass(code.Decode):
 				break
 			y = self.decode(pj, adr + x.len, l)
 			if y != None:
-				return y
+				break;
 			l.pop(-1)
 		if y != None:
 			for i in self.flow_check:
@@ -144,6 +154,9 @@ class Instree_disass(code.Decode):
 class Arg(object):
 	def __init__(self, pj):
 		self.pj = pj
+
+	def render(self, pj):
+		return str(self)
 
 class Arg_verbatim(Arg):
 	def __init__(self, pj, txt):
