@@ -145,7 +145,7 @@ class word_mem(address_space):
 	def __getitem__(self, a):
 		"""Read location"""
 		b = self._off(a)
-		if not (self.a[b] & DEFINED):
+		if not self.a[b] & DEFINED:
 			raise MemError(a, "Undefined")
 		return self.m[b]
 
@@ -154,7 +154,7 @@ class word_mem(address_space):
 
 	def __setitem__(self, a, d):
 		"""Write location"""
-		if (d & ~self.msk):
+		if d & ~self.msk:
 			raise MemError(a, "Data too big (0x%x)" % d)
 		b = self._off(a)
 		self.m[b] = self.mt(d)
@@ -170,14 +170,14 @@ class word_mem(address_space):
 
 	def set_attr(self, a, x):
 		"""Set attributes"""
-		if (x & ~self.amsk):
+		if x & ~self.amsk:
 			raise MemError(a, "Attribute too big (0x%x)" % x)
 		b = self._off(a)
 		self.a[b] |= x
 
 	def clr_attr(self, a, x):
 		"""Clear attributes"""
-		if (x & ~self.amsk):
+		if x & ~self.amsk:
 			raise MemError(a, "Attribute too big (0x%x)" % x)
 		b = self._off(a)
 		self.a[b] &= ~x
@@ -187,7 +187,7 @@ class word_mem(address_space):
 		s = " |"
 		b = self.bits - 8
 		while b >= 0:
-			if w == None:
+			if w is None:
 				s += " "
 			else:
 				x = (w >> b) & 0xff
@@ -405,4 +405,3 @@ if __name__ == "__main__":
 	print(m.get_attr(0x101))
 	print(m.set_attr(0x101, 4))
 	print(m.get_attr(0x101))
-

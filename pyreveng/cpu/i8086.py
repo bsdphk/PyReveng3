@@ -30,9 +30,6 @@ Disassembler for Intel i8086 microprocessor
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import instree, assy, binutils
 
 i8086_instructions="""
@@ -342,22 +339,22 @@ def fixup_mod_reg_rm(ins):
 i8086_instructions = fixup_mod_reg_rm(i8086_instructions)
 i8087_instructions = fixup_mod_reg_rm(i8087_instructions)
 if __name__ == "__main__":
-	import instree
 	print(i8086_instructions)
 	print(i8087_instructions)
-	it = instree.instree(8)
+	it = instree.Instree(8)
 	it.load_string(i8086_instructions)
 	it.load_string(i8087_instructions)
 	it.print()
 
-wreg = ["%ax","%cx","%dx","%bx","%sp","%bp","%si","%di"]
-breg = ["%al","%cl","%dl","%bl","%ah","%ch","%dh","%bh"]
-ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di","%si","%di","%bp","%bx"]
+wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
+breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
+ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 
 class arg_i1(assy.Arg):
 	""" Immediate 8 bit """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_i1
+		super(arg_i1, self).__init__(pj)
 
 	def render(self, pj):
 		return "#0x%02x" % self.value
@@ -366,6 +363,7 @@ class arg_i2(assy.Arg):
 	""" Immediate 16 bit """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_i1 | ins.im.F_i2 << 8
+		super(arg_i2, self).__init__(pj)
 
 	def render(self, pj):
 		return "#0x%04x" % self.value
@@ -374,6 +372,7 @@ class arg_da(assy.Arg):
 	""" Direct address """
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_alo | ins.im.F_ahi << 8
+		super(arg_da, self).__init__(pj)
 
 	def render(self, pj):
 		return "0x%04x" % self.value
@@ -426,6 +425,7 @@ class arg_ea(assy.Arg):
 	def __init__(self, pj, ins):
 		self.im = ins.im
 		self.seg = ins.seg
+		super(arg_ea, self).__init__(pj)
 
 	def render(self, pj):
 		print("R", self.im)
@@ -486,7 +486,7 @@ class arg_e3(arg_ea):
 
 def arg_sr(pj, ins):
 	""" Segment register """
-	return ["%es","%cs","%ss","%ds"][ins.im.F_sr]
+	return ["%es", "%cs", "%ss", "%ds"][ins.im.F_sr]
 
 def arg_r1(pj, ins):
 	""" Byte register """

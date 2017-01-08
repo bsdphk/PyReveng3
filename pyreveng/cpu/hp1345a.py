@@ -30,10 +30,7 @@ Disassembler for HP1345A graphical primitives
 
 from __future__ import print_function
 
-import os
-import sys
-
-from pyreveng import instree, assy
+from pyreveng import assy
 
 hp1345a_instructions = """
 _SET	i,l,s,>R	|0 1 1| i | ? | l |0|?| s | ?	|
@@ -90,7 +87,7 @@ def arg_s(pj, ins):
 
 
 class hp1345a(assy.Instree_disass):
-	def __init__(self, lang = "hp1345a"):
+	def __init__(self, lang="hp1345a"):
 		super(hp1345a, self).__init__(lang, 16, 8, ">")
 		self.it.load_string(hp1345a_instructions)
 

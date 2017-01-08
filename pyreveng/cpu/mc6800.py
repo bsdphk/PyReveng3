@@ -34,7 +34,7 @@ Presently supported variants:
 
 from __future__ import print_function
 
-from pyreveng import mem, assy, data
+from pyreveng import assy, data
 
 mc6800_instructions = """
 NOP	-	|01	|

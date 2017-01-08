@@ -30,9 +30,6 @@ Disassembler for HP1345A graphical primitives
 
 from __future__ import print_function
 
-import os
-import sys
-
 from pyreveng import instree, assy
 
 hp85662a_instructions = """
@@ -132,7 +129,7 @@ def arg_R(pj, ins):
 
 
 class hp85662a(assy.Instree_disass):
-	def __init__(self, lang = "hp85662a"):
+	def __init__(self, lang="hp85662a"):
 		super(hp85662a, self).__init__(lang, 16, 8, ">")
 
 		self.itc = instree.Instree(16, 8, ">")

@@ -34,7 +34,7 @@ Presently supported variants:
 """
 
 from __future__ import print_function
-from pyreveng import mem, assy, data
+from pyreveng import assy, data
 
 m68000_instructions = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -474,13 +474,13 @@ def arg_rlist(pj, ins):
 	l = []
 	if ins.im.F_eam == 4:
 		for r in ("A", "D"):
-			for n in range(7,-1,-1):
+			for n in range(7, -1, -1):
 				if v & 0x0001:
 					l.append(r + "%d" % n)
 				v >>= 1
 	else:
 		for r in ("D", "A"):
-			for n in range(0,8):
+			for n in range(0, 8):
 				if v & 0x0001:
 					l.append(r + "%d" % n)
 				v >>= 1
@@ -505,7 +505,7 @@ def arg_word(pj, ins):
 def arg_Z(pj, ins):
 	if ins.im.F_sz == 3:
 		raise assy.Invalid('0x%x F_sz == 3' % ins.lo)
-	i,j = [
+	i, j = [
 		[1, ".B"],
 		[2, ".W"],
 		[4, ".L"],
@@ -516,12 +516,12 @@ def arg_Z(pj, ins):
 
 
 class m68000(assy.Instree_disass):
-	def __init__(self, lang = "m68000"):
+	def __init__(self, lang="m68000"):
 		super(m68000, self).__init__(
 		    lang,
-		    ins_word = 16,
-		    mem_word = 8,
-		    endian = ">")
+		    ins_word=16,
+		    mem_word=8,
+		    endian=">")
 		self.it.load_string(m68000_instructions)
 
 		self.args.update( {
@@ -584,7 +584,7 @@ class m68000(assy.Instree_disass):
 			return "VECTOR_TRAP_%d" % (v - 32)
 		return "VECTOR_%d" % v
 
-	def vectors(self, pj, hi = 0x400):
+	def vectors(self, pj, hi=0x400):
 		y = data.Const(pj, 0, 4, "0x%08x", pj.m.bu32, 4)
 		y.lcmt = "Reset SP"
 		vn = {}
@@ -621,11 +621,11 @@ class m68000(assy.Instree_disass):
 
 	def decodex(self, pj, adr):
 		y = super(m68000, self).decode(pj, adr)
-		if y == None:
+		if y is None:
 			return y
 		for i in y.im.assy[1].split(","):
 			if i != "ea":
 				continue
-			if arg_ea(pj, y) == None:
+			if arg_ea(pj, y) is None:
 				return None
 		return y

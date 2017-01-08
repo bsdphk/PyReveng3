@@ -30,10 +30,7 @@ Disassembler for Intel mcs-51 microprocessor family
 
 from __future__ import print_function
 
-import os
-import sys
-
-from pyreveng import instree, assy
+from pyreveng import assy
 
 mcs51_instructions = """
 
@@ -268,7 +265,7 @@ def arg_anbit(pj, ins):
 	return "/" + arg_abit(pj, ins)
 
 class mcs51(assy.Instree_disass):
-	def __init__(self, lang = "mcs51"):
+	def __init__(self, lang="mcs51"):
 		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)
 		self.args.update( {

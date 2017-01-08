@@ -26,7 +26,6 @@
 
 from __future__ import print_function
 
-import sys
 from . import mem, misc
 
 class Render_mem(object):
@@ -61,7 +60,7 @@ class Render_mem(object):
 			except mem.MemError:
 				v = None
 
-			if v == None:
+			if v is None:
 				s += " " + self.undef
 			else:
 				s += " " + self.dpct % v
@@ -69,7 +68,7 @@ class Render_mem(object):
 			if self.ascii:
 				b = pj.m.bits - 8
 				while b >= 0:
-					if v == None:
+					if v is None:
 						t += " "
 					else:
 						x = (v >> b) & 0xff
@@ -109,7 +108,7 @@ class Listing(object):
 
 		nxxx = 0
 		cxxx = 0
-		if fn == None:
+		if fn is None:
 			fn = "/tmp/_." + pj.name + ".txt"
 		print("Listing into", fn)
 		self.fo = open(fn, "w")
@@ -123,7 +122,7 @@ class Listing(object):
 				a0 = i.lo
 
 			rx = i.render(pj)
-			if rx == None:
+			if rx is None:
 				alo = pj.afmt(i.lo)
 				ahi = pj.afmt(i.hi)
 				self.fo.write(
@@ -181,7 +180,7 @@ class Listing(object):
 			self.fo.write("-------------------------------------------------------------------------------\n")
 
 		lbl = self.pj.labels.get(lo)
-		if lbl == None:
+		if lbl is None:
 			lbl = "\t"
 		elif len(lbl) > 6:
 			self.fo.write("%s\t%s:\n" % (" " * len(hex[0]), lbl))

@@ -30,10 +30,7 @@ Disassembler for Intel MCS4 ("Worlds first") microprocessor
 
 from __future__ import print_function
 
-import os
-import sys
-
-from pyreveng import instree, assy
+from pyreveng import assy
 
 mcs4_instructions="""
 NOP	-		|0 0 0 0|0 0 0 0|
@@ -95,10 +92,11 @@ class arg_cc(assy.Arg):
 		self.ins = ins
 		self.cc = ins.im.F_cc
 		ins.cc = self.render(pj)
+		super(arg_cc, self).__init__(pj)
 
 	def render(self, pj):
 		x = self.ins.lang.cc.get(self.cc)
-		if x == None:
+		if x is None:
 			return "CC#0x%x" % self.cc
 		else:
 			return x

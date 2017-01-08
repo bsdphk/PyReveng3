@@ -30,9 +30,10 @@ Data of various sorts
 
 from __future__ import print_function
 
+import struct
+
 from . import job
 
-import struct
 
 #######################################################################
 
@@ -43,21 +44,21 @@ class Data(job.Leaf):
 		self.fmt = None
 
 	def render(self, pj):
-		if self.fmt == None:
+		if self.fmt is None:
 			return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 		return self.fmt
 
 class Const(Data):
-	def __init__(self, pj, lo, hi, fmt = None, func = None, size=1):
+	def __init__(self, pj, lo, hi, fmt=None, func=None, size=1):
 		super(Const, self).__init__(pj, lo, hi, "const")
-		if func == None:
+		if func is None:
 			func = pj.m.rd
-		if fmt == None:
+		if fmt is None:
 			fmt = "0x%x"
-		l = []
+		v = []
 		for a in range(lo, hi, size):
-			l.append(fmt % func(a))
-		self.fmt = ",".join(l)
+			v.append(fmt % func(a))
+		self.fmt = ",".join(v)
 		self.typ = ".CONST"
 		self.val = None
 		self.compact = True
@@ -67,13 +68,13 @@ class Const(Data):
 
 class Pstruct(Data):
 	''' Uses python struct.* to untangle data '''
-	def __init__(self, pj, lo, spec, fmt = None, typ = ".PSTRUCT"):
+	def __init__(self, pj, lo, spec, fmt=None, typ=".PSTRUCT"):
 		hi = lo + struct.calcsize(spec)
 		super(Pstruct, self).__init__(pj, lo, hi, "const")
-		l = []
+		v = []
 		for i in range(lo, hi):
-			l.append(pj.m.rd(i))
-		self.data = struct.unpack(spec, bytearray(l))
+			v.append(pj.m.rd(i))
+		self.data = struct.unpack(spec, bytearray(v))
 		self.spec = spec
 		self.fmt = fmt
 		self.typ = typ
@@ -102,46 +103,47 @@ class Dataptr(Data):
 	def render(self, pj):
 		return ".PTR\t" + pj.render_adr(self.dst)
 
-def stringify(pj, lo, len=None, term=None):
-	if term == None:
+def stringify(pj, lo, length=None, term=None):
+	if term is None:
 		term = (0,)
 	s = ""
-	l = ""
+	v = ""
 	while True:
 		x = pj.m.rd(lo)
 		lo += 1
-		if len == None and x in term:
-			return lo,s,l
+		if length is None and x in term:
+			return lo, s, v
 		if x > 32 and x < 127:
 			s += "%c" % x
-			l += "%c" % x
+			v += "%c" % x
 		elif x == 32:
 			s += " "
 		elif x == 10:
 			s += "\\n"
-			l += "NL"
+			v += "NL"
 		elif x == 13:
 			s += "\\r"
-			l += "CR"
+			v += "CR"
 		else:
 			s += "\\x%02x" % x
-			l += "%%%02x" % x
-		if len != None:
-			len -= 1
-			if len == 0:
-				return lo,s,l
+			v += "%%%02x" % x
+		if length != None:
+			length -= 1
+			if length == 0:
+				return lo, s, v
 
 class Txt(Data):
-	def __init__(self, pj, lo, hi=None, label=True, term=None, pfx=None, align=2):
+	def __init__(self, pj, lo, hi=None,
+	    label=True, term=None, pfx=None, align=2):
 		self.pre = ""
 		if pfx == 1:
 			x = pj.m.rd(lo)
 			self.pre = '%d,' % x
-			hi,s,l = stringify(pj, lo + 1, len=x)
-		elif hi == None:
-			hi,s,l = stringify(pj, lo, term=term)
+			hi, s, v = stringify(pj, lo + 1, length=x)
+		elif hi is None:
+			hi, s, v = stringify(pj, lo, term=term)
 		else:
-			hi,s,l = stringify(pj, lo, hi - lo, term=term)
+			hi, s, v = stringify(pj, lo, hi - lo, term=term)
 
 		while hi % align:
 			hi += 1
@@ -149,7 +151,7 @@ class Txt(Data):
 		self.txt = s
 		self.fmt = "'" + s + "'"
 		if label:
-			pj.set_label(lo, "t_" + l.strip())
+			pj.set_label(lo, "t_" + v.strip())
 		self.compact = True
 
 	def render(self, pj):
@@ -157,4 +159,3 @@ class Txt(Data):
 
 	def arg_render(self, pj):
 		return "'" + self.txt + "'"
-

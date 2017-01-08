@@ -33,7 +33,7 @@ Presently supported variants:
 
 from __future__ import print_function
 
-from pyreveng import mem, assy, data
+from pyreveng import assy, data
 
 mc6809_instructions = """
 NEG	-	|0 0 0 0 0 0 0 0| d		|
@@ -335,6 +335,7 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
 class arg_i(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_i
+		super(arg_i, self).__init__(pj)
 
 	def render(self, pj):
 		return "#0x%02x" % self.val
@@ -342,6 +343,7 @@ class arg_i(assy.Arg):
 class arg_d(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_d
+		super(arg_d, self).__init__(pj)
 
 	def render(self, pj):
 		return "$0x%02x" % self.val
@@ -370,7 +372,7 @@ class arg_R(assy.Arg_dst):
 		ins.dstadr = (ins.hi + a) & 0xffff
 		super(arg_R, self).__init__(pj, ins.dstadr)
 
-class arg_s(assy.Arg_dst):
+class arg_s(assy.Arg):
 	def __init__(self, pj, ins):
 		x = ins.im.F_i
 		l = []
@@ -386,6 +388,7 @@ class arg_s(assy.Arg_dst):
 		if ins.mne[:3] == "PSH":
 			l = reversed(l)
 		self.s = ",".join(l)
+		super(arg_s, self).__init__(pj)
 
 	def render(self, pj):
 		return self.s
@@ -395,7 +398,7 @@ class arg_P(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		if ins.im.F_X == 1:
-			ins.hi += [0,0,0,0,0,0,0,0,1,2,0,0,1,2,0,2][ins.im.F_m]
+			ins.hi += [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 2][ins.im.F_m]
 		if self.ins.im.F_X == 1 and self.ins.im.F_m == 0xf:
 			ins.dstadr = pj.m.bu16(self.ins.hi - 2)
 		super(arg_P, self).__init__(pj, ins.dstadr, "")
@@ -446,11 +449,12 @@ class arg_P(assy.Arg_dst):
 class arg_t(assy.Arg):
 	def __init__(self, pj, ins):
 		self.val = ins.im.F_t
+		super(arg_t, self).__init__(pj)
 
 	def render(self, pj):
 		r = [
-			"D", "X", "Y", "U",
-			"S", "PC","?6?", "?7?",
+			"D", "X",  "Y", "U",
+			"S", "PC", "?6?", "?7?",
 			"A", "B", "CCR", "DPR",
 			"?c?", "?d?", "?e?", "?f?"
 		]
@@ -483,7 +487,7 @@ class mc6809(assy.Instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
-	def vectors(self, pj, adr = 0xfff0):
+	def vectors(self, pj, adr=0xfff0):
 		for v in (
 			"V??", "SWI3", "SWI2", "FIRQ",
 			"IRQ", "SWI", "NMI", "RST"

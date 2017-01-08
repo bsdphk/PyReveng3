@@ -68,11 +68,11 @@ class Tree(object):
 		"""
 		assert o.lo < o.hi
 		if o.hi <= self.mid and not self.leaf:
-			if self.less == None:
+			if self.less is None:
 				self.less = Tree(self.lo, self.mid, self.lim)
 			self.less.insert(o)
 		elif o.lo >= self.mid and not self.leaf:
-			if self.more == None:
+			if self.more is None:
 				self.more = Tree(self.mid, self.hi, self.lim)
 			self.more.insert(o)
 		else:
@@ -87,7 +87,7 @@ class Tree(object):
 			Objects which are both inside and outside the range
 		"""
 		assert lo < hi
-		if l == None:
+		if l is None:
 			l = [[], [], [], []]
 		if lo < self.mid and self.less != None:
 			self.less.find_range(lo, hi, l)
@@ -110,7 +110,7 @@ class Tree(object):
 		"""
 		Return list of objects with given .lo
 		"""
-		if l == None:
+		if l is None:
 			l = []
 		if lo < self.mid and self.less != None:
 			self.less.find_lo(lo, l)
@@ -125,7 +125,7 @@ class Tree(object):
 		"""
 		Return list of objects with given .hi
 		"""
-		if l == None:
+		if l is None:
 			l = []
 		if hi <= self.mid and self.less != None:
 			self.less.find_hi(hi, l)
@@ -165,7 +165,7 @@ class Tree(object):
 			yield lst.pop(0)
 
 if __name__ == "__main__":
-	"""Minimal test cases"""
+	# Minimal test cases
 
 	class Leaf(object):
 		def __init__(self, lo, hi, tag):

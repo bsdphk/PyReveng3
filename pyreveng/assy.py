@@ -86,16 +86,16 @@ class Instree_assy(Assy):
 			i = self.im.assy
 			for j in i[1].split(","):
 				x = lang.args.get(j)
-				if x == None:
+				if x is None:
 					if j == "-":
 						continue
 					x = "?" + j + "?"
 					print("ERROR: ARG <%s> not translated" % j)
-				if type(x) != str:
+				if not isinstance(x, str):
 					x = x(pj, self)
-				if type(x) == str:
+				if isinstance(x, str):
 					x = Arg_verbatim(pj, x)
-				if x == None:
+				if x is None:
 					continue
 				if not isinstance(x, Arg):
 					print(self)
@@ -121,13 +121,13 @@ class Instree_disass(code.Decode):
 			">JC":	Arg_flow_jmp_cond,
 			">C":	Arg_flow_call,
 		}
-		if mem_word == None:
+		if mem_word is None:
 			mem_word = ins_word
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
 
-	def decode(self, pj, adr, l = None):
-		if l == None:
+	def decode(self, pj, adr, l=None):
+		if l is None:
 			l = []
 		y = None
 		for x in self.it.find(pj, adr):
@@ -141,7 +141,7 @@ class Instree_disass(code.Decode):
 				break
 			y = self.decode(pj, adr + x.len, l)
 			if y != None:
-				break;
+				break
 			l.pop(-1)
 		if y != None:
 			for i in self.flow_check:
@@ -177,7 +177,7 @@ class Arg_dst(Arg):
 		l = self.pj.labels.get(self.dst)
 		if l != None:
 			return self.pfx + "%s" % l + self.sfx
-		elif self.dst == None:
+		elif self.dst is None:
 			return self.pfx + "0x?" + self.sfx
 		else:
 			return self.pfx + "0x%x" % self.dst + self.sfx

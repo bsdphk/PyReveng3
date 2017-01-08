@@ -39,13 +39,7 @@ assumes that the upper (0xf800) address bits are preserved.
 
 from __future__ import print_function
 
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join("..")))
-
-
-from pyreveng import instree, assy
+from pyreveng import assy
 
 # Lower-case means we guessed
 # Uppercase came from 09411 listing
@@ -102,6 +96,7 @@ STR	reg,imm		|1 1 0 1| reg   | imm		|
 class arg_imm(assy.Arg):
 	def __init__(self, pj, ins):
 		self.value = ins.im.F_imm
+		super(arg_imm, self).__init__(pj)
 
 	def render(self, pj):
 		return "#0x%x" % self.value
@@ -115,6 +110,7 @@ class arg_reg(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.reg = ins.im.F_reg
+		super(arg_reg, self).__init__(pj)
 
 	def render(self, pj):
 		return self.ins.lang.reg[self.reg]
@@ -123,6 +119,7 @@ class arg_bno(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.bno = ins.im.F_bno
+		super(arg_bno, self).__init__(pj)
 
 	def render(self, pj):
 		return self.ins.lang.bno[self.bno]
@@ -131,6 +128,7 @@ class arg_dctl(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.dctl = ins.im.F_dctl
+		super(arg_dctl, self).__init__(pj)
 
 	def render(self, pj):
 		return self.ins.lang.dctl[self.dctl]
@@ -139,6 +137,7 @@ class arg_dev(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
 		self.dev = ins.im.F_dev
+		super(arg_dev, self).__init__(pj)
 
 	def render(self, pj):
 		return self.ins.lang.dev[self.dev]
@@ -147,6 +146,7 @@ class arg_iA(assy.Arg):
 	def __init__(self, pj, ins):
 		ins.dstadr = None
 		self.ins = ins
+		super(arg_iA, self).__init__(pj)
 
 	def render(self, pj):
 		return "(0x%x+A)" % (self.ins.lo & 0xf800)
@@ -155,6 +155,7 @@ class arg_dA(assy.Arg):
 	def __init__(self, pj, ins):
 		ins.dstadr = None
 		self.ins = ins
+		super(arg_dA, self).__init__(pj)
 
 	def render(self, pj):
 		return "(0x%x-A)" % (0x800 + self.ins.lo & 0xf800)
@@ -209,6 +210,7 @@ class arg_mctl(assy.Arg):
 	def __init__(self, pj, ins):
 		self.mctl = ins.im.F_mctl
 		self.ins = ins
+		super(arg_mctl, self).__init__(pj)
 
 	def render(self, pj):
 		l = list()

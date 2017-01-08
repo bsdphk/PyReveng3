@@ -106,7 +106,7 @@ class Job(object):
 
 	def find(self, adr, tag=None):
 		x = self.t.find_lo(adr)
-		if tag == None:
+		if tag is None:
 			return x
 		for i in x:
 			if i.tag == tag:
@@ -133,7 +133,7 @@ class Job(object):
 		return l
 
 	def todo(self, adr, func):
-		assert type(adr) == int
+		assert isinstance(adr, int)
 		if adr >= self.m.lo and adr < self.m.hi:
 			self.dolist.append((adr, func))
 			return

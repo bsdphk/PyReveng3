@@ -89,7 +89,7 @@ class Discover(object):
 					x = self.cx.decode(self.pj, adr)
 				except mem.MemError:
 					continue
-				if x == None:
+				if x is None:
 					continue
 				self.code[adr] = x
 				self.trust[adr] = 1
@@ -176,7 +176,7 @@ class Discover(object):
 				if k == adr:
 					continue
 				if self.prob[k] < self.prob[adr]:
-					g = True;
+					g = True
 					break
 		if not g:
 			p -= 0.1
@@ -220,7 +220,7 @@ class Discover(object):
 		"""
 
 		n = 0
-		for i in self.trust.keys():
+		for i in self.trust:
 			if self.trust[i] == 0 or self.trust[i] > 1:
 				continue
 			if self.prob[i] < 0.1:
@@ -235,7 +235,7 @@ class Discover(object):
 
 	def commit(self):
 		n = 0
-		for i in self.code.keys():
+		for i in self.code:
 			if self.trust[i] > 0 and self.trust[i] < 10:
 				c = self.code[i]
 				c.lcmt += "<discover>\n"

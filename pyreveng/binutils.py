@@ -55,4 +55,3 @@ def ask_objdump(p, adr, m, M):
 	r = r.split("\n")
 	os.unlink(nm)
 	return r[7]
-

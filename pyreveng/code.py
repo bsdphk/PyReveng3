@@ -49,7 +49,7 @@ class Flow(object):
 	execution can go next and under what condition.
 	"""
 	def __init__(self, fm, typ, cond=True, to=None, lang=None):
-		if lang == None:
+		if lang is None:
 			lang = fm.lang
 		self.fm = fm
 		self.lang = lang
@@ -58,7 +58,7 @@ class Flow(object):
 		self.to = to
 		self.dst = None
 
-		if typ == True:
+		if typ is True:
 			self.to = fm.hi
 
 	def propagate(self, pj):
@@ -67,12 +67,12 @@ class Flow(object):
 			del pj.pending_flows[self.fm.lo]
 			x.propagate(pj)
 
-		if self.to != None:
+		if not self.to is None:
 			pj.todo(self.to, self.lang.disass)
 
 	def __repr__(self):
 		s = "<Flow @%x " % self.fm.lo + str(self.typ)
-		if self.to == None:
+		if self.to is None:
 			s += " -"
 		else:
 			s += " 0x%x" % self.to
@@ -80,14 +80,14 @@ class Flow(object):
 		return s
 
 	def lcmt(self, leaf):
-		if self.typ == True:
+		if self.typ is True:
 			return
 		s = "Flow %s" % self.typ
-		if self.cond == None:
+		if self.cond is None:
 			s += " cc=?"
 		elif self.cond != True:
 			s += " cc=%s" % self.cond
-		if self.to != None:
+		if not self.to is None:
 			s += " 0x%x" % self.to
 		leaf.lcmt += s + "\n"
 
@@ -141,7 +141,7 @@ class Decode(object):
 	Base class for decoding code.
 	"""
 	def __init__(self, name):
-		assert type(name) == str
+		assert isinstance(name, str)
 		self.name = name
 
 	def init_code(self, pj, x):
@@ -173,7 +173,7 @@ class Decode(object):
 		if len(y) > 0:
 			return y
 		x = self.decode(pj, adr)
-		if x == None:
+		if x is None:
 			print(pj.afmt(adr) + ": disass(%s) failed" % self.name)
 		else:
 			assert isinstance(x, Code)

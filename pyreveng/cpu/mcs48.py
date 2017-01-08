@@ -30,10 +30,7 @@ Disassembler for Intel mcs-48 microprocessor family
 
 from __future__ import print_function
 
-import os
-import sys
-
-from pyreveng import instree, assy
+from pyreveng import assy
 
 mcs48_instructions = """
 # 4-8
@@ -216,7 +213,7 @@ def arg_im(pj, ins):
 	return "#0x%02x" % ins.im.F_im
 
 class mcs48(assy.Instree_disass):
-	def __init__(self, lang = "mcs48"):
+	def __init__(self, lang="mcs48"):
 		super(mcs48, self).__init__(lang, 8)
 		self.it.load_string(mcs48_instructions)
 
@@ -242,7 +239,7 @@ class mcs48(assy.Instree_disass):
 		self.amask = a
 
 	def vectors(self, pj):
-		for a,l in (
+		for a, l in (
 			(0x000, "RESET"),
 			(0x003, "INT"),
 			(0x007, "TINT"),

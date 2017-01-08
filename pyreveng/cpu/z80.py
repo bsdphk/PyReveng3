@@ -31,7 +31,7 @@ Partial disassembler for Z80
 
 from __future__ import print_function
 
-from pyreveng import mem, assy, data
+from pyreveng import assy, data
 
 z80_instructions = """
 LD	rd,rs		|0 1| rd  | rs  |

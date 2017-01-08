@@ -31,7 +31,7 @@ Disassembler for TI TMS9900 microprocessor
 
 from __future__ import print_function
 
-from pyreveng import instree, assy, data
+from pyreveng import assy, data
 
 tms9900_instructions = """
 A	b,so,do	|1 0 1|b|td | d     |ts | s     |
@@ -252,12 +252,12 @@ class Tms9900(assy.Instree_disass):
 			pj.set_label(c.dstadr, lbl)
 			return c
 
-		c = vect(pj, adr, "RESET")
+		vect(pj, adr, "RESET")
 		for i in range(1, self.n_interrupt):
 			if pj.m.bu16(i * 4) != 0:
-				c = vect(pj, i * 4, "INT%d" % i)
+				vect(pj, i * 4, "INT%d" % i)
 		for i in range(xops):
-			c = vect(pj, 0x40 + i * 4, "XOP%d" % i)
+			vect(pj, 0x40 + i * 4, "XOP%d" % i)
 
 class Tms9981(Tms9900):
 	def __init__(self):
@@ -265,5 +265,5 @@ class Tms9981(Tms9900):
 		self.n_interrupt = 5
 
 if __name__ == "__main__":
-	h = tms9900()
+	h = Tms9900()
 	h.it.print()

@@ -147,7 +147,7 @@ def resolve(pj, adr, map, inv):
 			l.append(False)
 	n &= 0x7f
 	k = known.get(n)
-	if k == None:
+	if k is None:
 		print("NB! Unknown 7seg (TBL idx: 0x%x)" % n)
 	return k, l
 
@@ -156,7 +156,7 @@ class digit(job.Leaf):
 		"""
 		map = [A, B, C, D, E, F, G, RDP, LDP]
 		"""
-		if map == None:
+		if map is None:
 			map = default_map
 		assert len(map) == 9
 		super(digit, self).__init__(pj, adr, adr+1, "7seg")
@@ -186,7 +186,7 @@ def table(pj, lo, hi, map=None, inv=False, verbose=False):
 	"""
 	map = [A, B, C, D, E, F, G, RDP, LDP]
 	"""
-	if map == None:
+	if map is None:
 		map = default_map
 	assert len(map) == 9
 	c = pj.add(lo, hi, "7segtable")
@@ -206,7 +206,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 	f = False
 	for i in pattern:
 		j = known_rev.get(i)
-		if j == None:
+		if j is None:
 			print("cannot hunt for '%s' -- no reference" % i)
 			f = True
 		else:
@@ -217,7 +217,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		p = True
 		n = True
 		y = list()
-		for i in range(len(l)):
+		for i, z in enumerate(l):
 			try:
 				x = pj.m.rd(a + i * distance)
 			except mem.MemError:
@@ -225,9 +225,9 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 				n = False
 				break
 			y.append(x)
-			if bc(x) != l[i]:
+			if bc(x) != z:
 				p = False
-			if bc(x ^ 255) != l[i]:
+			if bc(x ^ 255) != z:
 				n = False
 			if not p and not n:
 				break
@@ -242,8 +242,8 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		adr = a
 
 		# Prune map based on recognized pattern
-		for i in range(len(pattern)):
-			j = known_rev[pattern[i]]
+		for i, z in enumerate(pattern):
+			j = known_rev[z]
 			yy = y[i]
 			if inv:
 				yy ^= 0xff
@@ -261,15 +261,15 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		f = False
 		while True:
 			d = True
-			for i in range(len(map)):
-				if map[i] == 0:
+			for i, z in enumerate(map):
+				if z == 0:
 					f = True
 					break
-				if bc(map[i]) != 1:
+				if bc(z) != 1:
 					continue
-				for j in range(len(map)):
-					if j != i and map[j] & map[i]:
-						map[j] &= ~map[i]
+				for j, w in enumerate(map):
+					if j != i and w & z:
+						w &= ~z
 						d = False
 			if d:
 				break
@@ -289,7 +289,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		s = "\t\tProbable table contents:"
 		while True:
 			x, y = resolve(pj, adr, map, inv)
-			if x == None:
+			if x is None:
 				break
 			s += " " + x
 			adr += distance
