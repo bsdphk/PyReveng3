@@ -618,14 +618,3 @@ class m68000(assy.Instree_disass):
 			else:
 				pj.set_label(i, "VECTORS_%d" % mv)
 				mv += 1
-
-	def decodex(self, pj, adr):
-		y = super(m68000, self).decode(pj, adr)
-		if y is None:
-			return y
-		for i in y.im.assy[1].split(","):
-			if i != "ea":
-				continue
-			if arg_ea(pj, y) is None:
-				return None
-		return y
