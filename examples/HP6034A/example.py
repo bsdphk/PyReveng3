@@ -30,17 +30,16 @@ import os
 from pyreveng import job, mem, listing, data, code
 import pyreveng.cpu.tms9900 as tms9900
 
-def setup():
-
+def mem_setup():
 	m = mem.byte_mem(0x0000, 0x2000)
-
 	fn = os.path.join(os.path.dirname(__file__), "HP6034A_U25.hex")
-	fi = open(fn)
-	for i in fi:
+	for i in open(fn):
 		j = i.split()
 		m.wr(int(j[0], 16), int(j[1], 16))
+	return m
 
-	pj = job.Job(m, "HP6034A")
+def setup():
+	pj = job.Job(mem_setup(), "HP6034A")
 	cx = tms9900.Tms9981()
 	return pj, cx
 

@@ -31,13 +31,14 @@ import os
 from pyreveng import job, mem, code, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
-def setup():
-
+def mem_setup():
 	m = mem.byte_mem(0x0000, 0x0200)
 	fn = os.path.join(os.path.dirname(__file__), "1818-2270B.bin")
 	m.load_binfile(0, 1, fn)
+	return m
 
-	pj = job.Job(m, "HP3455A")
+def setup():
+	pj = job.Job(mem_setup(), "HP3455A")
 
 	dx = hp_nanoproc.hp_nanoproc_pg()
 

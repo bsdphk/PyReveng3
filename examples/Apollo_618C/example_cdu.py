@@ -37,12 +37,15 @@ import os
 from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.mcs51 as mcs51
 
-def setup():
+def mem_setup():
 	m = mem.byte_mem(0x0000, 0x1000)
 	fn = os.path.join(os.path.dirname(__file__),
 	    "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin")
 	m.load_binfile(0x0000, 1, fn)
-	pj  = job.Job(m, "Apollo618c_cdu")
+	return m
+
+def setup():
+	pj  = job.Job(mem_setup(), "Apollo618c_cdu")
 	cx = mcs51.i8032()
 	return pj, cx
 

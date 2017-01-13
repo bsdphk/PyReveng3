@@ -79,7 +79,7 @@ class mycpu(m68000.m68000):
 		s += "|\n"
 		self.it.load_string(s)
 
-def setup():
+def mem_setup():
 	m = mem.byte_mem(0x0, 0x20000)
 	for b,n in (
 		(0x00000, "85680-80116.BIN"),
@@ -89,7 +89,10 @@ def setup():
 	):
 		m.load_binfile(first = b, step = 0x2,
 		    filename=os.path.join(os.path.dirname(__file__), n))
+	return m
 
+def setup():
+	m = mem_setup()
 	# Checum EPROMS
 	# See 00e9e/ROMSUM
 	s = [0xff, 0xff, 0xff, 0xff]

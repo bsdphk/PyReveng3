@@ -35,11 +35,14 @@ fw="01347-80010.bin"
 
 #######################################################################
 
-def setup():
+def mem_setup():
 	m = mem.byte_mem(0x0, 0x400)
 	m.load_binfile(0x0, 1, os.path.join(os.path.dirname(__file__), fw))
+	return m
 
-	pj = job.Job(m, "HP1345A")
+
+def setup():
+	pj = job.Job(mem_setup(), "HP1345A")
 	cpu = mcs48.i8748()
 	return pj,cpu
 

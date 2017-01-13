@@ -30,34 +30,22 @@ import os
 from pyreveng import job, mem, listing, code
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
-def setup():
-
-	#######################################################################
+def mem_setup():
 	# Slightly confusing mapping of memory for this one.  Probably an
 	# artifact of a chance from smaller to bigger ROMS along the way.
-
 	m = mem.byte_mem(0x0000, 0x4000)
-
 	fn = os.path.join(os.path.dirname(__file__), "A6U1.bin")
-	fi = open(fn, "rb")
-	d = bytearray(fi.read())
-	fi.close()
+	d = bytearray(open(fn, "rb").read())
 	m.load_data(0x0000, 1, d[:0x1000])
 	m.load_data(0x2000, 1, d[0x1000:])
-
 	fn = os.path.join(os.path.dirname(__file__), "A6U2.bin")
-	fi = open(fn, "rb")
-	d = bytearray(fi.read())
-	fi.close()
+	d = bytearray(open(fn, "rb").read())
 	m.load_data(0x1000, 1, d[:0x1000])
 	m.load_data(0x3000, 1, d[0x1000:])
+	return m
 
-	#######################################################################
-
-	pj = job.Job(m, "HP3325A")
-
-	#######################################################################
-
+def setup():
+	pj = job.Job(mem_setup(), "HP3325A")
 	dx = hp_nanoproc.hp_nanoproc_pg()
 	return pj, dx
 

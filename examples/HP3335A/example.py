@@ -30,16 +30,16 @@ import os
 from pyreveng import job, mem, listing, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
-def setup():
-
+def mem_setup():
 	m = mem.byte_mem(0x6800, 0x8000)
-	
 	dn = os.path.dirname(__file__)
 	m.load_binfile(0x6800, 1, os.path.join(dn, "A13U2.bin"))
 	m.load_binfile(0x7000, 1, os.path.join(dn, "A13U3.bin"))
 	m.load_binfile(0x7800, 1, os.path.join(dn, "A13U4.bin"))
+	return m
 
-	pj = job.Job(m, "HP3335A")
+def setup():
+	pj = job.Job(mem_setup(), "HP3335A")
 	cpu = mc6800.mc6800(mask = 0x7fff)
 
 	return pj, cpu

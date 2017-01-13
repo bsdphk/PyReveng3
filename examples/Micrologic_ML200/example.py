@@ -30,8 +30,7 @@ import os
 from pyreveng import job, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4
 
-def setup():
-
+def mem_setup():
 	m = mem.byte_mem(0x0, 0x900)
 	def hexfile(bn, a0):
 		fn = os.path.join(os.path.dirname(__file__), bn)
@@ -49,8 +48,11 @@ def setup():
 
 	hexfile("P8316.hex", 0)
 	hexfile("P1702.hex", 0x800)
+	return m
 
-	pj = job.Job(m, "Micrologic_ML200")
+
+def setup():
+	pj = job.Job(mem_setup(), "Micrologic_ML200")
 
 	cpu = mcs4.mcs4()
 
