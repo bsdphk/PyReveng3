@@ -547,23 +547,23 @@ def task(pj, cpu):
 		for a in range(0x193da, 0x194b2, 2):
 			y = oldcmd(pj, a, n)
 			n += 1
-		print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
+		# print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
 
 		pj.set_label(0x194b2, "KEYTAB")
 		for a in range(0x194b2, 0x1951e, 8):
 			y = data.Const(pj, a, min(a + 8, 0x1951e), fmt="0x%02x")
-		print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
+		# print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
 
 		pj.set_label(0x1951e, "IMEDBITS")
 		for a in range(0x1951e, 0x1952c, 8):
 			y = data.Const(pj, a, min(a + 8, 0x1952c), fmt="0x%02x")
-		print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
+		# print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
 
 		pj.set_label(0x1952c, "SFLGVAL")
 		for a in range(0x1952c, 0x195c4, 16):
 			y = data.Const(pj, a, min(a + 16, 0x195c4),
 			    "0x%08x", pj.m.bu32, 4)
-		print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
+		# print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
 
 	###############################################################
 
@@ -585,7 +585,7 @@ def task(pj, cpu):
 
 	for n in keynos:
 		t = keynos[n]
-		print("KEY_%02x" % n, t)
+		# print("KEY_%02x" % n, t)
 		sk = "KS%c" % n
 		ksk = hp856x_cmds.cmds.get(sk)
 		if ksk != None and type(ksk) != str:
@@ -784,7 +784,7 @@ def task(pj, cpu):
 		pj.set_label(0x19826, "PFXSCALE")
 		for a in range(0x19826, 0x19853, 1):
 			y = data.Const(pj, a, a + 1, fmt="0x%02x")
-		print("PFXSCALE %d" % ((0x19853-0x19826)/1))
+		# print("PFXSCALE %d" % ((0x19853-0x19826)/1))
 
 
 	else: 
@@ -1302,7 +1302,7 @@ def task(pj, cpu):
 			0x021a8,
 			0x02268,
 		):
-			print("ORPHAN %x" % a)
+			# print("ORPHAN %x" % a)
 			y = cpu.disass(pj, a)
 			y.lcmt = "ORPHAN - "
 
@@ -1321,7 +1321,7 @@ def task(pj, cpu):
 					l.append(b)
 				elif pj.m.rd(b) in (0x61,):
 					l.append(b)
-			print(l)
+			# print(l)
 			for i in l:
 				y = cpu.disass(pj, i)
 				y.lcmt = "DISCOVER - "

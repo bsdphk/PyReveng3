@@ -428,7 +428,7 @@ class arg_ea(assy.Arg):
 		super(arg_ea, self).__init__(pj)
 
 	def render(self, pj):
-		print("R", self.im)
+		#print("R", self.im)
 		s = ""
 		s += self.seg
 		if self.im.F_mod == 0 and self.im.F_rm == 6:

@@ -51,7 +51,7 @@ def task(pj, cx):
 
 	def vect(seg, off):
 		a = (seg << 4) + off
-		print("VECTOR %05x" % a)
+		# print("VECTOR %05x" % a)
 		pj.todo(a, cx.disass)
 		pj.set_label(a, "VECTOR")
 
@@ -78,7 +78,7 @@ def task(pj, cx):
 	def txl(seg, a):
 		for i in range(2,0x22, 2):
 			x = pj.m.lu16(a + i)
-			print("%04x" % seg, i, "%05x" % (a + i), "%04x" % x, "%05x" % (seg * 16 + x))
+			#print("%04x" % seg, i, "%05x" % (a + i), "%04x" % x, "%05x" % (seg * 16 + x))
 			y = data.Codeptr(pj, a + i, a + i + 2, seg*16+x)
 		
 	txl(0xff1b, 0xffe00)
@@ -104,7 +104,7 @@ def task(pj, cx):
 		assert pj.m.rd(a + 2) == 0xa7
 		o = pj.m.lu16(a + 3)
 		s = (a + 5 - o)
-		print("T2", "seg", "%05x" % s, "off", "%04x" % o)
+		#print("T2", "seg", "%05x" % s, "off", "%04x" % o)
 		e = o + s
 		l = 0xfffff
 		while e < l:
