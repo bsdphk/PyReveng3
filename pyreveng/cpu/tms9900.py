@@ -34,86 +34,163 @@ from __future__ import print_function
 from pyreveng import assy, data
 
 tms9900_instructions = """
-A	b,so,do	|1 0 1|b|td | d     |ts | s     |
-C	b,so,do	|1 0 0|b|td | d     |ts | s     |
-S	b,so,do	|0 1 1|b|td | d     |ts | s     |
-SOC	b,so,do	|1 1 1|b|td | d     |ts | s     |
-SZC	b,so,do	|0 1 0|b|td | d     |ts | s     |
-MOV	b,so,do	|1 1 0|b|td | d     |ts | s     |
 
-COC	so,w	|0 0 1 0 0 0| w     |ts | s     |
-CZC	so,w	|0 0 1 0 0 1| w     |ts | s     |
-XOR	so,w	|0 0 1 0 1 0| w     |ts | s     |
+# Page numbers referst to:
+#	9900 Family Systems Design
+#	and Data Book
+#	LCC4000 97049-118-NI
+
+# 6-18 / 328
+LI	w,i	|0 0 0 0 0 0 1 0 0 0 0|n| w	| iop				|
+LIMI	i	|0 0 0 0 0 0 1 1 0 0 0|0 0 0 0 0| iop				|
+
+# 6-19 / 329
+LWPI	i	|0 0 0 0 0 0 1 0 1 1 1|0 0 0 0 0| iop				|
+MOV	so,do	|1 1 0 0|td | d     |ts | s     |
+
+# 6-20 / 330
+MOVb	so,do	|1 1 0 1|td | d     |ts | s     |
+
+# 6-21 / 331
+SWPB	so	|0 0 0 0 0 1 1 0 1 1|ts | s     |
+STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	|
+
+# 6-22 / 332
+STWP	?	|0 0 0 0 0 0 1 0 1 0 1|n| w	|
+
+# 6-23 / 333
+A	so,do	|1 0 1 0|td | d     |ts | s     |
+
+# 6-24 / 334
+Ab	so,do	|1 0 1 1|td | d     |ts | s     |
+
+# 6-25 / 335
+AI	w,i	|0 0 0 0 0 0 1 0 0 0 1|n| w	| iop				|
+S	so,do	|0 1 1 0|td | d     |ts | s     |
+
+# 6-26 / 336
+Sb	so,do	|0 1 1 1|td | d     |ts | s     |
+
+# 6-27 / 337
+INC	so	|0 0 0 0 0 1 0 1 1 0|ts | s     |
+INCT	so	|0 0 0 0 0 1 0 1 1 1|ts | s     |
+
+# 6-28 / 338
+DEC	so	|0 0 0 0 0 1 1 0 0 0|ts | s	|
+DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	|
+
+# 6-29 / 339
+NEG	so	|0 0 0 0 0 1 0 1 0 0|ts | s     |
+ABS	so	|0 0 0 0 0 1 1 1 0 1|ts | s     |
+
+# 6-30 / 340
 MPY	so,w	|0 0 1 1 1 0| w     |ts | s     |
+
+# 6-31 / 341
 DIV	so,w	|0 0 1 1 1 1| w     |ts | s     |
 
-XOP	?	|0 0 1 0 1 1| d     |ts | s     |
+# 6-32 / 342
+C	so,do	|1 0 0 0|td | d     |ts | s     |
 
+# 6-33 / 343
+Cb	so,do	|1 0 0 1|td | d     |ts | s     |
+
+# 6-34 / 344
+CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				|
+COC	so,w	|0 0 1 0 0 0| w     |ts | s     |
+
+# 6-35 / 345
+CZC	so,w	|0 0 1 0 0 1| w     |ts | s     |
+
+# 6-36 / 346
+ANDI	w,i	|0 0 0 0 0 0 1 0 0 1 0|n| w	| iop				|
+
+# 6-37 / 347
+ORI	w,i	|0 0 0 0 0 0 1 0 0 1 1|n| w	| iop				|
+
+# 6-38 / 348
+XOR	so,w	|0 0 1 0 1 0| w     |ts | s     |
+INV	so	|0 0 0 0 0 1 0 1 0 1|ts | s     |
+
+# 6-39 / 349
+CLR	so	|0 0 0 0 0 1 0 0 1 1|ts | s     |
+SETO	so	|0 0 0 0 0 1 1 1 0 0|ts | s     |
+
+# 6-40 / 350
+SOC	so,do	|1 1 1 0|td | d     |ts | s     |
+SOCb	so,do	|1 1 1 1|td | d     |ts | s     |
+
+# 6-41 / 351
+SZC	so,do	|0 1 0 0|td | d     |ts | s     |
+
+# 6-42 / 352
+SZCb	so,do	|0 1 0 1|td | d     |ts | s     |
+
+# 6-43 / 353
+SRA	sc,w	|0 0 0 0 1 0 0 0| c     | w	|
+
+# 6-44 / 354
+SLA	sc,w	|0 0 0 0 1 0 1 0| c     | w	|
+
+# 6-45 / 355
+SRL	sc,w	|0 0 0 0 1 0 0 1| c     | w	|
+SRC	sc,w	|0 0 0 0 1 0 1 1| c     | w	|
+
+# 6-46 / 356
 B	da,>J	|0 0 0 0 0 1 0 0 0 1|1 0|0 0 0 0| da				|
 B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     |
+
+# 6-47 / 357
 BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				|
 BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     |
+
+# 6-48 / 358
 BLWP	ptr,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				|
 BLWP	so	|0 0 0 0 0 1 0 0 0 0|ts | s     |
 
-CLR	so	|0 0 0 0 0 1 0 0 1 1|ts | s     |
-SETO	so	|0 0 0 0 0 1 1 1 0 0|ts | s     |
-INV	so	|0 0 0 0 0 1 0 1 0 1|ts | s     |
-NEG	so	|0 0 0 0 0 1 0 1 0 0|ts | s     |
-ABS	so	|0 0 0 0 0 1 1 1 0 1|ts | s     |
-SWPB	so	|0 0 0 0 0 1 1 0 1 1|ts | s     |
+# 6-49 / 259
+XOP	?	|0 0 1 0 1 1| d     |ts | s     |
 
-INC	so	|0 0 0 0 0 1 0 1 1 0|ts | s     |
-INCT	so	|0 0 0 0 0 1 0 1 1 1|ts | s     |
-DEC	so	|0 0 0 0 0 1 1 0 0 0|ts | s	|
-DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	|
+# 6-50 / 360
+RTWP	>R	|0 0 0 0 0 0 1 1 1 0 0| n	|
+JMP	r,>J	|0 0 0 1 0 0 0 0| disp		|
+
+# 6-51 / 361
 X	so	|0 0 0 0 0 1 0 0 1 0|ts | s	|
 
-LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     |
-STCR	c,so	|0 0 1 1 0 1| c     |ts | s     |
+# 6-52 / 362
+JH	r,>JC	|0 0 0 1 1 0 1 1| disp		|
+JL	r,>JC	|0 0 0 1 1 0 1 0| disp		|
+JHE	r,>JC	|0 0 0 1 0 1 0 0| disp		|
+JLE	r,>JC	|0 0 0 1 0 0 1 0| disp		|
+JGT	r,>JC	|0 0 0 1 0 1 0 1| disp		|
+JLT	r,>JC	|0 0 0 1 0 0 0 1| disp		|
+JEQ	r,>JC	|0 0 0 1 0 0 1 1| disp		|
+JNE	r,>JC	|0 0 0 1 0 1 1 0| disp		|
+JOC	r,>JC	|0 0 0 1 1 0 0 0| disp		|
+JNC	r,>JC	|0 0 0 1 0 1 1 1| disp		|
+JNO	r,>JC	|0 0 0 1 1 0 0 1| disp		|
+JOP	r,>JC	|0 0 0 1 1 1 0 0| disp		|
 
+# 6-53 / 363
 SBO	cru	|0 0 0 1 1 1 0 1| cru		|
+
+# 6-54 / 364
 SBZ	cru	|0 0 0 1 1 1 1 0| cru		|
 TB	cru	|0 0 0 1 1 1 1 1| cru		|
 
-JEQ	r,>JC	|0 0 0 1 0 0 1 1| disp		|
-JGT	r,>JC	|0 0 0 1 0 1 0 1| disp		|
-JH	r,>JC	|0 0 0 1 1 0 1 1| disp		|
-JHE	r,>JC	|0 0 0 1 0 1 0 0| disp		|
-JL	r,>JC	|0 0 0 1 1 0 1 0| disp		|
-JLE	r,>JC	|0 0 0 1 0 0 1 0| disp		|
-JLT	r,>JC	|0 0 0 1 0 0 0 1| disp		|
-JMP	r,>J	|0 0 0 1 0 0 0 0| disp		|
-JNC	r,>JC	|0 0 0 1 0 1 1 1| disp		|
-JNE	r,>JC	|0 0 0 1 0 1 1 0| disp		|
-JNO	r,>JC	|0 0 0 1 1 0 0 1| disp		|
-JOC	r,>JC	|0 0 0 1 1 0 0 0| disp		|
-JOP	r,>JC	|0 0 0 1 1 1 0 0| disp		|
+# 6-55 / 365
+LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     |
 
-SLA	sc,w	|0 0 0 0 1 0 1 0| c     | w	|
-SRA	sc,w	|0 0 0 0 1 0 0 0| c     | w	|
-SRC	sc,w	|0 0 0 0 1 0 1 1| c     | w	|
-SRL	sc,w	|0 0 0 0 1 0 0 1| c     | w	|
+# 6-57 / 367
+STCR	c,so	|0 0 1 1 0 1| c     |ts | s     |
 
-AI	w,i	|0 0 0 0 0 0 1 0 0 0 1|n| w	| iop				|
-ANDI	w,i	|0 0 0 0 0 0 1 0 0 1 0|n| w	| iop				|
-CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				|
-LI	w,i	|0 0 0 0 0 0 1 0 0 0 0|n| w	| iop				|
-ORI	w,i	|0 0 0 0 0 0 1 0 0 1 1|n| w	| iop				|
-
-LWPI	i	|0 0 0 0 0 0 1 0 1 1 1|0 0 0 0 0| iop				|
-LIMI	i	|0 0 0 0 0 0 1 1 0 0 0|0 0 0 0 0| iop				|
-
-STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	|
-STWP	?	|0 0 0 0 0 0 1 0 1 0 1|n| w	|
-
-RTWP	>R	|0 0 0 0 0 0 1 1 1 0 0| n	|
-
-IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
-RSET	?	|0 0 0 0 0 0 1 1 0 1 1| n	|
+# 6-58 / 368
+LREX	?	|0 0 0 0 0 0 1 1 1 1 1| n	|
 CKOF	?	|0 0 0 0 0 0 1 1 1 1 0| n	|
 CKON	?	|0 0 0 0 0 0 1 1 1 0 1| n	|
-LREX	?	|0 0 0 0 0 0 1 1 1 1 1| n	|
+RSET	?	|0 0 0 0 0 0 1 1 0 1 1| n	|
+IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 
 """
 
@@ -139,7 +216,7 @@ def arg_o(pj, ins, to, o):
 			return assy.Arg_dst(pj, v, "@")
 
 		# print("XXX", "%04x" % v, "%04x" % w, ins.mne)
-		if ins.mne[-1] == "B":
+		if ins.mne[-1] == "b":
 			c = data.Const(pj, v, v + 1)
 			c.typ = ".BYTE"
 			c.fmt = "0x%02x" % pj.m.rd(v)
