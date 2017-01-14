@@ -82,15 +82,15 @@ DCL	-		|1 1 1 1|1 1 0 1|
 """
 
 def arg_data(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_data, 8)
+	return assy.Arg_imm(pj, ins['data'], 8)
 
 def arg_d(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_d, 4)
+	return assy.Arg_imm(pj, ins['d'], 4)
 
 class arg_cc(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		self.cc = ins.im.F_cc
+		self.cc = ins['cc']
 		ins.cc = self.render(pj)
 		super(arg_cc, self).__init__(pj)
 
@@ -102,17 +102,17 @@ class arg_cc(assy.Arg):
 			return x
 
 def arg_r(pj, ins):
-	return "r%d" % ins.im.F_r
+	return "r%d" % ins['r']
 
 def arg_rr(pj, ins):
-	return "rr%d" % (ins.im.F_rr << 1)
+	return "rr%d" % (ins['rr'] << 1)
 
 def arg_adr(pj, ins):
-	ins.dstadr = (ins.lo & ~0xff) | ins.im.F_adr
+	ins.dstadr = (ins.lo & ~0xff) | ins['adr']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_ladr(pj, ins):
-	ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
+	ins.dstadr = (ins['ahi'] << 8) | ins['alo']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_isz(pj, ins):

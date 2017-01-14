@@ -230,47 +230,47 @@ def arg_o(pj, ins, to, o):
 		return "*R%d+" % o
 
 def arg_so(pj, ins):
-	return arg_o(pj, ins, ins.im.F_ts, ins.im.F_s)
+	return arg_o(pj, ins, ins['ts'], ins['s'])
 
 def arg_do(pj, ins):
-	return arg_o(pj, ins, ins.im.F_td, ins.im.F_d)
+	return arg_o(pj, ins, ins['td'], ins['d'])
 
 def arg_b(pj, ins):
-	if ins.im.F_b:
+	if ins['b']:
 		ins.mne += "B"
 
 def arg_blwp1(pj, ins):
-	a = ins.im.F_ptr
+	a = ins['ptr']
 	data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
 	return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
 
 def arg_blwp2(pj, ins):
-	a = ins.im.F_ptr
+	a = ins['ptr']
 	ins.dstadr = pj.m.bu16(a+2)
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_da(pj, ins):
-	ins.dstadr = ins.im.F_da
+	ins.dstadr = ins['da']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_r(pj, ins):
-	i = ins.im.F_disp
+	i = ins['disp']
 	if i & 0x80:
 		i -= 256
 	ins.dstadr = ins.hi + i * 2
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_c(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_c)
+	return assy.Arg_imm(pj, ins['c'])
 
 def arg_i(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_iop, 16)
+	return assy.Arg_imm(pj, ins['iop'], 16)
 
 def arg_w(pj, ins):
-	return "R%d" % ins.im.F_w
+	return "R%d" % ins['w']
 
 def arg_cru(pj, ins):
-	i = ins.im.F_cru
+	i = ins['cru']
 	if i & 0x80:
 		i -= 0x100
 	# XXX: This doubling may be model-dependent
@@ -279,10 +279,10 @@ def arg_cru(pj, ins):
 	return "R12%#+x" % i
 
 def arg_sc(pj, ins):
-	if ins.im.F_c == 0:
+	if ins['c'] == 0:
 		return "R0"
 	else:
-		return "#%d" % ins.im.F_c
+		return "#%d" % ins['c']
 
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):

@@ -334,7 +334,7 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
 
 class arg_i(assy.Arg):
 	def __init__(self, pj, ins):
-		self.val = ins.im.F_i
+		self.val = ins['i']
 		super(arg_i, self).__init__(pj)
 
 	def render(self, pj):
@@ -342,7 +342,7 @@ class arg_i(assy.Arg):
 
 class arg_d(assy.Arg):
 	def __init__(self, pj, ins):
-		self.val = ins.im.F_d
+		self.val = ins['d']
 		super(arg_d, self).__init__(pj)
 
 	def render(self, pj):
@@ -350,17 +350,17 @@ class arg_d(assy.Arg):
 
 class arg_I(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_I1 << 8) | ins.im.F_I2
+		ins.dstadr = (ins['I1'] << 8) | ins['I2']
 		super(arg_I, self).__init__(pj, ins.dstadr, "#")
 
 class arg_E(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_e1 << 8) | ins.im.F_e2
+		ins.dstadr = (ins['e1'] << 8) | ins['e2']
 		super(arg_E, self).__init__(pj, ins.dstadr, "")
 
 class arg_r(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		a = ins.im.F_r
+		a = ins['r']
 		if a & 0x80:
 			a += 0xff00
 		ins.dstadr = (ins.hi + a) & 0xffff
@@ -368,13 +368,13 @@ class arg_r(assy.Arg_dst):
 
 class arg_R(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		a = ins.im.F_R1 << 8 | ins.im.F_R2
+		a = ins['R1'] << 8 | ins['R2']
 		ins.dstadr = (ins.hi + a) & 0xffff
 		super(arg_R, self).__init__(pj, ins.dstadr)
 
 class arg_s(assy.Arg):
 	def __init__(self, pj, ins):
-		x = ins.im.F_i
+		x = ins['i']
 		l = []
 		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
 		if ins.mne[-1] == "S":
@@ -397,58 +397,58 @@ class arg_s(assy.Arg):
 class arg_P(assy.Arg_dst):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		if ins.im.F_X == 1:
-			ins.hi += [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 2][ins.im.F_m]
-		if self.ins.im.F_X == 1 and self.ins.im.F_m == 0xf:
+		if ins['X'] == 1:
+			ins.hi += [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 2][ins['m']]
+		if self.ins['X'] == 1 and self.ins['m'] == 0xf:
 			ins.dstadr = pj.m.bu16(self.ins.hi - 2)
 		super(arg_P, self).__init__(pj, ins.dstadr, "")
 
 	def render(self, pj):
-		r = ["X", "Y", "U", "S"][self.ins.im.F_R]
-		if self.ins.im.F_X == 0:
-			o = self.ins.im.F_m
-			if self.ins.im.F_i:
+		r = ["X", "Y", "U", "S"][self.ins['R']]
+		if self.ins['X'] == 0:
+			o = self.ins['m']
+			if self.ins['i']:
 				o -= 16
 			return("%s%+d" % (r, o))
 
-		if self.ins.im.F_m == 0x0:
+		if self.ins['m'] == 0x0:
 			s = r + "+"
-		elif self.ins.im.F_m == 0x1:
+		elif self.ins['m'] == 0x1:
 			s = r + "++"
-		elif self.ins.im.F_m == 0x2:
+		elif self.ins['m'] == 0x2:
 			s = "-" + r
-		elif self.ins.im.F_m == 0x3:
+		elif self.ins['m'] == 0x3:
 			s = "--" + r
-		elif self.ins.im.F_m == 0x4:
+		elif self.ins['m'] == 0x4:
 			s = r
-		elif self.ins.im.F_m == 0x5:
+		elif self.ins['m'] == 0x5:
 			s = r + "+B"
-		elif self.ins.im.F_m == 0x6:
+		elif self.ins['m'] == 0x6:
 			s = r + "+A"
-		elif self.ins.im.F_m == 0x8:
+		elif self.ins['m'] == 0x8:
 			o = pj.m.s8(self.ins.hi - 1)
 			s = r + "%+d" % o
-		elif self.ins.im.F_m == 0x9:
+		elif self.ins['m'] == 0x9:
 			o = pj.m.bs16(self.ins.hi - 2)
 			s = r + "%+d" % o
-		elif self.ins.im.F_m == 0xb:
+		elif self.ins['m'] == 0xb:
 			s = r + "+D"
-		elif self.ins.im.F_m == 0xf:
+		elif self.ins['m'] == 0xf:
 			s = str(self)	# XXX HACK, FIX
 		else:
 			s = "<%d,%s,%d,0x%x>XXXIDX" % (
-				self.ins.im.F_X,
-				["X", "Y", "U", "S"][self.ins.im.F_R],
-				self.ins.im.F_i,
-				self.ins.im.F_m
+				self.ins['X'],
+				["X", "Y", "U", "S"][self.ins['R']],
+				self.ins['i'],
+				self.ins['m']
 			)
-		if self.ins.im.F_i:
+		if self.ins['i']:
 			return "[" + s + "]"
 		return s
 
 class arg_t(assy.Arg):
 	def __init__(self, pj, ins):
-		self.val = ins.im.F_t
+		self.val = ins['t']
 		super(arg_t, self).__init__(pj)
 
 	def render(self, pj):

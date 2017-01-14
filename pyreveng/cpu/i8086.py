@@ -353,7 +353,7 @@ ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 class arg_i1(assy.Arg):
 	""" Immediate 8 bit """
 	def __init__(self, pj, ins):
-		self.value = ins.im.F_i1
+		self.value = ins['i1']
 		super(arg_i1, self).__init__(pj)
 
 	def render(self, pj):
@@ -362,7 +362,7 @@ class arg_i1(assy.Arg):
 class arg_i2(assy.Arg):
 	""" Immediate 16 bit """
 	def __init__(self, pj, ins):
-		self.value = ins.im.F_i1 | ins.im.F_i2 << 8
+		self.value = ins['i1'] | ins['i2'] << 8
 		super(arg_i2, self).__init__(pj)
 
 	def render(self, pj):
@@ -371,7 +371,7 @@ class arg_i2(assy.Arg):
 class arg_da(assy.Arg):
 	""" Direct address """
 	def __init__(self, pj, ins):
-		self.value = ins.im.F_alo | ins.im.F_ahi << 8
+		self.value = ins['alo'] | ins['ahi'] << 8
 		super(arg_da, self).__init__(pj)
 
 	def render(self, pj):
@@ -381,9 +381,9 @@ class arg_da(assy.Arg):
 class arg_ipcs(assy.Arg_dst):
 	""" Long address (seg:off) """
 	def __init__(self, pj, ins):
-		self.seg = ins.im.F_slo | (ins.im.F_shi << 8)
+		self.seg = ins['slo'] | (ins['shi'] << 8)
 		ins.dseg = self.seg
-		self.off = ins.im.F_alo | (ins.im.F_ahi << 8)
+		self.off = ins['alo'] | (ins['ahi'] << 8)
 		ins.dstadr = (self.seg << 4) + self.off
 		super(arg_ipcs, self).__init__(pj, ins.dstadr)
 
@@ -393,7 +393,7 @@ class arg_ipcs(assy.Arg_dst):
 class arg_Rel(assy.Arg_dst):
 	""" Relative address """
 	def __init__(self, pj, ins):
-		d = ins.im.F_i1 | (ins.im.F_i2 << 8)
+		d = ins['i1'] | (ins['i2'] << 8)
 		if d & 0x8000:
 			d -= 65536
 		ins.dstadr = ins.hi + d
@@ -402,7 +402,7 @@ class arg_Rel(assy.Arg_dst):
 class arg_rel(assy.Arg_dst):
 	""" Relative address """
 	def __init__(self, pj, ins):
-		d = ins.im.F_disp
+		d = ins['disp']
 		if d & 0x80:
 			d -= 256
 		ins.dstadr = ins.hi + d
@@ -423,109 +423,112 @@ def arg_ds(pj, ins):
 class arg_ea(assy.Arg):
 	""" Effective address """
 	def __init__(self, pj, ins):
-		self.im = ins.im
+		self.ins = ins
 		self.seg = ins.seg
 		super(arg_ea, self).__init__(pj)
+
+	def __getitem__(self, f):
+		return self.ins[f]
 
 	def render(self, pj):
 		#print("R", self.im)
 		s = ""
 		s += self.seg
-		if self.im.F_mod == 0 and self.im.F_rm == 6:
-			dst = self.im.F_dlo | (self.im.F_dhi << 8)
+		if self['mod'] == 0 and self['rm'] == 6:
+			dst = self['dlo'] | (self['dhi'] << 8)
 			s += "0x%04x" % dst
-		elif self.im.F_mod == 0:
-			s += "(" + ireg[self.im.F_rm] + ")"
-		elif self.im.F_mod == 1:
-			v = self.im.F_dlo
+		elif self['mod'] == 0:
+			s += "(" + ireg[self['rm']] + ")"
+		elif self['mod'] == 1:
+			v = self['dlo']
 			if v & 0x80:
 				s += "-0x%02x+(" % (-v + 256)
 			else:
 				s += "0x%02x+(" % v
-			s += ireg[self.im.F_rm]
+			s += ireg[self['rm']]
 			s += ")"
-		elif self.im.F_mod == 2:
-			v = self.im.F_dlo | self.im.F_dhi << 8
+		elif self['mod'] == 2:
+			v = self['dlo'] | self['dhi'] << 8
 			if v & 0x8000:
 				s += "-0x%04x+(" % (-v + 65536)
 			else:
 				s += "0x%04x+(" % (v)
-			s += ireg[self.im.F_rm]
+			s += ireg[self['rm']]
 			s += ")"
-		elif self.im.F_mod == 3:
+		elif self['mod'] == 3:
 			try:
-				if self.im.F_w:
-					s += wreg[self.im.F_rm]
+				if self['w']:
+					s += wreg[self['rm']]
 				else:
-					s += breg[self.im.F_rm]
+					s += breg[self['rm']]
 			except:
 				s += "*FAIL*miss_w*"
 				print(self.im, "missing w")
 		else:
-			s += "<EA mod=%d r/m=%d>" % (self.im.F_mod, self.im.F_rm)
+			s += "<EA mod=%d r/m=%d>" % (self['mod'], self['rm'])
 		return s
 
 class arg_e1(arg_ea):
 	""" Effective address 8 bit offset """
 	def __init__(self, pj, ins):
-		ins.im.F_mod = 1
+		ins['mod'] = 1
 		super(arg_e1, self).__init__(pj, ins)
 
 class arg_e2(arg_ea):
 	""" Effective address 16 bit offset """
 	def __init__(self, pj, ins):
-		ins.im.F_mod = 2
+		ins['mod'] = 2
 		super(arg_e2, self).__init__(pj, ins)
 
 class arg_e3(arg_ea):
 	""" Effective address -- direct address """
 	def __init__(self, pj, ins):
-		ins.im.F_mod = 0
-		ins.im.F_rm = 6
+		ins['mod'] = 0
+		ins['rm'] = 6
 		super(arg_e3, self).__init__(pj, ins)
 
 def arg_sr(pj, ins):
 	""" Segment register """
-	return ["%es", "%cs", "%ss", "%ds"][ins.im.F_sr]
+	return ["%es", "%cs", "%ss", "%ds"][ins['sr']]
 
 def arg_r1(pj, ins):
 	""" Byte register """
-	return breg[ins.im.F_reg]
+	return breg[ins['reg']]
 
 def arg_r2(pj, ins):
 	""" Word register """
-	return wreg[ins.im.F_reg]
+	return wreg[ins['reg']]
 
 def arg_a(pj, ins):
 	""" Accumulator """
-	if ins.im.F_w:
+	if ins['w']:
 		return "%ax"
 	else:
 		return "%al"
 
 def arg_r(pj, ins):
 	""" Register """
-	if ins.im.F_w:
-		return wreg[ins.im.F_reg]
+	if ins['w']:
+		return wreg[ins['reg']]
 	else:
-		return breg[ins.im.F_reg]
+		return breg[ins['reg']]
 
 def arg_v(pj, ins):
-	if ins.im.F_v:
+	if ins['v']:
 		return "%cl"
 	return None
 
 def arg_W(pj, ins):
 	""" Instruction is Word sized """
-	ins.im.F_w = 1
+	ins['w'] = 1
 
 def arg_B(pj, ins):
 	""" Instruction is Byte sized """
-	ins.im.F_w = 9
+	ins['w'] = 9
 
 def arg_S(pj, ins):
 	""" Mark Byte sized instrustions"""
-	if not ins.im.F_w:
+	if not ins['w']:
 		ins.mne += "B"
 
 def arg_dx(pj, ins):
@@ -533,10 +536,10 @@ def arg_dx(pj, ins):
 
 
 def arg7_st(pj, ins):
-	return "%%st(%d)" % ins.im.F_st
+	return "%%st(%d)" % ins['st']
 
 def arg7_mf(pj, ins):
-	ins.mne += "fids" [ins.im.F_mf]
+	ins.mne += "fids" [ins['mf']]
 
 class i8086(assy.Instree_disass):
 	def __init__(self):

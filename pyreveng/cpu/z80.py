@@ -201,48 +201,48 @@ OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
 
 def arg_e(pj, ins):
 	ins.dstadr = ins.hi
-	e = ins.im.F_e
+	e = ins['e']
 	if e & 0x80:
 		e -= 256
 	ins.dstadr += e
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_nn(pj, ins):
-	ins.dstadr = (ins.im.F_n2 << 8) | ins.im.F_n1
+	ins.dstadr = (ins['n2'] << 8) | ins['n1']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_t(pj, ins):
-	ins.dstadr = ins.im.F_t << 3
+	ins.dstadr = ins['t'] << 3
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_inn(pj, ins):
-	ins.dstadr = (ins.im.F_n2 << 8) | ins.im.F_n1
+	ins.dstadr = (ins['n2'] << 8) | ins['n1']
 	return assy.Arg_dst(pj, ins.dstadr, "(", ")")
 
 def arg_dd(pj, ins):
-	return ["BC", "DE", ins.idx, "SP"][ins.im.F_dd]
+	return ["BC", "DE", ins.idx, "SP"][ins['dd']]
 
 def arg_qq(pj, ins):
-	return ["BC", "DE", ins.idx, "AF"][ins.im.F_qq]
+	return ["BC", "DE", ins.idx, "AF"][ins['qq']]
 
 def arg_rs(pj, ins):
-	return ["B", "C", "D", "E", "H", "L", None, "A"][ins.im.F_rs]
+	return ["B", "C", "D", "E", "H", "L", None, "A"][ins['rs']]
 
 def arg_rd(pj, ins):
-	return ["B", "C", "D", "E", "H", "L", None, "A"][ins.im.F_rd]
+	return ["B", "C", "D", "E", "H", "L", None, "A"][ins['rd']]
 
 def arg_cc(pj, ins):
-	ins.cc = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"][ins.im.F_cc]
+	ins.cc = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"][ins['cc']]
 	return ins.cc
 
 def arg_b(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_b, 8)
+	return assy.Arg_imm(pj, ins['b'], 8)
 
 def arg_n(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_n, 8)
+	return assy.Arg_imm(pj, ins['n'], 8)
 
 def arg_io(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_io, 8)
+	return assy.Arg_imm(pj, ins['io'], 8)
 
 def arg_ix(pj, ins):
 	ins.idx = "IX"

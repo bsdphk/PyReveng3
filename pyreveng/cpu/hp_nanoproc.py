@@ -95,7 +95,7 @@ STR	reg,imm		|1 1 0 1| reg   | imm		|
 
 class arg_imm(assy.Arg):
 	def __init__(self, pj, ins):
-		self.value = ins.im.F_imm
+		self.value = ins['imm']
 		super(arg_imm, self).__init__(pj)
 
 	def render(self, pj):
@@ -103,13 +103,13 @@ class arg_imm(assy.Arg):
 
 class arg_adrl(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & 0xf800) | (ins.im.F_ahi<<8) | ins.im.F_alo
+		ins.dstadr = (ins.lo & 0xf800) | (ins['ahi']<<8) | ins['alo']
 		super(arg_adrl, self).__init__(pj, ins.dstadr)
 
 class arg_reg(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		self.reg = ins.im.F_reg
+		self.reg = ins['reg']
 		super(arg_reg, self).__init__(pj)
 
 	def render(self, pj):
@@ -118,7 +118,7 @@ class arg_reg(assy.Arg):
 class arg_bno(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		self.bno = ins.im.F_bno
+		self.bno = ins['bno']
 		super(arg_bno, self).__init__(pj)
 
 	def render(self, pj):
@@ -127,7 +127,7 @@ class arg_bno(assy.Arg):
 class arg_dctl(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		self.dctl = ins.im.F_dctl
+		self.dctl = ins['dctl']
 		super(arg_dctl, self).__init__(pj)
 
 	def render(self, pj):
@@ -136,7 +136,7 @@ class arg_dctl(assy.Arg):
 class arg_dev(assy.Arg):
 	def __init__(self, pj, ins):
 		self.ins = ins
-		self.dev = ins.im.F_dev
+		self.dev = ins['dev']
 		super(arg_dev, self).__init__(pj)
 
 	def render(self, pj):
@@ -202,13 +202,13 @@ MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
 
 class arg_pgadr(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = ins.im.F_pgno << 11
-		ins.dstadr |= (ins.im.F_ahi<<8) | ins.im.F_alo
+		ins.dstadr = ins['pgno'] << 11
+		ins.dstadr |= (ins['ahi']<<8) | ins['alo']
 		super(arg_pgadr, self).__init__(pj, ins.dstadr)
 
 class arg_mctl(assy.Arg):
 	def __init__(self, pj, ins):
-		self.mctl = ins.im.F_mctl
+		self.mctl = ins['mctl']
 		self.ins = ins
 		super(arg_mctl, self).__init__(pj)
 

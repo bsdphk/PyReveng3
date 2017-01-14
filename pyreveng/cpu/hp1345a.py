@@ -43,47 +43,47 @@ _CHR	a,t,>R		|0 1 0| s | r |e| t		|
 
 class arg_adr(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
+		ins.dstadr = (ins['ahi'] << 8) | ins['alo']
 		self.dstadr = ins.dstadr
 		super(arg_adr, self).__init__(pj, ins.dstadr)
 
 class arg_a8(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & ~0x0ff) | ins.im.F_a8
+		ins.dstadr = (ins.lo & ~0x0ff) | ins['a8']
 		self.dstadr = ins.dstadr
 		super(arg_a8, self).__init__(pj, ins.dstadr)
 
 def arg_c(pj, ins):
-	return "#%d" % ins.im.F_c
+	return "#%d" % ins['c']
 
 def arg_t(pj, ins):
-	a = ins.im.F_t
+	a = ins['t']
 	if a < 32 or a > 126:
 		return "#0x%02x" % a
 	else:
 		return "'%c'" % a
 
 def arg_a(pj, ins):
-	if not ins.im.F_e:
+	if not ins['e']:
 		return "-"
-	s = ["1x", "1.5x", "2x", "2.5x"][ins.im.F_s]
-	s += "@%d" % (ins.im.F_r * 90)
+	s = ["1x", "1.5x", "2x", "2.5x"][ins['s']]
+	s += "@%d" % (ins['r'] * 90)
 	return s
 
 def arg_p(pj, ins):
-	return ["OFF", "ON"][ins.im.F_p]
+	return ["OFF", "ON"][ins['p']]
 
 def arg_im(pj, ins):
-	return "#0x%02x" % ins.im.F_im
+	return "#0x%02x" % ins['im']
 
 def arg_i(pj, ins):
-	return ("Blank", "Dim", "Half", "Full")[ins.im.F_i]
+	return ("Blank", "Dim", "Half", "Full")[ins['i']]
 
 def arg_l(pj, ins):
-	return ("Solid", "Ends", "Long", "Short")[ins.im.F_l]
+	return ("Solid", "Ends", "Long", "Short")[ins['l']]
 
 def arg_s(pj, ins):
-	return ("slow", "low", "med", "high")[ins.im.F_s]
+	return ("slow", "low", "med", "high")[ins['s']]
 
 
 class hp1345a(assy.Instree_disass):

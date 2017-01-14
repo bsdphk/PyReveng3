@@ -111,6 +111,12 @@ class Instree_assy(Assy):
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
 
+	def __getitem__(self,f):
+		return self.lim[-1][f]
+
+	def __setitem__(self,f,v):
+		self.lim[-1][f] = v
+
 #######################################################################
 
 class Instree_disass(code.Decode):

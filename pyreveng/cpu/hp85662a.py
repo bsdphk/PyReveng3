@@ -65,26 +65,26 @@ DSPG	-		|?				|
 """
 
 def arg_dst(pj, ins):
-	return "#0x%04x" % ins.im.F_dst
+	return "#0x%04x" % ins['dst']
 
 def arg_b(pj, ins):
-	if ins.im.F_b:
+	if ins['b']:
 		return "bex"
 
 def arg_i(pj, ins):
-	if ins.im.F_i:
+	if ins['i']:
 		return "brt"
 
 def arg_e(pj, ins):
-	if ins.im.F_e:
+	if ins['e']:
 		return "exs"
 
 def arg_c(pj, ins):
-	if ins.im.F_c:
+	if ins['c']:
 		return "clx"
 
 def arg_d(pj, ins):
-	if ins.im.F_d:
+	if ins['d']:
 		return "dim"
 
 def arg_V(pj, ins):
@@ -97,7 +97,7 @@ def arg_G(pj, ins):
 	ins.lang.it = ins.lang.itg
 
 def arg_C(pj, ins):
-	x = ins.im.F_chr
+	x = ins['chr']
 	t = "0x%02x" % x
 	if x >= 0x20 and x < 0x7e:
 		t += " '%c'" % x
@@ -119,12 +119,12 @@ def arg_C(pj, ins):
 
 def arg_R(pj, ins):
 	t = ""
-	if ins.im.F_R:
-		t += "+%d" % (ins.im.F_X)
-		t += ",+%d" % (ins.im.F_Y)
+	if ins['R']:
+		t += "+%d" % (ins['X'])
+		t += ",+%d" % (ins['Y'])
 	else:
-		t += "%d" % (ins.im.F_X)
-		t += ",%d" % (ins.im.F_Y)
+		t += "%d" % (ins['X'])
+		t += ",%d" % (ins['Y'])
 	return t
 
 

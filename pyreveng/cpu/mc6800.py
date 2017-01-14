@@ -237,22 +237,22 @@ STX	e	|FF	| e1		| e2		|
 """
 
 def arg_d(pj, ins):
-	ins.dstadr = ins.im.F_d
+	ins.dstadr = ins['d']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_e(pj, ins):
-	ins.dstadr = (ins.im.F_e1 << 8) | ins.im.F_e2
+	ins.dstadr = (ins['e1'] << 8) | ins['e2']
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_i(pj, ins):
-	return assy.Arg_imm(pj, ins.im.F_i, 8)
+	return assy.Arg_imm(pj, ins['i'], 8)
 
 def arg_I(pj, ins):
-	ins.dstadr = (ins.im.F_I1 << 8) | ins.im.F_I2
+	ins.dstadr = (ins['I1'] << 8) | ins['I2']
 	return assy.Arg_dst(pj, ins.dstadr, "#")
 
 def arg_r(pj, ins):
-	a = ins.im.F_r
+	a = ins['r']
 	if a & 0x80:
 		a -= 256
 	ins.dstadr = ins.hi + a
@@ -263,7 +263,7 @@ def arg_r(pj, ins):
 class arg_x(assy.Arg):
 	def __init__(self, pj, ins):
 		super(arg_x, self).__init__(pj)
-		self.val = ins.im.F_x
+		self.val = ins['x']
 		self.ins = ins
 
 	def __str__(self):
@@ -362,7 +362,7 @@ STD	e		|FD	| e1		| e2		|
 class arg_y(assy.Arg):
 	def __init__(self, pj, ins):
 		super(arg_y, self).__init__(pj)
-		self.val = ins.im.F_y
+		self.val = ins['y']
 
 	def __str__(self):
 		return "0x%02x+Y" % self.val

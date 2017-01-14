@@ -282,8 +282,15 @@ class Insmatch(object):
 		self.words = words
 		self.adr = adr
 		self.len = il.words * up.width // up.memwidth
+		self.flds = {}
 		for i in il.flds:
-			self.__dict__["F_" + i] = il.get_field(i, self.words)
+			self.flds[i] = il.get_field(i, self.words)
+
+	def __getitem__(self, f):
+		return self.flds[f]
+
+	def __setitem__(self, f, v):
+		self.flds[f] = v
 
 	def __repr__(self):
 		s = "<InsMatch"

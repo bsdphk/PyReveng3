@@ -274,38 +274,38 @@ cond_code = (
 #######################################################################
 
 def arg_an(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins.im.F_An)
+	return assy.Arg_verbatim(pj, "A%d" % ins['An'])
 
 def arg_ax_dec(pj, ins):
-	return assy.Arg_verbatim(pj, "-(A%d)" % ins.im.F_Ax)
+	return assy.Arg_verbatim(pj, "-(A%d)" % ins['Ax'])
 
 def arg_ax_inc(pj, ins):
-	return assy.Arg_verbatim(pj, "(A%d)+" % ins.im.F_Ax)
+	return assy.Arg_verbatim(pj, "(A%d)+" % ins['Ax'])
 
 def arg_ax(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins.im.F_Ax)
+	return assy.Arg_verbatim(pj, "A%d" % ins['Ax'])
 
 def arg_ay_dec(pj, ins):
-	return assy.Arg_verbatim(pj, "-(A%d)" % ins.im.F_Ay)
+	return assy.Arg_verbatim(pj, "-(A%d)" % ins['Ay'])
 
 def arg_ay_inc(pj, ins):
-	return assy.Arg_verbatim(pj, "(A%d)+" % ins.im.F_Ay)
+	return assy.Arg_verbatim(pj, "(A%d)+" % ins['Ay'])
 
 def arg_ay(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins.im.F_Ay)
+	return assy.Arg_verbatim(pj, "A%d" % ins['Ay'])
 
 def arg_B(pj, ins):
 	ins.sz = 1
 	ins.mne += ".B"
 
 def arg_bn(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%x" % ins.im.F_bn)
+	return assy.Arg_verbatim(pj, "#0x%x" % ins['bn'])
 
 def arg_cc(pj, ins):
-	ins.mne += cond_code[ins.im.F_cc]
+	ins.mne += cond_code[ins['cc']]
 
 def arg_const(pj, ins):
-	o = ins.im.F_const
+	o = ins['const']
 	if o == 0:
 		o = 8
 	return assy.Arg_verbatim(pj, "#0x%x" % o)
@@ -328,21 +328,21 @@ class arg_data(assy.Arg_verbatim):
 		)
 
 def arg_data8(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%02x" % ins.im.F_data8)
+	return assy.Arg_verbatim(pj, "#0x%02x" % ins['data8'])
 
 def arg_disp16(pj, ins):
-	o = ins.im.F_disp16
+	o = ins['disp16']
 	if o & 0x8000:
 		o -= 1 << 16
 	ins.dstadr = ins.hi + o - 2
 	return assy.Arg_dst(pj, ins.dstadr)
 
 def arg_dn(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins.im.F_Dn)
+	return assy.Arg_verbatim(pj, "D%d" % ins['Dn'])
 
 class arg_dst(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		x = ins.im.F_disp8
+		x = ins['disp8']
 		if x == 0x00:
 			ins.dstadr = ins.hi + pj.m.bs16(ins.hi)
 			ins.hi += 2
@@ -356,10 +356,10 @@ class arg_dst(assy.Arg_dst):
 		super(arg_dst, self).__init__(pj, ins.dstadr)
 
 def arg_dx(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins.im.F_Dx)
+	return assy.Arg_verbatim(pj, "D%d" % ins['Dx'])
 
 def arg_dy(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins.im.F_Dy)
+	return assy.Arg_verbatim(pj, "D%d" % ins['Dy'])
 
 def arg_eaxt(pj, ins, ref):
 	ew = pj.m.bu16(ins.hi)
@@ -460,19 +460,19 @@ def arg_eax(pj, ins, eam, ear):
 	raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (ins.lo, eax, eam, ear))
 
 def arg_ea(pj, ins):
-	return arg_eax(pj, ins, ins.im.F_eam, ins.im.F_ear)
+	return arg_eax(pj, ins, ins['eam'], ins['ear'])
 
 def arg_ead(pj, ins):
-	return arg_eax(pj, ins, ins.im.F_eamx, ins.im.F_earx)
+	return arg_eax(pj, ins, ins['eamx'], ins['earx'])
 
 def arg_L(pj, ins):
 	ins.sz = 4
 	ins.mne += ".L"
 
 def arg_rlist(pj, ins):
-	v = ins.im.F_rlist
+	v = ins['rlist']
 	l = []
-	if ins.im.F_eam == 4:
+	if ins['eam'] == 4:
 		for r in ("A", "D"):
 			for n in range(7, -1, -1):
 				if v & 0x0001:
@@ -487,29 +487,29 @@ def arg_rlist(pj, ins):
 	return "+".join(l)
 
 def arg_rot(pj, ins):
-	a = ins.im.F_rot
+	a = ins['rot']
 	if a == 0:
 		a = 8
 	return assy.Arg_verbatim(pj, "#0x%x" % a)
 
 def arg_vect(pj, ins):
-	return assy.Arg_verbatim(pj, "#%d" % ins.im.F_vect)
+	return assy.Arg_verbatim(pj, "#%d" % ins['vect'])
 
 def arg_W(pj, ins):
 	ins.sz = 2
 	ins.mne += ".W"
 
 def arg_word(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%04x" % ins.im.F_word)
+	return assy.Arg_verbatim(pj, "#0x%04x" % ins['word'])
 
 def arg_Z(pj, ins):
-	if ins.im.F_sz == 3:
+	if ins['sz'] == 3:
 		raise assy.Invalid('0x%x F_sz == 3' % ins.lo)
 	i, j = [
 		[1, ".B"],
 		[2, ".W"],
 		[4, ".L"],
-	] [ins.im.F_sz]
+	] [ins['sz']]
 	ins.sz = i
 	ins.mne += j
 

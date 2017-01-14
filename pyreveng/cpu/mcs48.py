@@ -190,27 +190,27 @@ XRL	A,im		|1 1 0 1|0 0 1 1| im		|
 
 class arg_adr(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.im.F_ahi << 8) | ins.im.F_alo
+		ins.dstadr = (ins['ahi'] << 8) | ins['alo']
 		self.dstadr = ins.dstadr
 		super(arg_adr, self).__init__(pj, ins.dstadr)
 
 class arg_a8(assy.Arg_dst):
 	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & ~0x0ff) | ins.im.F_a8
+		ins.dstadr = (ins.lo & ~0x0ff) | ins['a8']
 		self.dstadr = ins.dstadr
 		super(arg_a8, self).__init__(pj, ins.dstadr)
 
 def arg_p(pj, ins):
-	return "P%d" % ins.im.F_p
+	return "P%d" % ins['p']
 
 def arg_ar(pj, ins):
-	return "@R%d" % ins.im.F_r
+	return "@R%d" % ins['r']
 
 def arg_r(pj, ins):
-	return "R%d" % ins.im.F_r
+	return "R%d" % ins['r']
 
 def arg_im(pj, ins):
-	return "#0x%02x" % ins.im.F_im
+	return "#0x%02x" % ins['im']
 
 class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
