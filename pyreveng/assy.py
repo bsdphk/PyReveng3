@@ -77,10 +77,13 @@ class Instree_assy(Assy):
 		lo = lim[0].adr
 		hi = lim[-1].adr + lim[-1].len
 		super(Instree_assy, self).__init__(pj, lo, hi, lang)
+		self.prefix = False
 		self.cc = True
 		self.dstadr = None
 		self.lim = lim
 		self.mne = lim[-1].assy[0]
+		if self.mne[0] == "+":
+			self.prefix = True
 		self.oper = list()
 		for self.im in lim:
 			i = self.im.assy
@@ -125,6 +128,7 @@ class Instree_disass(code.Decode):
 			mem_word = ins_word
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
+		self.myleaf = Instree_assy
 
 	def decode(self, pj, adr, l=None):
 		if l is None:
@@ -133,11 +137,12 @@ class Instree_disass(code.Decode):
 		for x in self.it.find(pj, adr):
 			l.append(x)
 			try:
-				y = Instree_assy(pj, l, self)
+				y = self.myleaf(pj, l, self)
 			except Invalid:
+				y = None
 				l.pop(-1)
 				continue
-			if x.assy[0][0] != "+":
+			if not y.prefix:
 				break
 			y = self.decode(pj, adr + x.len, l)
 			if y != None:
