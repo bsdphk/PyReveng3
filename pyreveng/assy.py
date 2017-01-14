@@ -52,8 +52,78 @@ class Assy(code.Code):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
+		self.il = []
+		self.il_c = 0
+
+	def il_reg(self, r, d):
+		if r[0] != "%":
+			return r
+		# XXX Problem with instructions at loc=0
+		o = self.lo * 100
+		if r[1] == "-" and r[2:].isdigit():
+			assert int(r[2:]) < 100
+			return "%%%d" % (o + self.il_c - int(r[2:]))
+		if r[1] == "+" and r[2:].isdigit():
+			assert int(r[2:]) < 100
+			return "%%%d" % (o + self.il_c + int(r[2:]))
+		if r[1:].isdigit():
+			if int(r[1:]) >= 100:
+				return r
+			n = "%%%d" % (o + self.il_c)
+			d[r] = n
+			self.il_c += 1
+			return n
+		return r
+
+	def add_il(self, ll):
+		if ll == None:
+			return
+		d = {}
+		for l in ll:
+			if l == None:
+				continue
+			if isinstance(l, str):
+				f = l.split()
+			else:
+				f = l
+				for i in f:
+					assert i == i.strip()
+			if len(f) == 0:
+				continue
+			v = []
+			for i in f:
+				j = d.get(i)
+				if j is not None:
+					v.append(j)
+					continue
+				j = self.il_reg(i, d)
+				if j != i:
+					v.append(j)
+					continue
+				try:
+					j = getattr(self, "macro_" + i)
+				except AttributeError:
+					v.append(i)
+					continue
+				# self.il.append(["/* MACRO " + i + " */"])
+				k = j()
+				if k is not None:
+					x = self.il_reg(k, d)
+					v.append(x)
+			if len(v) == 0:
+				continue
+
+			try:
+				j = getattr(self, "func_" + v[0])
+			except AttributeError:
+				self.il.append(v)
+				continue
+			# self.il.append(["/* FUNC " + " ".join(v) + " */" ])
+			j(v[1:])
 
 	def render(self, pj):
+		for i in self.il:
+			self.lcmt += "IL " + " ".join(i) + "\n"
 		s = self.mne + "\t"
 		l = []
 		for i in self.oper:
@@ -135,6 +205,7 @@ class Instree_disass(code.Decode):
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
 		self.myleaf = Instree_assy
+		self.il = False
 
 	def decode(self, pj, adr, l=None):
 		if l is None:
@@ -155,6 +226,12 @@ class Instree_disass(code.Decode):
 				break
 			l.pop(-1)
 		if y != None:
+			if self.il:
+				x = y.im.il.details
+				if x is not None:
+					y.add_il(x.split("\n"))
+				else:
+					y.add_il(["pyreveng.noidea ( )"])
 			for i in self.flow_check:
 				i(pj, y)
 		return y
