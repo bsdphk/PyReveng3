@@ -69,25 +69,78 @@ STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	|
 STWP	?	|0 0 0 0 0 0 1 0 1 0 1|n| w	|
 
 # 6-23 / 333
-A	so,do	|1 0 1 0|td | d     |ts | s     |
+A	so,do	|1 0 1 0|td | d     |ts | s     | {
+	%0 = add i16 RS , RD
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LD %0
+}
 
 # 6-24 / 334
-Ab	so,do	|1 0 1 1|td | d     |ts | s     |
+Ab	so,do	|1 0 1 1|td | d     |ts | s     | {
+	%0 = add i8 RS , RD
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LD %0
+}
 
 # 6-25 / 335
-AI	w,i	|0 0 0 0 0 0 1 0 0 0 1|n| w	| iop				|
-S	so,do	|0 1 1 0|td | d     |ts | s     |
+AI	w,i	|0 0 0 0 0 0 1 0 0 0 1|n| w	| iop				| {
+	R = add i16 R , IMM
+	FLAGS3 R
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+}
+S	so,do	|0 1 1 0|td | d     |ts | s     | {
+	%0 = add i16 RS , RD
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LD %0
+}
 
 # 6-26 / 336
-Sb	so,do	|0 1 1 1|td | d     |ts | s     |
+Sb	so,do	|0 1 1 1|td | d     |ts | s     | {
+	%0 = add i8 RS , RD
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LD %0
+}
 
 # 6-27 / 337
-INC	so	|0 0 0 0 0 1 0 1 1 0|ts | s     |
-INCT	so	|0 0 0 0 0 1 0 1 1 1|ts | s     |
+INC	so	|0 0 0 0 0 1 0 1 1 0|ts | s     | {
+	%0 = add i16 RS , 0x0001
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LS %0
+}
+INCT	so	|0 0 0 0 0 1 0 1 1 1|ts | s     | {
+	%0 = add i16 RS , 0x0002
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LS %0
+}
 
 # 6-28 / 338
-DEC	so	|0 0 0 0 0 1 1 0 0 0|ts | s	|
-DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	|
+DEC	so	|0 0 0 0 0 1 1 0 0 0|ts | s	| {
+	%0 = sub i16 RS , 0x0001
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LS %0
+}
+DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	| {
+	%0 = sub i16 RS , 0x0002
+	FLAGS3 %0
+	%status.c = i1 pyreveng.xxx ( )
+	%status.ov = i1 pyreveng.xxx ( )
+	LS %0
+}
 
 # 6-29 / 339
 NEG	so	|0 0 0 0 0 1 0 1 0 0|ts | s     | {
@@ -106,17 +159,32 @@ MPY	so,w	|0 0 1 1 1 0| w     |ts | s     |
 DIV	so,w	|0 0 1 1 1 1| w     |ts | s     |
 
 # 6-32 / 342
-C	so,do	|1 0 0 0|td | d     |ts | s     |
+C	so,do	|1 0 0 0|td | d     |ts | s     | {
+	%0 = sub i16 RS , RD
+	FLAGS3 %0
+}
 
 # 6-33 / 343
-Cb	so,do	|1 0 0 1|td | d     |ts | s     |
+Cb	so,do	|1 0 0 1|td | d     |ts | s     | {
+	%0 = sub i8 RS , RD
+	FLAGS3 %0
+}
 
 # 6-34 / 344
-CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				|
-COC	so,w	|0 0 1 0 0 0| w     |ts | s     |
+CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				| {
+	%0 = sub i16 R , IMM
+	FLAGS3 %0
+}
+COC	so,w	|0 0 1 0 0 0| w     |ts | s     | {
+	%0 = and i16 R , RS
+	%status.eq = icmp eq i16 %0 , RS
+}
 
 # 6-35 / 345
-CZC	so,w	|0 0 1 0 0 1| w     |ts | s     |
+CZC	so,w	|0 0 1 0 0 1| w     |ts | s     | {
+	%0 = and i16 R , RS
+	%status.eq = icmp eq i16 %0 , 0x0000
+}
 
 # 6-36 / 346
 ANDI	w,i	|0 0 0 0 0 0 1 0 0 1 0|n| w	| iop				| {
@@ -194,12 +262,20 @@ SRL	sc,w	|0 0 0 0 1 0 0 1| c     | w	| {
 SRC	sc,w	|0 0 0 0 1 0 1 1| c     | w	|
 
 # 6-46 / 356
-B	da,>J	|0 0 0 0 0 1 0 0 0 1|1 0|0 0 0 0| da				|
-B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     |
+B	da,>J	|0 0 0 0 0 1 0 0 0 1|1 0|0 0 0 0| da				| {
+	br BRYES
+}
+B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     | {
+	br label AS
+}
 
 # 6-47 / 357
-BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				|
-BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     |
+BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				| {
+	call void BRYES ( )
+}
+BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     | {
+	call label AS ( )
+}
 
 # 6-48 / 358
 BLWP	blwp1,blwp2,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				|
@@ -404,6 +480,33 @@ class Tms9900assy(assy.Instree_assy):
 	def macro_IMM(self):
 		return "0x%04x" % self['iop']
 
+	def arg_ao(self, t, s, nm):
+		sz = self.sz()
+		print(self, self.mne, self.oper, ['// YYY RO %d ' % sz + "T %x S %x  " % (t, s) ])
+		tsz = "i%d" % sz
+		r = "%%R%d" % s
+		assert t != 0
+		
+		if t == 1:
+			return self.add_il([
+				[ "%0", '=', 'inttoptr', 'i16', r, 'to', tsz + "*"],
+			], "%0")
+
+		if t == 2 and s == 0:
+			return "0x%04x" % self[nm]
+
+		if t == 2:
+			return self.add_il([
+				[ "%0", '=', 'add', 'i16', r, ',', "0x%04x" % self[nm]],
+				[ "%1", '=', 'inttoptr', "i16", "%0", 'to', tsz + "*"],
+			], "%1")
+
+		assert t == 3
+		return self.add_il([
+			[ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
+			[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz / 8)],
+		], "%0")
+
 	def arg_ro(self, t, s, nm):
 		sz = self.sz()
 		print(self, self.mne, self.oper, ['// YYY RO %d ' % sz + "T %x S %x  " % (t, s) ])
@@ -413,43 +516,15 @@ class Tms9900assy(assy.Instree_assy):
 			return r
 		
 		if t == 0 and sz == 8:
-			self.add_il([
+			return self.add_il([
 				[ "%0", '=', 'shr', "i16", r, ',', '8' ],
 				[ "%1", '=', 'trunc', "i16", "%0", 'to', 'i8' ],
-			])
-			return "%-1"
-		
-		if t == 1:
-			self.add_il([
-				[ "%0", '=', 'inttoptr', 'i16', r, 'to', tsz + "*"],
-				[ "%1", '=', 'load', tsz, ',', tsz + "*", "%0" ],
-			])
-			return "%-1"
+			], "%1")
 
-		if t == 2 and s == 0:
-			self.add_il([
-				[ "%0", '=', 'load', tsz, ',', tsz + "*", "0x%04x" % self[nm]],
-			])
-			return "%-1"
-
-		if t == 2:
-			self.add_il([
-				[ "%0", '=', 'add', 'i16', r, ',', "0x%04x" % self[nm]],
-				[ "%1", '=', 'inttoptr', "i16", "%0", 'to', tsz + "*"],
-				[ "%2", '=', 'load', tsz, ',', tsz + "*", "%1"],
-			])
-			return "%-1"
-
-		if t == 3:
-			self.add_il([
-				[ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
-				[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz / 8)],
-				[ "%1", '=', 'load', tsz, ',', tsz + "*", "%0"],
-			])
-			return "%-1"
-			
-		self.add_il(['// YYY RO %d ' % sz + "T %x S %x  " % (t, s) ])
-		return "ZZZ"
+		a = self.arg_ao(t, s, nm)
+		return self.add_il([
+			[ "%0", '=', 'load', tsz, ',', tsz + "*", a],
+		], "%0")
 
 	def arg_lo(self, t, s, args, nm):
 		sz = self.sz()
@@ -467,42 +542,24 @@ class Tms9900assy(assy.Instree_assy):
 				[ r, "=", "or", "i16", r, ",", "%1" ],
 			])
 			return
-		if t == 1:
-			self.add_il([
-				[ "%0", '=', 'inttoptr', 'i16', r, 'to', tsz + "*"],
-				[ 'store', tsz, args[0], ',', tsz + "*", "%0" ],
-			])
-			return
 
-		if t == 2 and s == 0:
-			self.add_il([
-				[ 'store', tsz, args[0], ',', tsz + "*", "0x%04x" % self[nm]],
-			])
-			return
-		if t == 2:
-			self.add_il([
-				[ "%0", '=', 'add', 'i16', r, ',', "0x%04x" % self[nm]],
-				[ "%1", '=', 'inttoptr', "i16", "%0", 'to', tsz + "*"],
-				[ 'store', tsz, args[0], ',', tsz + "*", "%1"],
-			])
-			return
-		if t == 3:
-			self.add_il([
-				[ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
-				[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz / 8)],
-				[ 'store', tsz, args[0], ',', tsz + "*", "%0"],
-			])
-			return
-		
-
-		self.add_il(['// YYY LO %d ' % sz + "T %x S %x  " % (t, s) + " ".join(args) ])
+		a = self.arg_ao(t, s, nm)
+		self.add_il([
+			[ 'store', tsz, args[0], ',', tsz + "*", a],
+		])
 		return
+
+	def macro_AS(self):
+		return self.arg_ao(self['ts'], self['s'], 'Gs')
 
 	def func_LS(self, args):
 		self.arg_lo(self['ts'], self['s'], args, 'Gs')
 
 	def macro_RS(self):
 		return self.arg_ro(self['ts'], self['s'], 'Gs')
+
+	def macro_AD(self):
+		return self.arg_ao(self['td'], self['d'], 'Gd')
 
 	def func_LD(self, args):
 		self.arg_lo(self['td'], self['d'], args, 'Gd')

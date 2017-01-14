@@ -60,12 +60,6 @@ class Assy(code.Code):
 			return r
 		# XXX Problem with instructions at loc=0
 		o = self.lo * 100
-		if r[1] == "-" and r[2:].isdigit():
-			assert int(r[2:]) < 100
-			return "%%%d" % (o + self.il_c - int(r[2:]))
-		if r[1] == "+" and r[2:].isdigit():
-			assert int(r[2:]) < 100
-			return "%%%d" % (o + self.il_c + int(r[2:]))
 		if r[1:].isdigit():
 			if int(r[1:]) >= 100:
 				return r
@@ -75,7 +69,7 @@ class Assy(code.Code):
 			return n
 		return r
 
-	def add_il(self, ll):
+	def add_il(self, ll, ret=None):
 		if ll == None:
 			return
 		d = {}
@@ -120,6 +114,7 @@ class Assy(code.Code):
 				continue
 			# self.il.append(["/* FUNC " + " ".join(v) + " */" ])
 			j(v[1:])
+		return d.get(ret)
 
 	def render(self, pj):
 		for i in self.il:
