@@ -145,7 +145,7 @@ BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				|
 BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     |
 
 # 6-48 / 358
-BLWP	ptr,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				|
+BLWP	blwp1,blwp2,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				|
 BLWP	so	|0 0 0 0 0 1 0 0 0 0|ts | s     |
 
 # 6-49 / 259
@@ -239,6 +239,16 @@ def arg_b(pj, ins):
 	if ins.im.F_b:
 		ins.mne += "B"
 
+def arg_blwp1(pj, ins):
+	a = ins.im.F_ptr
+	data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+	return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
+
+def arg_blwp2(pj, ins):
+	a = ins.im.F_ptr
+	ins.dstadr = pj.m.bu16(a+2)
+	return assy.Arg_dst(pj, ins.dstadr)
+
 def arg_da(pj, ins):
 	ins.dstadr = ins.im.F_da
 	return assy.Arg_dst(pj, ins.dstadr)
@@ -252,13 +262,6 @@ def arg_r(pj, ins):
 
 def arg_c(pj, ins):
 	return assy.Arg_imm(pj, ins.im.F_c)
-
-class arg_ptr(assy.Arg_ref):
-	def __init__(self, pj, ins):
-		self.val = ins.im.F_ptr
-		self.vector = vector(pj, self.val, ins.lang)
-		ins.dstadr = self.vector.dstadr
-		super(arg_ptr, self).__init__(pj, self.vector)
 
 def arg_i(pj, ins):
 	return assy.Arg_imm(pj, ins.im.F_iop, 16)
@@ -303,7 +306,6 @@ class Tms9900(assy.Instree_disass):
 		self.args.update({
 		    "r":	arg_r,
 		    "i":	arg_i,
-		    "ptr":	arg_ptr,
 		    "w":	arg_w,
 		    "b":	arg_b,
 		    "c":	arg_c,
@@ -312,6 +314,8 @@ class Tms9900(assy.Instree_disass):
 		    "da":	arg_da,
 		    "sc":	arg_sc,
 		    "cru":	arg_cru,
+		    "blwp1":	arg_blwp1,
+		    "blwp2":	arg_blwp2,
 		})
 
 	def codeptr(self, pj, adr):
