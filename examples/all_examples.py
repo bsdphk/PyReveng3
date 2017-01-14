@@ -30,10 +30,13 @@ Run all examples
 
 from __future__ import print_function
 
-import glob, os
+import glob, os, sys
 from pyreveng import code, listing
 
-l = glob.glob("*/example*.py")
+if len(sys.argv) == 1:
+	l = glob.glob("*/example*.py")
+else:
+	l = glob.glob(sys.argv[1] + "/example*.py")
 
 try:
 	os.mkdir("_output")
