@@ -166,7 +166,7 @@ recog0 = {
 	"ASLB": {
 	    "LDX":	0,
 	    "CLRA": {
-	        "LDX":	1,
+		"LDX":	1,
 	    }
 	}
     }
@@ -301,7 +301,7 @@ recog_array = {
 			    "LDU": 2,
 			}
 		    }
-	        },
+		},
 		"LDY": {
 		    "LDU": 2
 		}

@@ -92,7 +92,7 @@ def task(pj, cx):
 		v = pj.m.bu16(a)
 		data.Dataptr(pj, a, a + 2, v)
 		return v
-		
+
 
 	i_args = {
 		0x79c:	"ii",
@@ -178,7 +178,7 @@ def task(pj, cx):
 
 	if True:
 		pj.todo(0x0d18, cx.disass)
-		
+
 	if True:
 		pj.todo(0x0e50, cx.disass)
 		pj.todo(0x0e80, cx.disass)
@@ -266,6 +266,6 @@ def output(pj):
 	listing.Listing(pj, ncol = 4)
 
 if __name__ == '__main__':
-        pj, cx = setup()
+	pj, cx = setup()
 	task(pj, cx)
 	output(pj)

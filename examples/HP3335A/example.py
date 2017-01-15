@@ -130,7 +130,6 @@ def task(pj, cpu):
 				return ".PTR 0x%x" % v
 			else:
 				return ".PTR %s" % l
-			
 
 	def jmptbl(lo, hi, x = None):
 		c = pj.add(lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))

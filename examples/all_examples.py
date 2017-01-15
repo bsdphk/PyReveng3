@@ -30,7 +30,7 @@ Run all examples
 
 from __future__ import print_function
 
-import glob, os, sys
+import glob, os, sys, importlib
 from pyreveng import code, listing
 
 if len(sys.argv) == 1:
@@ -47,8 +47,7 @@ for i in l:
 	j = i.split("/")
 	k = j[1].replace(".py", "")
 	print(j[0], k)
-	x = spam = __import__(j[0] + "." + k, globals(), locals(), [], -1)
-	y = x.__dict__[k]
+	y = importlib.import_module(j[0] + "." + k)
 	pj, cx = y.setup()
 	y.task(pj, cx)
 	code.lcmt_flows(pj)

@@ -32,7 +32,7 @@ import pyreveng.cpu.i8086 as i8086
 
 def mem_setup():
 	m = mem.byte_mem(0xe0000, 0x100000)
-        fn = os.path.join(os.path.dirname(__file__),
+	fn = os.path.join(os.path.dirname(__file__),
 	    "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
 	m.load_binfile(0xe0000, 1, fn)
 	return m
@@ -80,7 +80,7 @@ def task(pj, cx):
 			x = pj.m.lu16(a + i)
 			#print("%04x" % seg, i, "%05x" % (a + i), "%04x" % x, "%05x" % (seg * 16 + x))
 			y = data.Codeptr(pj, a + i, a + i + 2, seg*16+x)
-		
+
 	txl(0xff1b, 0xffe00)
 	txl(0xff1b, 0xffe22)
 	txl(0xff1b, 0xffe44)

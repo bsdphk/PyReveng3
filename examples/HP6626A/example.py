@@ -376,7 +376,7 @@ def task(pj, cpu):
 				y = pj.t.find_lo(ex)
 				y[0].lcmt += " ".join(ll) + "\n"
 				# print(y)
-				
+
 			a += 4
 
 	tt5(0xa3a2, 0xa5d1)
@@ -392,7 +392,7 @@ def task(pj, cpu):
 		softlbl(z, "task_%04x" % z)
 		cpu.codeptr(pj, a + 2)
 		data.Dataptr(pj, a + 4, a + 6, pj.m.bu16(a + 4))
-		
+
 
 	cpu.disass(pj, 0x8631)
 	cpu.disass(pj, 0x8b65)

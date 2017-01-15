@@ -77,7 +77,7 @@ def collect_errors():
 errors = collect_errors()
 
 #######################################################################
-# 
+#
 
 def collect_keys():
 	keys = {}
@@ -716,7 +716,7 @@ def Menu(pj, cpu, a, nm):
 		MenuPage(pj, cpu, a + i * 10)
 
 #######################################################################
-# Markup RAISE 
+# Markup RAISE
 
 def error_arg(pj, dst, arg, errors):
 	for i in pj:
@@ -1016,7 +1016,7 @@ def hints(pj, cpu):
 			y = data.Const(pj, a, a + 2, fmt="0x%02x")
 			i = keys.get(pj.m.rd(a))
 			j = keys.get(pj.m.rd(a + 1))
-			y.lcmt += "%8s | %-8s\n" % (i, j) 
+			y.lcmt += "%8s | %-8s\n" % (i, j)
 
 #######################################################################
 
@@ -1046,8 +1046,8 @@ for pg in (0,1,2,3,4):
 	while pj.run():
 		pass
 
-	str_len_args(pj, 0xd8a5, 3, 2)	
-	str_len_args(pj, 0x9ffe, 1, 2)	
+	str_len_args(pj, 0xd8a5, 3, 2)
+	str_len_args(pj, 0x9ffe, 1, 2)
 	error_arg(pj, 0xc3fe, 1, errors)
 	num_arg(pj, 0xd37d, 1)
 	num_arg(pj, 0xd37d, 2)
@@ -1055,9 +1055,9 @@ for pg in (0,1,2,3,4):
 	num_arg(pj, 0xd392, 2)
 	num_arg(pj, 0xd3c6, 1)
 	num_arg(pj, 0xd3c6, 2)
-	str_len_args(pj, 0xd8ea, 3, 2)	
+	str_len_args(pj, 0xd8ea, 3, 2)
 	if pj.pg == 2:
-		str_len_args(pj, 0x44ee, 3, 2)	
+		str_len_args(pj, 0x44ee, 3, 2)
 
 	decompile.mopup(pj, cpu)
 

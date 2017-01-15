@@ -143,7 +143,7 @@ def task(pj, dx):
 			assert pg == a0 << 9
 			dpf = pj.m.rd(a0 + 2) << 8
 			dpf |= pj.m.rd(a0 + 3)
-			dpf &= 0x7ff 
+			dpf &= 0x7ff
 			dpf |= pg
 			pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			pj.todo(a0, dx.disass)
@@ -158,7 +158,7 @@ def task(pj, dx):
 				pj.set_label(a1, "PTR_%02x" % v)
 				pj.set_label(da, "FN_%02x" % v)
 				pj.todo(a1, dx.disass)
-			
+
 
 	#######################################################################
 	def jmp_table(lo, hi, span, txt = "table"):
@@ -203,7 +203,7 @@ def task(pj, dx):
 		# Comes from 0x29f9
 		# returns to 29fa
 		x = jmp_table(0x2fb8, 0x3000, 8)
-		
+
 	#######################################################################
 	if True:
 		# Comes from 0x3c37

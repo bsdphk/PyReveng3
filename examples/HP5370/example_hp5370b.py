@@ -27,7 +27,7 @@
 from __future__ import print_function
 
 from pyreveng import listing, code, data, seven_segment
-import utils
+from . import utils
 
 
 def setup():

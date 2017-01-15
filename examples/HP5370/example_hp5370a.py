@@ -27,7 +27,7 @@
 from __future__ import print_function
 
 from pyreveng import listing, code, seven_segment
-import utils
+from . import utils
 
 def setup():
 	return utils.setup("HP5370A", "HP5370A.ROM", -1)

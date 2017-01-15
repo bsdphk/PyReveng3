@@ -31,18 +31,18 @@ from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80
 
 def mem_setup():
-        m = mem.byte_mem(0x0000, 0x10000)
-        dn = os.path.dirname(__file__)
-        m.load_binfile(0x0000, 1, os.path.join(dn, "EPROM_ROB_357.bin"))
+	m = mem.byte_mem(0x0000, 0x10000)
+	dn = os.path.dirname(__file__)
+	m.load_binfile(0x0000, 1, os.path.join(dn, "EPROM_ROB_357.bin"))
 
 	for a in range(0x7ee):
 		m.wr(0xa000 + a, m.rd(0x0012 + a))
 	return m
 
 def setup():
-        pj = job.Job(mem_setup(), "RC702_bootrom_rob_357")
-        cx = z80.z80()
-        return pj, cx
+	pj = job.Job(mem_setup(), "RC702_bootrom_rob_357")
+	cx = z80.z80()
+	return pj, cx
 
 def task(pj, cx):
 	data.Txt(pj, 0xa533, label=False)
@@ -92,12 +92,12 @@ def task(pj, cx):
 	pj.set_label(0x7068, "memcpy(BC, DE,  L)")
 
 def output(pj):
-        code.lcmt_flows(pj)
-        listing.Listing(pj, ncol = 4)
+	code.lcmt_flows(pj)
+	listing.Listing(pj, ncol = 4)
 
 if __name__ == '__main__':
-        print(__file__)
-        pj, cx = setup()
-        task(pj, cx)
-        output(pj)
+	print(__file__)
+	pj, cx = setup()
+	task(pj, cx)
+	output(pj)
 

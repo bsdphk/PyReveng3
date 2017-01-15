@@ -36,11 +36,11 @@
 #
 # 4,649,496  Wheelgol excerpts (typeset):
 #	     Appendix I:  mkrsave, nxtpk, mkpk, mkasrch, slft, srgt,
-#	     		  setavoid, newmrkrs, 
+#			  setavoid, newmrkrs,
 #	     Appendix II: sertrcad, loadtrc, mkrtrc, mkrad, mkrspot,
 #			  mkrdout, mkron, doeos, domrkr, newcmd,
 #			  oldcmd, trcadrs, dostring, dosoftkey ...
-# 
+#
 # 4,660,150  Wheelgol excerpts (tty):
 #	     same as 4,649,496 ?
 #######################################################################
@@ -58,7 +58,7 @@ from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.m68000 as m68000
 import pyreveng.cpu.hp85662a as hp85662a
 
-import hp856x_cmds
+from . import hp856x_cmds
 
 class mycpu(m68000.m68000):
 	def __init__(self):
@@ -437,7 +437,7 @@ def task(pj, cpu):
 		def render(self, pj):
 			t = ".PARAM\t"
 			t += "func=%d" % self.fi
-			t += " call=%s" % self.nm 
+			t += " call=%s" % self.nm
 			t += "(" + self.summ() + ")"
 			return t
 
@@ -482,7 +482,7 @@ def task(pj, cpu):
 			self.string = b
 
 			self.hash = 0
-			for i in bytearray(self.string):
+			for i in bytearray(self.string, 'ascii'):
 				self.hash += i
 			self.hash %= 13
 
@@ -787,7 +787,7 @@ def task(pj, cpu):
 		# print("PFXSCALE %d" % ((0x19853-0x19826)/1))
 
 
-	else: 
+	else:
 		y = cpu.disass(pj, 0xda1e)
 
 		for i in y.__dict__:
@@ -813,7 +813,7 @@ def task(pj, cpu):
 			if not k in keynos:
 				continue
 			y.oper[0].txt = "#KEY_" + keynos[k]
-			
+
 		if i.dstadr in (0xe4e8,):
 			y = pj.t.find_hi(i.lo)
 			if len(y) != 1:
@@ -1264,7 +1264,7 @@ def task(pj, cpu):
 	pj.set_label(0xffffc06a, "if_bw_fine")
 	pj.set_label(0xffffc06c, "if_fp_leds")
 
-	# HPIB 
+	# HPIB
 	######
 	# 0xffffc081
 	# 0xffffc083

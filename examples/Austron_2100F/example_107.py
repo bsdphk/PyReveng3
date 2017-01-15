@@ -155,7 +155,7 @@ def task(pj, cx):
 	# Addresses stored into 0x0010
 	pj.todo(0xd401, cx.disass)
 	pj.todo(0xde3a, cx.disass)
-	
+
 	# Addresses stored into 0x0033
 	pj.todo(0xdaaa, cx.disass)
 	pj.todo(0xdceb, cx.disass)
@@ -179,8 +179,6 @@ def task(pj, cx):
 	# LDS-JMP-TSX calls
 	pj.todo(0xd033, cx.disass)
 	pj.todo(0xf44d, cx.disass)
-
-	
 
 	# Things discover gets wrong
 	pj.todo(0xdee2, cx.disass)
