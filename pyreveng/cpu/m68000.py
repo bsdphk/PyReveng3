@@ -432,7 +432,7 @@ def arg_eax(pj, ins, eam, ear):
 		o = pj.m.bu16(ins.hi)
 		ins.hi += 2
 		if o & 0x8000:
-			o |= 0xffff0000L
+			o |= 0xffff0000
 		ins.dstadr = o
 		return assy.Arg_dst(pj, o)
 	if eax == 0x0200:
