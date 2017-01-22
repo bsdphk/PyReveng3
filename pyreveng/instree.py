@@ -111,10 +111,10 @@ def parse_match(fmt):
 		elif fmt[i] == "?":
 			pass
 		else:
-			return (fl+1)/2, None, None
+			return (fl+1)//2, None, None
 		i += 1
 		if i < fl and fmt[i] != " ":
-			return (fl+1)/2, None, None
+			return (fl+1)//2, None, None
 		i += 1
 	return (width, mask, bits)
 
