@@ -147,6 +147,7 @@ class Instree_assy(Assy):
 		self.dstadr = None
 		self.lim = lim
 		self.mne = lim[-1].assy[0]
+		self.cache = {}
 		if self.mne[0] == "+":
 			self.prefix = True
 		self.oper = list()
@@ -222,6 +223,7 @@ class Instree_disass(code.Decode):
 			l.pop(-1)
 		if y != None:
 			if self.il:
+				print(y)
 				x = y.im.il.details
 				if x is not None:
 					y.add_il(x.split("\n"))

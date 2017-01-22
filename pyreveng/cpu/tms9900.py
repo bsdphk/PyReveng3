@@ -24,7 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-# XXX: Does "NEG *R2+" increment once or twice ?
+# XXX: Does "NEG *R2+" increment once or twice ? (we assume once)
+# XXX: But how does "A *R2+, R2" behave  ?
+# XXX: and what about "A *R2+, *R2+" ?
 
 """
 Disassembler for TI TMS9900 microprocessor
@@ -45,35 +47,46 @@ tms9900_instructions = """
 # 6-18 / 328
 LI	w,i	|0 0 0 0 0 0 1 0 0 0 0|n| w	| iop				| {
 	R = i16 IMM
+	FLAGS3 IMM
 }
-LIMI	i	|0 0 0 0 0 0 1 1 0 0 0|0 0 0 0 0| iop				|
+LIMI	i	|0 0 0 0 0 0 1 1 0 0 0|0 0 0 0 0| iop				| {
+	%status.imask = trunc i16 IMM to i4
+}
 
 # 6-19 / 329
 LWPI	i	|0 0 0 0 0 0 1 0 1 1 1|0 0 0 0 0| iop				| {
-	%WP = i16 IMM
+	LWPI IMM
 }
 MOV	so,do	|1 1 0 0|td | d     |ts | s     | {
 	LD RS
+	FLAGS3 RS
 }
 
 # 6-20 / 330
 MOVb	so,do	|1 1 0 1|td | d     |ts | s     | {
 	LD RS
+	PARITY RS
+	FLAGS3 RS
 }
 
 # 6-21 / 331
-SWPB	so	|0 0 0 0 0 1 1 0 1 1|ts | s     |
-STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	|
+SWPB	so	|0 0 0 0 0 1 1 0 1 1|ts | s     | {
+	%0 = llvm.bswap.i16 ( i16 RS ) 
+	LS %0
+}
+STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	| {
+	R = i16 %status
+}
 
 # 6-22 / 332
-STWP	?	|0 0 0 0 0 0 1 0 1 0 1|n| w	|
+STWP	w	|0 0 0 0 0 0 1 0 1 0 1 0| w	| {
+	R = %WP
+}
 
 # 6-23 / 333
 A	so,do	|1 0 1 0|td | d     |ts | s     | {
 	%0 = add i16 RS , RD
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS RD %0
 	LD %0
 }
 
@@ -81,64 +94,52 @@ A	so,do	|1 0 1 0|td | d     |ts | s     | {
 Ab	so,do	|1 0 1 1|td | d     |ts | s     | {
 	%0 = add i8 RS , RD
 	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS RD %0
+	PARITY %0
 	LD %0
 }
 
 # 6-25 / 335
 AI	w,i	|0 0 0 0 0 0 1 0 0 0 1|n| w	| iop				| {
-	R = add i16 R , IMM
-	FLAGS3 R
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	%0 = add i16 R , IMM
+	FLAGS5 R IMM %0
+	R = %0
 }
 S	so,do	|0 1 1 0|td | d     |ts | s     | {
-	%0 = add i16 RS , RD
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	%0 = sub i16 RS , RD
+	FLAGS5 RS RD %0
 	LD %0
 }
 
 # 6-26 / 336
 Sb	so,do	|0 1 1 1|td | d     |ts | s     | {
-	%0 = add i8 RS , RD
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	%0 = sub i8 RS , RD
+	FLAGS5 RS RD %0
+	PARITY %0
 	LD %0
 }
 
 # 6-27 / 337
 INC	so	|0 0 0 0 0 1 0 1 1 0|ts | s     | {
 	%0 = add i16 RS , 0x0001
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS 1 %0
 	LS %0
 }
 INCT	so	|0 0 0 0 0 1 0 1 1 1|ts | s     | {
 	%0 = add i16 RS , 0x0002
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS 2 %0
 	LS %0
 }
 
 # 6-28 / 338
 DEC	so	|0 0 0 0 0 1 1 0 0 0|ts | s	| {
 	%0 = sub i16 RS , 0x0001
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS 1 %0
 	LS %0
 }
 DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	| {
 	%0 = sub i16 RS , 0x0002
-	FLAGS3 %0
-	%status.c = i1 pyreveng.xxx ( )
-	%status.ov = i1 pyreveng.xxx ( )
+	FLAGS5 RS 2 %0
 	LS %0
 }
 
@@ -146,35 +147,63 @@ DECT	so	|0 0 0 0 0 1 1 0 0 1|ts | s	| {
 NEG	so	|0 0 0 0 0 1 0 1 0 0|ts | s     | {
 	%0 = sub i16 0x0000 , RS
 	%status.ov = icmp eq i16 RS , 0x8000
-	XXX %status.c
-	LS %0
 	FLAGS3 %0
+	LS %0
 }
-ABS	so	|0 0 0 0 0 1 1 1 0 1|ts | s     |
+ABS	so	|0 0 0 0 0 1 1 1 0 1|ts | s     | {
+	%0 = icmp uge i16 RS , 0x8000
+	%1 = sub i16 0 , RS
+	%status.ov = icmp eq i16 RS , 0x8000
+	FLAGS3 RS
+	%2 = select i16 %0 , %1 , RS
+	LS %2
+}
 
 # 6-30 / 340
-MPY	so,w	|0 0 1 1 1 0| w     |ts | s     |
+MPY	so,w	|0 0 1 1 1 0| w     |ts | s     | {
+	%0 = zext i16 R to i32
+	%1 = zext i16 RS to i32
+	%2 = mul i32 %0 , %1
+	RN = trunc i32 %2 to i16
+	%3 = shr i32 %2 , 16
+	R = trunc i32 %3 to i16
+}
 
 # 6-31 / 341
-DIV	so,w	|0 0 1 1 1 1| w     |ts | s     |
+DIV	so,w	|0 0 1 1 1 1| w     |ts | s     | {
+	%status.ov = icmp ge i16 R , RS
+	%0 = zext i16 R to i32
+	%1 = shl i32 %0 , 16
+	%2 = zext i16 RN to i32
+	%3 = or i32 %1 , %2
+	%4 = zext i16 RS to i32
+	%5 = udiv i32 %3 , %4
+	%6 = urem i32 %3 , %4
+	%7 = trunc i32 %5 to i16
+	%8 = trunc i32 %6 to i16
+	R = select i16 %status.ov , R , %7
+	RN = select i16 %status.ov , RN , %8
+}
 
 # 6-32 / 342
 C	so,do	|1 0 0 0|td | d     |ts | s     | {
 	%0 = sub i16 RS , RD
-	FLAGS3 %0
+	CMPFLAGS %0
 }
 
 # 6-33 / 343
 Cb	so,do	|1 0 0 1|td | d     |ts | s     | {
 	%0 = sub i8 RS , RD
-	FLAGS3 %0
+	PARITY RS
+	CMPFLAGS %0
 }
 
 # 6-34 / 344
 CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				| {
 	%0 = sub i16 R , IMM
-	FLAGS3 %0
+	CMPFLAGS %0
 }
+# NB special flags
 COC	so,w	|0 0 1 0 0 0| w     |ts | s     | {
 	%0 = and i16 R , RS
 	%status.eq = icmp eq i16 %0 , RS
@@ -226,6 +255,7 @@ SOC	so,do	|1 1 1 0|td | d     |ts | s     | {
 SOCb	so,do	|1 1 1 1|td | d     |ts | s     | {
 	%0 = or i8 RS , RD
 	LD %0
+	PARITY %0
 	FLAGS3 %0
 }
 
@@ -242,8 +272,11 @@ SZCb	so,do	|0 1 0 1|td | d     |ts | s     | {
 	%0 = xor i8 RS , 0xffff
 	%1 = and i8 RD , %0
 	LD %1
+	PARITY %1
 	FLAGS3 %1
 }
+
+# XXX: review below
 
 # 6-43 / 353
 SRA	sc,w	|0 0 0 0 1 0 0 0| c     | w	|
@@ -252,7 +285,7 @@ SRA	sc,w	|0 0 0 0 1 0 0 0| c     | w	|
 SLA	sc,w	|0 0 0 0 1 0 1 0| c     | w	|
 
 # 6-45 / 355
-SRL	sc,w	|0 0 0 0 1 0 0 1|0 0 0 0| w	| 
+SRL	sc,w	|0 0 0 0 1 0 0 1|0 0 0 0| w	|
 SRL	sc,w	|0 0 0 0 1 0 0 1| c     | w	| {
 	%0 = srl i16 R , SCNT1
 	%status.c = trunc i16 %0 to i1
@@ -343,10 +376,13 @@ SBO	cru	|0 0 0 1 1 1 0 1| cru		|
 
 # 6-54 / 364
 SBZ	cru	|0 0 0 1 1 1 1 0| cru		|
+# NB special flags
 TB	cru	|0 0 0 1 1 1 1 1| cru		|
 
 # 6-55 / 365
-LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     |
+LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     | {
+	LDCR RS
+}
 
 # 6-57 / 367
 STCR	c,so	|0 0 1 1 0 1| c     |ts | s     |
@@ -360,7 +396,10 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 
 """
 
-def arg_o(pj, ins, to, o, nm):
+def arg_o(pj, ins, sd):
+	to = ins['t' + sd]
+	o = ins[sd]
+	nm = 'G' + sd
 	if to == 0:
 		return "R%d" % o
 	if to == 1:
@@ -397,10 +436,10 @@ def arg_o(pj, ins, to, o, nm):
 		return "*R%d+" % o
 
 def arg_so(pj, ins):
-	return arg_o(pj, ins, ins['ts'], ins['s'], 'Gs')
+	return arg_o(pj, ins, 's')
 
 def arg_do(pj, ins):
-	return arg_o(pj, ins, ins['td'], ins['d'], 'Gd')
+	return arg_o(pj, ins, 'd')
 
 def arg_b(pj, ins):
 	if ins['b']:
@@ -477,16 +516,22 @@ class Tms9900assy(assy.Instree_assy):
 	def macro_R(self):
 		return "%%R%d" % self['w']
 
+	def macro_RN(self):
+		assert self['w'] != 15
+		return "%%R%d" % (self['w'] + 1)
+
 	def macro_IMM(self):
 		return "0x%04x" % self['iop']
 
-	def arg_ao(self, t, s, nm):
+	def arg_ao(self, sd):
+		t = self['t' + sd]
+		s = self[sd]
+		nm = 'G' + sd
 		sz = self.sz()
-		print(self, self.mne, self.oper, ['// YYY RO %d ' % sz + "T %x S %x  " % (t, s) ])
 		tsz = "i%d" % sz
 		r = "%%R%d" % s
 		assert t != 0
-		
+
 		if t == 1:
 			return self.add_il([
 				[ "%0", '=', 'inttoptr', 'i16', r, 'to', tsz + "*"],
@@ -502,33 +547,42 @@ class Tms9900assy(assy.Instree_assy):
 			], "%1")
 
 		assert t == 3
-		return self.add_il([
+		z = self.cache.get(sd)
+		if z is not None:
+			return z
+		z = self.add_il([
 			[ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
-			[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz / 8)],
+			[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz // 8)],
 		], "%0")
+		self.cache[sd] = z
+		return z
 
-	def arg_ro(self, t, s, nm):
+	def arg_ro(self, sd):
+		t = self['t' + sd]
+		s = self[sd]
+		nm = 'G' + sd
 		sz = self.sz()
-		print(self, self.mne, self.oper, ['// YYY RO %d ' % sz + "T %x S %x  " % (t, s) ])
 		tsz = "i%d" % sz
 		r = "%%R%d" % s
 		if t == 0 and sz == 16:
 			return r
-		
+
 		if t == 0 and sz == 8:
 			return self.add_il([
 				[ "%0", '=', 'shr', "i16", r, ',', '8' ],
 				[ "%1", '=', 'trunc', "i16", "%0", 'to', 'i8' ],
 			], "%1")
 
-		a = self.arg_ao(t, s, nm)
+		a = self.arg_ao(sd)
 		return self.add_il([
 			[ "%0", '=', 'load', tsz, ',', tsz + "*", a],
 		], "%0")
 
-	def arg_lo(self, t, s, args, nm):
+	def arg_lo(self, sd, args):
+		t = self['t' + sd]
+		s = self[sd]
+		nm = 'G' + sd
 		sz = self.sz()
-		print(self, ['// YYY LO %d ' % sz + "T %x S %x  " % (t, s) + " ".join(args) ])
 		tsz = "i%d" % sz
 		r = "%%R%d" % s
 		if t == 0 and sz == 16:
@@ -543,29 +597,35 @@ class Tms9900assy(assy.Instree_assy):
 			])
 			return
 
-		a = self.arg_ao(t, s, nm)
+		a = self.arg_ao(sd)
 		self.add_il([
 			[ 'store', tsz, args[0], ',', tsz + "*", a],
 		])
 		return
 
 	def macro_AS(self):
-		return self.arg_ao(self['ts'], self['s'], 'Gs')
+		return self.arg_ao('s')
 
 	def func_LS(self, args):
-		self.arg_lo(self['ts'], self['s'], args, 'Gs')
+		self.arg_lo('s', args)
 
 	def macro_RS(self):
-		return self.arg_ro(self['ts'], self['s'], 'Gs')
+		z = self.cache.get("RS")
+		if z is None:
+			z = self.cache["RS"] = self.arg_ro('s')
+		return z
 
 	def macro_AD(self):
 		return self.arg_ao(self['td'], self['d'], 'Gd')
 
 	def func_LD(self, args):
-		self.arg_lo(self['td'], self['d'], args, 'Gd')
+		self.arg_lo('d', args)
 
 	def macro_RD(self):
-		return self.arg_ro(self['td'], self['d'], 'Gd')
+		z = self.cache.get("RD")
+		if z is None:
+			z = self.cache["RD"] = self.arg_ro('d')
+		return z
 
 	def macro_SCNT1(self):
 		return "0x%x" % (self['c'] - 1)
@@ -579,13 +639,60 @@ class Tms9900assy(assy.Instree_assy):
 	def macro_BRNO(self):
 		return "label 0x%04x" % self.flow_out[1].to
 
+	def func_PARITY(self, args):
+		# args: [result]
+		assert self.sz() == 8
+		sz = "i%d" % self.sz()
+		self.add_il([
+			["%status.op", "=", "pyreveng.parity.odd.i1",
+			    "(", sz, args[0], ')'],
+		])
 
 	def func_FLAGS3(self, args):
+		# args: [result]
+		sz = "i%d" % self.sz()
 		self.add_il([
-			["%status.eq",  "=", "pyreveng.tms9900.seteq",  "i1", "(", "i%d" % self.sz(), args[0], ')'],
-			["%status.lgt", "=", "pyreveng.tms9900.setlgt", "i1", "(", "i%d" % self.sz(), args[0], ')'],
-			["%status.agt", "=", "pyreveng.tms9900.setagt", "i1", "(", "i%d" % self.sz(), args[0], ')'],
+			["%status.lgt", "=", "icmp", "ne", sz,
+			    args[0], ",", "0"],
+			["%status.agt", "=", "pyreveng.tms99x.agt.i1",
+			    "(", sz, args[0], ')'],
+			["%status.eq",  "=", "icmp", "eq", sz,
+			    args[0], ',', "0" ],
 		])
+
+	def func_FLAGS5(self, args):
+		# args: [src, dst, result]
+		sz = "i%d" % self.sz()
+		self.add_il([
+			["%status.lgt", "=", "icmp", "ne", sz,
+			    args[2], ",", "0"],
+			["%status.eq",  "=", "icmp", "eq", sz,
+			    args[2], ',', "0" ],
+			["%status.c", "=", "pyreveng.carry.i1", "(",
+			    sz, args[0], ",", sz, args[1], ")" ],
+			["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
+			    sz, args[0], ",", sz, args[1], ",", sz, args[2], ")" ],
+		])
+
+	def func_LDCR(self, args):
+		# pg 365
+		print(self, "LDCR", args)
+
+	def func_LWPI(self, args):
+		x = int(args[0], 0)
+		self.add_il([ ["%WP", "=", "i16", args[0]] ])
+		for r in range(16):
+			d = "0x%04x" % (x + 2 * r)
+			self.add_il([
+			    ["pyreveng.alias", "(", "%%R%d" % r, ",",
+				"i16*", d, ")" ],
+			])
+		for r in range(16):
+			d = "0x%04x" % (x + 2 * r)
+			self.add_il([
+			    ["%%R%d" % r, "=",
+				"load", "i16", ",", "i16*", d],
+			])
 
 class Tms9900(assy.Instree_disass):
 	def __init__(self):
