@@ -203,7 +203,6 @@ CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				| {
 	%0 = sub i16 R , IMM
 	CMPFLAGS %0
 }
-# NB special flags
 COC	so,w	|0 0 1 0 0 0| w     |ts | s     | {
 	%0 = and i16 R , RS
 	%status.eq = icmp eq i16 %0 , RS
@@ -276,23 +275,101 @@ SZCb	so,do	|0 1 0 1|td | d     |ts | s     | {
 	FLAGS3 %1
 }
 
-# XXX: review below
-
 # 6-43 / 353
-SRA	sc,w	|0 0 0 0 1 0 0 0| c     | w	|
+SRA	w,R0	|0 0 0 0 1 0 0 0|0 0 0 0| w	| {
+	// NB R0=zero is wrong
+	%0 = and i16 R0 , 0x000f
+	%1 = icmp eq i16 %0 , 0
+	%2 = select %1 i16 16 , 0
+	%3 = sub i16 %0 , 1
+	%4 = lshr i16 R , %3
+	%status.c = trunc i16 %4 to i1
+	%5 = lshr i16 %4 , 1
+	FLAGS3 %5
+	R = %5
+}
+
+SRA	w,sc	|0 0 0 0 1 0 0 0| c     | w	| {
+	%0 = lshr i16 R , SCNT1
+	%status.c = trunc i16 %0 to i1
+	%1 = lshr i16 %0 , 1
+	FLAGS3 %1
+	R = %1
+}
 
 # 6-44 / 354
-SLA	sc,w	|0 0 0 0 1 0 1 0| c     | w	|
+SLA	w,R0	|0 0 0 0 1 0 1 0|0 0 0 0| w	| {
+	// NB R0=zero is wrong
+	%0 = and i16 R0 , 0x000f
+	%1 = icmp eq i16 %0 , 0
+	%2 = select %1 i16 16 , 0
+	%3 = sub i16 %0 , 1
+	%4 = shl i16 R , %3
+	%5 = lshr i16 %4 , 15
+	%status.c = trunc i16 %5 to i1
+	%6 = shl i16 %4 , 1
+	FLAGS3 %6
+	%7 = xor i16 R , %6
+	%8 = lshr i16 %2 , 15
+	%status.ov = trunc i16 %8 to i1
+	R = %6
+}
+SLA	w,sc	|0 0 0 0 1 0 1 0| c     | w	| {
+	%0 = shl i16 R , SCNT1
+	%1 = lshr i16 %0 , 15
+	%status.c = trunc i16 %1 to i1
+	%2 = shl i16 %0 , 1
+	FLAGS3 %2
+	%3 = xor i16 R , %2
+	%4 = lshr i16 %3 , 15
+	%status.ov = trunc i16 %4 to i1
+	R = %2
+}
 
 # 6-45 / 355
-SRL	sc,w	|0 0 0 0 1 0 0 1|0 0 0 0| w	|
-SRL	sc,w	|0 0 0 0 1 0 0 1| c     | w	| {
+SRL	w,R0	|0 0 0 0 1 0 0 1|0 0 0 0| w	| {
+	// NB R0=zero is wrong
+	%0 = and i16 R0 , 0x000f
+	%1 = sub i16 %0 , 1
+	%2 = lshr i16 R , %1
+	%status.c = trunc i16 %2 to i1
+	%3 = lshr i16 %2 , 1
+	FLAGS3 %3
+	R = %3
+}
+
+SRL	w,sc	|0 0 0 0 1 0 0 1| c     | w	| {
 	%0 = srl i16 R , SCNT1
 	%status.c = trunc i16 %0 to i1
-	R = srl i16 %0 , 1
+	%1 = srl i16 %0 , 1
+	FLAGS3 %1
+	R = %1
+}
+
+SRC	w,R0	|0 0 0 0 1 0 1 1|0 0 0 0| w	| {
+	// NB R0=zero is wrong
+	%0 = zext i16 R to i32
+	%1 = shl i32 %0 , 16
+	%2 = or i32 %0 , %1
+	%3 = and i16 R0 , 0x000f
+	%4 = sub i16 %3 , 1
+	%5 = lshr i32 %2 , %4
+	%status.c = trunc i32 %4 to i1
+	%6 = lshr i32 %5 , 1
+	R = trunc i32 %6 to i16
 	FLAGS3 R
 }
-SRC	sc,w	|0 0 0 0 1 0 1 1| c     | w	|
+
+SRC	w,sc	|0 0 0 0 1 0 1 1| c     | w	| {
+	%0 = zext i16 R to i32
+	%1 = shl i32 %0 , 16
+	%2 = or i32 %0 , %1
+	%3 = lshr i32 %2 , SCNT1
+	%status.c = trunc i32 %3 to i1
+	%4 = lshr i32 %3 , 1
+	R = trunc i32 %4 to i16
+	FLAGS3 R
+}
 
 # 6-46 / 356
 B	da,>J	|0 0 0 0 0 1 0 0 0 1|1 0|0 0 0 0| da				| {
@@ -304,21 +381,30 @@ B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     | {
 
 # 6-47 / 357
 BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				| {
-	call void BRYES ( )
+	R11 = NEXT
+	br BRYES 
 }
 BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     | {
-	call label AS ( )
+	R11 = NEXT
+	br label AS
 }
 
 # 6-48 / 358
-BLWP	blwp1,blwp2,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				|
-BLWP	so	|0 0 0 0 0 1 0 0 0 0|ts | s     |
+BLWP	blwp1,blwp2,>C	|0 0 0 0 0 1 0 0 0 0|1 0|0 0 0 0| ptr				| {
+	BLWP
+}
+
+BLWP	so	|0 0 0 0 0 1 0 0 0 0|ts | s     | {
+	BLWPDYN AS
+}
 
 # 6-49 / 259
 XOP	?	|0 0 1 0 1 1| d     |ts | s     |
 
 # 6-50 / 360
-RTWP	>R	|0 0 0 0 0 0 1 1 1 0 0| n	|
+RTWP	>R	|0 0 0 0 0 0 1 1 1 0 0| n	| {
+	RTWP
+}
 JMP	r,>J	|0 0 0 1 0 0 0 0| disp		| {
 	br BRYES
 }
@@ -372,12 +458,18 @@ JOP	r,>JC	|0 0 0 1 1 1 0 0| disp		| {
 }
 
 # 6-53 / 363
-SBO	cru	|0 0 0 1 1 1 0 1| cru		|
+SBO	cru	|0 0 0 1 1 1 0 1| cru		| {
+	store i1 1, i1 address_space(1) * CRU
+}
 
 # 6-54 / 364
-SBZ	cru	|0 0 0 1 1 1 1 0| cru		|
+SBZ	cru	|0 0 0 1 1 1 1 0| cru		| {
+	store i1 0, i1 address_space(1) * CRU
+}
 # NB special flags
-TB	cru	|0 0 0 1 1 1 1 1| cru		|
+TB	cru	|0 0 0 1 1 1 1 1| cru		| {
+	%status.eq = load i1 , i1 address_space(1) * CRU
+}
 
 # 6-55 / 365
 LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     | {
@@ -385,7 +477,9 @@ LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     | {
 }
 
 # 6-57 / 367
-STCR	c,so	|0 0 1 1 0 1| c     |ts | s     |
+STCR	c,so	|0 0 1 1 0 1| c     |ts | s     | {
+	STCR RS
+}
 
 # 6-58 / 368
 LREX	?	|0 0 0 0 0 0 1 1 1 1 1| n	|
@@ -447,11 +541,13 @@ def arg_b(pj, ins):
 
 def arg_blwp1(pj, ins):
 	a = ins['ptr']
+	ins.cache['blwp1'] = pj.m.bu16(a)
 	data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
 	return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
 
 def arg_blwp2(pj, ins):
 	a = ins['ptr']
+	ins.cache['blwp2'] = pj.m.bu16(a + 2)
 	ins.dstadr = pj.m.bu16(a+2)
 	return assy.Arg_dst(pj, ins.dstadr)
 
@@ -627,17 +723,86 @@ class Tms9900assy(assy.Instree_assy):
 			z = self.cache["RD"] = self.arg_ro('d')
 		return z
 
+	def macro_CRU(self):
+		o = self['cru']
+		l = []
+		l.append([ '%0', "=", "lshr", "i16", "%R12", ",", "1"])
+		if o & 0x80:
+			l.append(
+			    [ '%1', "=", "sub", "i16", "%0", ",", "0x%04x" % (256-o) ])
+		else:
+			l.append(
+			    [ '%1', "=", "add", "i16", "%0", ",", "0x%04x" % o ])
+		l.append([ '%2', "=", "inttoptr", "i16", "%1", "to",
+			    "i1", "address_space", "(", "1", ")", "*"])
+		return self.add_il(l, "%2")
+
 	def macro_SCNT1(self):
-		return "0x%x" % (self['c'] - 1)
+		c = self['c']
+		if c == 0:
+			c = 16
+		return "0x%x" % (c - 1)
 
 	def macro_SCNT(self):
-		return "0x%x" % self['c']
+		c = self['c']
+		if c == 0:
+			c = 16
+		return "0x%x" % c
 
 	def macro_BRYES(self):
 		return "label 0x%04x" % self.flow_out[0].to
 
 	def macro_BRNO(self):
 		return "label 0x%04x" % self.flow_out[1].to
+
+	def macro_NEXT(self):
+		return "0x%04x" % self.hi
+
+	def func_BLWP(self, args):
+		l = []
+		l.append(["%0", "=", "i16", "%WP"])
+		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
+		for r in range(16):
+			d = "0x%04x" % (self.cache['blwp1'] + 2 * r)
+			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
+				"i16*", d, ")" ])
+		l.append(["R13", "=", "i16", "%0"])
+		l.append(["R14", "=", "i16", "0x%04x" % self.hi])
+		l.append(["R15", "=", "i16", "%status"])
+		l.append(["br", "label", "i16*", "0x%04x" % self.cache['blwp2'] ])
+		self.add_il(l)
+
+	def func_BLWP_DYN(self, args):
+		# NB: Untested
+		l = []
+		l.append(["%0", '=', 'load', 'i16', ',', "i16*", args[0]])
+		l.append(["%1", '=', 'add', 'i16*', args[0], ',', '2'])
+		l.append(["%2", '=', 'load', 'i16', ',', "i16*", "%1"])
+		l.append(["%3", "=", "i16", "%WP"])
+		l.append(["%WP", "=", "i16", "%1"])
+		for r in range(16):
+			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
+				"i16*", "%1", ")" ])
+			l.append(["%1", "=", "add", "i16", "%1", ",", "2"])
+
+		l.append(["R13", "=", "i16", "%3"])
+		l.append(["R14", "=", "i16", "0x%04x" % self.hi])
+		l.append(["R15", "=", "i16", "%status"])
+		l.append(["br", "label", "i16*", "%2"])
+		self.add_il(l)
+
+	def func_RTWP(self, args):
+		l = []
+		l.append(["%status", "=", "i16", "%R15"])
+		l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
+		l.append(["%WP", "=", "i16", "%R13"])
+		l.append(["%0", "=", "inttoptr", "i16", "%WP", "to", "i16*"])
+		for r in range(16):
+			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
+				"i16*", "%0", ")" ])
+			l.append(["%0", "=", "add", "i16*", "%0", ",", "2"])
+		l.append(["br", "label", "i16*", "%1"])
+		self.add_il(l)
 
 	def func_PARITY(self, args):
 		# args: [result]
