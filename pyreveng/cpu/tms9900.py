@@ -188,20 +188,20 @@ DIV	so,w	|0 0 1 1 1 1| w     |ts | s     | {
 # 6-32 / 342
 C	so,do	|1 0 0 0|td | d     |ts | s     | {
 	%0 = sub i16 RS , RD
-	CMPFLAGS %0
+	CMPFLAGS i16 RS RD
 }
 
 # 6-33 / 343
 Cb	so,do	|1 0 0 1|td | d     |ts | s     | {
 	%0 = sub i8 RS , RD
 	PARITY RS
-	CMPFLAGS %0
+	CMPFLAGS i8 RS RD
 }
 
 # 6-34 / 344
 CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				| {
 	%0 = sub i16 R , IMM
-	CMPFLAGS %0
+	CMPFLAGS i16 R IMM
 }
 COC	so,w	|0 0 1 0 0 0| w     |ts | s     | {
 	%0 = and i16 R , RS
@@ -381,11 +381,11 @@ B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     | {
 
 # 6-47 / 357
 BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				| {
-	R11 = NEXT
+	%R11 = NEXT
 	br BRYES 
 }
 BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     | {
-	R11 = NEXT
+	%R11 = NEXT
 	br label AS
 }
 
@@ -766,9 +766,9 @@ class Tms9900assy(assy.Instree_assy):
 			d = "0x%04x" % (self.cache['blwp1'] + 2 * r)
 			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
 				"i16*", d, ")" ])
-		l.append(["R13", "=", "i16", "%0"])
-		l.append(["R14", "=", "i16", "0x%04x" % self.hi])
-		l.append(["R15", "=", "i16", "%status"])
+		l.append(["%R13", "=", "i16", "%0"])
+		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
+		l.append(["%R15", "=", "i16", "%status"])
 		l.append(["br", "label", "i16*", "0x%04x" % self.cache['blwp2'] ])
 		self.add_il(l)
 
@@ -785,9 +785,9 @@ class Tms9900assy(assy.Instree_assy):
 				"i16*", "%1", ")" ])
 			l.append(["%1", "=", "add", "i16", "%1", ",", "2"])
 
-		l.append(["R13", "=", "i16", "%3"])
-		l.append(["R14", "=", "i16", "0x%04x" % self.hi])
-		l.append(["R15", "=", "i16", "%status"])
+		l.append(["%R13", "=", "i16", "%3"])
+		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
+		l.append(["%R15", "=", "i16", "%status"])
 		l.append(["br", "label", "i16*", "%2"])
 		self.add_il(l)
 
@@ -817,26 +817,28 @@ class Tms9900assy(assy.Instree_assy):
 		# args: [result]
 		sz = "i%d" % self.sz()
 		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz,
-			    args[0], ",", "0"],
-			["%status.agt", "=", "pyreveng.tms99x.agt.i1",
-			    "(", sz, args[0], ')'],
-			["%status.eq",  "=", "icmp", "eq", sz,
-			    args[0], ',', "0" ],
+			["%status.lgt", "=", "icmp", "ne", sz, args[0], ",", "0"],
+			["%status.agt", "=", "icmp", "sgt", sz, args[0], ",", "0"],
+			["%status.eq",  "=", "icmp", "eq", sz, args[0], ',', "0" ],
 		])
 
 	def func_FLAGS5(self, args):
 		# args: [src, dst, result]
 		sz = "i%d" % self.sz()
 		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz,
-			    args[2], ",", "0"],
-			["%status.eq",  "=", "icmp", "eq", sz,
-			    args[2], ',', "0" ],
-			["%status.c", "=", "pyreveng.carry.i1", "(",
-			    sz, args[0], ",", sz, args[1], ")" ],
+			["%status.lgt", "=", "icmp", "ne", sz, args[2], ",", "0"],
+			["%status.eq",  "=", "icmp", "eq", sz, args[2], ',', "0" ],
+			["%status.c", "=", "pyreveng.carry.i1", "(", sz, args[0], ",", sz, args[1], ")" ],
 			["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
 			    sz, args[0], ",", sz, args[1], ",", sz, args[2], ")" ],
+		])
+
+	def func_CMPFLAGS(self, args):
+		# args: [sz, src, dst]
+		self.add_il([
+			["%status.lgt", "=", "icmp", "ugt", args[0], args[1], ",", args[2]],
+			["%status.agt", "=", "icmp", "sgt", args[0], args[1], ",", args[2]],
+			["%status.eq", "=", "icmp", "eq", args[0], args[1], ",", args[2]],
 		])
 
 	def func_LDCR(self, args):
