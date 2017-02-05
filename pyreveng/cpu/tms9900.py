@@ -71,7 +71,7 @@ MOVb	so,do	|1 1 0 1|td | d     |ts | s     | {
 
 # 6-21 / 331
 SWPB	so	|0 0 0 0 0 1 1 0 1 1|ts | s     | {
-	%0 = llvm.bswap.i16 ( i16 RS ) 
+	%0 = llvm.bswap.i16 ( i16 RS )
 	LS %0
 }
 STST	w	|0 0 0 0 0 0 1 0 1 1 0|0| w	| {
@@ -382,7 +382,7 @@ B	so,>J	|0 0 0 0 0 1 0 0 0 1|ts | s     | {
 # 6-47 / 357
 BL	da,>C	|0 0 0 0 0 1 1 0 1 0|1 0|0 0 0 0| da				| {
 	%R11 = NEXT
-	br BRYES 
+	br BRYES
 }
 BL	so,>C	|0 0 0 0 0 1 1 0 1 0|ts | s     | {
 	%R11 = NEXT
@@ -490,102 +490,6 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 
 """
 
-def arg_o(pj, ins, sd):
-	to = ins['t' + sd]
-	o = ins[sd]
-	nm = 'G' + sd
-	if to == 0:
-		return "R%d" % o
-	if to == 1:
-		return "*R%d" % o
-
-	if to == 2:
-		v = pj.m.bu16(ins.hi)
-		ins.hi += 2
-		ins[nm] = v
-		if o != 0:
-			return "R%d+#0x%04x" % (o, v)
-
-		x = pj.find(v)
-		if len(x) > 0:
-			return assy.Arg_ref(pj, x[0])
-
-		try:
-			w = pj.m.bu16(v)
-		except:
-			return assy.Arg_dst(pj, v, "@")
-
-		# print("XXX", "%04x" % v, "%04x" % w, ins.mne)
-		if ins.mne[-1] == "b":
-			c = data.Const(pj, v, v + 1)
-			c.typ = ".BYTE"
-			c.fmt = "0x%02x" % pj.m.rd(v)
-		else:
-			c = data.Const(pj, v, v + 2)
-			c.typ = ".WORD"
-			c.fmt = "0x%04x" % w
-		return assy.Arg_ref(pj, c)
-
-	if to == 3:
-		return "*R%d+" % o
-
-def arg_so(pj, ins):
-	return arg_o(pj, ins, 's')
-
-def arg_do(pj, ins):
-	return arg_o(pj, ins, 'd')
-
-def arg_b(pj, ins):
-	if ins['b']:
-		ins.mne += "B"
-
-def arg_blwp1(pj, ins):
-	a = ins['ptr']
-	ins.cache['blwp1'] = pj.m.bu16(a)
-	data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
-	return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
-
-def arg_blwp2(pj, ins):
-	a = ins['ptr']
-	ins.cache['blwp2'] = pj.m.bu16(a + 2)
-	ins.dstadr = pj.m.bu16(a+2)
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_da(pj, ins):
-	ins.dstadr = ins['da']
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_r(pj, ins):
-	i = ins['disp']
-	if i & 0x80:
-		i -= 256
-	ins.dstadr = ins.hi + i * 2
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_c(pj, ins):
-	return assy.Arg_imm(pj, ins['c'])
-
-def arg_i(pj, ins):
-	return assy.Arg_imm(pj, ins['iop'], 16)
-
-def arg_w(pj, ins):
-	return "R%d" % ins['w']
-
-def arg_cru(pj, ins):
-	i = ins['cru']
-	if i & 0x80:
-		i -= 0x100
-	# XXX: This doubling may be model-dependent
-	# XXX: Based on 9980/9981
-	i *= 2
-	return "R12%#+x" % i
-
-def arg_sc(pj, ins):
-	if ins['c'] == 0:
-		return "R0"
-	else:
-		return "#%d" % ins['c']
-
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):
 		super(vector, self).__init__(pj, adr, adr + 4)
@@ -609,17 +513,120 @@ class Tms9900assy(assy.Instree_assy):
 			return 8
 		return 16
 
-	def macro_R(self):
+	def arg_o(self, pj, sd):
+		to = self['t' + sd]
+		o = self[sd]
+		nm = 'G' + sd
+		if to == 0:
+			return "R%d" % o
+		if to == 1:
+			return "*R%d" % o
+
+		if to == 2:
+			v = pj.m.bu16(self.hi)
+			self.hi += 2
+			self[nm] = v
+			if o != 0:
+				return "R%d+#0x%04x" % (o, v)
+
+			x = pj.find(v)
+			if len(x) > 0:
+				return assy.Arg_ref(pj, x[0])
+
+			try:
+				w = pj.m.bu16(v)
+			except:
+				return assy.Arg_dst(pj, v, "@")
+
+			# print("XXX", "%04x" % v, "%04x" % w, self.mne)
+			if self.mne[-1] == "b":
+				c = data.Const(pj, v, v + 1)
+				c.typ = ".BYTE"
+				c.fmt = "0x%02x" % pj.m.rd(v)
+			else:
+				c = data.Const(pj, v, v + 2)
+				c.typ = ".WORD"
+				c.fmt = "0x%04x" % w
+			return assy.Arg_ref(pj, c)
+
+		if to == 3:
+			return "*R%d+" % o
+
+	#-----------------------------------
+	# Methods related to assembly output
+	#-----------------------------------
+
+	def assy_b(self, pj):
+		if self['b']:
+			ins.mne += "B"
+	def assy_blwp1(self, pj):
+		a = self['ptr']
+		self.cache['blwp1'] = pj.m.bu16(a)
+		data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+		return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
+
+	def assy_blwp2(self, pj):
+		a = self['ptr']
+		self.cache['blwp2'] = pj.m.bu16(a + 2)
+		self.dstadr = pj.m.bu16(a+2)
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_c(self, pj):
+		return assy.Arg_imm(pj, self['c'])
+
+	def assy_cru(self, pj):
+		i = self['cru']
+		if i & 0x80:
+			i -= 0x100
+		# XXX: This doubling may be model-dependent
+		# XXX: Based on 9980/9981
+		i *= 2
+		return "R12%#+x" % i
+
+	def assy_da(self, pj):
+		self.dstadr = self['da']
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_do(self, pj):
+		return self.arg_o(pj, 'd')
+
+	def assy_i(self, pj):
+		return assy.Arg_imm(pj, self['iop'], 16)
+
+	def assy_so(self, pj):
+		return self.arg_o(pj, 's')
+
+	def assy_r(self, pj):
+		i = self['disp']
+		if i & 0x80:
+			i -= 256
+		self.dstadr = self.hi + i * 2
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_sc(self, pj):
+		if self['c'] == 0:
+			return "R0"
+		else:
+			return "#%d" % self['c']
+
+	def assy_w(self, pj):
+		return "R%d" % self['w']
+
+	#-----------------------------
+	# Methods related to IL output
+	#-----------------------------
+
+	def ilmacro_R(self):
 		return "%%R%d" % self['w']
 
-	def macro_RN(self):
+	def ilmacro_RN(self):
 		assert self['w'] != 15
 		return "%%R%d" % (self['w'] + 1)
 
-	def macro_IMM(self):
+	def ilmacro_IMM(self):
 		return "0x%04x" % self['iop']
 
-	def arg_ao(self, sd):
+	def ilarg_ao(self, sd):
 		t = self['t' + sd]
 		s = self[sd]
 		nm = 'G' + sd
@@ -630,7 +637,8 @@ class Tms9900assy(assy.Instree_assy):
 
 		if t == 1:
 			return self.add_il([
-				[ "%0", '=', 'inttoptr', 'i16', r, 'to', tsz + "*"],
+				[ "%0", '=', 'inttoptr', 'i16', r,
+				    'to', tsz + "*"],
 			], "%0")
 
 		if t == 2 and s == 0:
@@ -638,8 +646,10 @@ class Tms9900assy(assy.Instree_assy):
 
 		if t == 2:
 			return self.add_il([
-				[ "%0", '=', 'add', 'i16', r, ',', "0x%04x" % self[nm]],
-				[ "%1", '=', 'inttoptr', "i16", "%0", 'to', tsz + "*"],
+				[ "%0", '=', 'add', 'i16', r, ',',
+				    "0x%04x" % self[nm]],
+				[ "%1", '=', 'inttoptr', "i16", "%0",
+				    'to', tsz + "*"],
 			], "%1")
 
 		assert t == 3
@@ -653,7 +663,7 @@ class Tms9900assy(assy.Instree_assy):
 		self.cache[sd] = z
 		return z
 
-	def arg_ro(self, sd):
+	def ilarg_ro(self, sd):
 		t = self['t' + sd]
 		s = self[sd]
 		nm = 'G' + sd
@@ -669,12 +679,12 @@ class Tms9900assy(assy.Instree_assy):
 				[ "%1", '=', 'trunc', "i16", "%0", 'to', 'i8' ],
 			], "%1")
 
-		a = self.arg_ao(sd)
+		a = self.ilarg_ao(sd)
 		return self.add_il([
 			[ "%0", '=', 'load', tsz, ',', tsz + "*", a],
 		], "%0")
 
-	def arg_lo(self, sd, args):
+	def ilarg_lo(self, sd, args):
 		t = self['t' + sd]
 		s = self[sd]
 		nm = 'G' + sd
@@ -686,79 +696,82 @@ class Tms9900assy(assy.Instree_assy):
 			return
 		if t == 0 and sz == 8:
 			self.add_il([
-				[ "%0", "=", "zext", tsz, args[0], "to", "i16" ],
+				[ "%0", "=", "zext", tsz, args[0],
+				    "to", "i16" ],
 				[ "%1", "=", "shl", "i16", "%0", ",", "8" ],
 				[ r, "=", "and", "i16", r, ",", "0x00ff" ],
 				[ r, "=", "or", "i16", r, ",", "%1" ],
 			])
 			return
 
-		a = self.arg_ao(sd)
+		a = self.ilarg_ao(sd)
 		self.add_il([
 			[ 'store', tsz, args[0], ',', tsz + "*", a],
 		])
 		return
 
-	def macro_AS(self):
-		return self.arg_ao('s')
+	def ilmacro_AS(self):
+		return self.ilarg_ao('s')
 
-	def func_LS(self, args):
-		self.arg_lo('s', args)
+	def ilfunc_LS(self, args):
+		self.ilarg_lo('s', args)
 
-	def macro_RS(self):
+	def ilmacro_RS(self):
 		z = self.cache.get("RS")
 		if z is None:
-			z = self.cache["RS"] = self.arg_ro('s')
+			z = self.cache["RS"] = self.ilarg_ro('s')
 		return z
 
-	def macro_AD(self):
-		return self.arg_ao(self['td'], self['d'], 'Gd')
+	def ilmacro_AD(self):
+		return self.ilarg_ao(self['td'], self['d'], 'Gd')
 
-	def func_LD(self, args):
-		self.arg_lo('d', args)
+	def ilfunc_LD(self, args):
+		self.ilarg_lo('d', args)
 
-	def macro_RD(self):
+	def ilmacro_RD(self):
 		z = self.cache.get("RD")
 		if z is None:
-			z = self.cache["RD"] = self.arg_ro('d')
+			z = self.cache["RD"] = self.ilarg_ro('d')
 		return z
 
-	def macro_CRU(self):
+	def ilmacro_CRU(self):
 		o = self['cru']
 		l = []
 		l.append([ '%0', "=", "lshr", "i16", "%R12", ",", "1"])
 		if o & 0x80:
 			l.append(
-			    [ '%1', "=", "sub", "i16", "%0", ",", "0x%04x" % (256-o) ])
+			    [ '%1', "=", "sub", "i16", "%0", ",",
+				"0x%04x" % (256-o) ])
 		else:
 			l.append(
-			    [ '%1', "=", "add", "i16", "%0", ",", "0x%04x" % o ])
+			    [ '%1', "=", "add", "i16", "%0", ",",
+				"0x%04x" % o ])
 		l.append([ '%2', "=", "inttoptr", "i16", "%1", "to",
 			    "i1", "address_space", "(", "1", ")", "*"])
 		return self.add_il(l, "%2")
 
-	def macro_SCNT1(self):
+	def ilmacro_SCNT1(self):
 		c = self['c']
 		if c == 0:
 			c = 16
 		return "0x%x" % (c - 1)
 
-	def macro_SCNT(self):
+	def ilmacro_SCNT(self):
 		c = self['c']
 		if c == 0:
 			c = 16
 		return "0x%x" % c
 
-	def macro_BRYES(self):
+	def ilmacro_BRYES(self):
 		return "label 0x%04x" % self.flow_out[0].to
 
-	def macro_BRNO(self):
+	def ilmacro_BRNO(self):
 		return "label 0x%04x" % self.flow_out[1].to
 
-	def macro_NEXT(self):
+	def ilmacro_NEXT(self):
 		return "0x%04x" % self.hi
 
-	def func_BLWP(self, args):
+	def ilfunc_BLWP(self, args):
 		l = []
 		l.append(["%0", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
@@ -769,10 +782,11 @@ class Tms9900assy(assy.Instree_assy):
 		l.append(["%R13", "=", "i16", "%0"])
 		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
 		l.append(["%R15", "=", "i16", "%status"])
-		l.append(["br", "label", "i16*", "0x%04x" % self.cache['blwp2'] ])
+		l.append(["br", "label", "i16*",
+		    "0x%04x" % self.cache['blwp2'] ])
 		self.add_il(l)
 
-	def func_BLWP_DYN(self, args):
+	def ilfunc_BLWP_DYN(self, args):
 		# NB: Untested
 		l = []
 		l.append(["%0", '=', 'load', 'i16', ',', "i16*", args[0]])
@@ -791,7 +805,7 @@ class Tms9900assy(assy.Instree_assy):
 		l.append(["br", "label", "i16*", "%2"])
 		self.add_il(l)
 
-	def func_RTWP(self, args):
+	def ilfunc_RTWP(self, args):
 		l = []
 		l.append(["%status", "=", "i16", "%R15"])
 		l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
@@ -804,7 +818,7 @@ class Tms9900assy(assy.Instree_assy):
 		l.append(["br", "label", "i16*", "%1"])
 		self.add_il(l)
 
-	def func_PARITY(self, args):
+	def ilfunc_PARITY(self, args):
 		# args: [result]
 		assert self.sz() == 8
 		sz = "i%d" % self.sz()
@@ -813,39 +827,48 @@ class Tms9900assy(assy.Instree_assy):
 			    "(", sz, args[0], ')'],
 		])
 
-	def func_FLAGS3(self, args):
+	def ilfunc_FLAGS3(self, args):
 		# args: [result]
 		sz = "i%d" % self.sz()
 		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz, args[0], ",", "0"],
-			["%status.agt", "=", "icmp", "sgt", sz, args[0], ",", "0"],
-			["%status.eq",  "=", "icmp", "eq", sz, args[0], ',', "0" ],
+			["%status.lgt", "=", "icmp", "ne", sz,
+			    args[0], ",", "0"],
+			["%status.agt", "=", "icmp", "sgt", sz,
+			    args[0], ",", "0"],
+			["%status.eq",  "=", "icmp", "eq", sz,
+			    args[0], ',', "0" ],
 		])
 
-	def func_FLAGS5(self, args):
+	def ilfunc_FLAGS5(self, args):
 		# args: [src, dst, result]
 		sz = "i%d" % self.sz()
 		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz, args[2], ",", "0"],
-			["%status.eq",  "=", "icmp", "eq", sz, args[2], ',', "0" ],
-			["%status.c", "=", "pyreveng.carry.i1", "(", sz, args[0], ",", sz, args[1], ")" ],
+			["%status.lgt", "=", "icmp", "ne", sz,
+			    args[2], ",", "0"],
+			["%status.eq",  "=", "icmp", "eq", sz,
+			    args[2], ',', "0" ],
+			["%status.c", "=", "pyreveng.carry.i1",
+			    "(", sz, args[0], ",", sz, args[1], ")" ],
 			["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
 			    sz, args[0], ",", sz, args[1], ",", sz, args[2], ")" ],
 		])
 
-	def func_CMPFLAGS(self, args):
+	def ilfunc_CMPFLAGS(self, args):
 		# args: [sz, src, dst]
 		self.add_il([
-			["%status.lgt", "=", "icmp", "ugt", args[0], args[1], ",", args[2]],
-			["%status.agt", "=", "icmp", "sgt", args[0], args[1], ",", args[2]],
-			["%status.eq", "=", "icmp", "eq", args[0], args[1], ",", args[2]],
+			["%status.lgt", "=", "icmp", "ugt",
+			    args[0], args[1], ",", args[2]],
+			["%status.agt", "=", "icmp", "sgt",
+			    args[0], args[1], ",", args[2]],
+			["%status.eq", "=", "icmp", "eq",
+			    args[0], args[1], ",", args[2]],
 		])
 
-	def func_LDCR(self, args):
+	def ilfunc_LDCR(self, args):
 		# pg 365
 		print(self, "LDCR", args)
 
-	def func_LWPI(self, args):
+	def ilfunc_LWPI(self, args):
 		x = int(args[0], 0)
 		self.add_il([ ["%WP", "=", "i16", args[0]] ])
 		for r in range(16):
@@ -868,20 +891,6 @@ class Tms9900(assy.Instree_disass):
 		self.n_interrupt = 16
 		self.myleaf = Tms9900assy
 		self.il = True
-		self.args.update({
-		    "r":	arg_r,
-		    "i":	arg_i,
-		    "w":	arg_w,
-		    "b":	arg_b,
-		    "c":	arg_c,
-		    "so":	arg_so,
-		    "do":	arg_do,
-		    "da":	arg_da,
-		    "sc":	arg_sc,
-		    "cru":	arg_cru,
-		    "blwp1":	arg_blwp1,
-		    "blwp2":	arg_blwp2,
-		})
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)

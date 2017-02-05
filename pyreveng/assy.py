@@ -95,7 +95,7 @@ class Assy(code.Code):
 					v.append(j)
 					continue
 				try:
-					j = getattr(self, "macro_" + i)
+					j = getattr(self, "ilmacro_" + i)
 				except AttributeError:
 					v.append(i)
 					continue
@@ -108,7 +108,7 @@ class Assy(code.Code):
 				continue
 
 			try:
-				j = getattr(self, "func_" + v[0])
+				j = getattr(self, "ilfunc_" + v[0])
 			except AttributeError:
 				self.il.append(v)
 				continue
@@ -154,14 +154,24 @@ class Instree_assy(Assy):
 		for self.im in lim:
 			i = self.im.assy
 			for j in i[1].split(","):
-				x = lang.args.get(j)
+				try:
+					x = getattr(self, "assy_" + j)
+					typ=1
+				except AttributeError:
+					x = None
+				if x is None:
+					x = lang.args.get(j)
+					typ=2
 				if x is None:
 					if j == "-":
 						continue
 					x = "?" + j + "?"
 					print("ERROR: ARG <%s> not translated" % j)
 				if not isinstance(x, str):
-					x = x(pj, self)
+					if typ == 1:
+						x = x(pj)
+					else:
+						x = x(pj, self)
 				if isinstance(x, str):
 					x = Arg_verbatim(pj, x)
 				if x is None:
@@ -223,7 +233,6 @@ class Instree_disass(code.Decode):
 			l.pop(-1)
 		if y != None:
 			if self.il:
-				print(y)
 				x = y.im.il.ilspec
 				if x is not None:
 					y.add_il(x.split("\n"))

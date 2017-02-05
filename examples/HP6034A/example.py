@@ -126,7 +126,7 @@ def task(pj, cx):
 		for a in range(0x0cd3, 0x0ce2):
 			c = data.Txt(pj, a, a + 1, False)
 			l.append(c.txt)
-		print(l)
+		# print(l)
 		for a in range(0xcee, 0xd0c, 2):
 			c = cx.codeptr(pj, a)
 			n = l.pop(0)
