@@ -31,7 +31,7 @@ This class turns a textual description close to what is typically used
 for documenting CPUs into a skeleton disassembler.
 
 	instree = * (
-		(assypart (wordmap/bitmap) [details]) \
+		(assypart (wordmap/bitmap) [ilspec]) \
 		('#' comment NL)
 	)
 
@@ -48,9 +48,7 @@ for documenting CPUs into a skeleton disassembler.
 	hex = 2* ( bit / '2' / '3' / ... 'D' / 'E' / 'F' )
 	# Always upper case, at least two digits
 
-	details = '{' NL anything_really NL '}' NL
-
-XXX: The details are currently unused.
+	ilspec = '{' NL IL_specificatoin NL '}' NL
 
 XXX: wordmap has yet to be implemented
 
@@ -122,10 +120,10 @@ def parse_match(fmt):
 # A single entry from the specification
 
 class Insline(object):
-	def __init__(self, width, assy, bits, details=None):
+	def __init__(self, width, assy, bits, ilspec=None):
 		self.assy = assy.split()
 		self.bits = bits
-		self.details = details
+		self.ilspec = ilspec
 
 		s = bits.split("|")
 		s.pop(0)

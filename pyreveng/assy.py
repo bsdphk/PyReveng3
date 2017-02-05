@@ -224,7 +224,7 @@ class Instree_disass(code.Decode):
 		if y != None:
 			if self.il:
 				print(y)
-				x = y.im.il.details
+				x = y.im.il.ilspec
 				if x is not None:
 					y.add_il(x.split("\n"))
 				else:
