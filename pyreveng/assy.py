@@ -35,7 +35,7 @@ arguments are processed before the instruction.
 
 from __future__ import print_function
 
-from . import instree, code
+from . import instree, code, il
 
 #######################################################################
 
@@ -52,73 +52,13 @@ class Assy(code.Code):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
-		self.il = []
-		self.il_c = 0
-
-	def il_reg(self, r, d):
-		if r[0] != "%":
-			return r
-		# XXX Problem with instructions at loc=0
-		o = self.lo * 100
-		if r[1:].isdigit():
-			if int(r[1:]) >= 100:
-				return r
-			n = "%%%d" % (o + self.il_c)
-			d[r] = n
-			self.il_c += 1
-			return n
-		return r
+		self.il = il.IL(lo)
 
 	def add_il(self, ll, ret=None):
-		if ll == None:
-			return
-		d = {}
-		for l in ll:
-			if l == None:
-				continue
-			if isinstance(l, str):
-				f = l.split()
-			else:
-				f = l
-				for i in f:
-					assert i == i.strip()
-			if len(f) == 0:
-				continue
-			v = []
-			for i in f:
-				j = d.get(i)
-				if j is not None:
-					v.append(j)
-					continue
-				j = self.il_reg(i, d)
-				if j != i:
-					v.append(j)
-					continue
-				try:
-					j = getattr(self, "ilmacro_" + i)
-				except AttributeError:
-					v.append(i)
-					continue
-				# self.il.append(["/* MACRO " + i + " */"])
-				k = j()
-				if k is not None:
-					x = self.il_reg(k, d)
-					v.append(x)
-			if len(v) == 0:
-				continue
-
-			try:
-				j = getattr(self, "ilfunc_" + v[0])
-			except AttributeError:
-				self.il.append(v)
-				continue
-			# self.il.append(["/* FUNC " + " ".join(v) + " */" ])
-			j(v[1:])
-		return d.get(ret)
+		return self.il.add_il(self, ll, ret)
 
 	def render(self, pj):
-		for i in self.il:
-			self.lcmt += "IL " + " ".join(i) + "\n"
+		self.lcmt += self.il.render()
 		s = self.mne + "\t"
 		l = []
 		for i in self.oper:
