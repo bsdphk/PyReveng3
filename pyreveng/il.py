@@ -39,17 +39,16 @@ from __future__ import print_function
 #######################################################################
 
 class IL(object):
-	def __init__(self, lo):
-		self.lo = lo
-		self.oper = []
+	def __init__(self, ins = None):
+		self.ins = ins
 		self.il = []
 		self.il_c = 0
 
 	def il_reg(self, r, d):
 		if r[0] != "%":
 			return r
-		# XXX Problem with instructions at loc=0
-		o = self.lo * 100
+		# We add a million to avoid problems at lo=0
+		o = self.ins.lo * 100 + 10000000
 		if r[1:].isdigit():
 			if int(r[1:]) >= 100:
 				return r
@@ -60,7 +59,13 @@ class IL(object):
 		return r
 
 	def add_il(self, ins, ll, ret=None):
+		'''
+		Add IL's in 'll', translating "%0" .. "%99" to unique
+		names along the way.  'ret' can be one of these and
+		the new unique name will be returned.
+		'''
 		if ll == None:
+			assert ret is None
 			return
 		d = {}
 		for l in ll:
@@ -91,7 +96,12 @@ class IL(object):
 					continue
 				# self.il.append(["/* MACRO " + i + " */"])
 				k = j()
-				if k is not None:
+				if isinstance(k, list):
+					for x in k:
+						y = self.il_reg(x, d)
+						v.append(y)
+				elif k is not None:
+					assert isinstance(k, str)
 					x = self.il_reg(k, d)
 					v.append(x)
 			if len(v) == 0:
@@ -111,3 +121,186 @@ class IL(object):
 		for i in self.il:
 			t += "IL " + " ".join(i) + "\n"
 		return t
+
+	def dot_def(self, fo):
+		fo.write('IL%x [shape="record",label="{' % self.lo)
+		fo.write("<in>0x%x-0x%x|" % (self.lo, self.hi))
+		for i in self.il:
+			j = " ".join(i)
+			fo.write("%s\\l" % j)
+		if len(self.il) == 0:
+			fo.write("|XXX")
+		fo.write('|<out>}"]\n')
+
+import assy
+
+class analysis(object):
+	def __init__(self, pj):
+		self.ils = {}
+		self.writes = {}
+		self.reads = {}
+		for j in pj:
+			if not isinstance(j, assy.Assy):
+				continue
+			x = j.il
+			self.ils[j.lo] = x
+			x.next = None
+			x.prev = None
+			x.comefrom = []
+			x.goto = []
+			x.lo = x.ins.lo
+			x.hi = x.ins.hi
+			x.ins = [x.ins]
+			x.parts = []
+			if len(x.il) == 0:
+				x.il.append(["pyreveng.void", "(", ")"])
+			for y in x.il:
+				if y[0][0] == "%" and y[1] == "=":
+					self.writes[y[0]] = True
+				if y[1] == "=":
+					for z in y[2:]:
+						if z[0] == "%":
+							self.reads[z] = True
+				else:
+					for z in y:
+						if z[0] == "%":
+							self.reads[z] = True
+		print("RAW", self.stats())
+		self.find_flow()
+		self.stitch()
+		print("STICHED", self.stats())
+		self.dead_stores()
+		print("DEAD STORES", self.stats())
+		self.totally_dead()
+		self.dot()
+
+	def stats(self):
+		n = 0
+		for a,x in self.ils.iteritems():
+			n += len(x.il)
+		return "%d ILs with %d instructions" % (len(self.ils), n)
+
+	def find_flow(self):
+		for j,x in self.ils.iteritems():
+			z = x.il[-1]
+			if z[0] != "br":
+				continue
+			d = []
+			p = 1
+			while p < len(z):
+				if z[p] != "label":
+					p += 1
+					continue
+				if z[p+1][:2] == "0x":
+					d.append(int(z[p+1], 0))
+					p += 2
+					continue
+				if z[p+1][:1] == "i" and z[p+2][:2] == "0x":
+					d.append(int(z[p+2], 0))
+					p += 3
+					continue
+				print(z[p:])
+				d.append(None)
+				p += 1
+			assert len(d) > 0
+			for y in d:
+				if y is not None:
+					z = self.ils[y]
+					x.goto.append(z)
+					z.comefrom.append(y)
+				else:
+					x.goto.append(None)
+
+	def stitch(self):
+		joins = []
+
+		# Convert .ins to list
+		for j,x in self.ils.iteritems():
+			if x.il[-1][0] != "br":
+				y = self.ils[x.hi]
+				if len(y.comefrom) == 0:
+					joins.append(x)
+					x.next = y
+					y.prev = x
+				else:
+					x.il.append(
+					    ["br", "label", "0x%x" % x.hi]
+					)
+					x.goto.append(y)
+					y.comefrom.append(x)
+
+		heads = []
+		for j in joins:
+			if j.prev == None:
+				heads.append(j)
+
+		for j in heads:
+			k = IL()
+			k.lo = j.lo
+			k.ins = []
+			k.comefrom = j.comefrom
+			k.parts = []
+			n = j
+			while n is not None:
+				k.parts.append(n)
+				k.il += n.il
+				k.hi = n.hi
+				k.ins += n.ins
+				k.goto = n.goto
+				del self.ils[n.lo]
+				n = n.next
+			self.ils[k.lo] = k
+
+	def dead_stores(self):
+		for a,x in self.ils.iteritems():
+			edit = ""
+			nn = 0
+			j = 0
+			while j < len(x.il):
+				if x.il[j][1] != "=":
+					j += 1
+					continue
+				t = x.il[j][0]
+				m = "  " + " ".join(x.il[j])
+				for k in range(j+1,len(x.il)):
+					p = x.il[k]
+					if p[0] == "pyreveng.void":
+						break
+					if t not in p:
+						continue
+					if p[0] == t and p[1] == "=":
+						y = x.il.pop(j)
+						m = "-" + m[1:]
+						nn += 1
+						j -= 1
+						break
+					else:
+						break
+				edit += "\n" + m 
+				j += 1
+			if nn > 0:
+				print("EDIT 0x%x" % x.lo, edit);
+
+	def totally_dead(self):
+		for i in self.writes:
+			if not i in self.reads:
+				print("Totally dead", i)
+
+	def dot(self):
+		# present
+		fo = open("/tmp/_.dot", "w")
+		fo.write("digraph {\n");
+		for a,x in self.ils.iteritems():
+			n=0
+			x.dot_def(fo)
+			for j in x.goto:
+				fo.write("IL%x -> " % a)
+				if j is None:
+					fo.write("XX%x_%d\n" % (a, n))
+					n += 1
+				else:
+					fo.write("IL%x:in\n" % j.lo)
+		fo.write("}\n")
+
+
+

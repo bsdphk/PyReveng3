@@ -52,7 +52,7 @@ class Assy(code.Code):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
-		self.il = il.IL(lo)
+		self.il = il.IL(self)
 
 	def add_il(self, ll, ret=None):
 		return self.il.add_il(self, ll, ret)

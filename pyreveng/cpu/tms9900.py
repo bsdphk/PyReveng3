@@ -187,20 +187,17 @@ DIV	so,w	|0 0 1 1 1 1| w     |ts | s     | {
 
 # 6-32 / 342
 C	so,do	|1 0 0 0|td | d     |ts | s     | {
-	%0 = sub i16 RS , RD
 	CMPFLAGS i16 RS RD
 }
 
 # 6-33 / 343
 Cb	so,do	|1 0 0 1|td | d     |ts | s     | {
-	%0 = sub i8 RS , RD
 	PARITY RS
 	CMPFLAGS i8 RS RD
 }
 
 # 6-34 / 344
 CI	w,i	|0 0 0 0 0 0 1 0 1 0 0|n| w	| iop				| {
-	%0 = sub i16 R , IMM
 	CMPFLAGS i16 R IMM
 }
 COC	so,w	|0 0 1 0 0 0| w     |ts | s     | {
@@ -763,10 +760,10 @@ class Tms9900assy(assy.Instree_assy):
 		return "0x%x" % c
 
 	def ilmacro_BRYES(self):
-		return "label 0x%04x" % self.flow_out[0].to
+		return ["label", "0x%04x" % self.flow_out[0].to]
 
 	def ilmacro_BRNO(self):
-		return "label 0x%04x" % self.flow_out[1].to
+		return ["label", "0x%04x" % self.flow_out[1].to]
 
 	def ilmacro_NEXT(self):
 		return "0x%04x" % self.hi
@@ -775,7 +772,8 @@ class Tms9900assy(assy.Instree_assy):
 		l = []
 		l.append(["%0", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
-		for r in range(16):
+		l.append(["pyreveng.alias", "(", "%%R0", ",", "i16*", "%WP", ")" ])
+		for r in range(1,16):
 			d = "0x%04x" % (self.cache['blwp1'] + 2 * r)
 			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
 				"i16*", d, ")" ])
@@ -871,7 +869,11 @@ class Tms9900assy(assy.Instree_assy):
 	def ilfunc_LWPI(self, args):
 		x = int(args[0], 0)
 		self.add_il([ ["%WP", "=", "i16", args[0]] ])
-		for r in range(16):
+		self.add_il([
+		    ["pyreveng.alias", "(", "%%R0", ",",
+			"i16*", "%WP", ")" ],
+		])
+		for r in range(1,16):
 			d = "0x%04x" % (x + 2 * r)
 			self.add_il([
 			    ["pyreveng.alias", "(", "%%R%d" % r, ",",

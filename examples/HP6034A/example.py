@@ -269,3 +269,7 @@ if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
 	output(pj)
+
+	import pyreveng.il
+
+	a = pyreveng.il.analysis(pj)
