@@ -474,8 +474,9 @@ LDCR	c,so	|0 0 1 1 0 0| c     |ts | s     | {
 }
 
 # 6-57 / 367
-STCR	c,so	|0 0 1 1 0 1| c     |ts | s     | {
-	STCR RS
+STCR	c,do	|0 0 1 1 0 1| c     |td | d     | {
+	STCR %0
+	LD %0
 }
 
 # 6-58 / 368
@@ -569,7 +570,12 @@ class Tms9900assy(assy.Instree_assy):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_c(self, pj):
-		return assy.Arg_imm(pj, self['c'])
+		x = self['c']
+		if x == 0:
+			x = 16
+		if x <= 8:
+			self.mne += "b"
+		return assy.Arg_imm(pj, x)
 
 	def assy_cru(self, pj):
 		i = self['cru']
@@ -706,6 +712,9 @@ class Tms9900assy(assy.Instree_assy):
 			[ 'store', tsz, args[0], ',', tsz + "*", a],
 		])
 		return
+
+	def ilmacro_SZ(self):
+		return "i%d" % self.sz()
 
 	def ilmacro_AS(self):
 		return self.ilarg_ao('s')
@@ -866,7 +875,53 @@ class Tms9900assy(assy.Instree_assy):
 
 	def ilfunc_LDCR(self, args):
 		# pg 365
-		print(self, "LDCR", args)
+		c = self['c']
+		if c == 0:
+			c = 16
+		# print(self, "LDCR", c, args)
+		self.ilfunc_FLAGS3(args)
+		l = []
+		ty = "i%d" % self.sz()
+		if c <= 8:
+			self.ilfunc_PARITY(args)
+		l.append(["%0", "=", ty, args[0]])
+		l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
+		l.append(["%2", "=", "inttoptr", "i1", "%1",
+		    "to", "i16", "address_space(1)*"])
+		for j in range(c):
+			l.append(["%3", "=", "trunc", ty, "%0", "to", "i1"])
+			l.append(["store", "i1", "%3",
+			    "i1", "address_space(1)*", "%2"])
+			l.append(["%0", "=", "shr", ty, "%0", ",", "1"])
+			l.append(["%3", "=", "add",
+			    "i1", "address_space(1)*", "%3", ",", "1"])
+		self.add_il(l)
+
+	def ilfunc_STCR(self, args):
+		# pg 367
+		c = self['c']
+		if c == 0:
+			c = 16
+		print(self, "STCR", c, args)
+		l = []
+		ty = "i%d" % self.sz()
+		l.append(["%0", "=", ty, "0"])
+		l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
+		l.append(["%2", "=", "inttoptr", "i1", "%1",
+		    "to", "i16", "address_space(1)*"])
+		for j in range(c):
+			l.append(["%3", "=", "load", "i1", ",",
+			    "i1", "address_space(1)*", "%2"])
+			l.append(["%4", "=", "zext", "i1", "%3", "to", ty])
+			l.append(["%0", "=", "shl", ty, "%0", ",", "1"])
+			l.append(["%0", "=", "or", ty, "%0", ",", "%4"])
+			l.append(["%2", "=", "add",
+			    "i16", "address_space(1)*", "%2", ",", "1"])
+		l.append([args[0], "=", ty, "%0"])
+		self.add_il(l)
+		self.ilfunc_FLAGS3(args)
+		if c <= 8:
+			self.ilfunc_PARITY(args)
 
 	def ilfunc_LWPI(self, args):
 		x = int(args[0], 0)
