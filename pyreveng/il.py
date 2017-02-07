@@ -38,6 +38,31 @@ from __future__ import print_function
 
 #######################################################################
 
+class ILS(object):
+	def __init__(self, spec):
+		self.spec = spec
+
+	def render(self):
+		return " ".join(self.spec)
+
+	def outputs(self):
+		l = []
+		if self.spec[1] == "=":
+			l.append(self.spec[0])
+		return l
+
+	def inputs(self):
+		l = []
+		if self.spec[1] == "=":
+			for i in self.spec[2:]:
+				if i[0] == "%":
+					l.append(i)
+		else:
+			for i in self.spec:
+				if i[0] == "%":
+					l.append(i)
+		return l
+
 class IL(object):
 	def __init__(self, ins = None):
 		self.ins = ins
@@ -110,7 +135,7 @@ class IL(object):
 			try:
 				j = getattr(ins, "ilfunc_" + v[0])
 			except AttributeError:
-				self.il.append(v)
+				self.il.append(ILS(v))
 				continue
 			# self.tl.append(["/* FUNC " + " ".join(v) + " */" ])
 			j(v[1:])
@@ -119,14 +144,14 @@ class IL(object):
 	def render(self):
 		t = ""
 		for i in self.il:
-			t += "IL " + " ".join(i) + "\n"
+			t += "IL " + i.render() + "\n"
 		return t
 
 	def dot_def(self, fo):
 		fo.write('IL%x [shape="record",label="{' % self.lo)
 		fo.write("<in>0x%x-0x%x|" % (self.lo, self.hi))
 		for i in self.il:
-			j = " ".join(i)
+			j = i.render()
 			fo.write("%s\\l" % j)
 		if len(self.il) == 0:
 			fo.write("|XXX")
@@ -153,18 +178,13 @@ class analysis(object):
 			x.ins = [x.ins]
 			x.parts = []
 			if len(x.il) == 0:
-				x.il.append(["pyreveng.void", "(", ")"])
+				x.il.append(ILS(["pyreveng.void", "(", ")"]))
 			for y in x.il:
-				if y[0][0] == "%" and y[1] == "=":
-					self.writes[y[0]] = True
-				if y[1] == "=":
-					for z in y[2:]:
-						if z[0] == "%":
-							self.reads[z] = True
-				else:
-					for z in y:
-						if z[0] == "%":
-							self.reads[z] = True
+				for z in y.outputs():
+					self.writes[z] = True
+				for z in y.inputs():
+					self.reads[z] = True
+
 		print("RAW", self.stats())
 		self.find_flow()
 		self.stitch()
@@ -183,23 +203,23 @@ class analysis(object):
 	def find_flow(self):
 		for j,x in self.ils.iteritems():
 			z = x.il[-1]
-			if z[0] != "br":
+			if z.spec[0] != "br":
 				continue
 			d = []
 			p = 1
-			while p < len(z):
-				if z[p] != "label":
+			while p < len(z.spec):
+				if z.spec[p] != "label":
 					p += 1
 					continue
-				if z[p+1][:2] == "0x":
-					d.append(int(z[p+1], 0))
+				if z.spec[p+1][:2] == "0x":
+					d.append(int(z.spec[p+1], 0))
 					p += 2
 					continue
-				if z[p+1][:1] == "i" and z[p+2][:2] == "0x":
-					d.append(int(z[p+2], 0))
+				if z.spec[p+1][:1] == "i" and z.spec[p+2][:2] == "0x":
+					d.append(int(z.spec[p+2], 0))
 					p += 3
 					continue
-				print(z[p:])
+				print(z.spec[p:])
 				d.append(None)
 				p += 1
 			assert len(d) > 0
@@ -216,16 +236,16 @@ class analysis(object):
 
 		# Convert .ins to list
 		for j,x in self.ils.iteritems():
-			if x.il[-1][0] != "br":
+			if x.il[-1].spec[0] != "br":
 				y = self.ils[x.hi]
 				if len(y.comefrom) == 0:
 					joins.append(x)
 					x.next = y
 					y.prev = x
 				else:
-					x.il.append(
+					x.il.append(ILS(
 					    ["br", "label", "0x%x" % x.hi]
-					)
+					))
 					x.goto.append(y)
 					y.comefrom.append(x)
 
@@ -257,18 +277,18 @@ class analysis(object):
 			nn = 0
 			j = 0
 			while j < len(x.il):
-				if x.il[j][1] != "=":
+				if x.il[j].spec[1] != "=":
 					j += 1
 					continue
-				t = x.il[j][0]
-				m = "  " + " ".join(x.il[j])
+				t = x.il[j].spec[0]
+				m = "  " + x.il[j].render()
 				for k in range(j+1,len(x.il)):
 					p = x.il[k]
-					if p[0] == "pyreveng.void":
+					if p.spec[0] == "pyreveng.void":
 						break
-					if t not in p:
+					if t not in p.spec:
 						continue
-					if p[0] == t and p[1] == "=":
+					if p.spec[0] == t and p.spec[1] == "=":
 						y = x.il.pop(j)
 						m = "-" + m[1:]
 						nn += 1
@@ -276,7 +296,7 @@ class analysis(object):
 						break
 					else:
 						break
-				edit += "\n" + m 
+				edit += "\n" + m
 				j += 1
 			if nn > 0:
 				print("EDIT 0x%x" % x.lo, edit);
