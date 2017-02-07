@@ -772,7 +772,7 @@ class Tms9900assy(assy.Instree_assy):
 		l = []
 		l.append(["%0", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
-		l.append(["pyreveng.alias", "(", "%%R0", ",", "i16*", "%WP", ")" ])
+		l.append(["pyreveng.alias", "(", "%R0", ",", "i16*", "%WP", ")" ])
 		for r in range(1,16):
 			d = "0x%04x" % (self.cache['blwp1'] + 2 * r)
 			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
@@ -870,7 +870,7 @@ class Tms9900assy(assy.Instree_assy):
 		x = int(args[0], 0)
 		self.add_il([ ["%WP", "=", "i16", args[0]] ])
 		self.add_il([
-		    ["pyreveng.alias", "(", "%%R0", ",",
+		    ["pyreveng.alias", "(", "%R0", ",",
 			"i16*", "%WP", ")" ],
 		])
 		for r in range(1,16):
