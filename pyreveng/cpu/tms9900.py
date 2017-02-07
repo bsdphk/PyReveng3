@@ -893,8 +893,8 @@ class Tms9900assy(assy.Instree_assy):
 			l.append(["store", "i1", "%3",
 			    "i1", "address_space(1)*", "%2"])
 			l.append(["%0", "=", "shr", ty, "%0", ",", "1"])
-			l.append(["%3", "=", "add",
-			    "i1", "address_space(1)*", "%3", ",", "1"])
+			l.append(["%2", "=", "add",
+			    "i1", "address_space(1)*", "%2", ",", "1"])
 		self.add_il(l)
 
 	def ilfunc_STCR(self, args):
