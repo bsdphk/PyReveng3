@@ -42,4 +42,4 @@ setup(name='pyreveng',
 	license='BSD',
 	packages=['pyreveng'],
 	zip_safe=False)
-	
+

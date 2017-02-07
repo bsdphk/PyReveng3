@@ -768,15 +768,23 @@ class Tms9900assy(assy.Instree_assy):
 	def ilmacro_NEXT(self):
 		return "0x%04x" % self.hi
 
+	def aliasregs(self):
+		l = []
+		l.append(["%50", "=", "inttoptr", "i16", "%WP", "to", "i16*"])
+		l.append(["%R0", "=", "pyreveng.alias", "(", "%50", ")"])
+		for r in range(1,16):
+			rr = "%%%d" % (50 + r)
+			l.append(
+			    [rr, "=", "add", "i16*", "%50", ",", "%d" % (2*r)])
+			l.append(
+			    ["%%R%d" % r, "=", "pyreveng.alias", "(", rr, ")"])
+		return l
+
 	def ilfunc_BLWP(self, args):
 		l = []
 		l.append(["%0", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
-		l.append(["pyreveng.alias", "(", "%R0", ",", "i16*", "%WP", ")" ])
-		for r in range(1,16):
-			d = "0x%04x" % (self.cache['blwp1'] + 2 * r)
-			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
-				"i16*", d, ")" ])
+		l += self.aliasregs()
 		l.append(["%R13", "=", "i16", "%0"])
 		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
 		l.append(["%R15", "=", "i16", "%status"])
@@ -784,23 +792,19 @@ class Tms9900assy(assy.Instree_assy):
 		    "0x%04x" % self.cache['blwp2'] ])
 		self.add_il(l)
 
-	def ilfunc_BLWP_DYN(self, args):
-		# NB: Untested
+	def ilfunc_BLWPDYN(self, args):
 		l = []
-		l.append(["%0", '=', 'load', 'i16', ',', "i16*", args[0]])
-		l.append(["%1", '=', 'add', 'i16*', args[0], ',', '2'])
-		l.append(["%2", '=', 'load', 'i16', ',', "i16*", "%1"])
-		l.append(["%3", "=", "i16", "%WP"])
+		l.append(["%0", '=', "i16*", args[0]])
+		l.append(["%1", '=', 'load', 'i16', ',', "i16*", "%0"])
+		l.append(["%2", '=', 'add', 'i16*', "%0", ',', '2'])
+		l.append(["%3", '=', 'load', 'i16', ',', "i16*", "%2"])
+		l.append(["%4", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "%1"])
-		for r in range(16):
-			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
-				"i16*", "%1", ")" ])
-			l.append(["%1", "=", "add", "i16", "%1", ",", "2"])
-
-		l.append(["%R13", "=", "i16", "%3"])
+		l += self.aliasregs()
+		l.append(["%R13", "=", "i16", "%4"])
 		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
 		l.append(["%R15", "=", "i16", "%status"])
-		l.append(["br", "label", "i16*", "%2"])
+		l.append(["br", "label", "i16*", "%3"])
 		self.add_il(l)
 
 	def ilfunc_RTWP(self, args):
@@ -808,11 +812,7 @@ class Tms9900assy(assy.Instree_assy):
 		l.append(["%status", "=", "i16", "%R15"])
 		l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
 		l.append(["%WP", "=", "i16", "%R13"])
-		l.append(["%0", "=", "inttoptr", "i16", "%WP", "to", "i16*"])
-		for r in range(16):
-			l.append(["pyreveng.alias", "(", "%%R%d" % r, ",",
-				"i16*", "%0", ")" ])
-			l.append(["%0", "=", "add", "i16*", "%0", ",", "2"])
+		l += self.aliasregs()
 		l.append(["br", "label", "i16*", "%1"])
 		self.add_il(l)
 
@@ -848,7 +848,9 @@ class Tms9900assy(assy.Instree_assy):
 			["%status.c", "=", "pyreveng.carry.i1",
 			    "(", sz, args[0], ",", sz, args[1], ")" ],
 			["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
-			    sz, args[0], ",", sz, args[1], ",", sz, args[2], ")" ],
+			    sz, args[0], ",",
+			    sz, args[1], ",",
+			    sz, args[2], ")" ],
 		])
 
 	def ilfunc_CMPFLAGS(self, args):
@@ -869,22 +871,7 @@ class Tms9900assy(assy.Instree_assy):
 	def ilfunc_LWPI(self, args):
 		x = int(args[0], 0)
 		self.add_il([ ["%WP", "=", "i16", args[0]] ])
-		self.add_il([
-		    ["pyreveng.alias", "(", "%R0", ",",
-			"i16*", "%WP", ")" ],
-		])
-		for r in range(1,16):
-			d = "0x%04x" % (x + 2 * r)
-			self.add_il([
-			    ["pyreveng.alias", "(", "%%R%d" % r, ",",
-				"i16*", d, ")" ],
-			])
-		for r in range(16):
-			d = "0x%04x" % (x + 2 * r)
-			self.add_il([
-			    ["%%R%d" % r, "=",
-				"load", "i16", ",", "i16*", d],
-			])
+		self.add_il(self.aliasregs())
 
 class Tms9900(assy.Instree_disass):
 	def __init__(self):

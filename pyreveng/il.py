@@ -36,11 +36,14 @@ LLVM IL a trivial exercise in dumb text-processing
 
 from __future__ import print_function
 
+
 #######################################################################
 
-class ILS(object):
+class IL_Stmt(object):
+	''' A single IL statement '''
 	def __init__(self, spec):
 		self.spec = spec
+		self.decorate = None
 
 	def render(self):
 		return " ".join(self.spec)
@@ -63,7 +66,16 @@ class ILS(object):
 					l.append(i)
 		return l
 
-class IL(object):
+	def __getitem__(self, i):
+		return self.spec[i]
+
+	def __repr__(self):
+		return "<IL %s>" % self.render()
+
+#######################################################################
+
+class IL_Ins(object):
+	''' IL statements related to a single assy/code object '''
 	def __init__(self, ins = None):
 		self.ins = ins
 		self.il = []
@@ -135,7 +147,7 @@ class IL(object):
 			try:
 				j = getattr(ins, "ilfunc_" + v[0])
 			except AttributeError:
-				self.il.append(ILS(v))
+				self.il.append(IL_Stmt(v))
 				continue
 			# self.tl.append(["/* FUNC " + " ".join(v) + " */" ])
 			j(v[1:])
@@ -147,180 +159,230 @@ class IL(object):
 			t += "IL " + i.render() + "\n"
 		return t
 
-	def dot_def(self, fo):
-		fo.write('IL%x [shape="record",label="{' % self.lo)
-		fo.write("<in>0x%x-0x%x|" % (self.lo, self.hi))
-		for i in self.il:
-			j = i.render()
-			fo.write("%s\\l" % j)
-		if len(self.il) == 0:
-			fo.write("|XXX")
-		fo.write('|<out>}"]\n')
+#######################################################################
+
+class IL_BB(object):
+	def __init__(self):
+		self.lo = None
+		self.hi = None
+		self.ilins = []
+		self.ils = []
+		self.goto = []
+		self.comefrom = []
+		self.doa = set()
+
+	def __repr__(self):
+		return "<BB 0x%x-0x%x>" % (self.lo, self.hi)
+
+	def dot_def(self, fo, pj):
+		def bb():
+			fo.write('<TR><TD ALIGN="left" BALIGN="left">\n')
+			fo.write('<FONT FACE="Courier">\n')
+		def ee():
+			fo.write('</FONT>\n')
+			fo.write("</TD></TR>\n")
+
+		fo.write('IL%x [shape="none",label=<\n' % self.lo)
+		fo.write('<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"')
+		fo.write(' ALIGN="left">\n')
+		fo.write('<TR><TD>0x%x-0x%x</TD></TR>\n' % (self.lo, self.hi))
+
+		bb()
+		for i in self.ilins:
+			fo.write(i.render(pj).expandtabs())
+			fo.write('<BR/>\n')
+		ee()
+
+		bb()
+		fo.write("DOA:<BR/>\n")
+		l = list(self.doa)
+		l.sort()
+		for i in l:
+			fo.write('%s<BR/>\n' % i)
+		ee()
+
+		bb()
+		fo.write("From:<BR/>\n")
+		for i in self.comefrom:
+			fo.write('0x%x-0x%x <BR/>\n' % (i.lo, i.hi))
+		ee()
+
+		bb()
+		for i in self.ils:
+			if i.decorate is not None:
+				fo.write('<FONT color="%s">' % i.decorate)
+			fo.write('%s' % i.render())
+			if i.decorate is not None:
+				fo.write('</FONT>')
+			fo.write('<BR/>\n')
+		ee()
+
+		bb()
+		fo.write("To:<BR/>\n")
+		for i in self.goto:
+			if isinstance(i, IL_BB):
+				fo.write("0x%x-0x%x<BR/>\n" % (i.lo, i.hi))
+			else:
+				fo.write("%s<BR/>\n" % i)
+		ee()
+
+		fo.write('</TABLE>\n')
+		fo.write('>]\n')
+		return
+
+	def whereto(self):
+		j = self.ils[-1]
+		if j[0] != "br":
+			return [ self.hi ]
+		l = []
+		for x in range(len(j.spec)):
+			if j[x] != "label":
+				continue
+			x += 1
+			if j[x][0] == "i":
+				x += 1
+			if j[x][:2] == "0x":
+				l.append(int(j[x], 0))
+			else:
+				l.append(j[x])
+		return l
+
+	def build_doa(self, init=None, color = "blue"):
+		nn = 0
+		# print("DOA", self, color, init)
+		doa = {}
+		if init is not None:
+			for j in init:
+				doa[j] = True
+
+		for j in self.ils:
+			for x in j.outputs():
+				if x[:2] == "%1":
+					doa[x] = True
+
+		for j in reversed(self.ils):
+			if j[0] == "pyreveng.void":
+				doa = {}
+				continue
+			n = 0
+			m = 0
+			for x in j.outputs():
+				m += 1
+				z = doa.get(x)
+				if z is not True:
+					n += 1
+				doa[x] = True
+			if n == 0 and m > 0:
+				if j.decorate is None:
+					j.decorate = color
+					nn += 1
+			else:
+				for x in j.inputs():
+					doa[x] = False
+		for i in doa:
+			if i[:2] != "%1" and doa[i] is True:
+				self.doa.add(i)
+		return nn
+
 
 import assy
 
 class analysis(object):
 	def __init__(self, pj):
-		self.ils = {}
-		self.writes = {}
-		self.reads = {}
+		self.ilbbs = {}
+		self.pj = pj
+
 		for j in pj:
 			if not isinstance(j, assy.Assy):
 				continue
-			x = j.il
-			self.ils[j.lo] = x
-			x.next = None
-			x.prev = None
-			x.comefrom = []
-			x.goto = []
-			x.lo = x.ins.lo
-			x.hi = x.ins.hi
-			x.ins = [x.ins]
-			x.parts = []
-			if len(x.il) == 0:
-				x.il.append(ILS(["pyreveng.void", "(", ")"]))
-			for y in x.il:
-				for z in y.outputs():
-					self.writes[z] = True
-				for z in y.inputs():
-					self.reads[z] = True
+			y = IL_BB()
+			for x in j.il.il:
+				y.ils.append(x)
+			if len(y.ils) == 0:
+				z = IL_Stmt(["pyreveng.void", "(",
+				    '"' + j.render(pj).expandtabs() + '"',
+				    ")"])
+				z.decorate = "magenta"
+				y.ils.append(z)
+			y.lo = j.lo
+			y.hi = j.hi
+			y.ilins.append(j)
+			self.ilbbs[j.lo] = y
 
-		print("RAW", self.stats())
-		self.find_flow()
-		self.stitch()
-		print("STICHED", self.stats())
-		self.dead_stores()
-		print("DEAD STORES", self.stats())
-		self.totally_dead()
-		self.dot()
+		self.build_flow()
+		for a,x in self.ilbbs.iteritems():
+			x.build_doa()
+		self.propagate_doa("red")
+		self.propagate_doa("green")
+		for i in range(10):
+			if self.propagate_doa("brown") == 0:
+				break
 
-	def stats(self):
-		n = 0
-		for a,x in self.ils.iteritems():
-			n += len(x.il)
-		return "%d ILs with %d instructions" % (len(self.ils), n)
+	def dump_bbs(self, fo):
+		l = list(self.ilbbs.keys())
+		l.sort()
+		for j in l:
+			x = self.ilbbs[j]
+			fo.write("digraph {\n")
+			x.dot_def(fo, self.pj)
+			fo.write("}\n")
 
-	def find_flow(self):
-		for j,x in self.ils.iteritems():
-			z = x.il[-1]
-			if z.spec[0] != "br":
-				continue
-			d = []
-			p = 1
-			while p < len(z.spec):
-				if z.spec[p] != "label":
-					p += 1
-					continue
-				if z.spec[p+1][:2] == "0x":
-					d.append(int(z.spec[p+1], 0))
-					p += 2
-					continue
-				if z.spec[p+1][:1] == "i" and z.spec[p+2][:2] == "0x":
-					d.append(int(z.spec[p+2], 0))
-					p += 3
-					continue
-				print(z.spec[p:])
-				d.append(None)
-				p += 1
-			assert len(d) > 0
-			for y in d:
-				if y is not None:
-					z = self.ils[y]
-					x.goto.append(z)
-					z.comefrom.append(y)
+	def build_flow(self):
+		for a,x in self.ilbbs.iteritems():
+			d = x.whereto()
+			for j in d:
+				if isinstance(j, int):
+					y = self.ilbbs.get(j)
+					assert y != None
+					y.comefrom.append(x)
+					x.goto.append(y)
 				else:
 					x.goto.append(None)
+					# print(x, j)
+		l = list(self.ilbbs.keys())
+		l.sort()
+		for j in l:
+			while True:
+				x = self.ilbbs.get(j)
+				if x is None:
+					break
+				if len(x.goto) > 1:
+					break
+				z = x.goto[0]
+				if z is None:
+					break
+				if z.lo != x.hi:
+					break
+				y = self.ilbbs.get(x.hi)
+				assert y is not None
+				if len(y.comefrom) != 1:
+					break
+				assert y.comefrom[0] == x
+				x.ils += y.ils
+				x.hi = y.hi
+				x.ilins += y.ilins
+				for i in y.goto:
+					if isinstance(i, IL_BB):
+						i.comefrom.remove(y)
+						i.comefrom.append(x)
+				x.goto = y.goto
+				del self.ilbbs[y.lo]
 
-	def stitch(self):
-		joins = []
-
-		# Convert .ins to list
-		for j,x in self.ils.iteritems():
-			if x.il[-1].spec[0] != "br":
-				y = self.ils[x.hi]
-				if len(y.comefrom) == 0:
-					joins.append(x)
-					x.next = y
-					y.prev = x
-				else:
-					x.il.append(ILS(
-					    ["br", "label", "0x%x" % x.hi]
-					))
-					x.goto.append(y)
-					y.comefrom.append(x)
-
-		heads = []
-		for j in joins:
-			if j.prev == None:
-				heads.append(j)
-
-		for j in heads:
-			k = IL()
-			k.lo = j.lo
-			k.ins = []
-			k.comefrom = j.comefrom
-			k.parts = []
-			n = j
-			while n is not None:
-				k.parts.append(n)
-				k.il += n.il
-				k.hi = n.hi
-				k.ins += n.ins
-				k.goto = n.goto
-				del self.ils[n.lo]
-				n = n.next
-			self.ils[k.lo] = k
-
-	def dead_stores(self):
-		for a,x in self.ils.iteritems():
-			edit = ""
-			nn = 0
-			j = 0
-			while j < len(x.il):
-				if x.il[j].spec[1] != "=":
-					j += 1
-					continue
-				t = x.il[j].spec[0]
-				m = "  " + x.il[j].render()
-				for k in range(j+1,len(x.il)):
-					p = x.il[k]
-					if p.spec[0] == "pyreveng.void":
-						break
-					if t not in p.spec:
-						continue
-					if p.spec[0] == t and p.spec[1] == "=":
-						y = x.il.pop(j)
-						m = "-" + m[1:]
-						nn += 1
-						j -= 1
-						break
-					else:
-						break
-				edit += "\n" + m
-				j += 1
-			if nn > 0:
-				print("EDIT 0x%x" % x.lo, edit);
-
-	def totally_dead(self):
-		for i in self.writes:
-			if not i in self.reads:
-				print("Totally dead", i)
-
-	def dot(self):
-		# present
-		fo = open("/tmp/_.dot", "w")
-		fo.write("digraph {\n");
-		for a,x in self.ils.iteritems():
-			n=0
-			x.dot_def(fo)
+	def propagate_doa(self, color):
+		n = 0
+		for a,x in self.ilbbs.iteritems():
+			#print("PROP", x)
+			if len(x.goto) == 0:
+				continue
+			if None in x.goto:
+				continue
+			dd = x.goto[0].doa
 			for j in x.goto:
-				fo.write("IL%x -> " % a)
-				if j is None:
-					fo.write("XX%x_%d\n" % (a, n))
-					n += 1
-				else:
-					fo.write("IL%x:in\n" % j.lo)
-		fo.write("}\n")
-
-
-
+				#print("\t", j, j.doa)
+				dd = dd.intersection(j.doa)
+			if len(dd) == 0:
+				continue
+			#print("  ", dd)
+			n += x.build_doa(dd, color)
+		print("PROP eliminated", n)
+		return n
