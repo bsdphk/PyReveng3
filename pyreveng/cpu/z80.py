@@ -199,10 +199,10 @@ OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
 +IY	iIX		|1 1 0 1 1 1 0 1|
 """
 
-class z80assy(assy.Instree_assy):
+class z80_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
+		super(z80_ins, self).__init__(pj, lim, lang)
 		self.idx = "HL"
-		super(z80assy, self).__init__(pj, lim, lang)
 
 	def assy_e(self, pj):
 		self.dstadr = self.hi
@@ -275,25 +275,10 @@ class z80(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super(z80, self).__init__("z80", 8)
 		self.it.load_string(z80_instructions)
-		self.myleaf = z80assy
-		self.args.update({
-			"A":	"A",
-			"DE":	"DE",
-			"(DE)":	"(DE)",
-			"(BC)":	"(BC)",
-			"(SP)":	"(SP)",
-			"(C)":	"(C)",
-			"SP":	"SP",
-			"I":	"I",
-			"2":	"2",
-			"C":	"C",
-			"NC":	"NC",
-			"NZ":	"NZ",
-			"Z":	"Z",
-			"AF":	"AF",
-			"AF'":	"AF'",
-		})
+		self.myleaf = z80_ins
 		self.mask = mask
+		self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",
+		    "(C)", "SP", "I", "2", "C", "NC", "NZ", "Z", "AF", "AF'"])
 
 	def codeptr(self, pj, adr):
 		t = pj.m.lu16(adr)

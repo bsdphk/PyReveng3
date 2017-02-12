@@ -77,52 +77,87 @@ class Assy(code.Code):
 
 #######################################################################
 
-class Instree_assy(Assy):
+class Instree_ins(Assy):
 	def __init__(self, pj, lim, lang):
 		lo = lim[0].adr
 		hi = lim[-1].adr + lim[-1].len
-		super(Instree_assy, self).__init__(pj, lo, hi, lang)
+		super(Instree_ins, self).__init__(pj, lo, hi, lang)
 		self.prefix = False
 		self.cc = True
 		self.dstadr = None
 		self.lim = lim
 		self.mne = lim[-1].assy[0]
 		self.cache = {}
+		self.verbatim = []
+		self.lang = lang
+
+	def flow_R(self, pj):
+		self.add_flow(pj, "R", self.cc)
+
+	def flow_J(self, pj):
+		self.add_flow(pj, ">", True, self.dstadr)
+
+
+	def flow_RC(self, pj):
+		self.add_flow(pj, "R", self.cc)
+		self.add_flow(pj, True, "!" + self.cc, self.hi)
+
+	def flow_JC(self, pj):
+		if self.cc == True:
+			self.add_flow(pj, ">", "?", self.dstadr)
+			self.add_flow(pj, ">", "!?", self.hi)
+		else:
+			self.add_flow(pj, ">", self.cc, self.dstadr)
+			self.add_flow(pj, True, "!" + self.cc, self.hi)
+
+	def flow_C(self, pj):
+		self.add_flow(pj, "C", True, self.dstadr)
+		self.add_flow(pj, True, True, self.hi)
+
+	def arg(self, pj, arg):
+		if arg in self.lang.verbatim:
+			self.oper.append(Arg_verbatim(pj, arg))
+			return
+
+		if arg == "-":
+			return
+
+		x = None
+		if arg[0] == ">":
+			try:
+				x = getattr(self, "flow_" + arg[1:])
+			except AttributeError:
+				x = None
+		if x is None:
+			try:
+				x = getattr(self, "assy_" + arg)
+			except AttributeError:
+				x = None
+		if x is None:
+			x = "?" + arg + "?"
+			print("ERROR: ARG <%s> not translated" % arg)
+		if not isinstance(x, str):
+			x = x(pj)
+		if isinstance(x, str):
+			x = Arg_verbatim(pj, x)
+		if x is None:
+			return
+		if not isinstance(x, Arg):
+			print(self)
+			print(lim)
+			print(lang)
+			raise Wrong("Not Arg, type '%s', str '%s'" %
+			    (str(type(x)), str(x)))
+		self.oper.append(x)
+
+	def parse(self, pj):
 		if self.mne[0] == "+":
 			self.prefix = True
 		self.oper = list()
-		for self.im in lim:
+		for self.im in self.lim:
 			i = self.im.assy
 			for j in i[1].split(","):
-				try:
-					x = getattr(self, "assy_" + j)
-					typ=1
-				except AttributeError:
-					x = None
-				if x is None:
-					x = lang.args.get(j)
-					typ=2
-				if x is None:
-					if j == "-":
-						continue
-					x = "?" + j + "?"
-					print("ERROR: ARG <%s> not translated" % j)
-				if not isinstance(x, str):
-					if typ == 1:
-						x = x(pj)
-					else:
-						x = x(pj, self)
-				if isinstance(x, str):
-					x = Arg_verbatim(pj, x)
-				if x is None:
-					continue
-				if not isinstance(x, Arg):
-					print(self)
-					print(lim)
-					print(lang)
-					raise Wrong("Not Arg, type '%s', str '%s'" %
-					    (str(type(x)), str(x)))
-				self.oper.append(x)
+				self.arg(pj, j)
 
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
@@ -138,20 +173,13 @@ class Instree_assy(Assy):
 class Instree_disass(code.Decode):
 	def __init__(self, name, ins_word=8, mem_word=None, endian=None):
 		super(Instree_disass, self).__init__(name)
-		self.args = {
-			"-":	None,
-			">R":	Arg_flow_return,
-			">RC":	Arg_flow_return_cond,
-			">J":	Arg_flow_jmp,
-			">JC":	Arg_flow_jmp_cond,
-			">C":	Arg_flow_call,
-		}
 		if mem_word is None:
 			mem_word = ins_word
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
-		self.myleaf = Instree_assy
+		self.myleaf = Instree_ins
 		self.il = False
+		self.verbatim = set()
 
 	def decode(self, pj, adr, l=None):
 		if l is None:
@@ -161,6 +189,7 @@ class Instree_disass(code.Decode):
 			l.append(x)
 			try:
 				y = self.myleaf(pj, l, self)
+				y.parse(pj)
 			except Invalid:
 				y = None
 				l.pop(-1)
@@ -241,25 +270,3 @@ class Arg_imm(Arg):
 			s += "0%d" % (self.wid / 4)
 		s += "x"
 		return s % self.val
-
-def Arg_flow_return(pj, ins):
-	ins.add_flow(pj, "R", ins.cc)
-
-def Arg_flow_return_cond(pj, ins):
-	ins.add_flow(pj, "R", ins.cc)
-	ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
-
-def Arg_flow_jmp(pj, ins):
-	ins.add_flow(pj, ">", True, ins.dstadr)
-
-def Arg_flow_jmp_cond(pj, ins):
-	if ins.cc == True:
-		ins.add_flow(pj, ">", "?", ins.dstadr)
-		ins.add_flow(pj, ">", "!?", ins.hi)
-	else:
-		ins.add_flow(pj, ">", ins.cc, ins.dstadr)
-		ins.add_flow(pj, True, "!" + ins.cc, ins.hi)
-
-def Arg_flow_call(pj, ins):
-	ins.add_flow(pj, "C", True, ins.dstadr)
-	ins.add_flow(pj, True, True, ins.hi)

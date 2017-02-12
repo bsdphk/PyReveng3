@@ -81,7 +81,7 @@ KBP	-		|1 1 1 1|1 1 0 0|
 DCL	-		|1 1 1 1|1 1 0 1|
 """
 
-class mcs4assy(assy.Instree_assy):
+class mcs4_ins(assy.Instree_ins):
 	pass
 
 	def assy_data(self, pj):
@@ -101,7 +101,7 @@ class mcs4assy(assy.Instree_assy):
 		}.get(self['cc'])
 		if self.cc is None:
 			self.cc = "CC#0x%x" % self['cc']
-		return assy.Arg_verbatim(pj, self.cc)
+		return self.cc
 
 	def assy_r(self, pj):
 		return "r%d" % self['r']
@@ -124,7 +124,5 @@ class mcs4(assy.Instree_disass):
 	def __init__(self):
 		super(mcs4, self).__init__("mcs4", 8)
 		self.it.load_string(mcs4_instructions)
-		self.args.update( {
-			"(rr0)": "(rr0)",
-		})
-		self.myleaf = mcs4assy
+		self.verbatim.add("(rr0)")
+		self.myleaf = mcs4_ins

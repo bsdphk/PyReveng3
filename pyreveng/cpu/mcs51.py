@@ -188,21 +188,21 @@ XRL	adir,data	|0 1 1 0 0 0 1 1| adir		| data		|
 
 """
 
-class mcs51assy(assy.Instree_assy):
+class mcs51_ins(assy.Instree_ins):
 	pass
 
 	def assy_adir(self, pj):
 		self.dstadr = self['adir']
 		s = self.lang.sfr.get(self.dstadr)
 		if s != None:
-			return assy.Arg_verbatim(pj, s[0])
+			return s[0]
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_adir2(self, pj):
 		self.dstadr = self['adir2']
 		s = self.lang.sfr.get(self.dstadr)
 		if s != None:
-			return assy.Arg_verbatim(pj, s[0])
+			return s[0]
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_a11(self, pj):
@@ -255,15 +255,9 @@ class mcs51(assy.Instree_disass):
 	def __init__(self, lang="mcs51"):
 		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)
-		self.myleaf = mcs51assy
-		self.args.update( {
-			"A":		"A",
-			"C":		"C",
-			"DPTR":		"DPTR",
-			"@A+DPTR":	"@A+DPTR",
-			"@A+PC":	"@A+PC",
-		})
+		self.myleaf = mcs51_ins
 		self.amask = 0xffff
+		self.verbatim |= set(("A", "C", "DPTR", "@A+DPTR", "@A+PC"))
 		self.sfr = {
 			0x80:	["P0",
 			    "AD0", "AD1", "AD2", "AD3",

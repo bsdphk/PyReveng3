@@ -188,7 +188,7 @@ XRL	A,im		|1 1 0 1|0 0 1 1| im		|
 
 """
 
-class mcs48assy(assy.Instree_assy):
+class mcs48_ins(assy.Instree_ins):
 	pass
 
 	def assy_adr(self, pj):
@@ -215,18 +215,10 @@ class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
 		super(mcs48, self).__init__(lang, 8)
 		self.it.load_string(mcs48_instructions)
-		self.myleaf = mcs48assy
+		self.myleaf = mcs48_ins
 
-		self.args.update( {
-			"TCNTI":	"TCNTI",
-			"BUS":		"BUS",
-			"T":		"T",
-			"A":		"A",
-			"@A":		"@A",
-			"I":		"I",
-			"F0":		"F0",
-			"F1":		"F1",
-		})
+		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",
+			"I", "F0", "F1",))
 		self.amask_ = 0xffff
 
 	def set_adr_mask(self, a):

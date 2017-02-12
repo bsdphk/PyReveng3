@@ -503,7 +503,7 @@ class vector(data.Data):
 		return self.ip.arg_render(pj)
 
 
-class Tms9900assy(assy.Instree_assy):
+class Tms9900_ins(assy.Instree_ins):
 	pass
 
 	def sz(self):
@@ -561,7 +561,7 @@ class Tms9900assy(assy.Instree_assy):
 		a = self['ptr']
 		self.cache['blwp1'] = pj.m.bu16(a)
 		data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
-		return assy.Arg_verbatim(pj, "WP=0x%04x" % pj.m.bu16(a))
+		return "WP=0x%04x" % pj.m.bu16(a)
 
 	def assy_blwp2(self, pj):
 		a = self['ptr']
@@ -933,7 +933,7 @@ class Tms9900(assy.Instree_disass):
 		super(Tms9900, self).__init__("TMS 9900", 16, 8, ">")
 		self.it.load_string(tms9900_instructions)
 		self.n_interrupt = 16
-		self.myleaf = Tms9900assy
+		self.myleaf = Tms9900_ins
 		self.il = True
 
 	def codeptr(self, pj, adr):

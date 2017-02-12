@@ -41,65 +41,54 @@ _GRAPH	c,p,>R		|0 0 1 1|p| c			|
 _CHR	a,t,>R		|0 1 0| s | r |e| t		|
 """
 
-class arg_adr(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins['ahi'] << 8) | ins['alo']
-		self.dstadr = ins.dstadr
-		super(arg_adr, self).__init__(pj, ins.dstadr)
+class hp1345_ins(assy.Instree_ins):
+	pass
 
-class arg_a8(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & ~0x0ff) | ins['a8']
-		self.dstadr = ins.dstadr
-		super(arg_a8, self).__init__(pj, ins.dstadr)
+	def assy_adr(self, pj):
+		self.dstadr = (self['ahi'] << 8) | self['alo']
+		return assy.Arg_dst(self.dstadr)
 
-def arg_c(pj, ins):
-	return "#%d" % ins['c']
+	def assy_arg8(self, pj):
+		self.dstadr = (self.lo & ~0x0ff) | self['a8']
+		return assy.Arg_dst(self.dstadr)
 
-def arg_t(pj, ins):
-	a = ins['t']
-	if a < 32 or a > 126:
-		return "#0x%02x" % a
-	else:
-		return "'%c'" % a
+	def assy_c(self, pj):
+		return "#%d" % self['c']
 
-def arg_a(pj, ins):
-	if not ins['e']:
-		return "-"
-	s = ["1x", "1.5x", "2x", "2.5x"][ins['s']]
-	s += "@%d" % (ins['r'] * 90)
-	return s
+	def assy_t(self, pj):
+		a = self['t']
+		if a < 32 or a > 126:
+			return "#0x%02x" % a
+		else:
+			return "'%c'" % a
 
-def arg_p(pj, ins):
-	return ["OFF", "ON"][ins['p']]
+	def assy_a(self, pj):
+		if not self['e']:
+			return "-"
+		s = ["1x", "1.5x", "2x", "2.5x"][self['s']]
+		s += "@%d" % (self['r'] * 90)
+		return s
 
-def arg_im(pj, ins):
-	return "#0x%02x" % ins['im']
+	def assy_p(self, pj):
+		return ["OFF", "ON"][self['p']]
 
-def arg_i(pj, ins):
-	return ("Blank", "Dim", "Half", "Full")[ins['i']]
+	def assy_im(self, pj):
+		return "#0x%02x" % self['im']
 
-def arg_l(pj, ins):
-	return ("Solid", "Ends", "Long", "Short")[ins['l']]
+	def assy_i(self, pj):
+		return ("Blank", "Dim", "Half", "Full")[self['i']]
 
-def arg_s(pj, ins):
-	return ("slow", "low", "med", "high")[ins['s']]
+	def assy_l(self, pj):
+		return ("Solid", "Ends", "Long", "Short")[self['l']]
 
+	def assy_s(self, pj):
+		return ("slow", "low", "med", "high")[self['s']]
 
 class hp1345a(assy.Instree_disass):
 	def __init__(self, lang="hp1345a"):
 		super(hp1345a, self).__init__(lang, 16, 8, ">")
 		self.it.load_string(hp1345a_instructions)
-
-		self.args.update( {
-			"c":		arg_c,
-			"t":		arg_t,
-			"a":		arg_a,
-			"p":		arg_p,
-			"i":		arg_i,
-			"l":		arg_l,
-			"s":		arg_s,
-		})
+		self.myleaf = hp1345_ins
 		self.amask_ = 0xfff
 
 	def set_adr_mask(self, a):

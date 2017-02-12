@@ -249,7 +249,7 @@ ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 464/6-10
 eORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 473/6-19
-MOVE		W,ea,SR		1f7d	|0 1 0 0|0 1 1 0|1 1| eam | ear |
+MOVE		W,ea,SR	1f7d	|0 1 0 0|0 1 1 0|1 1| eam | ear |
 # 475/6-21
 MOVE		L,An,USP	0000	|0 1 0 0|1 1 1 0|0 1 1 0|0| An  |
 MOVE		L,USP,An	0000	|0 1 0 0|1 1 1 0|0 1 1 0|1| An  |
@@ -273,36 +273,36 @@ cond_code = (
 
 #######################################################################
 
-class M68Kassy(assy.Instree_assy):
+class m68000_ins(assy.Instree_ins):
 	pass
 
 	def assy_An(self, pj):
-		return assy.Arg_verbatim(pj, "A%d" % self['An'])
+		return "A%d" % self['An']
 
 	def assy_decAx(self, pj):
-		return assy.Arg_verbatim(pj, "-(A%d)" % self['Ax'])
+		return "-(A%d)" % self['Ax']
 
 	def assy_Axinc(self, pj):
-		return assy.Arg_verbatim(pj, "(A%d)+" % self['Ax'])
+		return "(A%d)+" % self['Ax']
 
 	def assy_Ax(self, pj):
-		return assy.Arg_verbatim(pj, "A%d" % self['Ax'])
+		return "A%d" % self['Ax']
 
 	def assy_decAy(self, pj):
-		return assy.Arg_verbatim(pj, "-(A%d)" % self['Ay'])
+		return "-(A%d)" % self['Ay']
 
 	def assy_Ayinc(self, pj):
-		return assy.Arg_verbatim(pj, "(A%d)+" % self['Ay'])
+		return "(A%d)+" % self['Ay']
 
 	def assy_Ay(self, pj):
-		return assy.Arg_verbatim(pj, "A%d" % self['Ay'])
+		return "A%d" % self['Ay']
 
 	def assy_B(self, pj):
 		self.sz = 1
 		self.mne += ".B"
 
 	def assy_bn(self, pj):
-		return assy.Arg_verbatim(pj, "#0x%x" % self['bn'])
+		return "#0x%x" % self['bn']
 
 	def assy_cc(self, pj):
 		self.mne += cond_code[self['cc']]
@@ -311,7 +311,7 @@ class M68Kassy(assy.Instree_assy):
 		o = self['const']
 		if o == 0:
 			o = 8
-		return assy.Arg_verbatim(pj, "#0x%x" % o)
+		return "#0x%x" % o
 
 	def assy_data(self, pj):
 		if self.sz == 1:
@@ -325,10 +325,10 @@ class M68Kassy(assy.Instree_assy):
 		self.hi += self.sz
 		if self.sz == 1:
 			self.hi += 1
-		return assy.Arg_verbatim(pj, "#0x%0*x" % (self.sz * 2, self.v))
+		return "#0x%0*x" % (self.sz * 2, self.v)
 
 	def assy_data8(self, pj):
-		return assy.Arg_verbatim(pj, "#0x%02x" % self['data8'])
+		return "#0x%02x" % self['data8']
 
 	def assy_disp16(self, pj):
 		o = self['disp16']
@@ -338,7 +338,7 @@ class M68Kassy(assy.Instree_assy):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_Dn(self, pj):
-		return assy.Arg_verbatim(pj, "D%d" % self['Dn'])
+		return "D%d" % self['Dn']
 
 	def assy_dst(self, pj):
 		x = self['disp8']
@@ -355,10 +355,10 @@ class M68Kassy(assy.Instree_assy):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_Dx(self, pj):
-		return assy.Arg_verbatim(pj, "D%d" % self['Dx'])
+		return "D%d" % self['Dx']
 
 	def assy_Dy(self, pj):
-		return assy.Arg_verbatim(pj, "D%d" % self['Dy'])
+		return "D%d" % self['Dy']
 
 	def assy_eaxt(self, pj, ref):
 		ew = pj.m.bu16(self.hi)
@@ -409,22 +409,22 @@ class M68Kassy(assy.Instree_assy):
 			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
 			    self.lo, eam, ear))
 		if eax == 0x0001:
-			return assy.Arg_verbatim(pj, "D%d" % ear)
+			return "D%d" % ear
 		if eax == 0x0002:
-			return assy.Arg_verbatim(pj, "A%d" % ear)
+			return "A%d" % ear
 		if eax == 0x0004:
-			return assy.Arg_verbatim(pj, "(A%d)" % ear)
+			return "(A%d)" % ear
 		if eax == 0x0008:
-			return assy.Arg_verbatim(pj, "(A%d)+" % ear)
+			return "(A%d)+" % ear
 		if eax == 0x0010:
-			return assy.Arg_verbatim(pj, "-(A%d)" % ear)
+			return "-(A%d)" % ear
 		if eax == 0x0020:
 			o = pj.m.bs16(self.hi)
 			self.hi += 2
 			if o < 0:
-				return assy.Arg_verbatim(pj, "(A%d-0x%x)" % (ear, -o))
+				return "(A%d-0x%x)" % (ear, -o)
 			else:
-				return assy.Arg_verbatim(pj, "(A%d+0x%x)" % (ear, o))
+				return "(A%d+0x%x)" % (ear, o)
 		if eax == 0x0040:
 			return self.assy_eaxt(pj, "A%d" % ear)
 		if eax == 0x0100:
@@ -448,13 +448,13 @@ class M68Kassy(assy.Instree_assy):
 			return self.assy_eaxt(pj, "PC")
 		if eax == 0x1000 and self.sz == 1:
 			self.hi += 2
-			return assy.Arg_verbatim(pj, "#0x%02x" % pj.m.rd(self.hi-1))
+			return "#0x%02x" % pj.m.rd(self.hi-1)
 		if eax == 0x1000 and self.sz == 2:
 			self.hi += 2
-			return assy.Arg_verbatim(pj, "#0x%04x" % pj.m.bu16(self.hi-2))
+			return "#0x%04x" % pj.m.bu16(self.hi-2)
 		if eax == 0x1000 and self.sz == 4:
 			self.hi += 4
-			return assy.Arg_verbatim(pj, "#0x%08x" % pj.m.bu32(self.hi-4))
+			return "#0x%08x" % pj.m.bu32(self.hi-4)
 		print("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 		raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
@@ -489,17 +489,17 @@ class M68Kassy(assy.Instree_assy):
 		a = self['rot']
 		if a == 0:
 			a = 8
-		return assy.Arg_verbatim(pj, "#0x%x" % a)
+		return "#0x%x" % a
 
 	def assy_vect(self, pj):
-		return assy.Arg_verbatim(pj, "#%d" % self['vect'])
+		return "#%d" % self['vect']
 
 	def assy_W(self, pj):
 		self.sz = 2
 		self.mne += ".W"
 
 	def assy_word(self, pj):
-		return assy.Arg_verbatim(pj, "#0x%04x" % self['word'])
+		return "#0x%04x" % self['word']
 
 	def assy_Z(self, pj):
 		if self['sz'] == 3:
@@ -522,13 +522,8 @@ class m68000(assy.Instree_disass):
 		    mem_word=8,
 		    endian=">")
 		self.it.load_string(m68000_instructions)
-		self.myleaf = M68Kassy
-
-		self.args.update( {
-			'CCR':		'CCR',
-			'SR':		'SR',
-			'USP':		'USP',
-		})
+		self.myleaf = m68000_ins
+		self.verbatim |= set(["CCR", "SR", "USP"])
 
 	def set_adr_mask(self, a):
 		self.amask = a

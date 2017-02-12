@@ -332,153 +332,111 @@ CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1|
 CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
 """
 
-class arg_i(assy.Arg):
-	def __init__(self, pj, ins):
-		self.val = ins['i']
-		super(arg_i, self).__init__(pj)
+class mc6809_ins(assy.Instree_ins):
+	pass
 
-	def render(self, pj):
-		return "#0x%02x" % self.val
+	def assy_d(self, pj):
+		return "$0x%02x" % self['d']
 
-class arg_d(assy.Arg):
-	def __init__(self, pj, ins):
-		self.val = ins['d']
-		super(arg_d, self).__init__(pj)
+	def assy_i(self, pj):
+		return "#0x%02x" % self['i']
 
-	def render(self, pj):
-		return "$0x%02x" % self.val
+	def assy_I(self, pj):
+		self.dstadr = (self['I1'] << 8) | self['I2']
+		return assy.Arg_dst(pj, self.dstadr, "#")
 
-class arg_I(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins['I1'] << 8) | ins['I2']
-		super(arg_I, self).__init__(pj, ins.dstadr, "#")
+	def assy_E(self, pj):
+		self.dstadr = (self['e1'] << 8) | self['e2']
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_E(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins['e1'] << 8) | ins['e2']
-		super(arg_E, self).__init__(pj, ins.dstadr, "")
-
-class arg_r(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		a = ins['r']
+	def assy_r(self, pj):
+		a = self['r']
 		if a & 0x80:
 			a += 0xff00
-		ins.dstadr = (ins.hi + a) & 0xffff
-		super(arg_r, self).__init__(pj, ins.dstadr)
+		self.dstadr = (self.hi + a) & 0xffff
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_R(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		a = ins['R1'] << 8 | ins['R2']
-		ins.dstadr = (ins.hi + a) & 0xffff
-		super(arg_R, self).__init__(pj, ins.dstadr)
+	def assy_R(self, pj):
+		a = self['R1'] << 8 | self['R2']
+		self.dstadr = (self.hi + a) & 0xffff
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_s(assy.Arg):
-	def __init__(self, pj, ins):
-		x = ins['i']
+	def assy_s(self, pj):
+		x = self['i']
 		l = []
 		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
-		if ins.mne[-1] == "S":
+		if self.mne[-1] == "S":
 			r[6] = "U"
-		if ins.mne[-1] == "U":
+		if self.mne[-1] == "U":
 			r[6] = "S"
 		for i in r:
 			if x & 1:
 				l.append(i)
 			x >>= 1
-		if ins.mne[:3] == "PSH":
+		if self.mne[:3] == "PSH":
 			l = reversed(l)
-		self.s = ",".join(l)
-		super(arg_s, self).__init__(pj)
-
-	def render(self, pj):
-		return self.s
+		return ",".join(l)
 
 
-class arg_P(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		if ins['X'] == 1:
-			ins.hi += [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 2][ins['m']]
-		if self.ins['X'] == 1 and self.ins['m'] == 0xf:
-			ins.dstadr = pj.m.bu16(self.ins.hi - 2)
-		super(arg_P, self).__init__(pj, ins.dstadr, "")
-
-	def render(self, pj):
-		r = ["X", "Y", "U", "S"][self.ins['R']]
-		if self.ins['X'] == 0:
-			o = self.ins['m']
-			if self.ins['i']:
+	def assy_P(self, pj):
+		if self['X'] == 1:
+			self.hi += [
+			    0, 0, 0, 0, 0, 0, 0, 0,
+			    1, 2, 0, 0, 1, 2, 0, 2][self['m']]
+		if self['X'] == 1 and self['m'] == 0xf:
+			self.dstadr = pj.m.bu16(self.hi - 2)
+		r = ["X", "Y", "U", "S"][self['R']]
+		if self['X'] == 0:
+			o = self['m']
+			if self['i']:
 				o -= 16
 			return("%s%+d" % (r, o))
-
-		if self.ins['m'] == 0x0:
+		if self['m'] == 0x0:
 			s = r + "+"
-		elif self.ins['m'] == 0x1:
+		elif self['m'] == 0x1:
 			s = r + "++"
-		elif self.ins['m'] == 0x2:
+		elif self['m'] == 0x2:
 			s = "-" + r
-		elif self.ins['m'] == 0x3:
+		elif self['m'] == 0x3:
 			s = "--" + r
-		elif self.ins['m'] == 0x4:
+		elif self['m'] == 0x4:
 			s = r
-		elif self.ins['m'] == 0x5:
+		elif self['m'] == 0x5:
 			s = r + "+B"
-		elif self.ins['m'] == 0x6:
+		elif self['m'] == 0x6:
 			s = r + "+A"
-		elif self.ins['m'] == 0x8:
-			o = pj.m.s8(self.ins.hi - 1)
+		elif self['m'] == 0x8:
+			o = pj.m.s8(self.hi - 1)
 			s = r + "%+d" % o
-		elif self.ins['m'] == 0x9:
-			o = pj.m.bs16(self.ins.hi - 2)
+		elif self['m'] == 0x9:
+			o = pj.m.bs16(self.hi - 2)
 			s = r + "%+d" % o
-		elif self.ins['m'] == 0xb:
+		elif self['m'] == 0xb:
 			s = r + "+D"
-		elif self.ins['m'] == 0xf:
-			s = str(self)	# XXX HACK, FIX
 		else:
-			s = "<%d,%s,%d,0x%x>XXXIDX" % (
-				self.ins['X'],
-				["X", "Y", "U", "S"][self.ins['R']],
-				self.ins['i'],
-				self.ins['m']
-			)
-		if self.ins['i']:
+			raise assy.Wrong("somehow...")
+		if self['i']:
 			return "[" + s + "]"
 		return s
 
-class arg_t(assy.Arg):
-	def __init__(self, pj, ins):
-		self.val = ins['t']
-		super(arg_t, self).__init__(pj)
-
-	def render(self, pj):
+	def assy_t(self, pj):
+		val = self['t']
 		r = [
 			"D", "X",  "Y", "U",
 			"S", "PC", "?6?", "?7?",
 			"A", "B", "CCR", "DPR",
 			"?c?", "?d?", "?e?", "?f?"
 		]
-		# XXX: two args as one string is bad for analysis...
-		s = r[self.val >> 4] + "," + r[self.val & 0xf]
+		s = r[val >> 4] + "," + r[val & 0xf]
 		return s
 
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.it.load_string(mc6809_instructions)
+		self.myleaf = mc6809_ins
 		if macros:
 			self.it.load_string(mc6809_macro_instructions)
-		self.args.update( {
-			"d":	arg_d,
-			"i":	arg_i,
-			"s":	arg_s,
-			"I":	arg_I,
-			"r":	arg_r,
-			"t":	arg_t,
-			"P":	arg_P,
-			"E":	arg_E,
-			"R":	arg_R,
-		})
 		self.mask = mask
 
 	def codeptr(self, pj, adr):

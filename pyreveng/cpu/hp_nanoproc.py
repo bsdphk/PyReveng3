@@ -93,92 +93,44 @@ LDR	imm		|1 1 0 0|1 1 1 1| imm		|
 STR	reg,imm		|1 1 0 1| reg   | imm		|
 """
 
-class arg_imm(assy.Arg):
-	def __init__(self, pj, ins):
-		self.value = ins['imm']
-		super(arg_imm, self).__init__(pj)
+class hp_nanoproc_ins(assy.Instree_ins):
+	pass
 
-	def render(self, pj):
-		return "#0x%x" % self.value
+	def assy_imm(self, pj):
+		return "#0x%x" % self['imm']
 
-class arg_adrl(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & 0xf800) | (ins['ahi']<<8) | ins['alo']
-		super(arg_adrl, self).__init__(pj, ins.dstadr)
+	def assy_adrl(self, pj):
+		self.dstadr = (self.lo & 0xf800)
+		self.dstadr |= (self['ahi']<<8) | self['alo']
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_reg(assy.Arg):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.reg = ins['reg']
-		super(arg_reg, self).__init__(pj)
+	def assy_reg(self, pj):
+		return self.lang.reg[self['reg']]
 
-	def render(self, pj):
-		return self.ins.lang.reg[self.reg]
+	def assy_bno(self, pj):
+		return self.lang.bno[self['bno']]
 
-class arg_bno(assy.Arg):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.bno = ins['bno']
-		super(arg_bno, self).__init__(pj)
+	def assy_dctl(self, pj):
+		return self.lang.dctl[self['dctl']]
 
-	def render(self, pj):
-		return self.ins.lang.bno[self.bno]
+	def assy_dev(self, pj):
+		return self.lang.dev[self['dev']]
 
-class arg_dctl(assy.Arg):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.dctl = ins['dctl']
-		super(arg_dctl, self).__init__(pj)
+	def assy_iA(self, pj):
+		return "(0x%x+A)" % (self.lo & 0xf800)
 
-	def render(self, pj):
-		return self.ins.lang.dctl[self.dctl]
+	def assy_dA(self, pj):
+		return "(0x%x-A)" % (0x800 + self.lo & 0xf800)
 
-class arg_dev(assy.Arg):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.dev = ins['dev']
-		super(arg_dev, self).__init__(pj)
-
-	def render(self, pj):
-		return self.ins.lang.dev[self.dev]
-
-class arg_iA(assy.Arg):
-	def __init__(self, pj, ins):
-		ins.dstadr = None
-		self.ins = ins
-		super(arg_iA, self).__init__(pj)
-
-	def render(self, pj):
-		return "(0x%x+A)" % (self.ins.lo & 0xf800)
-
-class arg_dA(assy.Arg):
-	def __init__(self, pj, ins):
-		ins.dstadr = None
-		self.ins = ins
-		super(arg_dA, self).__init__(pj)
-
-	def render(self, pj):
-		return "(0x%x-A)" % (0x800 + self.ins.lo & 0xf800)
-
-def ins_skip(pj, ins):
-	ins.cc = ins.mne[1:]
-	ins.dstadr = ins.hi + 2
+	def assy_S(self, pj):
+		self.cc = self.mne[1:]
+		self.dstadr = self.hi + 2
 
 class hp_nanoproc(assy.Instree_disass):
 	def __init__(self):
 		super(hp_nanoproc, self).__init__("HP nanoprocessor", 8)
 		self.it.load_string(hp_nanoproc_instructions)
-		self.args.update({
-			"imm":	arg_imm,
-			"adrl":	arg_adrl,
-			"reg":	arg_reg,
-			"bno":	arg_bno,
-			"dev":	arg_dev,
-			"dctl":	arg_dctl,
-			"S":	ins_skip,
-			"iA":	arg_iA,
-			"dA":	arg_dA,
-		})
+		self.myleaf = hp_nanoproc_ins
 
 		self.reg = list()
 		self.dev = list()
@@ -200,19 +152,16 @@ LRET >R	      |0 1 1 0 1 1 1 1|0 1 0 1 1 0 0 0|1 0 1 1 1 0 0 0|
 MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
 """
 
-class arg_pgadr(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = ins['pgno'] << 11
-		ins.dstadr |= (ins['ahi']<<8) | ins['alo']
-		super(arg_pgadr, self).__init__(pj, ins.dstadr)
+class hp_nanoproc_pg_ins(hp_nanoproc_ins):
+	pass
 
-class arg_mctl(assy.Arg):
-	def __init__(self, pj, ins):
-		self.mctl = ins['mctl']
-		self.ins = ins
-		super(arg_mctl, self).__init__(pj)
+	def assy_pgadr(self, pj):
+		self.dstadr = self['pgno'] << 11
+		self.dstadr |= (self['ahi']<<8) | self['alo']
+		return assy.Arg_dst(pj, self.dstadr)
 
-	def render(self, pj):
+	def assy_mctl(self, pj):
+		self.mctl = self['mctl']
 		l = list()
 		if self.mctl & 0x10:
 			l.append("RMA")
@@ -222,7 +171,7 @@ class arg_mctl(assy.Arg):
 			l.append("IN")
 		if self.mctl & 0x80:
 			l.append("UP")
-		pg = self.ins.lo >> 11
+		pg = self.lo >> 11
 		npg = self.mctl & 7
 		if pg != npg:
 			l.append("%x" % npg)
@@ -233,8 +182,7 @@ class hp_nanoproc_pg(hp_nanoproc):
 		super(hp_nanoproc_pg, self).__init__()
 		self.it.load_string(hp_nanoproc_pg_instructions)
 		# self.it.print()
-		self.args["pgadr"] = arg_pgadr
-		self.args["mctl"] = arg_mctl
+		self.myleaf = hp_nanoproc_pg_ins
 
 if __name__ == "__main__":
 	h = hp_nanoproc()

@@ -350,10 +350,10 @@ wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
 breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
 ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 
-class i8086assy(assy.Instree_assy):
+class i8086_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
+		super(i8086_ins, self).__init__(pj, lim, lang)
 		self.seg = ""
-		super(i8086assy, self).__init__(pj, lim, lang)
 
 	def assy_i1(self, pj):
 		""" Immediate 8 bit """
@@ -502,7 +502,7 @@ class i8086assy(assy.Instree_assy):
 		self['rm'] = 6
 		return self.assy_ea(pj)
 
-class i808687assy(i8086assy):
+class i808687_ins(i8086_ins):
 	pass
 
 	def assy_st(self, pj):
@@ -515,16 +515,11 @@ class i8086(assy.Instree_disass):
 	def __init__(self):
 		super(i8086, self).__init__("i8086", 8)
 		self.it.load_string(i8086_instructions)
-		self.myleaf = i8086assy
-		self.args.update( {
-			# "ipcs":	arg_ipcs,
-			# "e1":	arg_e1,
-			# "ea":	arg_ea,
-		})
+		self.myleaf = i8086_ins
 
 	def has_8087(self):
 		self.it.load_string(i8087_instructions)
-		self.myleaf = i808687assy
+		self.myleaf = i808687_ins
 
 	def disass(self, pj, adr):
 		y = pj.find(adr, self.name)

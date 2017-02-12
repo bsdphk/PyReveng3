@@ -64,73 +64,77 @@ hp85662a_g_instructions = """
 DSPG	-		|?				|
 """
 
-def arg_dst(pj, ins):
-	return "#0x%04x" % ins['dst']
+class hp85662a_ins(assy.Instree_ins):
+	pass
 
-def arg_b(pj, ins):
-	if ins['b']:
-		return "bex"
+	def assy_dst(self, pj):
+		return "#0x%04x" % self['dst']
 
-def arg_i(pj, ins):
-	if ins['i']:
-		return "brt"
+	def assy_b(self, pj):
+		if self['b']:
+			return "bex"
 
-def arg_e(pj, ins):
-	if ins['e']:
-		return "exs"
+	def assy_i(self, pj):
+		if self['i']:
+			return "brt"
 
-def arg_c(pj, ins):
-	if ins['c']:
-		return "clx"
+	def assy_e(self, pj):
+		if self['e']:
+			return "exs"
 
-def arg_d(pj, ins):
-	if ins['d']:
-		return "dim"
+	def assy_c(self, pj):
+		if self['c']:
+			return "clx"
 
-def arg_V(pj, ins):
-	ins.lang.it = ins.lang.itv
+	def assy_d(self, pj):
+		if self['d']:
+			return "dim"
 
-def arg_L(pj, ins):
-	ins.lang.it = ins.lang.itl
+	def assy_V(self, pj):
+		self.lang.it = self.lang.itv
 
-def arg_G(pj, ins):
-	ins.lang.it = ins.lang.itg
+	def assy_L(self, pj):
+		self.lang.it = self.lang.itl
 
-def arg_C(pj, ins):
-	x = ins['chr']
-	t = "0x%02x" % x
-	if x >= 0x20 and x < 0x7e:
-		t += " '%c'" % x
-	nm = {
-		17:	"bkon",
-		18:	"bkoff",
-		145:	"sk16",
-		146:	"sk32",
-		147:	"sk64",
-		0xc8:	"HP-h",
-		0xd0:	"HP-p",
-		0xd8:	"X-mrk",
-		0xd9:	"Y-mrk",
-	}
-	a = nm.get(x)
-	if a != None:
-		t += " " + a
-	return t
+	def assy_G(self, pj):
+		self.lang.it = self.lang.itg
 
-def arg_R(pj, ins):
-	t = ""
-	if ins['R']:
-		t += "+%d" % (ins['X'])
-		t += ",+%d" % (ins['Y'])
-	else:
-		t += "%d" % (ins['X'])
-		t += ",%d" % (ins['Y'])
-	return t
+	def assy_C(self, pj):
+		x = self['chr']
+		t = "0x%02x" % x
+		if x >= 0x20 and x < 0x7e:
+			t += " '%c'" % x
+		nm = {
+			17:	"bkon",
+			18:	"bkoff",
+			145:	"sk16",
+			146:	"sk32",
+			147:	"sk64",
+			0xc8:	"HP-h",
+			0xd0:	"HP-p",
+			0xd8:	"X-mrk",
+			0xd9:	"Y-mrk",
+		}
+		a = nm.get(x)
+		if a != None:
+			t += " " + a
+		return t
+
+	def assy_R(self, pj):
+		t = ""
+		if self['R']:
+			t += "+%d" % (self['X'])
+			t += ",+%d" % (self['Y'])
+		else:
+			t += "%d" % (self['X'])
+			t += ",%d" % (self['Y'])
+		return t
 
 
 class hp85662a(assy.Instree_disass):
 	def __init__(self, lang="hp85662a"):
 		super(hp85662a, self).__init__(lang, 16, 8, ">")
+		self.myleaf = hp85662a_ins
 
 		self.itc = instree.Instree(16, 8, ">")
 		self.itc.load_string(hp85662a_instructions)
@@ -150,19 +154,6 @@ class hp85662a(assy.Instree_disass):
 
 		self.it = self.itc
 
-		self.args.update( {
-			"dst":		arg_dst,
-			"b":		arg_b,
-			"i":		arg_i,
-			"e":		arg_e,
-			"c":		arg_c,
-			"d":		arg_d,
-			"C":		arg_C,
-			"V":		arg_V,
-			"L":		arg_L,
-			"G":		arg_G,
-			"R":		arg_R,
-		})
 		self.amask_ = 0xfff
 
 	def set_adr_mask(self, a):

@@ -236,10 +236,10 @@ LDX	e	|FE	| e1		| e2		|
 STX	e	|FF	| e1		| e2		|
 """
 
-class mc6800assy(assy.Instree_assy):
+class mc6800_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
 		self.idx = "X"
-		super(mc6800assy, self).__init__(pj, lim, lang)
+		super(mc6800_ins, self).__init__(pj, lim, lang)
 
 	def assy_d(self, pj):
 		self.dstadr = self['d']
@@ -266,15 +266,14 @@ class mc6800assy(assy.Instree_assy):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_x(self, pj):
-		return assy.Arg_verbatim(pj,
-		    "0x%02x+" % self['x'] + self.idx)
+		return "0x%02x+" % self['x'] + self.idx
 
 class mc6800(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super(mc6800, self).__init__("mc6800", 8)
 		self.it.load_string(mc6800_instructions)
 		self.mask = mask
-		self.myleaf = mc6800assy
+		self.myleaf = mc6800_ins
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
@@ -349,11 +348,11 @@ STD	e		|FD	| e1		| e2		|
 
 """
 
-class mc68hc11assy(mc6800assy):
+class mc68hc11_ins(mc6800_ins):
 	pass
 
 	def assy_y(self, pj):
-		return assy.Arg_verbatim(pj, "0x%02x+Y" % self['y'])
+		return "0x%02x+Y" % self['y']
 
 	def assy_Y(self, pj):
 		if self.mne[-1] == "X":
@@ -364,7 +363,7 @@ class mc68hc11(mc6800):
 	def __init__(self, mask=0xffff):
 		super(mc68hc11, self).__init__(mask=mask)
 		self.it.load_string(mc68hc11_instructions)
-		self.myleaf = mc68hc11assy
+		self.myleaf = mc68hc11_ins
 
 	def register_labels(self, pj):
 		pj.set_label(0x1000, "PORTA")
