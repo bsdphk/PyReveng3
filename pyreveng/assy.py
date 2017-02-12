@@ -201,11 +201,11 @@ class Instree_disass(code.Decode):
 				break
 			l.pop(-1)
 		if y != None:
-			if self.il:
+			if self.il is not False:
 				x = y.im.il.ilspec
 				if x is not None:
 					y.add_il(x.split("\n"))
-				else:
+				elif self.il is not None:
 					y.add_il(["pyreveng.noidea ( )"])
 			for i in self.flow_check:
 				i(pj, y)

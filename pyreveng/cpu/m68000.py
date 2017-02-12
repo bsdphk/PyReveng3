@@ -149,16 +149,24 @@ LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  |
 lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| eam | ear |
 LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| eam | ear |
 # 220/4-116 NB! Not the usual BWL encoding
-MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | eam | ear |
-MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | eam | ear |
-MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | eam | ear |
+MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | eam | ear | {
+	EAD EA
+}
+MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | eam | ear | {
+	EAD EA
+}
+MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | eam | ear | {
+	EAD EA
+}
 # 223/4-119
 MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| eam | ear |
 MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| eam | ear |
 # 225/4-121
 MOVE		W,CCR,ea	037d	|0 1 0 0|0 0 1|0 1 1| eam | ear |
 # 227/4-123
-MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| eam | ear |
+MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| eam | ear | {
+	%CCR = i16 EA
+}
 # 229/4-125
 MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| eam | ear |
 # 232/4-128
@@ -249,7 +257,9 @@ ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 464/6-10
 eORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 473/6-19
-MOVE		W,ea,SR	1f7d	|0 1 0 0|0 1 1 0|1 1| eam | ear |
+MOVE		W,ea,SR		1f7d	|0 1 0 0|0 1 1 0|1 1| eam | ear | {
+	%SR = i16 EA
+}
 # 475/6-21
 MOVE		L,An,USP	0000	|0 1 0 0|1 1 1 0|0 1 1 0|0| An  |
 MOVE		L,USP,An	0000	|0 1 0 0|1 1 1 0|0 1 1 0|1| An  |
@@ -274,7 +284,10 @@ cond_code = (
 #######################################################################
 
 class m68000_ins(assy.Instree_ins):
-	pass
+	def __init__(self, pj, lim, lang):
+		super(m68000_ins, self).__init__(pj, lim, lang)
+		self.ea = {}
+		self.isz = "i32"
 
 	def assy_An(self, pj):
 		return "A%d" % self['An']
@@ -299,6 +312,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def assy_B(self, pj):
 		self.sz = 1
+		self.isz = "i8"
 		self.mne += ".B"
 
 	def assy_bn(self, pj):
@@ -360,46 +374,101 @@ class m68000_ins(assy.Instree_ins):
 	def assy_Dy(self, pj):
 		return "D%d" % self['Dy']
 
-	def assy_eaxt(self, pj, ref):
+	def assy_eaxt(self, pj, id, ref):
+		'''Extension Word Controlled Address Mode'''
+		il = self.ea[id]
+		iltyp = self.isz + "*"
+		ll = [None]
 		ew = pj.m.bu16(self.hi)
+
+		if ew & 0x100:
+			print("0x%x FULL EXT WORD" % self.lo, self)
+			raise assy.Invalid("FULL EXT WORD")
+
+		if ew & 0x600:
+			print("0x%x Non-zero SCALE" % self.lo, self)
+			raise assy.Invalid("BAD BRIEF EXT WORD")
+
 		self.hi += 2
 
 		if ew & 0x8000:
-			reg = "+A"
+			reg = "A"
 		else:
-			reg = "+D"
+			reg = "D"
 
 		reg = reg + "%d" % ((ew >> 12) & 7)
 
 		if ew & 0x800:
 			wl = ".L"
+			ll.append(
+				["%2", "=", iltyp, "%" + reg]
+			)
 		else:
+			ll.append(
+				["%1", "=", "trunc", "i32", "%" + reg,
+				    "to", "i16"]
+			)
+			ll.append(
+				["%2", "=", "sext", "i16", "%1",
+				    "to", iltyp]
+			)
 			wl = ".W"
+		ll[0] = "%2"
 
-		sc = 1 << ((ew >> 9) & 3)
+		scl = (ew >> 9) & 3
+		sc = 1 << scl
+		if scl != 0:
+			ll.append(
+				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scl]
+			)
+			ll[0] = "%3"
 
-		if ew & 0x100:
-			print("0x%x FULL EXT WORD" % self.lo, self)
-			raise assy.Invalid("FULL EXT WORD")
+		d = ew & 0xff
+		if d & 0x80:
+			d -= 0x100
+		if d > 0:
+			ll.append(
+				["%4", "=", "add", iltyp, ll[0], ",",
+				    "0x%x" % d]
+			)
+			ll[0] = "%4"
+		if d < 0:
+			ll.append(
+				["%4", "=", "sub", iltyp, ll[0], ",",
+				    "0x%x" % -d]
+			)
+			ll[0] = "%4"
+
+		ll.append(
+		    ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
+		)
+		ll[0] = "%5"
+
+		s = "("
+		if ref == "PC":
+			s += "#0x%x" % (d + self.hi - 2)
+		elif d != 0:
+			s += "#0x%x+" % d + ref
 		else:
-			d = ew & 0xff
-			if d & 0x80:
-				d -= 0x100
-			s = "("
-			if ref == "PC":
-				s += "#0x%x" % (d + self.hi - 2)
-			elif d != 0:
-				s += "#0x%x+" % d + ref
-			else:
-				s += ref
-			s += reg + wl
-			if sc > 1:
-				s += "*%d" % sc
-			s += ")"
-			return s
+			s += ref
+		s += "+" + reg + wl
+		if sc > 1:
+			s += "*%d" % sc
+		s += ")"
+		if id == "s":
+			il += [ll[0], ll[1:]]
+		elif id == "d":
+			ll.append(
+				["store", self.isz, "%0", ",",
+				    iltyp, ll[0]]
+			)
+			il += [None, ll[1:]]
+		return s
 
 
-	def assy_eax(self, pj, eam, ear):
+	def assy_eax(self, pj, id, eam, ear):
+		il = []
+		self.ea[id] = il
 		eax = 1 << eam
 		if eax > 0x40:
 			eax = 0x100 << ear
@@ -409,63 +478,159 @@ class m68000_ins(assy.Instree_ins):
 			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
 			    self.lo, eam, ear))
 		if eax == 0x0001:
+			il.append("%%D%d" % ear)
 			return "D%d" % ear
 		if eax == 0x0002:
+			il.append("%%A%d" % ear)
 			return "A%d" % ear
 		if eax == 0x0004:
+			if id == "s":
+				il += [ "%0", [
+				    ["%0", "=", "load", self.isz, ",",
+					self.isz + "*", "%%A%d" % ear],
+				]]
+			if id == "d":
+				il += [ None, [
+				    ["store", self.isz, "%0", ",",
+					self.isz + "*", "%%A%d" % ear],
+				]]
 			return "(A%d)" % ear
 		if eax == 0x0008:
+			r = "A%d" % ear
+			if id == "s":
+				il += [ "%0", [
+				    ["%0", "=", "load", self.isz, ",",
+					self.isz + "*", "%%A%d" % ear],
+				    ["%" + r, "=", "add", "i32",
+					"%" + r, ",", "%d" % self.sz],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    ["store", self.isz, "%0", ",",
+					self.isz + "*", "%%A%d" % ear],
+				    ["%" + r, "=", "add", "i32",
+					"%" + r, ",", "%d" % self.sz],
+				]]
 			return "(A%d)+" % ear
 		if eax == 0x0010:
-			return "-(A%d)" % ear
+			'''Address Register Indirect with Predecrement'''
+			r = "A%d" % ear
+			if id == "s":
+				il += [ "%0", [
+				    ["%" + r, "=", "sub", "i32",
+					"%" + r, ",", "%d" % self.sz],
+				    ["%0", "=", "load", self.isz, ",",
+					self.isz + "*", "%" +r],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    ["%" + r, "=", "sub", "i32",
+					"%" + r, ",", "%d" % self.sz],
+				    ["store", self.isz, "%0", ",",
+					self.isz + "*", "%" +r],
+				]]
+			return "-(%s)" % r
 		if eax == 0x0020:
+			'''Address Register Indirect with Displacement'''
 			o = pj.m.bs16(self.hi)
 			self.hi += 2
+			if id == "s":
+				il += [ "%0", [
+				    ["%1", "=", "add", self.isz + "*",
+					"%%A%d" % ear, ",", "0x%x" % o],
+				    ["%0", "=", "load", self.isz, ",",
+					self.isz + "*", "%1"],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    ["%1", "=", "add", self.isz + "*",
+					"%%A%d" % ear, ",", "0x%x" % o],
+				    ["store", self.isz, "%0", ",",
+					self.isz + "*", "%1"],
+				]]
 			if o < 0:
 				return "(A%d-0x%x)" % (ear, -o)
 			else:
 				return "(A%d+0x%x)" % (ear, o)
 		if eax == 0x0040:
-			return self.assy_eaxt(pj, "A%d" % ear)
+			return self.assy_eaxt(pj, id, "A%d" % ear)
 		if eax == 0x0100:
 			o = pj.m.bu16(self.hi)
 			self.hi += 2
 			if o & 0x8000:
 				o |= 0xffff0000
 			self.dstadr = o
+			if id == "s":
+				il += [ "%0", [
+				    [ "%0", "=", "load", self.isz, ",",
+					self.isz + "*", "0x%x" % o],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    [ "store", self.isz, "%0", ",",
+					self.isz + "*", "0x%x" % o],
+				]]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0200:
 			o = pj.m.bu32(self.hi)
 			self.hi += 4
 			self.dstadr = o
+			if id == "s":
+				il += [ "%0", [
+				    [ "%0", "=", "load", self.isz, ",",
+					self.isz + "*", "0x%x" % o],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    [ "store", self.isz, "%0", ",",
+					self.isz + "*", "0x%x" % o],
+				]]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0400:
 			o = self.hi + pj.m.bs16(self.hi)
 			self.hi += 2
 			self.dstadr = o
+			if id == "s":
+				il += [ "%0", [
+				    [ "%0", "=", "load", self.isz, ",",
+					self.isz + "*", "0x%x" % o],
+				]]
+			elif id == "d":
+				il += [ None, [
+				    [ "store", self.isz, "%0", ",",
+					self.isz + "*", "0x%x" % o],
+				]]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0800:
-			return self.assy_eaxt(pj, "PC")
+			return self.assy_eaxt(pj, id, "PC")
 		if eax == 0x1000 and self.sz == 1:
+			v = pj.m.rd(self.hi+1)
 			self.hi += 2
-			return "#0x%02x" % pj.m.rd(self.hi-1)
+			il += ["0x%x" % v]
+			return "#0x%02x" % v
 		if eax == 0x1000 and self.sz == 2:
+			v = pj.m.bu16(self.hi)
 			self.hi += 2
-			return "#0x%04x" % pj.m.bu16(self.hi-2)
+			il += ["0x%x" % v]
+			return "#0x%04x" % v
 		if eax == 0x1000 and self.sz == 4:
+			v = pj.m.bu32(self.hi)
 			self.hi += 4
-			return "#0x%08x" % pj.m.bu32(self.hi-4)
+			il += ["0x%x" % v]
+			return "#0x%08x" % v
 		print("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
-		raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
+		raise assy.Invalid(
+		    "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
 	def assy_ea(self, pj):
-		return self.assy_eax(pj, self['eam'], self['ear'])
+		return self.assy_eax(pj, "s", self['eam'], self['ear'])
 
 	def assy_ead(self, pj):
-		return self.assy_eax(pj, self['eamx'], self['earx'])
+		return self.assy_eax(pj, "d", self['eamx'], self['earx'])
 
 	def assy_L(self, pj):
 		self.sz = 4
+		self.isz = "i32"
 		self.mne += ".L"
 
 	def assy_rlist(self, pj):
@@ -496,6 +661,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def assy_W(self, pj):
 		self.sz = 2
+		self.isz = "i16"
 		self.mne += ".W"
 
 	def assy_word(self, pj):
@@ -510,9 +676,35 @@ class m68000_ins(assy.Instree_ins):
 			[4, ".L"],
 		] [self['sz']]
 		self.sz = i
+		self.isz = "i%d" % (i*8)
 		self.mne += j
 
+	def ilmacro_EA(self):
+		il = self.ea["s"]
+		if len(il) > 1:
+			return self.add_il(il[1],il[0])
+		elif len(il) > 0:
+			return il[0]
 
+		return "XXX EA %d %d %s" % (self['eam'], self['ear'], str(il))
+
+	def ilfunc_EAD(self, arg):
+		il = self.ea["d"]
+		if len(il) == 1:
+			self.add_il([
+			    [ il[0], "=", "i%d" % (self.sz * 8), arg[0]],
+			])
+			return
+		elif len(il) == 2 and il[0] is None:
+			ll = [
+			    [ "%0", "=", "i%d" % (self.sz * 8), arg[0]],
+			]
+			ll += il[1]
+			self.add_il(ll)
+		else:
+			e = "XXX EAD eam %d ear %d il %s arg %s" % (self['eamx'], self['earx'], str(il), str(arg))
+			self.add_il([[ e ]])
+			print(self, e)
 
 class m68000(assy.Instree_disass):
 	def __init__(self, lang="m68000"):
@@ -522,6 +714,7 @@ class m68000(assy.Instree_disass):
 		    mem_word=8,
 		    endian=">")
 		self.it.load_string(m68000_instructions)
+		self.il = None
 		self.myleaf = m68000_ins
 		self.verbatim |= set(["CCR", "SR", "USP"])
 
