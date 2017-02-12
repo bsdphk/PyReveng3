@@ -350,90 +350,108 @@ wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
 breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
 ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 
-class arg_i1(assy.Arg):
-	""" Immediate 8 bit """
-	def __init__(self, pj, ins):
-		self.value = ins['i1']
-		super(arg_i1, self).__init__(pj)
+class i8086assy(assy.Instree_assy):
+	def __init__(self, pj, lim, lang):
+		self.seg = ""
+		super(i8086assy, self).__init__(pj, lim, lang)
 
-	def render(self, pj):
-		return "#0x%02x" % self.value
+	def assy_i1(self, pj):
+		""" Immediate 8 bit """
+		return "#0x%02x" % self['i1']
 
-class arg_i2(assy.Arg):
-	""" Immediate 16 bit """
-	def __init__(self, pj, ins):
-		self.value = ins['i1'] | ins['i2'] << 8
-		super(arg_i2, self).__init__(pj)
+	def assy_i2(self, pj):
+		""" Immediate 16 bit """
+		self.dstadr = self['i1'] | self['i2'] << 8
+		return assy.Arg_dst(pj, self.dstadr, "#")
 
-	def render(self, pj):
-		return "#0x%04x" % self.value
+	def assy_da(self, pj):
+		""" Direct address """
+		self.dstadr = self['alo'] | self['ahi'] << 8
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_da(assy.Arg):
-	""" Direct address """
-	def __init__(self, pj, ins):
-		self.value = ins['alo'] | ins['ahi'] << 8
-		super(arg_da, self).__init__(pj)
-
-	def render(self, pj):
-		return "0x%04x" % self.value
-
-
-class arg_ipcs(assy.Arg_dst):
-	""" Long address (seg:off) """
-	def __init__(self, pj, ins):
-		self.seg = ins['slo'] | (ins['shi'] << 8)
-		ins.dseg = self.seg
-		self.off = ins['alo'] | (ins['ahi'] << 8)
-		ins.dstadr = (self.seg << 4) + self.off
-		super(arg_ipcs, self).__init__(pj, ins.dstadr)
-
-	def render(self, pj):
-		return "0x%04x:0x%04x" % (self.seg, self.off)
-
-class arg_Rel(assy.Arg_dst):
-	""" Relative address """
-	def __init__(self, pj, ins):
-		d = ins['i1'] | (ins['i2'] << 8)
+	def assy_Rel(self, pj):
+		""" 16 bit Relative address """
+		d = self['i1'] | (self['i2'] << 8)
 		if d & 0x8000:
 			d -= 65536
-		ins.dstadr = ins.hi + d
-		super(arg_Rel, self).__init__(pj, ins.dstadr)
+		self.dstadr = self.hi + d
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_rel(assy.Arg_dst):
-	""" Relative address """
-	def __init__(self, pj, ins):
-		d = ins['disp']
+	def assy_rel(self, pj):
+		""" Relative address """
+		d = self['disp']
 		if d & 0x80:
 			d -= 256
-		ins.dstadr = ins.hi + d
-		super(arg_rel, self).__init__(pj, ins.dstadr)
+		self.dstadr = self.hi + d
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_cs(pj, ins):
-	ins.seg = "%cs:"
+	def assy_cs(self, pj):
+		self.seg = "%cs:"
 
-def arg_es(pj, ins):
-	ins.seg = "%es:"
+	def assy_es(self, pj):
+		self.seg = "%es:"
 
-def arg_ss(pj, ins):
-	ins.seg = "%ss:"
+	def assy_ss(self, pj):
+		self.seg = "%ss:"
 
-def arg_ds(pj, ins):
-	ins.seg = "%ds:"
+	def assy_ds(self, pj):
+		self.seg = "%ds:"
 
-class arg_ea(assy.Arg):
-	""" Effective address """
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.seg = ins.seg
-		super(arg_ea, self).__init__(pj)
+	def assy_sr(self, pj):
+		""" Segment register """
+		return ["%es", "%cs", "%ss", "%ds"][self['sr']]
 
-	def __getitem__(self, f):
-		return self.ins[f]
+	def assy_r1(self, pj):
+		""" Byte register """
+		return breg[self['reg']]
 
-	def render(self, pj):
-		#print("R", self.im)
-		s = ""
-		s += self.seg
+	def assy_r2(self, pj):
+		""" Word register """
+		return wreg[self['reg']]
+
+	def assy_a(self, pj):
+		""" Accumulator """
+		if self['w']:
+			return "%ax"
+		else:
+			return "%al"
+
+	def assy_r(self, pj):
+		""" Register """
+		if self['w']:
+			return wreg[self['reg']]
+		else:
+			return breg[self['reg']]
+
+	def assy_v(self, pj):
+		if self['v']:
+			return "%cl"
+
+	def assy_W(self, pj):
+		""" Instruction is Word sized """
+		self['w'] = 1
+
+	def assy_B(self, pj):
+		""" Instruction is Byte sized """
+		self['w'] = 9
+
+	def assy_S(self, pj):
+		""" Mark Byte sized instrustions"""
+		if not self['w']:
+			self.mne += "B"
+
+	def assy_dx(pj, ins):
+		return "(%dx)"
+
+	def assy_ipcs(self, pj):
+		""" Long address (seg:off) """
+		self.seg = self['slo'] | (self['shi'] << 8)
+		self.off = self['alo'] | (self['ahi'] << 8)
+		self.dstadr = (self.seg << 4) + self.off
+		return "0x%04x:0x%04x" % (self.seg, self.off)
+
+	def assy_ea(self, pj):
+		s = self.seg
 		if self['mod'] == 0 and self['rm'] == 6:
 			dst = self['dlo'] | (self['dhi'] << 8)
 			s += "0x%04x" % dst
@@ -468,119 +486,45 @@ class arg_ea(assy.Arg):
 			s += "<EA mod=%d r/m=%d>" % (self['mod'], self['rm'])
 		return s
 
-class arg_e1(arg_ea):
-	""" Effective address 8 bit offset """
-	def __init__(self, pj, ins):
-		ins['mod'] = 1
-		super(arg_e1, self).__init__(pj, ins)
+	def assy_e1(self, pj):
+		""" Effective address 8 bit offset """
+		self['mod'] = 1
+		return self.assy_ea(pj)
 
-class arg_e2(arg_ea):
-	""" Effective address 16 bit offset """
-	def __init__(self, pj, ins):
-		ins['mod'] = 2
-		super(arg_e2, self).__init__(pj, ins)
+	def assy_e2(self, pj):
+		""" Effective address 16 bit offset """
+		self['mod'] = 2
+		return self.assy_ea(pj)
 
-class arg_e3(arg_ea):
-	""" Effective address -- direct address """
-	def __init__(self, pj, ins):
-		ins['mod'] = 0
-		ins['rm'] = 6
-		super(arg_e3, self).__init__(pj, ins)
+	def assy_e3(self, pj):
+		""" Effective address -- direct address """
+		self['mod'] = 0
+		self['rm'] = 6
+		return self.assy_ea(pj)
 
-def arg_sr(pj, ins):
-	""" Segment register """
-	return ["%es", "%cs", "%ss", "%ds"][ins['sr']]
+class i808687assy(i8086assy):
+	pass
 
-def arg_r1(pj, ins):
-	""" Byte register """
-	return breg[ins['reg']]
+	def assy_st(self, pj):
+		return "%%st(%d)" % self['st']
 
-def arg_r2(pj, ins):
-	""" Word register """
-	return wreg[ins['reg']]
-
-def arg_a(pj, ins):
-	""" Accumulator """
-	if ins['w']:
-		return "%ax"
-	else:
-		return "%al"
-
-def arg_r(pj, ins):
-	""" Register """
-	if ins['w']:
-		return wreg[ins['reg']]
-	else:
-		return breg[ins['reg']]
-
-def arg_v(pj, ins):
-	if ins['v']:
-		return "%cl"
-	return None
-
-def arg_W(pj, ins):
-	""" Instruction is Word sized """
-	ins['w'] = 1
-
-def arg_B(pj, ins):
-	""" Instruction is Byte sized """
-	ins['w'] = 9
-
-def arg_S(pj, ins):
-	""" Mark Byte sized instrustions"""
-	if not ins['w']:
-		ins.mne += "B"
-
-def arg_dx(pj, ins):
-	return "(%dx)"
-
-
-def arg7_st(pj, ins):
-	return "%%st(%d)" % ins['st']
-
-def arg7_mf(pj, ins):
-	ins.mne += "fids" [ins['mf']]
+	def assy_mf(self, pj):
+		self.mne += "fids" [self['mf']]
 
 class i8086(assy.Instree_disass):
 	def __init__(self):
 		super(i8086, self).__init__("i8086", 8)
 		self.it.load_string(i8086_instructions)
+		self.myleaf = i8086assy
 		self.args.update( {
-			"W":	arg_W,
-			"B":	arg_B,
-			"S":	arg_S,
-			"ipcs":	arg_ipcs,
-			"cs":	arg_cs,
-			"ds":	arg_ds,
-			"es":	arg_es,
-			"ss":	arg_ss,
-			"sr":	arg_sr,
-			"e1":	arg_e1,
-			"e2":	arg_e2,
-			"e3":	arg_e3,
-			"ea":	arg_ea,
-			"i1":	arg_i1,
-			"i2":	arg_i2,
-			"da":	arg_da,
-			"a":	arg_a,
-			"r":	arg_r,
-			"v":	arg_v,
-			"r1":	arg_r1,
-			"r2":	arg_r2,
-			"rel":	arg_rel,
-			"Rel":	arg_Rel,
-			"dx":	arg_dx,
+			# "ipcs":	arg_ipcs,
+			# "e1":	arg_e1,
+			# "ea":	arg_ea,
 		})
 
 	def has_8087(self):
 		self.it.load_string(i8087_instructions)
-		self.args.update( {
-			"st":	arg7_st,
-			"mf":	arg7_mf,
-		})
-
-	def init_code(self, pj, ins):
-		ins.seg = ""
+		self.myleaf = i808687assy
 
 	def disass(self, pj, adr):
 		y = pj.find(adr, self.name)
