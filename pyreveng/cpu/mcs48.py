@@ -35,15 +35,15 @@ from pyreveng import assy
 mcs48_instructions = """
 # 4-8
 ADD	A,r		|0 1 1 0|1|  r  |
-ADD	A,@r		|0 1 1 0|0 0 0|r|
+ADD	A,ar		|0 1 1 0|0 0 0|r|
 ADD	A,im		|0 0 0 0|0 0 1 1| im		|
 ADDC	A,r		|0 1 1 1|1|  r	|
 
 # 4-9
-ADDC	A,@r		|0 1 1 1|0 0 0|r|
+ADDC	A,ar		|0 1 1 1|0 0 0|r|
 ADDC	A,im		|0 0 0 1|0 0 1 1| im		|
 ANL	A,r		|0 1 0 1|1|  r	|
-ANL	A,@r		|0 1 0 1|0 0 0|r|
+ANL	A,ar		|0 1 0 1|0 0 0|r|
 
 # 4-10
 ANL	A,im		|0 1 0 1|0 0 1 1| im		|
@@ -83,7 +83,7 @@ INS	A,p		|0 0 0 0|1 0| p |
 # 4-16
 IN	A		|0 0 0 1|0 1 1 1|
 INC	r		|0 0 0 1|1|  r	|
-INC	@r		|0 0 0 1|0 0 0|r|
+INC	ar		|0 0 0 1|0 0 0|r|
 
 # 4-17
 #IN	A,P0		|0 0 0 0|1 0 0 0|
@@ -114,7 +114,7 @@ JZ	a8,>JC		|1 1 0 0|0 1 1 0| a8		|
 MOV	A,im		|0 0 1 0|0 0 1 1| im		|
 MOV	A,PSW		|1 1 0 0|0 1 1 1|
 MOV	A,r		|1 1 1 1|1|  r	|
-MOV	A,@r		|1 1 1 1|0 0 0|r|
+MOV	A,ar		|1 1 1 1|0 0 0|r|
 
 # 4-22
 MOV	A,T		|0 1 0 0|0 0 1 0|
@@ -123,8 +123,8 @@ MOV	r,A		|1 0 1 0|1|  r	|
 MOV	r,im		|1 0 1 1|1|  r	| im		|
 
 # 4-23
-MOV	@r,A		|1 0 1 0|0 0 0|r|
-MOV	@r,im		|1 0 1 1|0 0 0|r| im		|
+MOV	ar,A		|1 0 1 0|0 0 0|r|
+MOV	ar,im		|1 0 1 1|0 0 0|r| im		|
 MOV	T,A		|0 1 1 0|0 0 1 0|
 
 # 4-24
@@ -134,13 +134,13 @@ MOVP	A,@A		|1 0 1 0|0 0 1 1|
 
 # 4-25
 MOVP3	A,@A		|1 1 1 0|0 0 1 1|
-MOVX	A,@r		|1 0 0 0|0 0 0|r|
+MOVX	A,ar		|1 0 0 0|0 0 0|r|
 
 # 4-26
-MOVX	@r,A		|1 0 0 1|0 0 0|r|
+MOVX	ar,A		|1 0 0 1|0 0 0|r|
 NOP	-		|0 0 0 0|0 0 0 0|
 ORL	A,r		|0 1 0 0|1|  r	|
-ORL	A,@r		|0 1 0 0|0 0 0|r|
+ORL	A,ar		|0 1 0 0|0 0 0|r|
 ORL	A,im		|0 1 0 0|0 0 1 1| im		|
 
 # 4-27
@@ -177,45 +177,45 @@ SWAP	A		|0 1 0 0|0 1 1 1|
 
 # 4-33
 XCH	A,r		|0 0 1 0|1|  r	|
-XCH	A,@r		|0 0 1 0|0 0 0|r|
-XCHD	A,@r		|0 0 1 1|0 0 0|r|
+XCH	A,ar		|0 0 1 0|0 0 0|r|
+XCHD	A,ar		|0 0 1 1|0 0 0|r|
 
 # 4-34
 XRL	A,r		|1 1 0 1|1|  r	|
-XRL	A,@r		|1 1 0 1|0 0 0|r|
+XRL	A,ar		|1 1 0 1|0 0 0|r|
 XRL	A,im		|1 1 0 1|0 0 1 1| im		|
 
 
 """
 
-class arg_adr(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins['ahi'] << 8) | ins['alo']
-		self.dstadr = ins.dstadr
-		super(arg_adr, self).__init__(pj, ins.dstadr)
+class mcs48assy(assy.Instree_assy):
+	pass
 
-class arg_a8(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins.lo & ~0x0ff) | ins['a8']
-		self.dstadr = ins.dstadr
-		super(arg_a8, self).__init__(pj, ins.dstadr)
+	def assy_adr(self, pj):
+		self.dstadr = (self['ahi'] << 8) | self['alo']
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_p(pj, ins):
-	return "P%d" % ins['p']
+	def assy_a8(self, pj):
+		self.dstadr = (self.lo & ~0x0ff) | self['a8']
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_ar(pj, ins):
-	return "@R%d" % ins['r']
+	def assy_p(self, pj):
+		return "P%d" % self['p']
 
-def arg_r(pj, ins):
-	return "R%d" % ins['r']
+	def assy_ar(self, pj):
+		return "@R%d" % self['r']
 
-def arg_im(pj, ins):
-	return "#0x%02x" % ins['im']
+	def assy_r(self, pj):
+		return "R%d" % self['r']
+
+	def assy_im(self, pj):
+		return "#0x%02x" % self['im']
 
 class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
 		super(mcs48, self).__init__(lang, 8)
 		self.it.load_string(mcs48_instructions)
+		self.myleaf = mcs48assy
 
 		self.args.update( {
 			"TCNTI":	"TCNTI",
@@ -226,12 +226,6 @@ class mcs48(assy.Instree_disass):
 			"I":		"I",
 			"F0":		"F0",
 			"F1":		"F1",
-			"adr":		arg_adr,
-			"a8":		arg_a8,
-			"r":		arg_r,
-			"@r":		arg_ar,
-			"p":		arg_p,
-			"im":		arg_im,
 		})
 		self.amask_ = 0xffff
 
