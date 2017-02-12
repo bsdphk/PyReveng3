@@ -40,7 +40,7 @@ m68000_instructions = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
 aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
-ABCD		B,-(Ay),-(Ax)	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
+ABCD		B,decAy,decAx	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
 # 108/4-4
 ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| eam | ear |
 ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| eam | ear |
@@ -55,7 +55,7 @@ ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| eam | ear |
 # 117/4-13
 # Collision with ADDA.L
 ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
-ADDX		Z,-(Ay),-(Ax)	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
+ADDX		Z,decAy,decAx	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
 AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| eam | ear |
@@ -72,7 +72,7 @@ ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  |
 aSL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| eam | ear |
 aSR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| eam | ear |
 # 129/4-25
-B		cc,#dst,>JC	0000	|0 1 1 0| cc    | disp8		|
+B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		|
 # 131/4-27
 bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| eam | ear |
 BCHG		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 1|0 0 0| Dy  |
@@ -84,14 +84,14 @@ BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
 BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| eam | ear |0 0 0 0|0 0 0 0| bn		|
 BCLR		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 159/4-55
-BRA		#dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
+BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
 # 160/4-56
 BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| eam | ear |
 BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
 BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| eam | ear |0 0 0 0|0 0 0 0| bn		|
 BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 163/4-59
-BSR		#dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
+BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
 # 165/4-61
 BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| eam | ear |
 BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
@@ -110,7 +110,7 @@ CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| eam | ear |
 # 183/4-79
 CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| eam | ear |
 # 185/4-81
-CMPM		Z,(Ay)+,(Ax)+	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
+CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
 # 194/4-90
 DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			|
 # 196/4-92
@@ -216,7 +216,7 @@ RTR		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
 RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1|
 # 274/4-170
 sBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
-SBCD		B,-(Ax),-(Ay)	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
+SBCD		B,decAx,decAy	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
 # 276/4-172
 S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| eam | ear |
 # 278/4-174
@@ -231,13 +231,13 @@ SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| eam | ear |
 SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| eam | ear |
 # 287/4-183
 SUBX		Z,Dx,Dy		0000	|1 0 0 1| Dy  |1| sz|0 0|0| Dx  |
-SUBX		Z,-(Ax),-(Ay)	0000	|1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
+SUBX		Z,decAx,decAy	0000	|1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
 # 289/4-185
 SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
 # 290/4-186
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| eam | ear |
 # 292/4-188
-TRAP		#vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
+TRAP		vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 # 295/4-191
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
@@ -273,245 +273,244 @@ cond_code = (
 
 #######################################################################
 
-def arg_an(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins['An'])
+class M68Kassy(assy.Instree_assy):
+	pass
 
-def arg_ax_dec(pj, ins):
-	return assy.Arg_verbatim(pj, "-(A%d)" % ins['Ax'])
+	def assy_An(self, pj):
+		return assy.Arg_verbatim(pj, "A%d" % self['An'])
 
-def arg_ax_inc(pj, ins):
-	return assy.Arg_verbatim(pj, "(A%d)+" % ins['Ax'])
+	def assy_decAx(self, pj):
+		return assy.Arg_verbatim(pj, "-(A%d)" % self['Ax'])
 
-def arg_ax(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins['Ax'])
+	def assy_Axinc(self, pj):
+		return assy.Arg_verbatim(pj, "(A%d)+" % self['Ax'])
 
-def arg_ay_dec(pj, ins):
-	return assy.Arg_verbatim(pj, "-(A%d)" % ins['Ay'])
+	def assy_Ax(self, pj):
+		return assy.Arg_verbatim(pj, "A%d" % self['Ax'])
 
-def arg_ay_inc(pj, ins):
-	return assy.Arg_verbatim(pj, "(A%d)+" % ins['Ay'])
+	def assy_decAy(self, pj):
+		return assy.Arg_verbatim(pj, "-(A%d)" % self['Ay'])
 
-def arg_ay(pj, ins):
-	return assy.Arg_verbatim(pj, "A%d" % ins['Ay'])
+	def assy_Ayinc(self, pj):
+		return assy.Arg_verbatim(pj, "(A%d)+" % self['Ay'])
 
-def arg_B(pj, ins):
-	ins.sz = 1
-	ins.mne += ".B"
+	def assy_Ay(self, pj):
+		return assy.Arg_verbatim(pj, "A%d" % self['Ay'])
 
-def arg_bn(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%x" % ins['bn'])
+	def assy_B(self, pj):
+		self.sz = 1
+		self.mne += ".B"
 
-def arg_cc(pj, ins):
-	ins.mne += cond_code[ins['cc']]
+	def assy_bn(self, pj):
+		return assy.Arg_verbatim(pj, "#0x%x" % self['bn'])
 
-def arg_const(pj, ins):
-	o = ins['const']
-	if o == 0:
-		o = 8
-	return assy.Arg_verbatim(pj, "#0x%x" % o)
+	def assy_cc(self, pj):
+		self.mne += cond_code[self['cc']]
 
-class arg_data(assy.Arg_verbatim):
-	def __init__(self, pj, ins):
-		if ins.sz == 1:
-			self.v = pj.m.bu16(ins.hi)
-		elif ins.sz == 2:
-			self.v = pj.m.bu16(ins.hi)
-		elif ins.sz == 4:
-			self.v = pj.m.bu32(ins.hi)
+	def assy_const(self, pj):
+		o = self['const']
+		if o == 0:
+			o = 8
+		return assy.Arg_verbatim(pj, "#0x%x" % o)
+
+	def assy_data(self, pj):
+		if self.sz == 1:
+			self.v = pj.m.bu16(self.hi)
+		elif self.sz == 2:
+			self.v = pj.m.bu16(self.hi)
+		elif self.sz == 4:
+			self.v = pj.m.bu32(self.hi)
 		else:
 			assert False
-		ins.hi += ins.sz
-		if ins.sz == 1:
-			ins.hi += 1
-		super(arg_data, self).__init__(pj,
-		    "#0x%0*x" % (ins.sz * 2, self.v)
-		)
+		self.hi += self.sz
+		if self.sz == 1:
+			self.hi += 1
+		return assy.Arg_verbatim(pj, "#0x%0*x" % (self.sz * 2, self.v))
 
-def arg_data8(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%02x" % ins['data8'])
+	def assy_data8(self, pj):
+		return assy.Arg_verbatim(pj, "#0x%02x" % self['data8'])
 
-def arg_disp16(pj, ins):
-	o = ins['disp16']
-	if o & 0x8000:
-		o -= 1 << 16
-	ins.dstadr = ins.hi + o - 2
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_dn(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins['Dn'])
-
-class arg_dst(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		x = ins['disp8']
-		if x == 0x00:
-			ins.dstadr = ins.hi + pj.m.bs16(ins.hi)
-			ins.hi += 2
-		elif x == 0xff:
-			ins.dstadr = ins.hi + pj.m.bs32(ins.hi)
-			ins.hi += 4
-		elif x & 0x80:
-			ins.dstadr = ins.hi + x - 0x100
-		else:
-			ins.dstadr = ins.hi + x
-		super(arg_dst, self).__init__(pj, ins.dstadr)
-
-def arg_dx(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins['Dx'])
-
-def arg_dy(pj, ins):
-	return assy.Arg_verbatim(pj, "D%d" % ins['Dy'])
-
-def arg_eaxt(pj, ins, ref):
-	ew = pj.m.bu16(ins.hi)
-	ins.hi += 2
-
-	if ew & 0x8000:
-		reg = "+A"
-	else:
-		reg = "+D"
-
-	reg = reg + "%d" % ((ew >> 12) & 7)
-
-	if ew & 0x800:
-		wl = ".L"
-	else:
-		wl = ".W"
-
-	sc = 1 << ((ew >> 9) & 3)
-
-	if ew & 0x100:
-		print("0x%x FULL EXT WORD" % ins.lo, ins)
-		raise assy.Invalid("FULL EXT WORD")
-	else:
-		d = ew & 0xff
-		if d & 0x80:
-			d -= 0x100
-		s = "("
-		if ref == "PC":
-			s += "#0x%x" % (d + ins.hi - 2)
-		elif d != 0:
-			s += "#0x%x+" % d + ref
-		else:
-			s += ref
-		s += reg + wl
-		if sc > 1:
-			s += "*%d" % sc
-		s += ")"
-		return s
-
-
-def arg_eax(pj, ins, eam, ear):
-	eax = 1 << eam
-	if eax > 0x40:
-		eax = 0x100 << ear
-	eamask = int(ins.im.assy[-1], 16)
-	if not eax & eamask:
-		print ("0x%x Wrong EA mode m=%d/r=%d" % (ins.lo, eam, ear))
-		raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
-		    ins.lo, eam, ear))
-	if eax == 0x0001:
-		return assy.Arg_verbatim(pj, "D%d" % ear)
-	if eax == 0x0002:
-		return assy.Arg_verbatim(pj, "A%d" % ear)
-	if eax == 0x0004:
-		return assy.Arg_verbatim(pj, "(A%d)" % ear)
-	if eax == 0x0008:
-		return assy.Arg_verbatim(pj, "(A%d)+" % ear)
-	if eax == 0x0010:
-		return assy.Arg_verbatim(pj, "-(A%d)" % ear)
-	if eax == 0x0020:
-		o = pj.m.bs16(ins.hi)
-		ins.hi += 2
-		if o < 0:
-			return assy.Arg_verbatim(pj, "(A%d-0x%x)" % (ear, -o))
-		else:
-			return assy.Arg_verbatim(pj, "(A%d+0x%x)" % (ear, o))
-	if eax == 0x0040:
-		return arg_eaxt(pj, ins, "A%d" % ear)
-	if eax == 0x0100:
-		o = pj.m.bu16(ins.hi)
-		ins.hi += 2
+	def assy_disp16(self, pj):
+		o = self['disp16']
 		if o & 0x8000:
-			o |= 0xffff0000
-		ins.dstadr = o
-		return assy.Arg_dst(pj, o)
-	if eax == 0x0200:
-		o = pj.m.bu32(ins.hi)
-		ins.hi += 4
-		ins.dstadr = o
-		return assy.Arg_dst(pj, o)
-	if eax == 0x0400:
-		o = ins.hi + pj.m.bs16(ins.hi)
-		ins.hi += 2
-		ins.dstadr = o
-		return assy.Arg_dst(pj, o)
-	if eax == 0x0800:
-		return arg_eaxt(pj, ins, "PC")
-	if eax == 0x1000 and ins.sz == 1:
-		ins.hi += 2
-		return assy.Arg_verbatim(pj, "#0x%02x" % pj.m.rd(ins.hi-1))
-	if eax == 0x1000 and ins.sz == 2:
-		ins.hi += 2
-		return assy.Arg_verbatim(pj, "#0x%04x" % pj.m.bu16(ins.hi-2))
-	if eax == 0x1000 and ins.sz == 4:
-		ins.hi += 4
-		return assy.Arg_verbatim(pj, "#0x%08x" % pj.m.bu32(ins.hi-4))
-	print("0x%x EA? 0x%04x m=%d/r=%d" % (ins.lo, eax, eam, ear))
-	raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (ins.lo, eax, eam, ear))
+			o -= 1 << 16
+		self.dstadr = self.hi + o - 2
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_ea(pj, ins):
-	return arg_eax(pj, ins, ins['eam'], ins['ear'])
+	def assy_Dn(self, pj):
+		return assy.Arg_verbatim(pj, "D%d" % self['Dn'])
 
-def arg_ead(pj, ins):
-	return arg_eax(pj, ins, ins['eamx'], ins['earx'])
+	def assy_dst(self, pj):
+		x = self['disp8']
+		if x == 0x00:
+			self.dstadr = self.hi + pj.m.bs16(self.hi)
+			self.hi += 2
+		elif x == 0xff:
+			self.dstadr = self.hi + pj.m.bs32(self.hi)
+			self.hi += 4
+		elif x & 0x80:
+			self.dstadr = self.hi + x - 0x100
+		else:
+			self.dstadr = self.hi + x
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_L(pj, ins):
-	ins.sz = 4
-	ins.mne += ".L"
+	def assy_Dx(self, pj):
+		return assy.Arg_verbatim(pj, "D%d" % self['Dx'])
 
-def arg_rlist(pj, ins):
-	v = ins['rlist']
-	l = []
-	if ins['eam'] == 4:
-		for r in ("A", "D"):
-			for n in range(7, -1, -1):
-				if v & 0x0001:
-					l.append(r + "%d" % n)
-				v >>= 1
-	else:
-		for r in ("D", "A"):
-			for n in range(0, 8):
-				if v & 0x0001:
-					l.append(r + "%d" % n)
-				v >>= 1
-	return "+".join(l)
+	def assy_Dy(self, pj):
+		return assy.Arg_verbatim(pj, "D%d" % self['Dy'])
 
-def arg_rot(pj, ins):
-	a = ins['rot']
-	if a == 0:
-		a = 8
-	return assy.Arg_verbatim(pj, "#0x%x" % a)
+	def assy_eaxt(self, pj, ref):
+		ew = pj.m.bu16(self.hi)
+		self.hi += 2
 
-def arg_vect(pj, ins):
-	return assy.Arg_verbatim(pj, "#%d" % ins['vect'])
+		if ew & 0x8000:
+			reg = "+A"
+		else:
+			reg = "+D"
 
-def arg_W(pj, ins):
-	ins.sz = 2
-	ins.mne += ".W"
+		reg = reg + "%d" % ((ew >> 12) & 7)
 
-def arg_word(pj, ins):
-	return assy.Arg_verbatim(pj, "#0x%04x" % ins['word'])
+		if ew & 0x800:
+			wl = ".L"
+		else:
+			wl = ".W"
 
-def arg_Z(pj, ins):
-	if ins['sz'] == 3:
-		raise assy.Invalid('0x%x F_sz == 3' % ins.lo)
-	i, j = [
-		[1, ".B"],
-		[2, ".W"],
-		[4, ".L"],
-	] [ins['sz']]
-	ins.sz = i
-	ins.mne += j
+		sc = 1 << ((ew >> 9) & 3)
+
+		if ew & 0x100:
+			print("0x%x FULL EXT WORD" % self.lo, self)
+			raise assy.Invalid("FULL EXT WORD")
+		else:
+			d = ew & 0xff
+			if d & 0x80:
+				d -= 0x100
+			s = "("
+			if ref == "PC":
+				s += "#0x%x" % (d + self.hi - 2)
+			elif d != 0:
+				s += "#0x%x+" % d + ref
+			else:
+				s += ref
+			s += reg + wl
+			if sc > 1:
+				s += "*%d" % sc
+			s += ")"
+			return s
+
+
+	def assy_eax(self, pj, eam, ear):
+		eax = 1 << eam
+		if eax > 0x40:
+			eax = 0x100 << ear
+		eamask = int(self.im.assy[-1], 16)
+		if not eax & eamask:
+			print ("0x%x Wrong EA mode m=%d/r=%d" % (self.lo, eam, ear))
+			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
+			    self.lo, eam, ear))
+		if eax == 0x0001:
+			return assy.Arg_verbatim(pj, "D%d" % ear)
+		if eax == 0x0002:
+			return assy.Arg_verbatim(pj, "A%d" % ear)
+		if eax == 0x0004:
+			return assy.Arg_verbatim(pj, "(A%d)" % ear)
+		if eax == 0x0008:
+			return assy.Arg_verbatim(pj, "(A%d)+" % ear)
+		if eax == 0x0010:
+			return assy.Arg_verbatim(pj, "-(A%d)" % ear)
+		if eax == 0x0020:
+			o = pj.m.bs16(self.hi)
+			self.hi += 2
+			if o < 0:
+				return assy.Arg_verbatim(pj, "(A%d-0x%x)" % (ear, -o))
+			else:
+				return assy.Arg_verbatim(pj, "(A%d+0x%x)" % (ear, o))
+		if eax == 0x0040:
+			return self.assy_eaxt(pj, "A%d" % ear)
+		if eax == 0x0100:
+			o = pj.m.bu16(self.hi)
+			self.hi += 2
+			if o & 0x8000:
+				o |= 0xffff0000
+			self.dstadr = o
+			return assy.Arg_dst(pj, o)
+		if eax == 0x0200:
+			o = pj.m.bu32(self.hi)
+			self.hi += 4
+			self.dstadr = o
+			return assy.Arg_dst(pj, o)
+		if eax == 0x0400:
+			o = self.hi + pj.m.bs16(self.hi)
+			self.hi += 2
+			self.dstadr = o
+			return assy.Arg_dst(pj, o)
+		if eax == 0x0800:
+			return self.assy_eaxt(pj, "PC")
+		if eax == 0x1000 and self.sz == 1:
+			self.hi += 2
+			return assy.Arg_verbatim(pj, "#0x%02x" % pj.m.rd(self.hi-1))
+		if eax == 0x1000 and self.sz == 2:
+			self.hi += 2
+			return assy.Arg_verbatim(pj, "#0x%04x" % pj.m.bu16(self.hi-2))
+		if eax == 0x1000 and self.sz == 4:
+			self.hi += 4
+			return assy.Arg_verbatim(pj, "#0x%08x" % pj.m.bu32(self.hi-4))
+		print("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
+		raise assy.Invalid("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
+
+	def assy_ea(self, pj):
+		return self.assy_eax(pj, self['eam'], self['ear'])
+
+	def assy_ead(self, pj):
+		return self.assy_eax(pj, self['eamx'], self['earx'])
+
+	def assy_L(self, pj):
+		self.sz = 4
+		self.mne += ".L"
+
+	def assy_rlist(self, pj):
+		v = self['rlist']
+		l = []
+		if self['eam'] == 4:
+			for r in ("A", "D"):
+				for n in range(7, -1, -1):
+					if v & 0x0001:
+						l.append(r + "%d" % n)
+					v >>= 1
+		else:
+			for r in ("D", "A"):
+				for n in range(0, 8):
+					if v & 0x0001:
+						l.append(r + "%d" % n)
+					v >>= 1
+		return "+".join(l)
+
+	def assy_rot(self, pj):
+		a = self['rot']
+		if a == 0:
+			a = 8
+		return assy.Arg_verbatim(pj, "#0x%x" % a)
+
+	def assy_vect(self, pj):
+		return assy.Arg_verbatim(pj, "#%d" % self['vect'])
+
+	def assy_W(self, pj):
+		self.sz = 2
+		self.mne += ".W"
+
+	def assy_word(self, pj):
+		return assy.Arg_verbatim(pj, "#0x%04x" % self['word'])
+
+	def assy_Z(self, pj):
+		if self['sz'] == 3:
+			raise assy.Invalid('0x%x F_sz == 3' % self.lo)
+		i, j = [
+			[1, ".B"],
+			[2, ".W"],
+			[4, ".L"],
+		] [self['sz']]
+		self.sz = i
+		self.mne += j
 
 
 
@@ -523,38 +522,12 @@ class m68000(assy.Instree_disass):
 		    mem_word=8,
 		    endian=">")
 		self.it.load_string(m68000_instructions)
+		self.myleaf = M68Kassy
 
 		self.args.update( {
-			'An':		arg_an,
-			'-(Ax)':	arg_ax_dec,
-			'(Ax)+':	arg_ax_inc,
-			'Ax':		arg_ax,
-			'-(Ay)':	arg_ay_dec,
-			'(Ay)+':	arg_ay_inc,
-			'Ay':		arg_ay,
-			'B':		arg_B,
-			'bn':		arg_bn,
-			'cc':		arg_cc,
 			'CCR':		'CCR',
-			'const':	arg_const,
-			'data':		arg_data,
-			'data8':	arg_data8,
-			'disp16':	arg_disp16,
-			'Dn':		arg_dn,
-			'#dst':		arg_dst,
-			'Dx':		arg_dx,
-			'Dy':		arg_dy,
-			'ea':		arg_ea,
-			'ead':		arg_ead,
-			'L':		arg_L,
-			'rlist':	arg_rlist,
-			'rot':		arg_rot,
 			'SR':		'SR',
 			'USP':		'USP',
-			'#vect':	arg_vect,
-			'W':		arg_W,
-			'word':		arg_word,
-			'Z':		arg_Z,
 		})
 
 	def set_adr_mask(self, a):
