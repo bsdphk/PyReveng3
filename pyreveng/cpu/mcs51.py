@@ -39,30 +39,30 @@ ACALL	a11,>C		| ahi |1 0 0 0 1| alo		|
 
 ADD	A,Rn		|0 0 1 0 1| rn  |
 ADD	A,adir		|0 0 1 0 0 1 0 1| adir		|
-ADD	A,@Ri		|0 0 1 0 0 1 1|i|
-ADD	A,#data		|0 0 1 0 0 1 0 0| data		|
+ADD	A,iri		|0 0 1 0 0 1 1|i|
+ADD	A,data		|0 0 1 0 0 1 0 0| data		|
 
 ADC	A,Rn		|0 0 1 1 1| rn  |
 ADC	A,adir		|0 0 1 1 0 1 0 1| adir		|
-ADC	A,@Ri		|0 0 1 1 0 1 1|i|
+ADC	A,iri		|0 0 1 1 0 1 1|i|
 ADC	A,imm		|0 0 1 1 0 1 0 0| imm		|
 
 AJMP	a11,>J		| ahi |0 0 0 0 1| alo		|
 
 ANL	A,Rn		|0 1 0 1 1| rn  |
 ANL	A,adir		|0 1 0 1 0 1 0 1| adir		|
-ANL	A,@Ri		|0 1 0 1 0 1 1|i|
-ANL	A,#data		|0 1 0 1 0 1 0 0| data		|
+ANL	A,iri		|0 1 0 1 0 1 1|i|
+ANL	A,data		|0 1 0 1 0 1 0 0| data		|
 
 ANL	adir,A		|0 1 0 1 0 0 1 0| adir		|
-ANL	adir,#data	|0 1 0 1 0 0 1 1| adir		| data		|
+ANL	adir,data	|0 1 0 1 0 0 1 1| adir		| data		|
 ANL	C,abit		|1 0 0 0 0 0 1 0| abit		|
-ANL	C,/abit		|1 0 1 1 0 0 0 0| abit		|
+ANL	C,nabit		|1 0 1 1 0 0 0 0| abit		|
 
 CJNE	A,adir,arel,>JC	|1 0 1 1 0 1 0 1| adir		| arel		|
-CJNE	A,#data,arel,>JC	|1 0 1 1 0 1 0 0| data		| arel		|
-CJNE	Rn,#data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
-CJNE	@Ri,#data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
+CJNE	A,data,arel,>JC	|1 0 1 1 0 1 0 0| data		| arel		|
+CJNE	Rn,data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
+CJNE	iri,data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
 
 CLR	A		|1 1 1 0 0 1 0 0|
 CLR	C		|1 1 0 0 0 0 1 1|
@@ -77,7 +77,7 @@ DA	A		|1 1 0 1 0 1 0 0|
 DEC	A		|0 0 0 1 0 1 0 0|
 DEC	Rn		|0 0 0 1 1| rn  |
 DEC	adir		|0 0 0 1 0 1 0 1| adir		|
-DEC	@Ri		|0 0 0 1 0 1 1|i|
+DEC	iri		|0 0 0 1 0 1 1|i|
 
 DIV	AB		|1 0 0 0 0 1 0 0|
 
@@ -87,7 +87,7 @@ DJNZ	adir,arel	|1 1 0 1 0 1 0 1| adir		| arel		|
 INC	A		|0 0 0 0 0 1 0 0|
 INC	Rn		|0 0 0 0 1| rn	|
 INC	adir		|0 0 0 0 0 1 0 1| adir		|
-INC	@Ri		|0 0 0 0 0 1 1|i|
+INC	iri		|0 0 0 0 0 1 1|i|
 INC	DPTR		|1 0 1 0 0 0 1 1|
 
 JB	abit,arel,>JC	|0 0 1 0 0 0 0 0| abit		| arel		|
@@ -111,31 +111,31 @@ LJMP	a16,>J		|0 0 0 0 0 0 1 0| ahi		| alo		|
 
 MOV	A,Rn		|1 1 1 0 1| rn	|
 MOV	A,adir		|1 1 1 0 0 1 0 1| adir		|
-MOV	A,@Ri		|1 1 1 0 0 1 1|i|
-MOV	A,#data		|0 1 1 1 0 1 0 0| data		|
+MOV	A,iri		|1 1 1 0 0 1 1|i|
+MOV	A,data		|0 1 1 1 0 1 0 0| data		|
 MOV	Rn,A		|1 1 1 1 1| rn	|
 MOV	Rn,adir		|1 0 1 0 1| rn	| adir		|
-MOV	Rn,#data	|0 1 1 1 1| rn	| data		|
+MOV	Rn,data	|0 1 1 1 1| rn	| data		|
 MOV	adir,A		|1 1 1 1 0 1 0 1| adir		|
 MOV	adir,Rn		|1 0 0 0 1| rn	| adir		|
 MOV	adir2,adir	|1 0 0 0 0 1 0 1| adir		| adir2		|
-MOV	adir,@Ri	|1 0 0 0 0 1 1|i| adir		|
-MOV	adir,#data	|0 1 1 1 0 1 0 1| adir		| data		|
-MOV	@Ri,A		|1 1 1 1 0 1 1|i|
-MOV	@Ri,adir	|1 0 1 0 0 1 1|i| adir		|
-MOV	@Ri,#data	|0 1 1 1 0 1 1|i| data		|
+MOV	adir,iri	|1 0 0 0 0 1 1|i| adir		|
+MOV	adir,data	|0 1 1 1 0 1 0 1| adir		| data		|
+MOV	iri,A		|1 1 1 1 0 1 1|i|
+MOV	iri,adir	|1 0 1 0 0 1 1|i| adir		|
+MOV	iri,data	|0 1 1 1 0 1 1|i| data		|
 
 MOV	C,abit		|1 0 1 0 0 0 1 0| abit		|
 MOV	abit,C		|1 0 0 1 0 0 1 0| abit		|
 
-MOV	DPTR,#data16	|1 0 0 1 0 0 0 0| dhi		| dlo		|
+MOV	DPTR,data16	|1 0 0 1 0 0 0 0| dhi		| dlo		|
 
 MOVC	A,@A+DPTR	|1 0 0 1 0 0 1 1|
 MOVC	A,@A+PC		|1 0 0 0 0 0 1 1|
 
-MOVX	A,@Ri		|1 1 1 0 0 0 1|i|
+MOVX	A,iri		|1 1 1 0 0 0 1|i|
 MOVX	A,@DPTR		|1 1 1 0 0 0 0 0|
-MOVX	@Ri,A		|1 1 1 1 0 0 1|i|
+MOVX	iri,A		|1 1 1 1 0 0 1|i|
 MOVX	@DPTR,A		|1 1 1 1 0 0 0 0|
 
 MUL	AB		|1 0 1 0 0 1 0 0|
@@ -144,10 +144,10 @@ NOP	-		|0 0 0 0 0 0 0 0|
 
 ORL	A,Rn		|0 1 0 0 1| rn	|
 ORL	A,adir		|0 1 0 0 0 1 0 1| adir		|
-ORL	A,@Ri		|0 1 0 0 0 1 1|i|
-ORL	A,#data		|0 1 0 0 0 1 0 0| data		|
+ORL	A,iri		|0 1 0 0 0 1 1|i|
+ORL	A,data		|0 1 0 0 0 1 0 0| data		|
 ORL	adir,A		|0 1 0 0 0 0 1 0| adir		|
-ORL	adir,#data	|0 1 0 0 0 0 1 1| adir		| data		|
+ORL	adir,data	|0 1 0 0 0 0 1 1| adir		| data		|
 ORL	C,bit		|0 1 1 1 0 0 1 0| bit		|
 ORL	C,/bit		|1 0 1 0 0 0 0 0| bit		|
 
@@ -170,121 +170,98 @@ SJMP	arel,>J		|1 0 0 0 0 0 0 0| arel		|
 
 SUBB	A,Rn		|1 0 0 1 1| rn  |
 SUBB	A,adir		|1 0 0 1 0 1 0 1| adir		|
-SUBB	A,@Ri		|1 0 0 1 0 1 1|i|
-SUBB	A,#data		|1 0 0 1 0 1 0 0| data		|
+SUBB	A,iri		|1 0 0 1 0 1 1|i|
+SUBB	A,data		|1 0 0 1 0 1 0 0| data		|
 
 SWAP	A		|1 1 0 0 0 1 0 0|
 XCH	A,Rn		|1 1 0 0 1| rn  |
 XCH	A,adir		|1 1 0 0 0 1 0 1| adir		|
-XCH	A,@Ri		|1 1 0 0 0 1 1|i|
-XCHD	A,@Ri		|1 1 0 1 0 1 1|i|
+XCH	A,iri		|1 1 0 0 0 1 1|i|
+XCHD	A,iri		|1 1 0 1 0 1 1|i|
 
 XRL	A,Rn		|0 1 1 0 1| rn	|
 XRL	A,adir		|0 1 1 0 0 1 0 1| adir		|
-XRL	A,@Ri		|0 1 1 0 0 1 1|i|
-XRL	A,#data		|0 1 1 0 0 1 0 0| data		|
+XRL	A,iri		|0 1 1 0 0 1 1|i|
+XRL	A,data		|0 1 1 0 0 1 0 0| data		|
 XRL	adir,A		|0 1 1 0 0 0 1 0| adir		|
-XRL	adir,#data	|0 1 1 0 0 0 1 1| adir		| data		|
+XRL	adir,data	|0 1 1 0 0 0 1 1| adir		| data		|
 
 """
 
+class mcs51assy(assy.Instree_assy):
+	pass
 
-class arg_adir(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		ins.dstadr = ins['adir']
-		self.dstadr = ins.dstadr
-		super(arg_adir, self).__init__(pj, ins.dstadr)
-
-	def render(self, pj):
-		s = self.ins.lang.sfr.get(self.dstadr)
+	def assy_adir(self, pj):
+		self.dstadr = self['adir']
+		s = self.lang.sfr.get(self.dstadr)
 		if s != None:
-			return s[0]
-		return super(arg_adir, self).render(pj)
+			return assy.Arg_verbatim(pj, s[0])
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_adir2(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		ins.dstadr = ins['adir2']
-		self.dstadr = ins.dstadr
-		super(arg_adir2, self).__init__(pj, ins.dstadr)
-
-	def render(self, pj):
-		s = self.ins.lang.sfr.get(self.dstadr)
+	def assy_adir2(self, pj):
+		self.dstadr = self['adir2']
+		s = self.lang.sfr.get(self.dstadr)
 		if s != None:
-			return s
-		return super(arg_adir2, self).render(pj)
+			return assy.Arg_verbatim(pj, s[0])
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_a11(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		a = (ins['ahi'] << 8) | ins['alo']
-		ins.dstadr = (ins.hi & 0xf800) + a
-		super(arg_a11, self).__init__(pj, ins.dstadr)
+	def assy_a11(self, pj):
+		a = (self['ahi'] << 8) | self['alo']
+		self.dstadr = (self.hi & 0xf800) + a
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_a16(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		ins.dstadr = (ins['ahi'] << 8) | ins['alo']
-		ins.dstadr &= ins.lang.amask
-		super(arg_a16, self).__init__(pj, ins.dstadr)
+	def assy_a16(self, pj):
+		self.dstadr = (self['ahi'] << 8) | self['alo']
+		self.dstadr &= self.lang.amask
+		return assy.Arg_dst(pj, self.dstadr)
 
-class arg_arel(assy.Arg_dst):
-	def __init__(self, pj, ins):
-		a = ins['arel']
+	def assy_arel(self, pj):
+		a = self['arel']
 		if a & 0x80:
 			a -= 256
-		ins.dstadr = ins.hi + a
-		super(arg_arel, self).__init__(pj, ins.dstadr)
+		self.dstadr = self.hi + a
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_iri(pj, ins):
-	return "@R%d" % ins['i']
+	def assy_iri(self, pj):
+		return "@R%d" % self['i']
 
-def arg_rn(pj, ins):
-	return "R%d" % ins['rn']
+	def assy_Rn(self, pj):
+		return "R%d" % self['rn']
 
-def arg_data(pj, ins):
-	return "#0x%02x" % ins['data']
+	def assy_data(self, pj):
+		return "#0x%02x" % self['data']
 
-def arg_data16(pj, ins):
-	v = (ins['dhi'] << 8) | ins['dlo']
-	return "#0x%04x" % v
+	def assy_data16(self, pj):
+		v = (self['dhi'] << 8) | self['dlo']
+		return "#0x%04x" % v
 
-def arg_abit(pj, ins):
-	b = ins['abit']
-	if b < 0x80:
-		return "0x%02x.%d" % (0x20 + (b >> 3), b & 7)
-	r = ins.lang.sfr.get(b & 0xf8)
-	if r != None:
-		b &= 7
-		if len(r) > (b + 1):
-			return "%s.%s" % (r[0], r[b + 1])
-		else:
-			return "%s.%d" % (r[0], b)
-	return "b#%0x2x" % b
+	def assy_abit(self, pj):
+		b = self['abit']
+		if b < 0x80:
+			return "0x%02x.%d" % (0x20 + (b >> 3), b & 7)
+		r = self.lang.sfr.get(b & 0xf8)
+		if r != None:
+			b &= 7
+			if len(r) > (b + 1):
+				return "%s.%s" % (r[0], r[b + 1])
+			else:
+				return "%s.%d" % (r[0], b)
+		return "b#%0x2x" % b
 
-def arg_anbit(pj, ins):
-	return "/" + arg_abit(pj, ins)
+	def assy_nabit(self, pj):
+		return "/" + self.assy_abit(pj)
 
 class mcs51(assy.Instree_disass):
 	def __init__(self, lang="mcs51"):
 		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)
+		self.myleaf = mcs51assy
 		self.args.update( {
-			"arel":		arg_arel,
-			"a11":		arg_a11,
-			"a16":		arg_a16,
-			"abit":		arg_abit,
-			"/abit":	arg_anbit,
-			"adir":		arg_adir,
-			"adir2":	arg_adir2,
 			"A":		"A",
 			"C":		"C",
 			"DPTR":		"DPTR",
 			"@A+DPTR":	"@A+DPTR",
 			"@A+PC":	"@A+PC",
-			"@Ri":		arg_iri,
-			"Rn":		arg_rn,
-			"#data":	arg_data,
-			"#data16":	arg_data16,
 		})
 		self.amask = 0xffff
 		self.sfr = {

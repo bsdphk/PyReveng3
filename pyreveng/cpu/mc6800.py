@@ -237,7 +237,9 @@ STX	e	|FF	| e1		| e2		|
 """
 
 class mc6800assy(assy.Instree_assy):
-	pass
+	def __init__(self, pj, lim, lang):
+		self.idx = "X"
+		super(mc6800assy, self).__init__(pj, lim, lang)
 
 	def assy_d(self, pj):
 		self.dstadr = self['d']
@@ -273,9 +275,6 @@ class mc6800(assy.Instree_disass):
 		self.it.load_string(mc6800_instructions)
 		self.mask = mask
 		self.myleaf = mc6800assy
-
-	def init_code(self, pj, ins):
-		ins.idx = "X"
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
