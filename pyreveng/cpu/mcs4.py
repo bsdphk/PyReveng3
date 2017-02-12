@@ -81,58 +81,16 @@ KBP	-		|1 1 1 1|1 1 0 0|
 DCL	-		|1 1 1 1|1 1 0 1|
 """
 
-def arg_data(pj, ins):
-	return assy.Arg_imm(pj, ins['data'], 8)
+class mcs4assy(assy.Instree_assy):
+	pass
 
-def arg_d(pj, ins):
-	return assy.Arg_imm(pj, ins['d'], 4)
+	def assy_data(self, pj):
+		return assy.Arg_imm(pj, self['data'], 8)
 
-class arg_cc(assy.Arg):
-	def __init__(self, pj, ins):
-		self.ins = ins
-		self.cc = ins['cc']
-		ins.cc = self.render(pj)
-		super(arg_cc, self).__init__(pj)
+	def assy_d(self, pj):
+		return assy.Arg_imm(pj, self['d'], 4)
 
-	def render(self, pj):
-		x = self.ins.lang.cc.get(self.cc)
-		if x is None:
-			return "CC#0x%x" % self.cc
-		else:
-			return x
-
-def arg_r(pj, ins):
-	return "r%d" % ins['r']
-
-def arg_rr(pj, ins):
-	return "rr%d" % (ins['rr'] << 1)
-
-def arg_adr(pj, ins):
-	ins.dstadr = (ins.lo & ~0xff) | ins['adr']
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_ladr(pj, ins):
-	ins.dstadr = (ins['ahi'] << 8) | ins['alo']
-	return assy.Arg_dst(pj, ins.dstadr)
-
-def arg_isz(pj, ins):
-	ins.cc = "Z"
-
-class mcs4(assy.Instree_disass):
-	def __init__(self):
-		super(mcs4, self).__init__("mcs4", 8)
-		self.it.load_string(mcs4_instructions)
-		self.args.update( {
-			"data":	arg_data,
-			"d":	arg_d,
-			"r":	arg_r,
-			"rr":	arg_rr,
-			"adr":	arg_adr,
-			"ladr":	arg_ladr,
-			"isz":	arg_isz,
-			"cc":	arg_cc,
-			"(rr0)": "(rr0)",
-		})
+	def assy_cc(self, pj):
 		self.cc = {
 			0x1: "JNT",
 			0x2: "JC",
@@ -140,4 +98,33 @@ class mcs4(assy.Instree_disass):
 			0x9: "JT",
 			0xa: "JNC",
 			0xc: "JNZ",
-		}
+		}.get(self['cc'])
+		if self.cc is None:
+			self.cc = "CC#0x%x" % self['cc']
+		return assy.Arg_verbatim(pj, self.cc)
+
+	def assy_r(self, pj):
+		return "r%d" % self['r']
+
+	def assy_rr(self, pj):
+		return "rr%d" % (self['rr'] << 1)
+
+	def assy_adr(self, pj):
+		self.dstadr = (self.lo & ~0xff) | self['adr']
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_ladr(self, pj):
+		self.dstadr = (self['ahi'] << 8) | self['alo']
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_isz(self, pj):
+		self.cc = "Z"
+
+class mcs4(assy.Instree_disass):
+	def __init__(self):
+		super(mcs4, self).__init__("mcs4", 8)
+		self.it.load_string(mcs4_instructions)
+		self.args.update( {
+			"(rr0)": "(rr0)",
+		})
+		self.myleaf = mcs4assy

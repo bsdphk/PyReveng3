@@ -264,7 +264,7 @@ class mc6800assy(assy.Instree_assy):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_x(self, pj):
-		return assy.Arg_verbatim(pj, 
+		return assy.Arg_verbatim(pj,
 		    "0x%02x+" % self['x'] + self.idx)
 
 class mc6800(assy.Instree_disass):
