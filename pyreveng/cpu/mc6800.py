@@ -236,52 +236,43 @@ LDX	e	|FE	| e1		| e2		|
 STX	e	|FF	| e1		| e2		|
 """
 
-def arg_d(pj, ins):
-	ins.dstadr = ins['d']
-	return assy.Arg_dst(pj, ins.dstadr)
+class mc6800assy(assy.Instree_assy):
+	pass
 
-def arg_e(pj, ins):
-	ins.dstadr = (ins['e1'] << 8) | ins['e2']
-	return assy.Arg_dst(pj, ins.dstadr)
+	def assy_d(self, pj):
+		self.dstadr = self['d']
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_i(pj, ins):
-	return assy.Arg_imm(pj, ins['i'], 8)
+	def assy_e(self, pj):
+		self.dstadr = (self['e1'] << 8) | self['e2']
+		return assy.Arg_dst(pj, self.dstadr)
 
-def arg_I(pj, ins):
-	ins.dstadr = (ins['I1'] << 8) | ins['I2']
-	return assy.Arg_dst(pj, ins.dstadr, "#")
+	def assy_i(self, pj):
+		return assy.Arg_imm(pj, self['i'], 8)
 
-def arg_r(pj, ins):
-	a = ins['r']
-	if a & 0x80:
-		a -= 256
-	ins.dstadr = ins.hi + a
-	if ins.mne != "BRA":
-		ins.cc = ins.mne[1:]
-	return assy.Arg_dst(pj, ins.dstadr)
+	def assy_I(self, pj):
+		self.dstadr = (self['I1'] << 8) | self['I2']
+		return assy.Arg_dst(pj, self.dstadr, "#")
 
-class arg_x(assy.Arg):
-	def __init__(self, pj, ins):
-		super(arg_x, self).__init__(pj)
-		self.val = ins['x']
-		self.ins = ins
+	def assy_r(self, pj):
+		a = self['r']
+		if a & 0x80:
+			a -= 256
+		self.dstadr = self.hi + a
+		if self.mne != "BRA":
+			self.cc = self.mne[1:]
+		return assy.Arg_dst(pj, self.dstadr)
 
-	def __str__(self):
-		return "0x%02x+" % self.val + self.ins.idx
+	def assy_x(self, pj):
+		return assy.Arg_verbatim(pj, 
+		    "0x%02x+" % self['x'] + self.idx)
 
 class mc6800(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super(mc6800, self).__init__("mc6800", 8)
 		self.it.load_string(mc6800_instructions)
-		self.args.update({
-			"d":	arg_d,
-			"e":	arg_e,
-			"i":	arg_i,
-			"I":	arg_I,
-			"r":	arg_r,
-			"x":	arg_x,
-		})
 		self.mask = mask
+		self.myleaf = mc6800assy
 
 	def init_code(self, pj, ins):
 		ins.idx = "X"
@@ -359,29 +350,22 @@ STD	e		|FD	| e1		| e2		|
 
 """
 
-class arg_y(assy.Arg):
-	def __init__(self, pj, ins):
-		super(arg_y, self).__init__(pj)
-		self.val = ins['y']
+class mc68hc11assy(mc6800assy):
+	pass
 
-	def __str__(self):
-		return "0x%02x+Y" % self.val
+	def assy_y(self, pj):
+		return assy.Arg_verbatim(pj, "0x%02x+Y" % self['y'])
 
-def arg_Y(pj, ins):
-	if ins.mne[-1] == "X":
-		ins.mne = ins.mne[:-1] + "Y"
-	ins.idx = "Y"
+	def assy_Y(self, pj):
+		if self.mne[-1] == "X":
+			self.mne = self.mne[:-1] + "Y"
+		self.idx = "Y"
 
 class mc68hc11(mc6800):
 	def __init__(self, mask=0xffff):
 		super(mc68hc11, self).__init__(mask=mask)
 		self.it.load_string(mc68hc11_instructions)
-		self.args.update(
-			{
-			"y":	arg_y,
-			"Y":	arg_Y,
-			}
-		)
+		self.myleaf = mc68hc11assy
 
 	def register_labels(self, pj):
 		pj.set_label(0x1000, "PORTA")
