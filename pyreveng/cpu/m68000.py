@@ -58,10 +58,30 @@ ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
 ADDX		Z,decAy,decAx	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
-AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| ea	|
-AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| ea	|
+AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| ea	| {
+	DN = and SZ DN , EA
+	%CCR.n = icmp slt SZ DN , 0
+	%CCR.z = icmp eq SZ DN , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
+AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| ea	| {
+	%0 = and SZ EA , DN
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 122/4-18
-ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| ea	|
+ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| ea	| {
+	%0 = and SZ EA , DATA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 124/4-20
 ANDI		B,const,CCR	0000	|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const		|
 # 125/4-21
@@ -81,31 +101,56 @@ BCHG		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
 # 134/4-30
 BCLR		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 0| ea	|
 BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
-BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| ea	|0 0 0 0|0 0 0 0| bn		|
-BCLR		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
+BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| ea	|0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ EA , BN
+	%CCR.z = icmp eq SZ %0 , 0
+	%1 = and SZ EA , IBN
+	LEAS %1
+}
+BCLR		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ DN , BN
+	%CCR.z = icmp eq SZ %0 , 0
+	DN = and SZ DN , IBN
+}
 # 159/4-55
 BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
 # 160/4-56
 BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| ea	|
 BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
-BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| ea	|0 0 0 0|0 0 0 0| bn		|
+BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| ea	|0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ EA , BN
+	%CCR.z = icmp eq SZ %0 , 0
+	%1 = or SZ EA , BN
+	LEAS %1
+}
 BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
-	%0 = and i32 DN , BN
-	%CCR.z = icmp eq i32 %0 , 0
-	DN = or i32 DN , BN
+	%0 = and SZ DN , BN
+	%CCR.z = icmp eq SZ %0 , 0
+	DN = or SZ DN , BN
 }
 # 163/4-59
 BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
 # 165/4-61
 BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| ea	|
 BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
-BTST		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 0| ea	|0 0 0 0|0 0 0 0| bn		|
-BTST		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
+BTST		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 0| ea	|0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ EA , BN
+	%CCR.z = icmp eq SZ %0 , 0
+}
+BTST		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ DN , BN
+	%CCR.z = icmp eq SZ %0 , 0
+}
 # 173/4-69
 cHK		W,ea,Dn		1f7d	|0 1 0 0| Dn  |1 1|0| ea	|
 CHK		L,ea,Dn		1f7d	|0 1 0 0| Dn  |1 0|0| ea	|
 # 177/4-73
-CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| ea	|
+CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| ea	| {
+	LEAS 0
+	%CCR.z = i1 1
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
 # 179/4-75
 CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| ea	|
 # 181/4-77
@@ -122,9 +167,23 @@ DIVS		W,ea,Dn		1f7d	|1 0 0 0| Dn  |1 1 1| ea	|
 # 201/4-97
 DIVU		W,ea,Dn		1f7d	|1 0 0 0| Dn  |0 1 1| ea	|
 # 204/4-100
-EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| ea	|
+EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| ea	| {
+	%0 = xor SZ EA , DN
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 206/4-102
-EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| ea	|
+EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| ea	| {
+	%0 = xor SZ EA , DATA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 208/4-104
 eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
@@ -153,48 +212,45 @@ LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  |
 lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	|
 LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| ea	|
 # 220/4-116 NB! Not the usual BWL encoding
-MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | ea	| {
-	%0 = i8 EA
-	EAD %0
-	%CCR.z = icmp eq i8 %0 , 0
-	%CCR.n = icmp slt i8 %0 , 0
+MOVE		B,ea,ead	1f7f	|0 0|0 1| ead       | ea	| {
+	LEAD EA
+	%CCR.z = icmp eq i8 EA , 0
+	%CCR.n = icmp slt i8 EA , 0
 	%CCR.v = i1 0
 	%CCR.c = i1 0
 }
-MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | ea	| {
-	%0 = i32 EA
-	EAD %0
-	%CCR.z = icmp eq i32 %0 , 0
-	%CCR.n = icmp slt i32 %0 , 0
+MOVE		L,ea,ead	1f7f	|0 0|1 0| ead       | ea	| {
+	LEAD EA
+	%CCR.z = icmp eq i32 EA , 0
+	%CCR.n = icmp slt i32 EA , 0
 	%CCR.v = i1 0
 	%CCR.c = i1 0
 }
-MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | ea	| {
-	%0 = i16 EA
-	EAD %0
-	%CCR.z = icmp eq i16 %0 , 0
-	%CCR.n = icmp slt i16 %0 , 0
+MOVE		W,ea,ead	1f7f	|0 0|1 1| ead       | ea	| {
+	LEAD EA
+	%CCR.z = icmp eq i16 EA , 0
+	%CCR.n = icmp slt i16 EA , 0
 	%CCR.v = i1 0
 	%CCR.c = i1 0
 }
 # 223/4-119
 MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| ea	| {
-	AN EA
+	AN = SZ EA
 }
 MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| ea	| {
-	AN EA
+	AN = SZ EA
 }
 # 225/4-121
-MOVE		W,CCR,ead	037d	|0 1 0 0|0 0 1|0 1 1| eamx| earx| {
-	EAD %CCR
+MOVE		W,CCR,ea	037d	|0 1 0 0|0 0 1|0 1 1| ea	| {
+	LEAS %CCR
 }
 # 227/4-123
 MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| ea	| {
 	%CCR = i16 EA
 }
 # 229/4-125
-MOVE		W,SR,ead	037d	|0 1 0 0|0 0 0|0 1 1| eamx| earx| {
-	EAD %SR
+MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| ea	| {
+	LEAS %SR
 }
 # 232/4-128
 MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| ea	| rlist				|
@@ -223,12 +279,39 @@ NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1| {
 	%0 = i32 0
 }
 # 252/4-148
-NOT		Z,ead		037d	|0 1 0 0|0 1 1|0| sz| eamx| earx|
+NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| ea	| {
+	%0 = xor SZ EA , -1
+	LEAS %0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
 # 254/4-150
-OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| ea	|
-OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| ea	|
+OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| ea	| {
+	DN = or SZ DN , EA
+	%CCR.n = icmp slt SZ DN , 0
+	%CCR.z = icmp eq SZ DN , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
+OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| ea	| {
+	%0 = or SZ EA , DN
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 257/4-153
-ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| ea	|
+ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| ea	| {
+	%0 = or SZ EA , DATA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+	LEAS %0
+}
 # 259/4-155
 ORI		word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		|
 # 263/4-159
@@ -325,6 +408,7 @@ class m68000_ins(assy.Instree_ins):
 		super(m68000_ins, self).__init__(pj, lim, lang)
 		self.ea = {}
 		self.isz = "i32"
+		self.icache = {}
 
 	def assy_An(self, pj):
 		return "A%d" % self['An']
@@ -350,6 +434,7 @@ class m68000_ins(assy.Instree_ins):
 	def assy_B(self, pj):
 		self.sz = 1
 		self.isz = "i8"
+		self.imsk = 0xff
 		self.mne += ".B"
 
 	def assy_bn(self, pj):
@@ -492,14 +577,7 @@ class m68000_ins(assy.Instree_ins):
 		if sc > 1:
 			s += "*%d" % sc
 		s += ")"
-		if id == "s":
-			il += [ll[0], ll[1:]]
-		elif id == "d":
-			ll.append(
-				["store", self.isz, "%0", ",",
-				    iltyp, ll[0]]
-			)
-			il += [None, ll[1:]]
+		il += [ll[0], ll[1:]]
 		return s
 
 
@@ -515,79 +593,46 @@ class m68000_ins(assy.Instree_ins):
 			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
 			    self.lo, eam, ear))
 		if eax == 0x0001:
-			il.append("%%D%d" % ear)
+			il += ["%%D%d" % ear]
 			return "D%d" % ear
 		if eax == 0x0002:
-			il.append("%%A%d" % ear)
+			il += ["%%A%d" % ear]
 			return "A%d" % ear
 		if eax == 0x0004:
-			if id == "s":
-				il += [ "%0", [
-				    ["%0", "=", "load", self.isz, ",",
-					self.isz + "*", "%%A%d" % ear],
-				]]
-			if id == "d":
-				il += [ None, [
-				    ["store", self.isz, "%0", ",",
-					self.isz + "*", "%%A%d" % ear],
-				]]
+			il += [ "%%A%d" % ear, []]
 			return "(A%d)" % ear
 		if eax == 0x0008:
 			r = "A%d" % ear
-			if id == "s":
-				il += [ "%0", [
-				    ["%0", "=", "load", self.isz, ",",
-					self.isz + "*", "%%A%d" % ear],
-				    ["%" + r, "=", "add", "i32",
-					"%" + r, ",", "%d" % self.sz],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    ["store", self.isz, "%0", ",",
-					self.isz + "*", "%%A%d" % ear],
-				    ["%" + r, "=", "add", "i32",
-					"%" + r, ",", "%d" % self.sz],
-				]]
+			il += [ "%0", [
+			    ["%0", "=", self.isz, "%" + r],
+			    ["%" + r, "=", "add", "i32",
+				"%" + r, ",", "%d" % self.sz],
+			]]
 			return "(A%d)+" % ear
 		if eax == 0x0010:
 			'''Address Register Indirect with Predecrement'''
 			r = "A%d" % ear
-			if id == "s":
-				il += [ "%0", [
-				    ["%" + r, "=", "sub", "i32",
-					"%" + r, ",", "%d" % self.sz],
-				    ["%0", "=", "load", self.isz, ",",
-					self.isz + "*", "%" +r],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    ["%" + r, "=", "sub", "i32",
-					"%" + r, ",", "%d" % self.sz],
-				    ["store", self.isz, "%0", ",",
-					self.isz + "*", "%" +r],
-				]]
+			il += [ "%0", [
+			    ["%" + r, "=", "sub", "i32",
+				"%" + r, ",", "%d" % self.sz],
+			    ["%0", "=", "i32", "%" + r],
+			]]
 			return "-(%s)" % r
 		if eax == 0x0020:
 			'''Address Register Indirect with Displacement'''
 			o = pj.m.bs16(self.hi)
 			self.hi += 2
-			if id == "s":
-				il += [ "%0", [
-				    ["%1", "=", "add", self.isz + "*",
-					"%%A%d" % ear, ",", "0x%x" % o],
-				    ["%0", "=", "load", self.isz, ",",
-					self.isz + "*", "%1"],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    ["%1", "=", "add", self.isz + "*",
-					"%%A%d" % ear, ",", "0x%x" % o],
-				    ["store", self.isz, "%0", ",",
-					self.isz + "*", "%1"],
-				]]
 			if o < 0:
+				il += [ "%0", [
+				    ["%0", "=", "sub", self.isz + "*",
+					"%%A%d" % ear, ",", "0x%x" % -o],
+				]]
 				return "(A%d-0x%x)" % (ear, -o)
 			else:
+				il += [ "%0", [
+				    ["%0", "=", "add", self.isz + "*",
+					"%%A%d" % ear, ",", "0x%x" % o],
+				]]
 				return "(A%d+0x%x)" % (ear, o)
 		if eax == 0x0040:
 			return self.assy_eaxt(pj, id, "A%d" % ear)
@@ -597,46 +642,19 @@ class m68000_ins(assy.Instree_ins):
 			if o & 0x8000:
 				o |= 0xffff0000
 			self.dstadr = o
-			if id == "s":
-				il += [ "%0", [
-				    [ "%0", "=", "load", self.isz, ",",
-					self.isz + "*", "0x%x" % o],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    [ "store", self.isz, "%0", ",",
-					self.isz + "*", "0x%x" % o],
-				]]
+			il += [ "0x%x" % o, [] ]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0200:
 			o = pj.m.bu32(self.hi)
 			self.hi += 4
 			self.dstadr = o
-			if id == "s":
-				il += [ "%0", [
-				    [ "%0", "=", "load", self.isz, ",",
-					self.isz + "*", "0x%x" % o],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    [ "store", self.isz, "%0", ",",
-					self.isz + "*", "0x%x" % o],
-				]]
+			il += [ "0x%x" % o, [] ]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0400:
 			o = self.hi + pj.m.bs16(self.hi)
 			self.hi += 2
 			self.dstadr = o
-			if id == "s":
-				il += [ "%0", [
-				    [ "%0", "=", "load", self.isz, ",",
-					self.isz + "*", "0x%x" % o],
-				]]
-			elif id == "d":
-				il += [ None, [
-				    [ "store", self.isz, "%0", ",",
-					self.isz + "*", "0x%x" % o],
-				]]
+			il += [ "0x%x" % o, [] ]
 			return assy.Arg_dst(pj, o)
 		if eax == 0x0800:
 			return self.assy_eaxt(pj, id, "PC")
@@ -664,11 +682,13 @@ class m68000_ins(assy.Instree_ins):
 		return self.assy_eax(pj, "s", j >> 3, j & 7)
 
 	def assy_ead(self, pj):
-		return self.assy_eax(pj, "d", self['eamx'], self['earx'])
+		j = self['ead']
+		return self.assy_eax(pj, "d", j & 7, j >> 3)
 
 	def assy_L(self, pj):
 		self.sz = 4
 		self.isz = "i32"
+		self.imsk = 0xffffffff
 		self.mne += ".L"
 
 	def assy_rlist(self, pj):
@@ -700,6 +720,7 @@ class m68000_ins(assy.Instree_ins):
 	def assy_W(self, pj):
 		self.sz = 2
 		self.isz = "i16"
+		self.imsk = 0xffff
 		self.mne += ".W"
 
 	def assy_word(self, pj):
@@ -708,54 +729,81 @@ class m68000_ins(assy.Instree_ins):
 	def assy_Z(self, pj):
 		if self['sz'] == 3:
 			raise assy.Invalid('0x%x F_sz == 3' % self.lo)
-		i, j = [
-			[1, ".B"],
-			[2, ".W"],
-			[4, ".L"],
+		i, j, m = [
+			[1, ".B", 0xff],
+			[2, ".W", 0xffff],
+			[4, ".L", 0xffffffff],
 		] [self['sz']]
 		self.sz = i
 		self.isz = "i%d" % (i*8)
+		self.imsk = m
 		self.mne += j
+
+	def ilmacro_AN(self):
+		return "%%A%d" % self['An']
 
 	def ilmacro_BN(self):
 		return "0x%x" % (1 << self['bn'])
+
+	def ilmacro_IBN(self):
+		return "0x%x" % (self.imsk ^ (1 << self['bn']))
+
+	def ilmacro_DATA(self):
+		return "0x%x" % self.v
 
 	def ilmacro_DN(self):
 		return "%%D%d" % self['Dn']
 
 	def ilmacro_EA(self):
 		il = self.ea["s"]
-		if len(il) > 1:
-			return self.add_il(il[1],il[0])
-		elif len(il) > 0:
+		if len(il) == 1:
 			return il[0]
-		return "XXX EA %d %d %s" % (self['eam'], self['ear'], str(il))
+		j = self.icache.get("EA")
+		if j is not None:
+			return j
+		if len(il[1]) > 0:
+			j = self.add_il(il[1], il[0])
+		else:
+			j = il[0]
+		self.icache["EAs"] = j
+		j = self.add_il([
+			[ "%0", "=", "load", self.isz, ",", self.isz + "*", j ],
+		], "%0")
+		self.icache["EA"] = j
+		return j
 
 	def ilmacro_SZ(self):
 		return self.isz
 
-	def ilfunc_AN(self, arg):
-		self.add_il([
-			[ "%%A%d" % self['An'], "=", self.isz, arg[0] ],
-		])
-
-	def ilfunc_EAD(self, arg):
-		il = self.ea["d"]
+	def isubr_LEA(self, arg, which):
+		il = self.ea[which]
 		if len(il) == 1:
 			self.add_il([
 			    [ il[0], "=", self.isz, arg[0]],
 			])
 			return
-		elif len(il) == 2 and il[0] is None:
-			ll = [
-			    [ "%0", "=", self.isz, arg[0]],
-			]
+		assert len(il) == 2
+		j = self.icache.get("EA" + which)
+		if j is None:
+			self.icache["EA" + which] = il[0]
+			ll = []
 			ll += il[1]
+			ll.append(
+			    [ "store", self.isz, arg[0], ",",
+				self.isz + "*", il[0]],
+			)
 			self.add_il(ll)
 		else:
-			e = "XXX EAD eam %d ear %d il %s arg %s" % (self['eamx'], self['earx'], str(il), str(arg))
-			self.add_il([[ e ]])
-			print(self, e)
+			self.add_il([
+			    [ "store", self.isz, arg[0], ",",
+				self.isz + "*", j],
+			])
+
+	def ilfunc_LEAD(self, arg):
+		self.isubr_LEA(arg, "d")
+
+	def ilfunc_LEAS(self, arg):
+		self.isubr_LEA(arg, "s")
 
 class m68000(assy.Instree_disass):
 	def __init__(self, lang="m68000"):
