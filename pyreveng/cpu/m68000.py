@@ -150,13 +150,28 @@ lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| eam | ear |
 LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| eam | ear |
 # 220/4-116 NB! Not the usual BWL encoding
 MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | eam | ear | {
-	EAD EA
+	%0 = i8 EA
+	EAD %0
+	%status.z = icmp eq i8 %0 , 0
+	%status.n = icmp slt i8 %0 , 0
+	%status.v = i1 0
+	%status.c = i1 0
 }
 MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | eam | ear | {
-	EAD EA
+	%0 = i32 EA
+	EAD %0
+	%status.z = icmp eq i32 %0 , 0
+	%status.n = icmp slt i32 %0 , 0
+	%status.v = i1 0
+	%status.c = i1 0
 }
 MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | eam | ear | {
-	EAD EA
+	%0 = i16 EA
+	EAD %0
+	%status.z = icmp eq i16 %0 , 0
+	%status.n = icmp slt i16 %0 , 0
+	%status.v = i1 0
+	%status.c = i1 0
 }
 # 223/4-119
 MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| eam | ear |
