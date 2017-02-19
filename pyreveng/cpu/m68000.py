@@ -89,7 +89,11 @@ BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
 BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| eam | ear |
 BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
 BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| eam | ear |0 0 0 0|0 0 0 0| bn		|
-BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
+BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
+	%0 = and i32 DN , BN
+	%CCR.z = icmp eq i32 %0 , 0
+	DN = or i32 DN , BN
+}
 # 163/4-59
 BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
 # 165/4-61
@@ -152,38 +156,46 @@ LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| eam | ear |
 MOVE		B,ea,ead	1f7f	|0 0|0 1|earx |eamx | eam | ear | {
 	%0 = i8 EA
 	EAD %0
-	%status.z = icmp eq i8 %0 , 0
-	%status.n = icmp slt i8 %0 , 0
-	%status.v = i1 0
-	%status.c = i1 0
+	%CCR.z = icmp eq i8 %0 , 0
+	%CCR.n = icmp slt i8 %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
 }
 MOVE		L,ea,ead	1f7f	|0 0|1 0|earx |eamx | eam | ear | {
 	%0 = i32 EA
 	EAD %0
-	%status.z = icmp eq i32 %0 , 0
-	%status.n = icmp slt i32 %0 , 0
-	%status.v = i1 0
-	%status.c = i1 0
+	%CCR.z = icmp eq i32 %0 , 0
+	%CCR.n = icmp slt i32 %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
 }
 MOVE		W,ea,ead	1f7f	|0 0|1 1|earx |eamx | eam | ear | {
 	%0 = i16 EA
 	EAD %0
-	%status.z = icmp eq i16 %0 , 0
-	%status.n = icmp slt i16 %0 , 0
-	%status.v = i1 0
-	%status.c = i1 0
+	%CCR.z = icmp eq i16 %0 , 0
+	%CCR.n = icmp slt i16 %0 , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
 }
 # 223/4-119
-MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| eam | ear |
-MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| eam | ear |
+MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| eam | ear | {
+	AN EA
+}
+MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| eam | ear | {
+	AN EA
+}
 # 225/4-121
-MOVE		W,CCR,ea	037d	|0 1 0 0|0 0 1|0 1 1| eam | ear |
+MOVE		W,CCR,ead	037d	|0 1 0 0|0 0 1|0 1 1| eamx| earx| {
+	EAD %CCR
+}
 # 227/4-123
 MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| eam | ear | {
 	%CCR = i16 EA
 }
 # 229/4-125
-MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| eam | ear |
+MOVE		W,SR,ead	037d	|0 1 0 0|0 0 0|0 1 1| eamx| earx| {
+	EAD %SR
+}
 # 232/4-128
 MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| eam | ear | rlist				|
 MOVEM		L,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| eam | ear | rlist				|
@@ -207,9 +219,11 @@ NEG		Z,ea		037d	|0 1 0 0|0 1 0|0| sz| eam | ear |
 # 249/4-146
 NEGX		Z,ea		037d	|0 1 0 0|0 0 0|0| sz| eam | ear |
 # 251/4-147
-NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1|
+NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1| {
+	%0 = i32 0
+}
 # 252/4-148
-NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| eam | ear |
+NOT		Z,ead		037d	|0 1 0 0|0 1 1|0| sz| eamx| earx|
 # 254/4-150
 OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| eam | ear |
 OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| eam | ear |
@@ -256,7 +270,15 @@ SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| eam | ear |
 SUBX		Z,Dx,Dy		0000	|1 0 0 1| Dy  |1| sz|0 0|0| Dx  |
 SUBX		Z,decAx,decAy	0000	|1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
 # 289/4-185
-SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  |
+SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  | {
+	%0 = lshr i32 DN , 16
+	%1 = shl i32 DN , 16
+	DN = or i32 %0 , %1
+	%CCR.n = icmp slt i32 DN , 0
+	%CCR.z = icmp eq i32 DN , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
 # 290/4-186
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| eam | ear |
 # 292/4-188
@@ -694,25 +716,38 @@ class m68000_ins(assy.Instree_ins):
 		self.isz = "i%d" % (i*8)
 		self.mne += j
 
+	def ilmacro_BN(self):
+		return "0x%x" % (1 << self['bn'])
+
+	def ilmacro_DN(self):
+		return "%%D%d" % self['Dn']
+
 	def ilmacro_EA(self):
 		il = self.ea["s"]
 		if len(il) > 1:
 			return self.add_il(il[1],il[0])
 		elif len(il) > 0:
 			return il[0]
-
 		return "XXX EA %d %d %s" % (self['eam'], self['ear'], str(il))
+
+	def ilmacro_SZ(self):
+		return self.isz
+
+	def ilfunc_AN(self, arg):
+		self.add_il([
+			[ "%%A%d" % self['An'], "=", self.isz, arg[0] ],
+		])
 
 	def ilfunc_EAD(self, arg):
 		il = self.ea["d"]
 		if len(il) == 1:
 			self.add_il([
-			    [ il[0], "=", "i%d" % (self.sz * 8), arg[0]],
+			    [ il[0], "=", self.isz, arg[0]],
 			])
 			return
 		elif len(il) == 2 and il[0] is None:
 			ll = [
-			    [ "%0", "=", "i%d" % (self.sz * 8), arg[0]],
+			    [ "%0", "=", self.isz, arg[0]],
 			]
 			ll += il[1]
 			self.add_il(ll)
