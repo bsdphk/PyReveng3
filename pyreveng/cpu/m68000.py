@@ -152,12 +152,36 @@ CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| ea	| {
 	%CCR.c = i1 0
 }
 # 179/4-75
-CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| ea	|
+CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| ea	| {
+	%0 = sub SZ DN , EA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.c = pyreveng.carry.sub( DN , EA )
+	%CCR.v = pyreveng.overflow.sub( DN , EA )
+}
 # 181/4-77
-CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| ea	|
-CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| ea	|
+CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| ea	| {
+	%0 = sub SZ AN , EA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.c = pyreveng.carry.sub( AN , EA )
+	%CCR.v = pyreveng.overflow.sub( AN , EA )
+}
+CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| ea	| {
+	%0 = sub SZ AN , EA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.c = pyreveng.carry.sub( AN , EA )
+	%CCR.v = pyreveng.overflow.sub( AN , EA )
+}
 # 183/4-79
-CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	|
+CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	| {
+	%0 = sub SZ EA , DATA
+	%CCR.n = icmp slt SZ %0 , 0
+	%CCR.z = icmp eq SZ %0 , 0
+	%CCR.c = pyreveng.carry.sub( EA , DATA )
+	%CCR.v = pyreveng.overflow.sub( EA , DATA )
+}
 # 185/4-81
 CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
 # 194/4-90
@@ -369,7 +393,12 @@ TRAP		vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 # 295/4-191
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
-TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	|
+TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	| {
+	%CCR.n = icmp slt SZ EA , 0
+	%CCR.z = icmp eq SZ EA , 0
+	%CCR.v = i1 0
+	%CCR.c = i1 0
+}
 # 298/4-194
 UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  |
 # 456/6-2
