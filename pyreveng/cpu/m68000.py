@@ -42,44 +42,72 @@ m68000_instructions = """
 aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
 ABCD		B,decAy,decAx	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
 # 108/4-4
-ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| ea	|
-ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| ea	|
+ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| ea	| {
+	%0 = add SZ EA , DN
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.add( EA , DN )
+	%SR.v = pyreveng.overflow.add( EA , DN )
+	LEAS %0
+}
+ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| ea	| {
+	%0 = add SZ DN , EA
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.add( DN , EA )
+	%SR.v = pyreveng.overflow.add( DN , EA )
+	DN = %0
+}
 # 111/4-7
-ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| ea	|
-ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| ea	|
+ADDA		W,ea,An		1f7f	|1 1 0 1| An  |0 1 1| ea	| {
+	%0 = sext SZ EA to i32
+	AN = add i32 AN , %0
+}
+ADDA		L,ea,An		1f7f	|1 1 0 1| An  |1 1 1| ea	| {
+	AN = add SZ AN , EA
+}
 # 113/4-9
-ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| ea	|
+ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| ea	| {
+	%0 = add SZ EA , DATA
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.add( EA , DATA )
+	%SR.v = pyreveng.overflow.add( EA , DATA )
+	LEAS %0
+}
 # 115/4-11
-# FIX ADDQ.B ->An sounds bogus, and unreferenced '*' footnote indicates not available
-ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| ea	|
+ADDQ		L,const,An	0	|0 1 0 1|const|0|1 0|0 0 1| An	| {
+	AN = add SZ AN , CONST
+}
+ADDQ		L,const,An	0	|0 1 0 1|const|0|0 1|0 0 1| An	| {
+	AN = add SZ AN , CONST
+}
+ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| ea	| {
+	%0 = add SZ EA , CONST
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.add( EA , CONST )
+	%SR.v = pyreveng.overflow.add( EA , CONST )
+	LEAS %0
+}
 # 117/4-13
-# Collision with ADDA.L
 ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
 ADDX		Z,decAy,decAx	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
 AND		Z,ea,Dn		1f7d	|1 1 0 0| Dn  |0| sz| ea	| {
 	DN = and SZ DN , EA
-	%CCR.n = icmp slt SZ DN , 0
-	%CCR.z = icmp eq SZ DN , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 DN
 }
 AND		Z,Dn,ea		037c	|1 1 0 0| Dn  |1| sz| ea	| {
 	%0 = and SZ EA , DN
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 122/4-18
 ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| ea	| {
 	%0 = and SZ EA , DATA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 124/4-20
@@ -103,29 +131,31 @@ BCLR		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 0| ea	|
 BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
 BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 	%1 = and SZ EA , IBN
 	LEAS %1
 }
 BCLR		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ DN , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 	DN = and SZ DN , IBN
 }
 # 159/4-55
-BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		|
+BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		| {
+	br label DST
+}
 # 160/4-56
 BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| ea	|
 BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
 BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 	%1 = or SZ EA , BN
 	LEAS %1
 }
 BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ DN , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 	DN = or SZ DN , BN
 }
 # 163/4-59
@@ -135,11 +165,11 @@ BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| ea	|
 BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
 BTST		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 0| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 }
 BTST		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ DN , BN
-	%CCR.z = icmp eq SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
 }
 # 173/4-69
 cHK		W,ea,Dn		1f7d	|0 1 0 0| Dn  |1 1|0| ea	|
@@ -147,40 +177,40 @@ CHK		L,ea,Dn		1f7d	|0 1 0 0| Dn  |1 0|0| ea	|
 # 177/4-73
 CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| ea	| {
 	LEAS 0
-	%CCR.z = i1 1
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	%SR.z = i1 1
+	%SR.v = i1 0
+	%SR.c = i1 0
 }
 # 179/4-75
 CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| ea	| {
 	%0 = sub SZ DN , EA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.c = pyreveng.carry.sub( DN , EA )
-	%CCR.v = pyreveng.overflow.sub( DN , EA )
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( DN , EA )
+	%SR.v = pyreveng.overflow.sub( DN , EA )
 }
 # 181/4-77
 CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| ea	| {
 	%0 = sub SZ AN , EA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.c = pyreveng.carry.sub( AN , EA )
-	%CCR.v = pyreveng.overflow.sub( AN , EA )
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( AN , EA )
+	%SR.v = pyreveng.overflow.sub( AN , EA )
 }
 CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| ea	| {
 	%0 = sub SZ AN , EA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.c = pyreveng.carry.sub( AN , EA )
-	%CCR.v = pyreveng.overflow.sub( AN , EA )
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( AN , EA )
+	%SR.v = pyreveng.overflow.sub( AN , EA )
 }
 # 183/4-79
 CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	| {
 	%0 = sub SZ EA , DATA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.c = pyreveng.carry.sub( EA , DATA )
-	%CCR.v = pyreveng.overflow.sub( EA , DATA )
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( EA , DATA )
+	%SR.v = pyreveng.overflow.sub( EA , DATA )
 }
 # 185/4-81
 CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
@@ -193,19 +223,13 @@ DIVU		W,ea,Dn		1f7d	|1 0 0 0| Dn  |0 1 1| ea	|
 # 204/4-100
 EOR		Z,Dn,ea		037d	|1 0 1 1| Dn  |1| sz| ea	| {
 	%0 = xor SZ EA , DN
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 206/4-102
 EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| ea	| {
 	%0 = xor SZ EA , DATA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 208/4-104
@@ -225,7 +249,9 @@ JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| ea	|
 # 213/4-109
 JSR		ea,>C		0f64	|0 1 0 0|1 1 1 0|1 0| ea	|
 # 214/4-110
-LEA		L,ea,An		0f64	|0 1 0 0| An  |1 1 1| ea	|
+LEA		L,ea,An		0f64	|0 1 0 0| An  |1 1 1| ea	| {
+	AN = SZ PTR_EA
+}
 # 215/4-111
 LINK		W,An,word	0000	|0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word				|
 # 217/4-113
@@ -237,25 +263,16 @@ lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	|
 LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| ea	|
 # 220/4-116 NB! Not the usual BWL encoding
 MOVE		B,ea,ead	1f7f	|0 0|0 1| ead       | ea	| {
+	STDF4 EA
 	LEAD EA
-	%CCR.z = icmp eq i8 EA , 0
-	%CCR.n = icmp slt i8 EA , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
 }
 MOVE		L,ea,ead	1f7f	|0 0|1 0| ead       | ea	| {
+	STDF4 EA
 	LEAD EA
-	%CCR.z = icmp eq i32 EA , 0
-	%CCR.n = icmp slt i32 EA , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
 }
 MOVE		W,ea,ead	1f7f	|0 0|1 1| ead       | ea	| {
+	STDF4 EA
 	LEAD EA
-	%CCR.z = icmp eq i16 EA , 0
-	%CCR.n = icmp slt i16 EA , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
 }
 # 223/4-119
 MOVEA		W,ea,An		1f7f	|0 0|1 1| An  |0 0 1| ea	| {
@@ -266,11 +283,14 @@ MOVEA		L,ea,An		1f7f	|0 0|1 0| An  |0 0 1| ea	| {
 }
 # 225/4-121
 MOVE		W,CCR,ea	037d	|0 1 0 0|0 0 1|0 1 1| ea	| {
-	LEAS %CCR
+	%0 = and SZ %SR , 0x1f
+	LEAS %0
 }
 # 227/4-123
 MOVE		W,ea,CCR	1f7d	|0 1 0 0|0 1 0|0 1 1| ea	| {
-	%CCR = i16 EA
+	%0 = and SZ EA , 0x1f
+	%1 = and SZ %SR , 0xff00
+	%SR = or SZ %1 , %0
 }
 # 229/4-125
 MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| ea	| {
@@ -287,7 +307,10 @@ MOVEP		L,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16			|
 MOVEP		W,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 0|0 0 1| An  | disp16			|
 MOVEP		L,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 1|0 0 1| An  | disp16			|
 # 238/4-134
-MOVEQ		L,data8,Dn	0000	|0 1 1 1| Dn  |0| data8		|
+MOVEQ		L,data8,Dn	0000	|0 1 1 1| Dn  |0| data8		| {
+	DN = i32 DATA8
+	STDF4 DN
+}
 # 239/4-135
 MULS		W,ea,Dn		1f7d	|1 1 0 0| Dn  |1 1 1| ea	|
 # 243/4-139
@@ -305,39 +328,30 @@ NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1| {
 # 252/4-148
 NOT		Z,ea		037d	|0 1 0 0|0 1 1|0| sz| ea	| {
 	%0 = xor SZ EA , -1
+	STDF4 %0
 	LEAS %0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
 }
 # 254/4-150
 OR		Z,ea,Dn		1f7d	|1 0 0 0| Dn  |0| sz| ea	| {
 	DN = or SZ DN , EA
-	%CCR.n = icmp slt SZ DN , 0
-	%CCR.z = icmp eq SZ DN , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 DN
 }
 OR		Z,Dn,ea		037c	|1 0 0 0| Dn  |1| sz| ea	| {
 	%0 = or SZ EA , DN
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 257/4-153
 ORI		Z,data,ea	037d	|0 0 0 0|0 0 0 0| sz| ea	| {
 	%0 = or SZ EA , DATA
-	%CCR.n = icmp slt SZ %0 , 0
-	%CCR.z = icmp eq SZ %0 , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 %0
 	LEAS %0
 }
 # 259/4-155
-ORI		word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		|
+ORI		W,word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		| {
+	%0 = and SZ WORD , 0x1f
+	%SR = or SZ %SR , %0
+}
 # 263/4-159
 PEA		L,ea		0f64	|0 1 0 0|1 0 0|0 0 1| ea	|
 # 264/4-160
@@ -364,11 +378,30 @@ SBCD		B,decAx,decAy	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
 # 276/4-172
 S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| ea	|
 # 278/4-174
-SUB		Z,ea,Dn		1f7f	|1 0 0 1| Dn  |0| sz| ea	|
-SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| ea	|
+SUB		Z,ea,Dn		1f7f	|1 0 0 1| Dn  |0| sz| ea	| {
+	%0 = sub SZ DN , EA
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( DN , EA )
+	%SR.v = pyreveng.overflow.sub( DN , EA )
+	DN = %0
+}
+SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| ea	| {
+	%0 = sub SZ EA , DN
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( EA , DN )
+	%SR.v = pyreveng.overflow.sub( EA , DN )
+	LEAS %0
+}
 # 281/4-177
-SUBA		W,ea,An		1f7f	|1 0 0 1| An  |0 1 1| ea	|
-SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| ea	|
+SUBA		W,ea,An		1f7f	|1 0 0 1| An  |0 1 1| ea	| {
+	%0 = sext SZ EA to i32
+	AN = sub i32 AN , %0
+}
+SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| ea	| {
+	AN = sub i32 AN , EA
+}
 # 283/4-179
 SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| ea	|
 # 285/4-181
@@ -381,10 +414,7 @@ SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  | {
 	%0 = lshr i32 DN , 16
 	%1 = shl i32 DN , 16
 	DN = or i32 %0 , %1
-	%CCR.n = icmp slt i32 DN , 0
-	%CCR.z = icmp eq i32 DN , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 DN
 }
 # 290/4-186
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| ea	|
@@ -394,15 +424,14 @@ TRAP		vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
 TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	| {
-	%CCR.n = icmp slt SZ EA , 0
-	%CCR.z = icmp eq SZ EA , 0
-	%CCR.v = i1 0
-	%CCR.c = i1 0
+	STDF4 EA
 }
 # 298/4-194
 UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  |
 # 456/6-2
-ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				|
+ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				| {
+	%SR = and SZ %SR , WORD
+}
 # 464/6-10
 eORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 473/6-19
@@ -493,7 +522,13 @@ class m68000_ins(assy.Instree_ins):
 		return "#0x%0*x" % (self.sz * 2, self.v)
 
 	def assy_data8(self, pj):
-		return "#0x%02x" % self['data8']
+		i = self['data8']
+		if i & 0x80:
+			i -= 256
+		if i < 0:
+			return "#-0x%02x" % (-i)
+		else:
+			return "#0x%02x" % (i)
 
 	def assy_disp16(self, pj):
 		o = self['disp16']
@@ -777,11 +812,28 @@ class m68000_ins(assy.Instree_ins):
 	def ilmacro_IBN(self):
 		return "0x%x" % (self.imsk ^ (1 << self['bn']))
 
+	def ilmacro_CONST(self):
+		i = self['const']
+		if i == 0:
+			i = 0
+		return "0x%x" % i
+
 	def ilmacro_DATA(self):
 		return "0x%x" % self.v
 
+	def ilmacro_DATA8(self):
+		i = self['data8']
+		if i & 0x80:
+			i -= 256
+			return "-0x%x" % (-i)
+		else:
+			return "0x%x" % i
+
 	def ilmacro_DN(self):
 		return "%%D%d" % self['Dn']
+
+	def ilmacro_DST(self):
+		return "0x%x" % self.dstadr
 
 	def ilmacro_EA(self):
 		il = self.ea["s"]
@@ -801,8 +853,19 @@ class m68000_ins(assy.Instree_ins):
 		self.icache["EA"] = j
 		return j
 
+	def ilmacro_PTR_EA(self):
+		il = self.ea["s"]
+		assert len(il) == 2
+		if len(il[1]) > 0:
+			return self.add_il(il[1], il[0])
+		else:
+			return il[0]
+
 	def ilmacro_SZ(self):
 		return self.isz
+
+	def ilmacro_WORD(self):
+		return "0x%x" % self['word']
 
 	def isubr_LEA(self, arg, which):
 		il = self.ea[which]
@@ -834,6 +897,13 @@ class m68000_ins(assy.Instree_ins):
 	def ilfunc_LEAS(self, arg):
 		self.isubr_LEA(arg, "s")
 
+	def ilfunc_STDF4(self, arg):
+		self.add_il([
+			["%SR.n", "=", "icmp", "slt","SZ",arg[0],",","0"],
+			["%SR.z", "=", "icmp", "eq","SZ",arg[0],",","0"],
+			["%SR.v", "=", "i1", "0"],
+			["%SR.c", "=", "i1", "0"],
+		])
 class m68000(assy.Instree_disass):
 	def __init__(self, lang="m68000"):
 		super(m68000, self).__init__(
