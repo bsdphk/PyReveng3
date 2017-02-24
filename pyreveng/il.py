@@ -298,7 +298,7 @@ class analysis(object):
 				y.ils.append(x)
 			if len(y.ils) == 0:
 				a = j.render(pj).expandtabs()
-				b = a.split()[0]
+				b = j.lim[-1].assy[0]
 				if b not in noil:
 					noil[b] = 1
 				else:
@@ -314,8 +314,8 @@ class analysis(object):
 
 		l = list(noil.iteritems())
 		l.sort(key=lambda x: -x[1])
-		print("Top ten IL-deficient instructions:")
-		for i,j in l[:10]:
+		print("Top twenty IL-deficient instructions:")
+		for i,j in l[:20]:
 			print("\t", i, j)
 
 		self.build_flow()
