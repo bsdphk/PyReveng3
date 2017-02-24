@@ -292,6 +292,8 @@ class analysis(object):
 		self.ilbbs = {}
 		self.pj = pj
 
+		noil = {}
+
 		for j in pj:
 			if not isinstance(j, assy.Assy):
 				continue
@@ -299,15 +301,26 @@ class analysis(object):
 			for x in j.il.il:
 				y.ils.append(x)
 			if len(y.ils) == 0:
+				a = j.render(pj).expandtabs()
+				b = a.split()[0]
+				if b not in noil:
+					noil[b] = 1
+				else:
+					noil[b] += 1
 				z = IL_Stmt(["pyreveng.void", "(",
-				    '"' + j.render(pj).expandtabs() + '"',
-				    ")"])
+				    '"' + a + '"', ")"])
 				z.decorate = "magenta"
 				y.ils.append(z)
 			y.lo = j.lo
 			y.hi = j.hi
 			y.ilins.append(j)
 			self.ilbbs[j.lo] = y
+
+		l = list(noil.iteritems())
+		l.sort(key=lambda x: -x[1])
+		print("Top ten IL-deficient instructions:")
+		for i,j in l[:10]:
+			print("\t", i, j)
 
 		self.build_flow()
 		for a,x in self.ilbbs.iteritems():
@@ -333,6 +346,9 @@ class analysis(object):
 			for j in d:
 				if isinstance(j, int):
 					y = self.ilbbs.get(j)
+					if y == None:
+						print("None bbs", j)
+						continue
 					assert y != None
 					y.comefrom.append(x)
 					x.goto.append(y)
@@ -347,6 +363,9 @@ class analysis(object):
 				if x is None:
 					break
 				if len(x.goto) > 1:
+					break
+				if len(x.goto) == 0:
+					print("No goto", x)
 					break
 				z = x.goto[0]
 				if z is None:

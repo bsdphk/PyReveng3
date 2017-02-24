@@ -120,7 +120,9 @@ ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  |
 aSL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| ea	|
 aSR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| ea	|
 # 129/4-25
-B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		|
+B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		| {
+	br i1 CC label DST , label HI
+}
 # 131/4-27
 bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| ea	|
 BCHG		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 1|0 0 0| Dy  |
@@ -808,6 +810,41 @@ class m68000_ins(assy.Instree_ins):
 
 	def ilmacro_BN(self):
 		return "0x%x" % (1 << self['bn'])
+
+	def ilmacro_CC(self):
+		cc = self['cc']
+		if cc == 0:
+			return "1"
+		if cc == 1:
+			return "0"
+		f = {
+		4: "%SR.c",
+		6: "%SR.z",
+		8: "%SR.v",
+		10: "%SR.n",
+		}.get(cc & 0xe)
+		if cc == 2 or cc == 3: # XXX check this
+			f = self.add_il([
+			    ["%0", "=", "or", "i1", "%SR.c", ",", "%SR.z"],
+			], "%0")
+		if cc == 12 or cc == 13:
+			f = self.add_il([
+			    ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
+			], "%0")
+		if cc == 14 or cc == 15:
+			f = self.add_il([
+			    ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
+			    ["%1", "=", "or", "i1", "%SR.z", ",", "%0"],
+			], "%1")
+		assert f is not None
+		if cc & 1:
+			return f
+		return self.add_il([
+		    ["%0", "=", "xor", "i1", f, ",", "1"],
+		], "%0")
+
+	def ilmacro_HI(self):
+		return "0x%x" % self.hi
 
 	def ilmacro_IBN(self):
 		return "0x%x" % (self.imsk ^ (1 << self['bn']))
