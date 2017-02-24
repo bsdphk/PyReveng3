@@ -217,6 +217,11 @@ CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	| {
 # 185/4-81
 CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
 # 194/4-90
+DBF		Dn,disp16,>JC	0000	|0 1 0 1|0 0 0 1|1 1 0 0 1| Dn  | disp16			| {
+	DN = sub i32 DN , 1
+	%0 = icmp ne i32 DN , -1
+	br i1 %0 label DST , label HI
+}
 DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			|
 # 196/4-92
 DIVS		W,ea,Dn		1f7d	|1 0 0 0| Dn  |1 1 1| ea	|
@@ -247,7 +252,9 @@ EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  |
 # 211/4-107
 iLLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
 # 212/4-108
-JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| ea	|
+JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| ea	| {
+	br label PTR_EA
+}
 # 213/4-109
 JSR		ea,>C		0f64	|0 1 0 0|1 1 1 0|1 0| ea	|
 # 214/4-110
@@ -407,7 +414,20 @@ SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| ea	| {
 # 283/4-179
 SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| ea	|
 # 285/4-181
-SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| ea	|
+SUBQ		L,const,An	037f	|0 1 0 1|const|1|0 1|0 0 1| An	| {
+	AN = sub SZ AN , CONST
+}
+SUBQ		L,const,An	037f	|0 1 0 1|const|1|1 0|0 0 1| An	| {
+	AN = sub SZ AN , CONST
+}
+SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| ea	| {
+	%0 = sub SZ EA , CONST
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub( EA , CONST )
+	%SR.v = pyreveng.overflow.sub( EA , CONST )
+	LEAS %0
+}
 # 287/4-183
 SUBX		Z,Dx,Dy		0000	|1 0 0 1| Dy  |1| sz|0 0|0| Dx  |
 SUBX		Z,decAx,decAy	0000	|1 0 0 1| Ay  |1| sz|0 0|1| Ax  |
