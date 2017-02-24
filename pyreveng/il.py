@@ -84,12 +84,8 @@ class IL_Ins(object):
 	def il_reg(self, r, d):
 		if r[0] != "%":
 			return r
-		# We add a million to avoid problems at lo=0
-		o = self.ins.lo * 100 + 10000000
 		if r[1:].isdigit():
-			if int(r[1:]) >= 100:
-				return r
-			n = "%%%d" % (o + self.il_c)
+			n = "%%_i%x_%d" % (self.ins.lo, self.il_c)
 			d[r] = n
 			self.il_c += 1
 			return n
