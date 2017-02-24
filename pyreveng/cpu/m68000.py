@@ -124,13 +124,50 @@ B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		| {
 	br i1 CC label DST , label HI
 }
 # 131/4-27
-bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| ea	|
-BCHG		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 1|0 0 0| Dy  |
-BCHG		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 1| ea	|0 0 0 0|0 0 0 0| bn		|
-BCHG		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		|
+bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| ea	| {
+	%0 = and SZ DN , 7
+	%1 = shl SZ 1 , %0
+	%2 = and SZ EA , %1
+	%SR.z = icmp ne SZ %2 , 0
+	%3 = xor SZ EA , %1
+	LEAS %3
+}
+BCHG		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 1|0 0 0| Dy  | {
+	%0 = and SZ DX , 31
+	%1 = shl SZ 1 , %0
+	%2 = and SZ DY , %1
+	%SR.z = icmp ne SZ %2 , 0
+	DY = xor SZ DY , %1
+}
+BCHG		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 1| ea	|0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ EA , BN
+	%SR.z = icmp eq SZ %0 , 0
+	%1 = xor SZ EA , BN
+	LEAS %1
+}
+BCHG		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
+	%0 = and SZ DN , BN
+	%SR.z = icmp eq SZ %0 , 0
+	DN = xor SZ DN , BN
+}
 # 134/4-30
-BCLR		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 0| ea	|
-BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  |
+BCLR		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 0| ea	| {
+	%0 = and SZ DN , 7
+	%1 = shl SZ 1 , %0
+	%2 = and SZ EA , %1
+	%SR.z = icmp ne SZ %2 , 0
+	%3 = xor SZ %1 , -1
+	%4 = and SZ EA , %3
+	LEAS %4
+}
+BCLR		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 0|0 0 0| Dy  | {
+	%0 = and SZ DX , 31
+	%1 = shl SZ 1 , %0
+	%2 = and SZ DY , %1
+	%SR.z = icmp ne SZ %2 , 0
+	%3 = xor SZ %1 , -1
+	DY = and SZ DY , %3
+}
 BCLR		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 0| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
 	%SR.z = icmp eq SZ %0 , 0
@@ -147,8 +184,21 @@ BRA		dst,>J		0000	|0 1 1 0|0 0 0 0| disp8		| {
 	br label DST
 }
 # 160/4-56
-BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| ea	|
-BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  |
+BSET		B,Dn,ea		037c	|0 0 0 0| Dn  |1 1 1| ea	| {
+	%0 = and SZ DN , 7
+	%1 = shl i8 1 , %0
+	%2 = and i8 EA , %1
+	%SR.z = icmp ne i8 %2 , 0
+	%3 = or i8 EA , %1
+	LEAS %3
+}
+BSET		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 1 1|0 0 0| Dy  | {
+	%0 = and SZ DX , 31
+	%1 = shl i32 1 , %0
+	%2 = and i32 DY , %1
+	%SR.z = icmp ne i32 %2 , 0
+	DY = or i32 DY , %1
+}
 BSET		B,bn,ea		037c	|0 0 0 0|1 0 0|0 1 1| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
 	%SR.z = icmp eq SZ %0 , 0
@@ -167,8 +217,16 @@ BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		| {
 	br label DST
 }
 # 165/4-61
-BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| ea	|
-BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
+BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| ea	| {
+	%0 = and SZ DN , 7
+	%1 = shr i32 EA , %0
+	%SR.z = trunc i32 %1 to i1
+}
+BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  | {
+	%0 = and SZ DX , 31
+	%1 = shr i32 DY , %0
+	%SR.z = trunc i32 %1 to i1
+}
 BTST		B,bn,ea		037c	|0 0 0 0|1 0 0|0 0 0| ea	|0 0 0 0|0 0 0 0| bn		| {
 	%0 = and SZ EA , BN
 	%SR.z = icmp eq SZ %0 , 0
