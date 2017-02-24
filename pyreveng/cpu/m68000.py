@@ -46,16 +46,16 @@ ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| ea	| {
 	%0 = add SZ EA , DN
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.add( EA , DN )
-	%SR.v = pyreveng.overflow.add( EA , DN )
+	%SR.c = pyreveng.carry.add ( EA , DN )
+	%SR.v = pyreveng.overflow.add ( EA , DN )
 	LEAS %0
 }
 ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| ea	| {
 	%0 = add SZ DN , EA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.add( DN , EA )
-	%SR.v = pyreveng.overflow.add( DN , EA )
+	%SR.c = pyreveng.carry.add ( DN , EA )
+	%SR.v = pyreveng.overflow.add ( DN , EA )
 	DN = %0
 }
 # 111/4-7
@@ -71,8 +71,8 @@ ADDI		Z,data,ea	037d	|0 0 0 0 0 1 1 0| sz| ea	| {
 	%0 = add SZ EA , DATA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.add( EA , DATA )
-	%SR.v = pyreveng.overflow.add( EA , DATA )
+	%SR.c = pyreveng.carry.add ( EA , DATA )
+	%SR.v = pyreveng.overflow.add ( EA , DATA )
 	LEAS %0
 }
 # 115/4-11
@@ -86,8 +86,8 @@ ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| ea	| {
 	%0 = add SZ EA , CONST
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.add( EA , CONST )
-	%SR.v = pyreveng.overflow.add( EA , CONST )
+	%SR.c = pyreveng.carry.add ( EA , CONST )
+	%SR.v = pyreveng.overflow.add ( EA , CONST )
 	LEAS %0
 }
 # 117/4-13
@@ -192,31 +192,31 @@ CMP		Z,ea,Dn		1f7f	|1 0 1 1| Dn  |0| sz| ea	| {
 	%0 = sub SZ DN , EA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( DN , EA )
-	%SR.v = pyreveng.overflow.sub( DN , EA )
+	%SR.c = pyreveng.carry.sub ( DN , EA )
+	%SR.v = pyreveng.overflow.sub ( DN , EA )
 }
 # 181/4-77
 CMPA		W,ea,An		1f7f	|1 0 1 1| An  |0|1 1| ea	| {
 	%0 = sub SZ AN , EA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( AN , EA )
-	%SR.v = pyreveng.overflow.sub( AN , EA )
+	%SR.c = pyreveng.carry.sub ( AN , EA )
+	%SR.v = pyreveng.overflow.sub ( AN , EA )
 }
 CMPA		L,ea,An		1f7f	|1 0 1 1| An  |1 1 1| ea	| {
 	%0 = sub SZ AN , EA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( AN , EA )
-	%SR.v = pyreveng.overflow.sub( AN , EA )
+	%SR.c = pyreveng.carry.sub ( AN , EA )
+	%SR.v = pyreveng.overflow.sub ( AN , EA )
 }
 # 183/4-79
 CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	| {
 	%0 = sub SZ EA , DATA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( EA , DATA )
-	%SR.v = pyreveng.overflow.sub( EA , DATA )
+	%SR.c = pyreveng.carry.sub ( EA , DATA )
+	%SR.v = pyreveng.overflow.sub ( EA , DATA )
 }
 # 185/4-81
 CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
@@ -246,13 +246,34 @@ EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| ea	| {
 # 208/4-104
 eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
-EXG		L,Dx,Dy		0000	|1 1 0 0| Dx  |1|0 1 0 0 0| Dy  |
-EXG		L,Ax,Ay		0000	|1 1 0 0| Ax  |1|0 1 0 0 1| Ay  |
-EXG		L,Dx,Ay		0000	|1 1 0 0| Dx  |1|1 0 0 0 1| Ay  |
+EXG		L,Dx,Dy		0000	|1 1 0 0| Dx  |1|0 1 0 0 0| Dy  | {
+	%0 = i32 DY
+	DY = i32 DX
+	DX = i32 %0
+}
+EXG		L,Ax,Ay		0000	|1 1 0 0| Ax  |1|0 1 0 0 1| Ay  | {
+	%0 = i32 AY
+	AY = i32 AX
+	AX = i32 %0
+}
+EXG		L,Dx,Ay		0000	|1 1 0 0| Dx  |1|1 0 0 0 1| Ay  | {
+	%0 = i32 AY
+	AY = i32 DX
+	DX = i32 %0
+}
 # 210/4-106
-EXTB		W,Dn		0000	|0 1 0 0|1 0 0|0 1 0|0 0 0| Dn  |
-EXTW		L,Dn		0000	|0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  |
-EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  |
+EXTB		W,Dn		0000	|0 1 0 0|1 0 0|0 1 0|0 0 0| Dn  | {
+	DN = exts i8 DN to i16
+	STDF4 DN
+}
+EXTW		L,Dn		0000	|0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  | {
+	DN = exts i16 DN to i32
+	STDF4 DN
+}
+EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  | {
+	DN = exts i8 DN to i32
+	STDF4 DN
+}
 # 211/4-107
 iLLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
 # 212/4-108
@@ -341,7 +362,15 @@ MULU		W,ea,Dn		1f7d	|1 1 0 0| Dn  |0 1 1| ea	|
 # 245/4-141
 NBCD		B,ea		037d	|0 1 0 0|1 0 0|0 0 0| ea	|
 # 247/4-143
-NEG		Z,ea		037d	|0 1 0 0|0 1 0|0| sz| ea	|
+NEG		Z,ea		037d	|0 1 0 0|0 1 0|0| sz| ea	| {
+	%0 = sub SZ 0 , EA
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub ( 0 , EA )
+	%SR.v = pyreveng.overflow.sub ( 0 , EA )
+	%SR.x = %SR.c
+	LEAS %0
+}
 # 249/4-146
 NEGX		Z,ea		037d	|0 1 0 0|0 0 0|0| sz| ea	|
 # 251/4-147
@@ -412,16 +441,16 @@ SUB		Z,ea,Dn		1f7f	|1 0 0 1| Dn  |0| sz| ea	| {
 	%0 = sub SZ DN , EA
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( DN , EA )
-	%SR.v = pyreveng.overflow.sub( DN , EA )
+	%SR.c = pyreveng.carry.sub ( DN , EA )
+	%SR.v = pyreveng.overflow.sub ( DN , EA )
 	DN = %0
 }
 SUB		Z,Dn,ea		037c	|1 0 0 1| Dn  |1| sz| ea	| {
 	%0 = sub SZ EA , DN
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( EA , DN )
-	%SR.v = pyreveng.overflow.sub( EA , DN )
+	%SR.c = pyreveng.carry.sub ( EA , DN )
+	%SR.v = pyreveng.overflow.sub ( EA , DN )
 	LEAS %0
 }
 # 281/4-177
@@ -433,7 +462,14 @@ SUBA		L,ea,An		1f7f	|1 0 0 1| An  |1 1 1| ea	| {
 	AN = sub i32 AN , EA
 }
 # 283/4-179
-SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| ea	|
+SUBI		Z,data,ea	037d	|0 0 0 0|0 1 0 0| sz| ea	| {
+	%0 = sub SZ EA , DATA
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.c = pyreveng.carry.sub ( EA , DATA )
+	%SR.v = pyreveng.overflow.sub ( EA , DATA )
+	LEAS %0
+}
 # 285/4-181
 SUBQ		L,const,An	037f	|0 1 0 1|const|1|0 1|0 0 1| An	| {
 	AN = sub SZ AN , CONST
@@ -445,8 +481,8 @@ SUBQ		Z,const,ea	037f	|0 1 0 1|const|1| sz| ea	| {
 	%0 = sub SZ EA , CONST
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
-	%SR.c = pyreveng.carry.sub( EA , CONST )
-	%SR.v = pyreveng.overflow.sub( EA , CONST )
+	%SR.c = pyreveng.carry.sub ( EA , CONST )
+	%SR.v = pyreveng.overflow.sub ( EA , CONST )
 	LEAS %0
 }
 # 287/4-183
@@ -493,7 +529,13 @@ ORI		W,word,SR	0000	|0 0 0 0|0 0 0 0|0 1 1 1|1 1 0 0| word				|
 # 537/6-83
 RESET		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 0 0|
 # 538/6-84
-RTE		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 1|
+RTE		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 1| {
+	%SR = load i16 , i16* %A7
+	%A7 = add i32 %A7 , 2
+	%0 = load i32 , i32* %A7
+	%A7 = add i32 %A7 , 4
+	br label %0
+}
 # 539/6-85
 STOP		word,>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 0 1 0| word				|
 # ...
@@ -853,6 +895,12 @@ class m68000_ins(assy.Instree_ins):
 	def ilmacro_AN(self):
 		return "%%A%d" % self['An']
 
+	def ilmacro_AX(self):
+		return "%%A%d" % self['Ax']
+
+	def ilmacro_AY(self):
+		return "%%A%d" % self['Ay']
+
 	def ilmacro_BN(self):
 		return "0x%x" % (1 << self['bn'])
 
@@ -913,6 +961,12 @@ class m68000_ins(assy.Instree_ins):
 
 	def ilmacro_DN(self):
 		return "%%D%d" % self['Dn']
+
+	def ilmacro_DX(self):
+		return "%%D%d" % self['Dx']
+
+	def ilmacro_DY(self):
+		return "%%D%d" % self['Dy']
 
 	def ilmacro_DST(self):
 		return "0x%x" % self.dstadr
