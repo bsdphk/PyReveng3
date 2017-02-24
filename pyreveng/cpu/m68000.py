@@ -161,7 +161,11 @@ BSET		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 1 1|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
 	DN = or SZ DN , BN
 }
 # 163/4-59
-BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		|
+BSR		dst,>C		0000	|0 1 1 0|0 0 0 1| disp8		| {
+	%A7 = sub i32 %A7 , 4
+	store i32 HI , i32* %A7
+	br label DST
+}
 # 165/4-61
 BTST		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 0| ea	|
 BTST		L,Dx,Dy		0000	|0 0 0 0| Dx  |1 0 0|0 0 0| Dy  |
@@ -256,13 +260,23 @@ JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| ea	| {
 	br label PTR_EA
 }
 # 213/4-109
-JSR		ea,>C		0f64	|0 1 0 0|1 1 1 0|1 0| ea	|
+JSR		ea,>C		0f64	|0 1 0 0|1 1 1 0|1 0| ea	| {
+	%A7 = sub i32 %A7 , 4
+	store i32 HI , i32* %A7
+	br label PTR_EA
+}
 # 214/4-110
 LEA		L,ea,An		0f64	|0 1 0 0| An  |1 1 1| ea	| {
 	AN = SZ PTR_EA
 }
 # 215/4-111
-LINK		W,An,word	0000	|0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word				|
+LINK		W,An,word	0000	|0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word				| {
+	%A7 = sub i32 %A7 , 4
+	store i32 AN , i32* %A7
+	AN = i32 %A7
+	%A7 = add i32 %A7 , WORDSGN
+}
+# XXX: LINK L ?
 # 217/4-113
 LSL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 1| Dy  |
 LSR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 1| Dy  |
@@ -362,7 +376,10 @@ ORI		W,word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		| {
 	%SR = or SZ %SR , %0
 }
 # 263/4-159
-PEA		L,ea		0f64	|0 1 0 0|1 0 0|0 0 1| ea	|
+PEA		L,ea		0f64	|0 1 0 0|1 0 0|0 0 1| ea	| {
+	%A7 = sub i32 %A7 , 4
+	store i32 PTR_EA , i32 * %A7
+}
 # 264/4-160
 ROL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 1| Dy  |
 ROR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 1| Dy  |
@@ -380,7 +397,11 @@ rOXR		W,ea		037c	|1 1 1 0|0 1 0|0|1 1| ea	|
 # 272/4-168
 RTR		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
 # 273/4-169
-RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1|
+RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1| {
+	%0 = load i32 , i32* %A7
+	%A7 = add i32 %A7 , 4
+	br label %0
+}
 # 274/4-170
 sBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
 SBCD		B,decAx,decAy	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
@@ -449,7 +470,11 @@ TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	| {
 	STDF4 EA
 }
 # 298/4-194
-UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  |
+UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  | {
+	%A7 = i32 AN
+	AN = load i32 , i32 * %A7
+	%A7 = add i32 %A7 , 4
+}
 # 456/6-2
 ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				| {
 	%SR = and SZ %SR , WORD
@@ -920,6 +945,15 @@ class m68000_ins(assy.Instree_ins):
 
 	def ilmacro_SZ(self):
 		return self.isz
+
+	def ilmacro_WORDSGN(self):
+		i = self['word']
+		if i & 0x8000:
+			i -= 65536
+		if i < 0:
+			return "-0x%x" % (-i)
+		else:
+			return "0x%x" % i
 
 	def ilmacro_WORD(self):
 		return "0x%x" % self['word']
