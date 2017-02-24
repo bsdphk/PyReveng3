@@ -435,7 +435,10 @@ RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1| {
 sBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
 SBCD		B,decAx,decAy	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
 # 276/4-172
-S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| ea	|
+S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| ea	| {
+	%0 = sext i1 CC to i8
+	LEAS %0
+}
 # 278/4-174
 SUB		Z,ea,Dn		1f7f	|1 0 0 1| Dn  |0| sz| ea	| {
 	%0 = sub SZ DN , EA
@@ -585,7 +588,7 @@ class m68000_ins(assy.Instree_ins):
 		self.mne += ".B"
 
 	def assy_bn(self, pj):
-		return "#0x%x" % self['bn']
+		return "#0x%x" % (self['bn'] % (self.sz*8))
 
 	def assy_cc(self, pj):
 		self.mne += cond_code[self['cc']]
@@ -902,7 +905,8 @@ class m68000_ins(assy.Instree_ins):
 		return "%%A%d" % self['Ay']
 
 	def ilmacro_BN(self):
-		return "0x%x" % (1 << self['bn'])
+		j = self['bn'] % (self.sz*8)
+		return "0x%x" % (1 << j)
 
 	def ilmacro_CC(self):
 		cc = self['cc']
@@ -940,7 +944,8 @@ class m68000_ins(assy.Instree_ins):
 		return "0x%x" % self.hi
 
 	def ilmacro_IBN(self):
-		return "0x%x" % (self.imsk ^ (1 << self['bn']))
+		j = self['bn'] % (self.sz*8)
+		return "0x%x" % (self.imsk ^ (1 << j))
 
 	def ilmacro_CONST(self):
 		i = self['const']
