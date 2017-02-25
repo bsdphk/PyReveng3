@@ -818,7 +818,7 @@ class m68000_ins(assy.Instree_ins):
 		if eax == 0x0008:
 			r = "A%d" % ear
 			il += [ "%0", [
-			    ["%0", "=", self.isz, "%" + r],
+			    ["%0", "=", self.isz + "*", "%" + r],
 			    ["%" + r, "=", "add", "i32",
 				"%" + r, ",", "%d" % self.sz],
 			]]
