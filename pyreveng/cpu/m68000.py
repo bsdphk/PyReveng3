@@ -114,11 +114,33 @@ ANDI		Z,data,ea	037d	|0 0 0 0 0 0 1 0| sz| ea	| {
 ANDI		B,const,CCR	0000	|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| const		|
 # 125/4-21
 ASL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 0| Dy  |
-ASR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 0| Dy  |
+ASR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 0| Dy  | {
+	DY = ashr SZ DY , DX
+	%SR.n = icmp slt SZ DY , 0
+	%SR.z = icmp eq SZ DY , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
 ASL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|0 0| Dn  |
-ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  |
+ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  | {
+	DN = ashr SZ DN , ROT
+	%SR.n = icmp slt SZ DN , 0
+	%SR.z = icmp eq SZ DN , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
 aSL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| ea	|
-aSR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| ea	|
+ASR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| ea	| {
+	%0 = ashr SZ EA , 1
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+	LEA %0
+}
 # 129/4-25
 B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		| {
 	br i1 CC label DST , label HI
@@ -357,12 +379,56 @@ LINK		W,An,word	0000	|0 1 0 0|1 1 1 0|0 1 0 1|0| An  | word				| {
 }
 # XXX: LINK L ?
 # 217/4-113
-LSL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 1| Dy  |
-LSR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 1| Dy  |
-LSL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|0 1| Dn  |
-LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  |
-lSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	|
-LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| ea	|
+LSL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|0 1| Dy  | {
+	DY = shl SZ DY , DX
+	%SR.n = icmp slt SZ DY , 0
+	%SR.z = icmp eq SZ DY , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
+LSR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|0 1| Dy  | {
+	DY = lshr SZ DY , DX
+	%SR.n = icmp slt SZ DY , 0
+	%SR.z = icmp eq SZ DY , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
+LSL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|0 1| Dn  | {
+	DN = shl SZ DN , ROT
+	%SR.n = icmp slt SZ DN , 0
+	%SR.z = icmp eq SZ DN , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
+LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  | {
+	DN = lshr SZ DN , ROT
+	%SR.n = icmp slt SZ DN , 0
+	%SR.z = icmp eq SZ DN , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+}
+LSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	| {
+	%0 = shl SZ EA , 1
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+	LEAD %0
+}
+LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| ea	| {
+	%0 = lshr SZ EA , 1
+	%SR.n = icmp slt SZ %0 , 0
+	%SR.z = icmp eq SZ %0 , 0
+	%SR.v = i1 0
+	%SR.x = XXX
+	%SR.c = XXX
+	LEAD %0
+}
 # 220/4-116 NB! Not the usual BWL encoding
 MOVE		B,ea,ead	1f7f	|0 0|0 1| ead       | ea	| {
 	STDF4 EA
@@ -399,10 +465,18 @@ MOVE		W,SR,ea		037d	|0 1 0 0|0 0 0|0 1 1| ea	| {
 	LEAS %SR
 }
 # 232/4-128
-MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| ea	| rlist				|
-MOVEM		L,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| ea	| rlist				|
-MOVEM		W,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 0| ea	| rlist				|
-MOVEM		L,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 1| ea	| rlist				|
+MOVEM		W,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 0| ea	| rlist				| {
+	MOVEM_RM
+}
+MOVEM		L,rlist,ea	0374	|0 1 0 0|1 0 0|0 1 1| ea	| rlist				| {
+	MOVEM_RM
+}
+MOVEM		W,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 0| ea	| rlist				| {
+	MOVEM_MR
+}
+MOVEM		L,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 1| ea	| rlist				| {
+	MOVEM_MR
+}
 # 235/4-131
 MOVEP		W,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 0|0 0 1| An  | disp16			|
 MOVEP		L,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16			|
@@ -617,6 +691,23 @@ class m68000_ins(assy.Instree_ins):
 		self.ea = {}
 		self.isz = "i32"
 		self.icache = {}
+
+	def subr_rlist(self):
+		v = self['rlist']
+		l = []
+		if (self['ea'] >> 3) == 4:
+			for r in ("A", "D"):
+				for n in range(7, -1, -1):
+					if v & 0x0001:
+						l.append(r + "%d" % n)
+					v >>= 1
+		else:
+			for r in ("D", "A"):
+				for n in range(0, 8):
+					if v & 0x0001:
+						l.append(r + "%d" % n)
+					v >>= 1
+		return l
 
 	def assy_An(self, pj):
 		return "A%d" % self['An']
@@ -906,21 +997,7 @@ class m68000_ins(assy.Instree_ins):
 		self.mne += ".L"
 
 	def assy_rlist(self, pj):
-		v = self['rlist']
-		l = []
-		if (self['ea'] >> 3) == 4:
-			for r in ("A", "D"):
-				for n in range(7, -1, -1):
-					if v & 0x0001:
-						l.append(r + "%d" % n)
-					v >>= 1
-		else:
-			for r in ("D", "A"):
-				for n in range(0, 8):
-					if v & 0x0001:
-						l.append(r + "%d" % n)
-					v >>= 1
-		return "+".join(l)
+		return "+".join(self.subr_rlist())
 
 	def assy_rot(self, pj):
 		a = self['rot']
@@ -1060,6 +1137,12 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return il[0]
 
+	def ilmacro_ROT(self):
+		a = self['rot']
+		if a == 0:
+			a = 8
+		return "0x%x" % a
+
 	def ilmacro_SZ(self):
 		return self.isz
 
@@ -1104,6 +1187,86 @@ class m68000_ins(assy.Instree_ins):
 
 	def ilfunc_LEAS(self, arg):
 		self.isubr_LEA(arg, "s")
+
+	def ilfunc_MOVEM_RM(self, arg):
+		ll = []
+		eam = self['ea'] >> 3
+		if eam == 3:
+			raise assy.Invalid(
+			    "0x%x MOVEM r->m predecrement" % (self.lo))
+		elif eam == 4:
+			dr = "%%A%d" % (self['ea'] & 7)
+			rl = self.subr_rlist()
+			if dr[1:] in rl:
+				raise assy.Missing(
+				    "0x%x MOVEM push(SP)" % (self.lo))
+			for r in self.subr_rlist():
+				ll += [
+					[ dr, "=", "sub", "i32", dr, ",",
+					    "%d" % self.sz],
+					[ "store", "SZ", "%" + r, ",",
+					    self.isz + "*", dr],
+				]
+		else:
+			x = self.ilmacro_PTR_EA()
+			ll += [
+				[ "%0", "=", "SZ", x ],
+			]
+			for r in self.subr_rlist():
+				ll += [
+					[ "store", "SZ", "%" + r, ",",
+					    self.isz + "*", "%0"],
+					[ "%0", "=", "add", "i32","%0",",",
+					    "%d" % self.sz],
+				]
+		self.add_il(ll)
+
+	def ilfunc_MOVEM_MR(self, arg):
+		ll = []
+		eam = self['ea'] >> 3
+		if eam == 3:
+			sr = "%%A%d" % (self['ea'] & 7)
+			for r in self.subr_rlist():
+				if r == sr[1:]:
+					ll += [
+						[ sr, "=", "add", "i32", sr,",",
+						    "%d" % self.sz],
+					]
+					continue
+				ll += [
+					[ "%" + r, "=", "load", self.isz, ",",
+					    self.isz + "*", sr ],
+					[ sr, "=", "add", "i32", sr,",",
+					    "%d" % self.sz],
+				]
+				if self.sz == 4:
+					continue
+				ll += [
+					[ "%" + r, "=", "sext", self.isz,
+					    "%" + r, "to", "i32"],
+				]
+		elif eam == 4:
+			raise assy.Invalid(
+			    "0x%x MOVEM m->r postincrement" % (self.lo))
+		else:
+			x = self.ilmacro_PTR_EA()
+			ll += [
+				[ "%0", "=", self.isz + "*", x ],
+			]
+			for r in self.subr_rlist():
+				ll += [
+					[ "%" + r, "=", "load", self.isz, ",",
+					    self.isz + "*", "%0" ],
+					[ "%0", "=", "add", "i32", "%0",",",
+					    "%d" % self.sz],
+				]
+				if self.sz == 4:
+					continue
+				ll += [
+					[ "%" + r, "=", "sext", self.isz,
+					    "%" + r, "to", "i32"],
+				]
+		self.add_il(ll)
 
 	def ilfunc_STDF4(self, arg):
 		self.add_il([

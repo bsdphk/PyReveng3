@@ -45,6 +45,9 @@ class Invalid(Exception):
 class Wrong(Exception):
 	pass
 
+class Missing(Exception):
+	pass
+
 #######################################################################
 
 class Assy(code.Code):
