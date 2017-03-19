@@ -58,7 +58,7 @@ from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.m68000 as m68000
 import pyreveng.cpu.hp85662a as hp85662a
 
-#from . import hp856x_cmds
+# from . import hp856x_cmds
 import hp856x_cmds
 
 class mycpu(m68000.m68000):
@@ -1343,8 +1343,8 @@ if __name__ == '__main__':
 	task(pj, cx)
 	output(pj)
 
-        import pyreveng.il
+	import pyreveng.il
 
-        a = pyreveng.il.analysis(pj)
-        a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))
+	a = pyreveng.il.analysis(pj)
+	a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))
 

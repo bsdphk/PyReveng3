@@ -36,7 +36,6 @@ LLVM IL a trivial exercise in dumb text-processing
 
 from __future__ import print_function
 
-
 #######################################################################
 
 class IL_Stmt(object):
@@ -281,14 +280,15 @@ class IL_BB(object):
 		return nn
 
 
-import assy
-
 class analysis(object):
 	def __init__(self, pj):
 		self.ilbbs = {}
 		self.pj = pj
 
 		noil = {}
+
+		# XXX: This is kind of silly
+		from . import assy
 
 		for j in pj:
 			if not isinstance(j, assy.Assy):
@@ -312,14 +312,16 @@ class analysis(object):
 			y.ilins.append(j)
 			self.ilbbs[j.lo] = y
 
-		l = list(noil.iteritems())
+		#l = list(noil.iteritems())
+		l = list(noil.items())
 		l.sort(key=lambda x: -x[1])
 		print("Top twenty IL-deficient instructions:")
 		for i,j in l[:20]:
 			print("\t", i, j)
 
 		self.build_flow()
-		for a,x in self.ilbbs.iteritems():
+		#for a,x in self.ilbbs.iteritems():
+		for a,x in self.ilbbs.items():
 			x.build_doa()
 		self.propagate_doa("red")
 		self.propagate_doa("green")
@@ -337,7 +339,8 @@ class analysis(object):
 			fo.write("}\n")
 
 	def build_flow(self):
-		for a,x in self.ilbbs.iteritems():
+		#for a,x in self.ilbbs.iteritems():
+		for a,x in self.ilbbs.items():
 			d = x.whereto()
 			for j in d:
 				if isinstance(j, int):
@@ -385,7 +388,8 @@ class analysis(object):
 
 	def propagate_doa(self, color):
 		n = 0
-		for a,x in self.ilbbs.iteritems():
+		#for a,x in self.ilbbs.iteritems():
+		for a,x in self.ilbbs.items():
 			#print("PROP", x)
 			if len(x.goto) == 0:
 				continue
