@@ -496,9 +496,19 @@ MOVEQ		L,data8,Dn	0000	|0 1 1 1| Dn  |0| data8		| {
 	STDF4 DN
 }
 # 239/4-135
-MULS		W,ea,Dn		1f7d	|1 1 0 0| Dn  |1 1 1| ea	|
+MULS		W,ea,Dn		1f7d	|1 1 0 0| Dn  |1 1 1| ea	| {
+	%0 = sext i16 DN to i32
+	%1 = sext i16 EA to i32
+	DN = mul i32 %0 , %1
+	STDF4 DN
+}
 # 243/4-139
-MULU		W,ea,Dn		1f7d	|1 1 0 0| Dn  |0 1 1| ea	|
+MULU		W,ea,Dn		1f7d	|1 1 0 0| Dn  |0 1 1| ea	| {
+	%0 = and i32 DN , 0xffff
+	%1 = and i32 EA , 0xffff
+	DN = mul i32 %0 , %1
+	STDF4 DN
+}
 # 245/4-141
 NBCD		B,ea		037d	|0 1 0 0|1 0 0|0 0 0| ea	|
 # 247/4-143
