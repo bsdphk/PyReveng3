@@ -478,10 +478,18 @@ MOVEM		L,ea,rlist	0f6c	|0 1 0 0|1 1 0|0 1 1| ea	| rlist				| {
 	MOVEM_MR
 }
 # 235/4-131
-MOVEP		W,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 0|0 0 1| An  | disp16			|
-MOVEP		L,Dn,An+disp16	0000	|0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16			|
-MOVEP		W,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 0|0 0 1| An  | disp16			|
-MOVEP		L,An+disp16,Dn	0000	|0 0 0 0| Dn  |1|0 1|0 0 1| An  | disp16			|
+MOVEP		W,Dn,Andisp16	0000	|0 0 0 0| Dn  |1|1 0|0 0 1| An  | disp16			| {
+	MOVEP1
+}
+MOVEP		L,Dn,Andisp16	0000	|0 0 0 0| Dn  |1|1 1|0 0 1| An  | disp16			| {
+	MOVEP1
+}
+MOVEP		W,Andisp16,Dn	0000	|0 0 0 0| Dn  |1|0 0|0 0 1| An  | disp16			| {
+	MOVEP2
+}
+MOVEP		L,Andisp16,Dn	0000	|0 0 0 0| Dn  |1|0 1|0 0 1| An  | disp16			| {
+	MOVEP2
+}
 # 238/4-134
 MOVEQ		L,data8,Dn	0000	|0 1 1 1| Dn  |0| data8		| {
 	DN = i32 DATA8
@@ -777,6 +785,14 @@ class m68000_ins(assy.Instree_ins):
 			o -= 1 << 16
 		self.dstadr = self.hi + o - 2
 		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Andisp16(self, pj):
+		o = self['disp16']
+		if o & 0x8000:
+			o -= 1 << 16
+			return "A%d" % self['An'] + "-0x%x" % -o
+		else:
+			return "A%d" % self['An'] + "+0x%x" % o
 
 	def assy_Dn(self, pj):
 		return "D%d" % self['Dn']
@@ -1275,6 +1291,46 @@ class m68000_ins(assy.Instree_ins):
 			["%SR.v", "=", "i1", "0"],
 			["%SR.c", "=", "i1", "0"],
 		])
+
+	def ilfunc_MOVEP1(self, arg):
+		o = self['disp16']
+		if o & 0x8000:
+			o -= 1 << 16
+			oo = "-0x%x" % -o
+		else:
+			oo = "0x%x" % o
+		l = [
+			["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
+			["%1", "=", self.isz, "%%D%d" % self['Dn']],
+		]
+		for i in range(0, self.sz):
+			l.append(["%2", "=", "trunc", self.isz, "%1", "to", "i8"])
+			l.append(["%1", "=", "lshr", self.isz, "%1", ",", "8"])
+			l.append(["store", "i8", "%2", ",", "i8*", "%0"])
+			l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
+		self.add_il(l)
+
+	def ilfunc_MOVEP2(self, arg):
+		o = self['disp16']
+		if o & 0x8000:
+			o -= 1 << 16
+			oo = "-0x%x" % -o
+		else:
+			oo = "0x%x" % o
+		l = [
+			["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
+			["%1", "=", self.isz, "0"],
+		]
+		for i in range(0, self.sz):
+			l.append(["%2", "=", "load", "i8", ",", "i8*", "%0"])
+			l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
+			l.append(["%1", "=", "shl", self.isz, "%1", ",", "8"])
+			l.append(["%1", "=", "or", self.isz, "%1", ",", "%2"])
+
+		l.append(["%%D%d" % self['Dn'], "=", self.isz, "%1"])
+		self.add_il(l)
+
+
 class m68000(assy.Instree_disass):
 	def __init__(self, lang="m68000"):
 		super(m68000, self).__init__(
