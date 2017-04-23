@@ -79,6 +79,7 @@ class IL_Ins(object):
 		self.ins = ins
 		self.il = []
 		self.il_c = 0
+		self.add_il(ins, [["0x%x" % ins.lo, ":"]])
 
 	def il_reg(self, r, d):
 		if r[0] != "%":
