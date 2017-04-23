@@ -41,7 +41,7 @@ Things to do:
 
 from __future__ import print_function
 
-from pyreveng import mem
+from pyreveng import mem, assy
 
 class Discover(object):
 	def __init__(self, pj, cx):
@@ -88,6 +88,10 @@ class Discover(object):
 				try:
 					x = self.cx.decode(self.pj, adr)
 				except mem.MemError:
+					continue
+				except assy.Invalid:
+					continue
+				except assy.Missing:
 					continue
 				if x is None:
 					continue

@@ -1191,6 +1191,8 @@ class m68000_ins(assy.Instree_ins):
 		return "0x%x" % self['word']
 
 	def isubr_LEA(self, arg, which):
+		if not which in self.ea:
+			raise assy.Invalid("0x%x No '%s' in EA" % (self.lo, which))
 		il = self.ea[which]
 		if len(il) == 1:
 			self.add_il([
