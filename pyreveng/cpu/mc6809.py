@@ -65,6 +65,8 @@ BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 1| R1		| R2		|
 BGT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 0| R1		| R2		|
 BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 1| R1		| R2		|
 
+SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
+
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
 CMPY    I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 0 0| I1		| I2		|
 LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		|
@@ -75,6 +77,7 @@ LDY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 0| d		|
 STY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 1| d		|
 
 CMPD    P	|0 0 0 1 0 0 0 0|1 0 1 0 0 0 1 1|X| R |i| m     |
+CMPY    P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 0 0|X| R |i| m     |
 LDY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 0|X| R |i| m     |
 STY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 1|X| R |i| m     |
 CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| e1		| e2		|
@@ -90,6 +93,7 @@ STS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 1| d		|
 LDS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 0|X| R |i| m     |
 STS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 1|X| R |i| m     |
 
+SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
 CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
@@ -100,6 +104,7 @@ CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| e1		| e2		|
 CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| e1		| e2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
+SYNC	-	|0 0 0 1 0 0 1 1|
 BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		|
 BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		|
 DAA	-	|0 0 0 1 1 0 0 1|
@@ -137,7 +142,7 @@ PULU	s	|0 0 1 1 0 1 1 1| i		|
 RTS	>R	|0 0 1 1 1 0 0 1|
 ABX	-	|0 0 1 1 1 0 1 0|
 RTI	>R	|0 0 1 1 1 0 1 1|
-CWAI	i	|0 0 1 1 1 1 0 0| i		|
+CWAI	i,>J	|0 0 1 1 1 1 0 0| i		|
 MUL	-	|0 0 1 1 1 1 0 1|
 SWI	-	|0 0 1 1 1 1 1 1|
 
@@ -413,8 +418,14 @@ class mc6809_ins(assy.Instree_ins):
 			s = r + "%+d" % o
 		elif self['m'] == 0xb:
 			s = r + "+D"
+		elif self['m'] == 0xd:
+			o = pj.m.bs16(self.hi - 2)
+			s = "0x%x" % ((0x10000 + self.hi + o & 0xffff))
+		elif self['m'] == 0xf:
+			o = pj.m.bs16(self.hi - 2)
+			s = "0x%x" % o
 		else:
-			raise assy.Wrong("somehow...")
+			raise assy.Wrong("somehow... @ 0x%x" % self.lo + " %d" % self['m'])
 		if self['i']:
 			return "[" + s + "]"
 		return s
