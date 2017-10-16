@@ -36,6 +36,17 @@
 #
 #	http://phk.freebsd.dk/hacks/Wargames/index.html
 
+#
+# Notes:
+#
+#	0x4000-		TMS9914 chip for plotter interface
+#	0x2000-		TMS9914 chip for host interface
+#
+#	$0x02		HPIB chip address (0x2000 or 0x4000)
+#	$0x18		"cursor"-pointer into screen-RAM
+#	$0xe1		Plotter-ID (last char in plotter_table)
+#
+
 from __future__ import print_function
 
 import os
@@ -158,7 +169,7 @@ def setup():
 
 def ttab(pj, a, b):
 	while a < b:
-		y = data.Txt(pj, a, pfx=1, align=1, label=False)
+		y = data.Txt(pj, a, pfx=1, align=1, label=True)
 		a = y.hi
 
 class Scrtxt(data.Data):
@@ -184,7 +195,7 @@ class Scrtxt(data.Data):
 					l.append(t)
 					t = ""
 					n = 0
-				hi += 1 
+				hi += 1
 				x = pj.m.bu16(hi)
 				hi += 2
 				y = pj.m.bu16(hi)
@@ -196,11 +207,11 @@ class Scrtxt(data.Data):
 
 		ll = l[0].replace(" ", "_")
 		pj.set_label(lo, "SCRTXT_" + ll)
-	
+
 		super(Scrtxt, self).__init__(pj, lo, hi, "scrtxt")
 		self.fmt = f
 		self.compact = True
-		
+
 def task(pj, cpu):
 	gpu = hp1345a.hp1345a()
 
@@ -304,7 +315,7 @@ def task(pj, cpu):
 				gpu.disass(pj, a)
 				a += 2
 				l -= 1
-			
+
 	if True:
 		# No idea, possibly length error in IMG_FOCUS ?
 		data.Const(pj, 0xff17, 0xff19, fmt="0x%04x", func=pj.m.bu16, size=2)
@@ -330,24 +341,45 @@ def task(pj, cpu):
 			b += 1
 			a += 2
 
+	# Stuff not accessed from anywhere
 	pj.todo(0xe5a1, cpu.disass)
+	pj.todo(0xebf0, cpu.disass)
 
 	while pj.run():
 		pass
 
 	pj.set_label(0x0291, "A=GETCHAR()")
 	pj.set_label(0x02d0, "PUTCHAR(A)")
+	pj.set_label(0x0312, "Y=FIND_CMD()")
 	pj.set_label(0x0338, "CLEAR_SCREEN()")
 	pj.set_label(0x0395, "PUTSTR(',')")
 	pj.set_label(0x039a, "PUTSTR(CRNL)")
 	pj.set_label(0x03a9, "memcpy(Y,X+2,@X)")
 	pj.set_label(0x04a2, "PUTNBR(D)")
+	pj.set_label(0x0bcb, "ERR_1_UNKNOWN_INSN()")
+	pj.set_label(0x0bdc, "ERR_2_WRONG_NO_PARAMS()")
 	pj.set_label(0x0f4e, "SCR_MSG(X)")
 	pj.set_label(0x0f77, "X = PREP_SCREEN()")
+	pj.set_label(0x0fac, "DELAY(@U)")
 	pj.set_label(0x2800, "dip_switch")
 	pj.set_label(0xe77e, "CMD_nop")
+	pj.set_label(0xef76, "PLOT_pu_sp_lt()")
+	pj.set_label(0xef90, "PLOT_SELECT_PEN(A)")
+	pj.set_label(0xefb9, "PLOT_LINE_TYPE(A)")
+	pj.set_label(0xf004, "PUTSTR(X+1,@X)")
 	pj.set_label(0xf0c0, "SPEC_CHAR()")
+	pj.set_label(0xf56e, "plotter_table")
 	pj.set_label(0xf7fd, "DIAG_MODE()")
+	pj.set_label(0xf825, "DIAG_HPIB_BACK2BACK()")
+	pj.set_label(0xf895, "HPIB_RESET_CHIPS()")
+	pj.set_label(0xf8ae, "HPIB_IFC()")
+	pj.set_block_comment(0xf895, "Set reset, clear interrupt, Clr reset")
+	pj.set_label(0xfa9f, "DIAG_SIGNATURE_EPROM1()")
+	pj.set_label(0xfaaf, "DIAG_SIGNATURE_EPROM2()")
+	pj.set_label(0xfac2, "DIAG_SIGNATURE_3000()")
+	pj.set_label(0xfade, "DIAG_SIGNATURE_RAM()")
+	pj.set_label(0xfaee, "DIAG_RAM()")
+	pj.set_label(0xfb03, "DIAG_IMGRAM()")
 	pj.set_label(0xfbcb, "DIAG_PIKES_PEAK()")
 	pj.set_label(0xfbdc, "DIAG_FOCUS()")
 
