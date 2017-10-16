@@ -86,7 +86,9 @@ class Job(object):
 		self.labels[adr] = lbl
 
 	def set_block_comment(self, adr, cmt):
-		self.block_comments[adr] = cmt
+		if not adr in self.block_comments:
+			self.block_comments[adr] = ""
+		self.block_comments[adr] += cmt + "\n"
 
 	def set_comment_prefix(self, prefix):
 		self.comment_prefix = prefix
