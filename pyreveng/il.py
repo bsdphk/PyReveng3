@@ -79,7 +79,7 @@ class IL_Ins(object):
 		self.ins = ins
 		self.il = []
 		self.il_c = 0
-		self.add_il(ins, [["0x%x" % ins.lo, ":"]])
+		# self.add_il(ins, [["0x%x" % ins.lo, ":"]])
 
 	def il_reg(self, r, d):
 		if r[0] != "%":
@@ -237,6 +237,8 @@ class IL_BB(object):
 			x += 1
 			if j[x][0] == "i":
 				x += 1
+			if j[x][:3] == "0x-":
+				continue
 			if j[x][:2] == "0x":
 				l.append(int(j[x], 0))
 			else:
