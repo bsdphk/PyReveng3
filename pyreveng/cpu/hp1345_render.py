@@ -438,10 +438,11 @@ def svg_wl(fn, wl, scale=.25):
 	fo.write('</g>\n')
 	fo.write('</svg>\n')
 
-def svg(pj, lo, hi, fn=None):
-	l = []
-	for a in range(lo, hi, 2):
-		l.append(pj.m.bu16(a))
+def svg(pj, lo, hi, fn=None, l=None):
+	if l is None:
+		l = []
+		for a in range(lo, hi, 2):
+			l.append(pj.m.bu16(a))
 	if fn is None:
 		fn = "/tmp/_.%s.%x.svg" % (pj.name, lo)
 	pj.set_block_comment(lo, "HP1345A graphics Rendered to " + fn)

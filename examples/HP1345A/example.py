@@ -30,6 +30,7 @@ import os
 from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.mcs48 as mcs48
 import pyreveng.cpu.hp1345a as hp1345a
+import pyreveng.cpu.hp1345_render as hp1345_render
 
 fw="01347-80010.bin"
 
@@ -76,14 +77,20 @@ def task(pj, cx):
 	while pj.run():
 		pass
 
+	l = []
 	for a in range(0x122, 0x200, 2):
+		l.append(pj.m.bu16(a))
 		gpu.disass(pj, a)
 
 	for a in range(0x222, 0x2c8, 2):
+		l.append(pj.m.bu16(a))
 		gpu.disass(pj, a)
+
+	hp1345_render.svg(pj, 0x122, 0x2c8, l=l)
 
 	for a in range(0x31e,0x400, 2):
 		gpu.disass(pj, a)
+	hp1345_render.svg(pj, 0x31e, 0x400)
 
 def output(pj):
 	code.lcmt_flows(pj)
