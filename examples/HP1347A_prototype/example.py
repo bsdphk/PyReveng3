@@ -146,8 +146,11 @@ CMDS = {
 
 def mem_setup():
 	m = mem.byte_mem(0x0000, 0x10000)
-	m.load_binfile(0x0000, 1, "hp1347a_proto.low.rom")
-	m.load_binfile(0xe000, 1, "hp1347a_proto.high.rom")
+	dn = os.path.dirname(__file__)
+	m.load_binfile(0x0000, 1,
+	    os.path.join(dn, "hp1347a_proto.low.rom"))
+	m.load_binfile(0xe000, 1,
+	    os.path.join(dn, "hp1347a_proto.high.rom"))
 
 	s = 0
 	for a in range(0x0000, 0x2000, 2):

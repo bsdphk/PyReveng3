@@ -43,6 +43,8 @@ try:
 except:
 	pass
 
+l.sort()
+
 for i in l:
 	j = i.split("/")
 	k = j[1].replace(".py", "")
