@@ -175,9 +175,12 @@ class Listing(object):
 
 		cmt = self.pj.block_comments.get(lo)
 		if cmt != None:
-			self.fo.write(self.pj.comment_prefix + "-------------------------------------------------------------------------------\n" + self.pj.comment_prefix)
-			self.fo.write(cmt.replace("\n", "\n" + self.pj.comment_prefix))
-			self.fo.write("-------------------------------------------------------------------------------\n")
+			w = 72 - len(self.pj.comment_prefix)
+			self.fo.write(self.pj.comment_prefix + "-" * w + "\n")
+			self.fo.write(self.pj.comment_prefix)
+			self.fo.write(cmt.replace("\n",
+			    "\n" + self.pj.comment_prefix))
+			self.fo.write("-" * w + "\n")
 
 		lbl = self.pj.labels.get(lo)
 		if lbl is None:
@@ -202,7 +205,7 @@ class Listing(object):
 			while len((r + " ").expandtabs()) < 32:
 				r += " "
 			if i < len(lcmt):
-				l = "; " + lcmt[i]
+				l = self.pj.comment_prefix + lcmt[i]
 			else:
 				l = ""
 			s = "%s\t%s%s%s" % (h, lbl, r, l)

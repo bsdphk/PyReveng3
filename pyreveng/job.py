@@ -75,7 +75,7 @@ class Job(object):
 		self.pending_flows = dict()	# flow.py
 		self.labels = dict()
 		self.block_comments = dict()
-		self.comment_prefix = ";"
+		self.comment_prefix = "; "
 		# Banks are valid but presently unavailable memory ranges
 		# such as overlay areas in bank-switching.
 		# use as:  pj.banks.append([0x1000, 0x2000])
