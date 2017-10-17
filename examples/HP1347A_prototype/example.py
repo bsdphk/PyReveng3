@@ -39,11 +39,20 @@
 #
 # Notes:
 #
-#	0x4000-		TMS9914 chip for plotter interface
+#	0x0000-1fff	EPROM.low
 #	0x2000-		TMS9914 chip for host interface
+#	0x2800		DIP switch
+#	0x3000		?
+#	0x3800		Signature-analysis ?
+#	0x4000-		TMS9914 chip for plotter interface
+#	0x6000-63ff	Scratch-pad RAM
+#	0x8000-bfff	Image RAM
+#	0xc000-dfff	?
+#	0xe000-ffff	EPROM.high
 #
+#	$0x09		End of image RAM
 #	$0x02		HPIB chip address (0x2000 or 0x4000)
-#	$0x18		"cursor"-pointer into screen-RAM
+#	$0x18		"cursor"-pointer into image-RAM
 #	$0xe1		Plotter-ID (last char in plotter_table)
 #
 
@@ -345,7 +354,14 @@ def task(pj, cpu):
 			a += 2
 
 	# Stuff not accessed from anywhere
+
 	pj.todo(0xe5a1, cpu.disass)
+	pj.set_label(0xe5a1, "BOGO_TEST_ROM")
+	pj.set_block_comment(0xe5a1, "Unused ROM checksum code")
+	pj.set_block_comment(0xe5a1, "NB: Expects low rom at 0xc000")
+
+	pj.set_label(0xe5ed, "TEST_IMGRAM")
+
 	pj.todo(0xebf0, cpu.disass)
 
 	while pj.run():
@@ -363,6 +379,7 @@ def task(pj, cpu):
 	pj.set_label(0x0bdc, "ERR_2_WRONG_NO_PARAMS()")
 	pj.set_label(0x0f4e, "SCR_MSG(X)")
 	pj.set_label(0x0f77, "X = PREP_SCREEN()")
+	pj.set_label(0x0f8e, "D = ADR2JMP(D)") 
 	pj.set_label(0x0fac, "DELAY(@U)")
 	pj.set_label(0x2800, "dip_switch")
 	pj.set_label(0xe77e, "CMD_nop")
