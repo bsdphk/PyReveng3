@@ -113,7 +113,7 @@ CMDS = {
 	"PG":	[ 0, "Page"],
 	"PR":	[ 0, "Plot Relative"],
 	"PU":	[ 0, "Pen Up"],
-	"RA":	[ 0, "? Read Attribute"],
+	"RA":	[ 0, "? Read Address"],
 	"RM":	[ 0, "? Read Memory"],
 	"SA":	[ 0, "Select Alt Charset"],
 	"SC":	[ 0, "Scale"],
@@ -135,8 +135,8 @@ CMDS = {
 	"VA":	[ 0, "Adaptive Velocity"],
 	"VN":	[ 0, "Normal Velocity"],
 	"VS":	[ 0, "Select Velocity"],
-	"WA":	[ 0, "? Write Attribute"],
-	"WM":	[ 0, "? Write Memory"],
+	"WA":	[ 0, "? Write Address <ADR>"],
+	"WM":	[ 0, "? Write Memory <DATA>[,<DATA>]*"],
 	"XC":	[ 0, "???"],
 	"XT":	[ 0, "X-Tick"],
 	"YT":	[ 0, "Y-Tick"],
@@ -374,9 +374,28 @@ def task(pj, cpu):
 	pj.set_label(0x0395, "PUTSTR(',')")
 	pj.set_label(0x039a, "PUTSTR(CRNL)")
 	pj.set_label(0x03a9, "memcpy(Y,X+2,@X)")
+	pj.set_label(0x03b9, "GETNBR()")
+	pj.set_block_comment(0x003b9, "Outputs $0x0c - Term (not comma)")
+	pj.set_block_comment(0x003b9, "Outputs $0x12 - Error")
+	pj.set_block_comment(0x003b9, "Outputs $0x1a = 0")
+	pj.set_block_comment(0x003b9, "Outputs $0x1b - Digits")
+	pj.set_block_comment(0x003b9, "Outputs $0x1f - Decimals")
+	pj.set_block_comment(0x003b9, "Outputs $0x27 - Negative")
+	pj.set_block_comment(0x003b9, "Outputs $0x31+32 - Number")
 	pj.set_label(0x04a2, "PUTNBR(D)")
 	pj.set_label(0x0bcb, "ERR_1_UNKNOWN_INSN()")
 	pj.set_label(0x0bdc, "ERR_2_WRONG_NO_PARAMS()")
+	pj.set_label(0x0bed, "ERR_3_XXX_OUT_OF_RANGE()")
+	pj.set_label(0x0c2e, "ERR_4_ILLEGAL_CHAR()")
+	pj.set_label(0x0c41, "ERR_11_NO_PLOTTER_HANDSHAKE()")
+	pj.set_label(0x0c5d, "ERR_12_UNRECOG_PLOTTER()")
+	pj.set_label(0x0c79, "ERR_22_FILE_NOT_OPEN_ON()")
+	pj.set_label(0x0c8c, "ERR_24_NOT_IN_SCROLL_MODE()")
+	pj.set_label(0x0c9f, "ERR_25_MEMORY_NOT_INIT()")
+	pj.set_label(0x0cb2, "ERR_32_ALL_FILES_NOT_CONFIG()")
+	pj.set_label(0x0cc5, "ERR_33_NO_DATA_TO_SCROLL()")
+	pj.set_label(0x0cd8, "ERR_34_MEMORY_OVERFLOW_ON()")
+	pj.set_label(0x0ceb, "ERR_35_FILE_ALREADY_OPEN_ON()")
 	pj.set_label(0x0f4e, "SCR_MSG(X)")
 	pj.set_label(0x0f77, "X = PREP_SCREEN()")
 	pj.set_label(0x0f8e, "D = ADR2JMP(D)") 
