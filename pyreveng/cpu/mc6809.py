@@ -36,18 +36,44 @@ from __future__ import print_function
 from pyreveng import assy, data
 
 mc6809_instructions = """
-NEG	-	|0 0 0 0 0 0 0 0| d		|
-COM	d	|0 0 0 0 0 0 1 1| d		|
+NEG	d	|0 0 0 0 0 0 0 0| d		| {
+	%1 = load i8 , i8* D
+	%2 = sub i8 %1 , 1
+	store i8 %2 , i8* D
+	FLG UXXXX %2 sub %1 1
+}
+COM	d	|0 0 0 0 0 0 1 1| d		| {
+	%1 = load i8 , i8* D
+	%2 = xor i8 %1 , 0xff
+	store i8 %2 , i8* D
+	FLG UXX01 %2
+}
 LSR	d	|0 0 0 0 0 1 0 0| d		|
 ROR	d	|0 0 0 0 0 1 1 0| d		|
 ASR	d	|0 0 0 0 0 1 1 1| d		|
 ASL	d	|0 0 0 0 1 0 0 0| d		|
 ROL	d	|0 0 0 0 1 0 0 1| d		|
-DEC	d	|0 0 0 0 1 0 1 0| d		|
-INC	d	|0 0 0 0 1 1 0 0| d		|
-TST	d	|0 0 0 0 1 1 0 1| d		|
+DEC	d	|0 0 0 0 1 0 1 0| d		| {
+	%1 = load i8 , i8* D
+	%2 = sub i8 %1 , 1
+	store i8 %2 , i8* D
+	FLG -XXX- %2 sub %1 1
+}
+INC	d	|0 0 0 0 1 1 0 0| d		| {
+	%1 = load i8 , i8* D
+	%2 = add i8 %1 , 1
+	store i8 %2 , i8* D
+	FLG -XXX- %2 add %1 1
+}
+TST	d	|0 0 0 0 1 1 0 1| d		| {
+	%1 = load i8 , i8* D
+	FLG -XX0- %1
+}
 JMP	d,>J	|0 0 0 0 1 1 1 0| d		|
-CLR	d	|0 0 0 0 1 1 1 1| d		|
+CLR	d	|0 0 0 0 1 1 1 1| d		| {
+	store i8 0 , i8* D
+	FLG -0100 
+}
 
 BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
 BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
@@ -69,7 +95,10 @@ SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
 
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
 CMPY    I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 0 0| I1		| I2		|
-LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		|
+LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		| {
+	%Y = i16 I16
+	FLG -XX0- %Y
+}
 
 CMPD	d	|0 0 0 1 0 0 0 0|1 0 0 1 0 0 1 1| d		|
 CMPY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 0 0| d		|
@@ -109,7 +138,9 @@ BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		|
 BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		|
 DAA	-	|0 0 0 1 1 0 0 1|
 ORCC	i	|0 0 0 1 1 0 1 0| i		|
-ANDCC	i	|0 0 0 1 1 1 0 0| i		|
+ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
+	%CC = and i8 %CC , I
+}
 SEX	-	|0 0 0 1 1 1 0 1|
 EXG	t	|0 0 0 1 1 1 1 0| t		|
 TFR	t	|0 0 0 1 1 1 1 1| t		|
@@ -154,9 +185,16 @@ ASRA	-	|0 1 0 0 0 1 1 1|
 ASLA	-	|0 1 0 0 1 0 0 0|
 ROLA	-	|0 1 0 0 1 0 0 1|
 DECA	-	|0 1 0 0 1 0 1 0|
-INCA	-	|0 1 0 0 1 1 0 0|
+INCA	-	|0 1 0 0 1 1 0 0| {
+	%1 = i8 %A
+	%A = add i8 %A , 1
+	FLG -XXX- %A add %1 1
+}
 TSTA	-	|0 1 0 0 1 1 0 1|
-CLRA	-	|0 1 0 0 1 1 1 1|
+CLRA	-	|0 1 0 0 1 1 1 1| {
+	%A = i8 0
+	FLG -0100
+}
 
 NEGB	-	|0 1 0 1 0 0 0 0|
 COMB	-	|0 1 0 1 0 0 1 1|
@@ -166,9 +204,16 @@ ASRB	-	|0 1 0 1 0 1 1 1|
 ASLB	-	|0 1 0 1 1 0 0 0|
 ROLB	-	|0 1 0 1 1 0 0 1|
 DECB	-	|0 1 0 1 1 0 1 0|
-INCB	-	|0 1 0 1 1 1 0 0|
+INCB	-	|0 1 0 1 1 1 0 0| {
+	%1 = i8 %B
+	%B = add i8 %B , 1
+	FLG -XXX- %B add %1 1
+}
 TSTB	-	|0 1 0 1 1 1 0 1|
-CLRB	-	|0 1 0 1 1 1 1 1|
+CLRB	-	|0 1 0 1 1 1 1 1| {
+	%B = i8 0
+	FLG -0100
+}
 
 NEG	P	|0 1 1 0 0 0 0 0|X| R |i| m	|
 COM	P	|0 1 1 0 0 0 1 1|X| R |i| m	|
@@ -200,16 +245,29 @@ SUBA	i	|1 0 0 0 0 0 0 0| i		|
 CMPA	i	|1 0 0 0 0 0 0 1| i		|
 SBCA	i	|1 0 0 0 0 0 1 0| i		|
 SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
-ANDA	i	|1 0 0 0 0 1 0 0| i		|
+ANDA	i	|1 0 0 0 0 1 0 0| i		| {
+	%A = and i8 %A , I
+	FLG -XX0- %A
+}
 BITA	i	|1 0 0 0 0 1 0 1| i		|
 LDA	i	|1 0 0 0 0 1 1 0| i		|
 EORA	i	|1 0 0 0 1 0 0 0| i		|
 ADCA	i	|1 0 0 0 1 0 0 1| i		|
-ORA	i	|1 0 0 0 1 0 1 0| i		|
-ADDA	i	|1 0 0 0 1 0 1 1| i		|
+ORA	i	|1 0 0 0 1 0 1 0| i		| {
+	%A = or i8 %A , I
+	FLG -XX0- %A
+}
+ADDA	i	|1 0 0 0 1 0 1 1| i		| {
+	%1 = i8 %A
+	%A = add i8 %A , I
+	FLG XXXXX %A add %1 I
+}
 CMPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		|
-LDX	I	|1 0 0 0 1 1 1 0| I1		| I2		|
+LDX	I	|1 0 0 0 1 1 1 0| I1		| I2		| {
+	%X = i16 I16
+	FLG -XX0- %X
+}
 
 SUBA	d	|1 0 0 1 0 0 0 0| d		|
 CMPA	d	|1 0 0 1 0 0 0 1| d		|
@@ -271,8 +329,15 @@ BITB	i	|1 1 0 0 0 1 0 1| i		|
 LDB	i	|1 1 0 0 0 1 1 0| i		|
 EORB	i	|1 1 0 0 1 0 0 0| i		|
 ADCB	i	|1 1 0 0 1 0 0 1| i		|
-ORB	i	|1 1 0 0 1 0 1 0| i		|
-ADDB	i	|1 1 0 0 1 0 1 1| i		|
+ORB	i	|1 1 0 0 1 0 1 0| i		| {
+	%B = or i8 %B , I
+	FLG -XX0- %B
+}
+ADDB	i	|1 1 0 0 1 0 1 1| i		| {
+	%1 = i8 %B
+	%B = add i8 %B , I
+	FLG XXXXX %B add %1 I
+}
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
 LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		|
 
@@ -338,7 +403,10 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
 """
 
 class mc6809_ins(assy.Instree_ins):
-	pass
+        def __init__(self, pj, lim, lang):
+                super(mc6809_ins, self).__init__(pj, lim, lang)
+		self.isz = "i8"
+                self.icache = {}
 
 	def assy_d(self, pj):
 		return "$0x%02x" % self['d']
@@ -441,10 +509,84 @@ class mc6809_ins(assy.Instree_ins):
 		s = r[val >> 4] + "," + r[val & 0xf]
 		return s
 
+	def ilmacro_D(self):
+		j = self.icache.get("d")
+		if j is None:
+			j = self.add_il([
+				["%1", "=", "add", "i16", "%DP", ",", "0x%02x" % self['d']]
+			], "%1")
+		self.icache["d"] = j
+		return j
+
+	def ilmacro_I(self):
+		return "0x%02x" % (self['i'])
+
+	def ilmacro_I16(self):
+		self.isz = "i16"
+		return "0x%02x%02x" % (self['I1'], self['I2'])
+
+	def ilfunc_FLG_N(self, arg):
+		c = "0x80"
+		if self.isz == "i16":
+			c += "00"
+		self.add_il([
+			["%1", "=", "and", self.isz, arg[0], ",", c],
+			["%CC.n", "=", "icmp", "eq", self.isz, "%1", ",", c]
+		])
+
+	def ilfunc_FLG_V(self, arg):
+		# XXX "Set if the carry from the MSB in the ALU does not match
+		# XXX the carry from the MSB-1"
+		assert len(arg) == 4
+		self.add_il([
+			["%CC.v", "=", "i1",
+			    "pyreveng.overflow." + arg[1], "(", arg[2], ",", arg[3], ")"]
+		])
+			
+	def ilfunc_FLG_Z(self, arg):
+		self.add_il([
+			["%CC.z", "=", "icmp", "eq", self.isz, arg[0], ",", "0"]
+		])
+
+	def ilfunc_FLG_H(self, arg):
+		# XXX
+		self.add_il([
+			["%CC.h", "=", "i1", "void"]
+		])
+
+	def ilfunc_FLG_C(self, arg):
+		assert len(arg) == 4
+		self.add_il([
+			["%CC.c", "=", "i1",
+			    "pyreveng.carry." + arg[1], "(", arg[2], ",", arg[3], ")"]
+		])
+
+	def ilfunc_FLG(self, arg):
+		f = {
+			"H": self.ilfunc_FLG_H,
+			"N": self.ilfunc_FLG_N,
+			"Z": self.ilfunc_FLG_Z,
+			"V": self.ilfunc_FLG_V,
+			"C": self.ilfunc_FLG_C,
+		}
+		a1 = arg.pop(0)
+		for j in "HNZVC":
+			if a1[0] == "0":
+				self.add_il([["%CC." + j.lower(), "=", "i1", "0" ]])
+			elif a1[0] == "1":
+				self.add_il([["%CC." + j.lower(), "=", "i1", "1" ]])
+			elif a1[0] == "U":
+				self.add_il([["%CC." + j.lower(), "=", "i1", "void" ]])
+			elif a1[0] != "-":
+				assert len(arg) > 0
+				f[j](arg)
+			a1 = a1[1:]
+
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.it.load_string(mc6809_instructions)
+		self.il = None
 		self.myleaf = mc6809_ins
 		if macros:
 			self.it.load_string(mc6809_macro_instructions)
