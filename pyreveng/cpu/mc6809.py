@@ -78,8 +78,12 @@ CLR	d	|0 0 0 0 1 1 1 1| d		| {
 BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
 BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
 BLS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 1| R1		| R2		|
-BCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		|
-BCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		|
+BCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		| {
+	br i1 %CC.c label HI , label DST
+}
+BCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		| {
+	br i1 %CC.c label DST , label HI
+}
 BNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		| {
 	br i1 %CC.z label HI , label DST
 }
@@ -122,7 +126,10 @@ CMPY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 0 0| e1		| e2		|
 LDY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 0| e1		| e2		|
 STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| e1		| e2		|
 
-LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		|
+LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		| {
+	%S = I16
+	FLG -XX0- %S
+}
 
 LDS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 0| d		|
 STS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 1| d		|
@@ -157,16 +164,24 @@ ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
 }
 SEX	-	|0 0 0 1 1 1 0 1|
 EXG	t	|0 0 0 1 1 1 1 0| t		|
-TFR	t	|0 0 0 1 1 1 1 1| t		|
+TFR	t	|0 0 0 1 1 1 1 1| t		| {
+	TFR
+}
 
 BRA	r,>J	|0 0 1 0 0 0 0 0| r		| {
 	br label DST
 }
-BRN	r,>JC	|0 0 1 0 0 0 0 1| r		|
+BRN	r,>JC	|0 0 1 0 0 0 0 1| r		| {
+	%0 = i8 0
+}
 BHI	r,>JC	|0 0 1 0 0 0 1 0| r		|
 BLS	r,>JC	|0 0 1 0 0 0 1 1| r		|
-BCC	r,>JC	|0 0 1 0 0 1 0 0| r		|
-BCS	r,>JC	|0 0 1 0 0 1 0 1| r		|
+BCC	r,>JC	|0 0 1 0 0 1 0 0| r		| {
+	br i1 %CC.c label DST , label HI
+}
+BCS	r,>JC	|0 0 1 0 0 1 0 1| r		| {
+	br i1 %CC.c label HI , label DST
+}
 BNE	r,>JC	|0 0 1 0 0 1 1 0| r		| {
 	br i1 %CC.z label HI , label DST
 }
@@ -388,7 +403,10 @@ ADDB	i	|1 1 0 0 1 0 1 1| i		| {
 	FLG XXXXX %B add %1 I
 }
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
-LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		|
+LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		| {
+	%U = I16
+	FLG -XX0- %U
+}
 
 SUBB	d	|1 1 0 1 0 0 0 0| d		|
 CMPB	d	|1 1 0 1 0 0 0 1| d		|
@@ -558,14 +576,17 @@ class mc6809_ins(assy.Instree_ins):
 
 	def assy_t(self, pj):
 		val = self['t']
+		sr = val >> 4
+		dr = val & 0xf
 		r = [
 			"D", "X",  "Y", "U",
 			"S", "PC", "?6?", "?7?",
 			"A", "B", "CCR", "DPR",
 			"?c?", "?d?", "?e?", "?f?"
 		]
-		s = r[val >> 4] + "," + r[val & 0xf]
-		return s
+		if r[sr][0] == "?" or r[dr][0] == "?":
+			raise assy.Wrong("Wrong arg to TFR (0x%02x)" % val)
+		return r[sr] + "," + r[dr]
 
 	def ilmacro_D(self):
 		j = self.icache.get("d")
@@ -575,6 +596,9 @@ class mc6809_ins(assy.Instree_ins):
 			], "%1")
 		self.icache["d"] = j
 		return j
+
+	def ilmacro_DST(self):
+		return "0x%04x" % self.dstadr
 
 	def ilmacro_HI(self):
 		return "0x%x" % self.hi
@@ -586,9 +610,36 @@ class mc6809_ins(assy.Instree_ins):
 		self.isz = "i16"
 		return "0x%02x%02x" % (self['I1'], self['I2'])
 
-	def ilmacro_DST(self):
-		return "0x%04x" % self.dstadr
-
+	def ilfunc_TFR(self, arg):
+		val = self['t']
+		sr = val >> 4
+		dr = val & 0xf
+		sz = ["i16", "i8"][sr >> 3]
+		r = [
+			"?0?", "%X",  "%Y", "%U",
+			"%S", "%PC", "?6?", "?7?",
+			"%A", "%B", "%CC", "%DP",
+			"?c?", "?d?", "?e?", "?f?"
+		]
+		if sr == 0:
+			r[0] = self.add_il([
+				["%1", "=", "zext", "i16", "%A"],
+				["%2", "=", "zext", "i16", "%B"],
+				["%3", "=", "shl", "i16", "8", "%2"],
+				["%0", "=", "or", "i16", "%1", ",", "%3"],
+			], "%0")
+		elif dr == 0:
+			r[0] = "%0"
+		self.add_il([
+			[r[dr], "=", sz, r[sr]]
+		])
+		if dr == 0:
+			self.add_il([
+				["%A", "=", "trunc", "i16", r[0], "to", "i8"],
+				["%0", "=", "shr", "i16", r[0], "8"],				
+				["%B", "=", "trunc", "i16", "%0", "to", "i8"],
+			])
+			
 	def ilfunc_FLG_N(self, arg):
 		c = "0x80"
 		if self.isz == "i16":
@@ -697,6 +748,7 @@ class mc6809_ins(assy.Instree_ins):
 					["store", "i16*", s, ",", r],
 				])
 			j >>= 1
+
 
 
 class mc6809(assy.Instree_disass):
