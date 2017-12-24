@@ -72,7 +72,7 @@ TST	d	|0 0 0 0 1 1 0 1| d		| {
 JMP	d,>J	|0 0 0 0 1 1 1 0| d		|
 CLR	d	|0 0 0 0 1 1 1 1| d		| {
 	store i8 0 , i8* D
-	FLG -0100 
+	FLG -0100
 }
 
 BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
@@ -80,10 +80,18 @@ BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
 BLS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 1| R1		| R2		|
 BCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		|
 BCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		|
-BNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		|
-BEQ	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 1| R1		| R2		|
-BVC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 0| R1		| R2		|
-BVS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 1| R1		| R2		|
+BNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		| {
+	br i1 %CC.z label HI , label DST
+}
+BEQ	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 1| R1		| R2		| {
+	br i1 %CC.z label DST , label HI
+}
+BVC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 0| R1		| R2		| {
+	br i1 %CC.v label HI , label DST
+}
+BVS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 1| R1		| R2		| {
+	br i1 %CC.v label DST , label HI
+}
 BPL	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 0| R1		| R2		|
 BMI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 1| R1		| R2		|
 BGE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 0| R1		| R2		|
@@ -134,8 +142,14 @@ CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| e1		| e2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
 SYNC	-	|0 0 0 1 0 0 1 1|
-BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		|
-BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		|
+BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		| {
+	br label DST
+}
+BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		| {
+	%S = sub i16 %S , 2
+	store i16 HI, i16* %S
+	br label DST
+}
 DAA	-	|0 0 0 1 1 0 0 1|
 ORCC	i	|0 0 0 1 1 0 1 0| i		|
 ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
@@ -145,16 +159,26 @@ SEX	-	|0 0 0 1 1 1 0 1|
 EXG	t	|0 0 0 1 1 1 1 0| t		|
 TFR	t	|0 0 0 1 1 1 1 1| t		|
 
-BRA	r,>J	|0 0 1 0 0 0 0 0| r		|
+BRA	r,>J	|0 0 1 0 0 0 0 0| r		| {
+	br label DST
+}
 BRN	r,>JC	|0 0 1 0 0 0 0 1| r		|
 BHI	r,>JC	|0 0 1 0 0 0 1 0| r		|
 BLS	r,>JC	|0 0 1 0 0 0 1 1| r		|
 BCC	r,>JC	|0 0 1 0 0 1 0 0| r		|
 BCS	r,>JC	|0 0 1 0 0 1 0 1| r		|
-BNE	r,>JC	|0 0 1 0 0 1 1 0| r		|
-BEQ	r,>JC	|0 0 1 0 0 1 1 1| r		|
-BVC	r,>JC	|0 0 1 0 1 0 0 0| r		|
-BVS	r,>JC	|0 0 1 0 1 0 0 1| r		|
+BNE	r,>JC	|0 0 1 0 0 1 1 0| r		| {
+	br i1 %CC.z label HI , label DST
+}
+BEQ	r,>JC	|0 0 1 0 0 1 1 1| r		| {
+	br i1 %CC.z label DST , label HI
+}
+BVC	r,>JC	|0 0 1 0 1 0 0 0| r		| {
+	br i1 %CC.v label HI , label DST
+}
+BVS	r,>JC	|0 0 1 0 1 0 0 1| r		| {
+	br i1 %CC.v label DST , label HI
+}
 BPL	r,>JC	|0 0 1 0 1 0 1 0| r		|
 BMI	r,>JC	|0 0 1 0 1 0 1 1| r		|
 BGE	r,>JC	|0 0 1 0 1 1 0 0| r		|
@@ -166,11 +190,23 @@ LEAX	P	|0 0 1 1 0 0 0 0|X| R |i| m	|
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
 LEAS	P	|0 0 1 1 0 0 1 0|X| R |i| m     |
 LEAU	P	|0 0 1 1 0 0 1 1|X| R |i| m     |
-PSHS	s	|0 0 1 1 0 1 0 0| i		|
-PULS	s	|0 0 1 1 0 1 0 1| i		|
-PSHU	s	|0 0 1 1 0 1 1 0| i		|
-PULU	s	|0 0 1 1 0 1 1 1| i		|
-RTS	>R	|0 0 1 1 1 0 0 1|
+PSHS	s	|0 0 1 1 0 1 0 0| i		| {
+	PUSH S
+}
+PULS	s	|0 0 1 1 0 1 0 1| i		| {
+	PULL S
+}
+PSHU	s	|0 0 1 1 0 1 1 0| i		| {
+	PUSH U
+}
+PULU	s	|0 0 1 1 0 1 1 1| i		| {
+	PULL U
+}
+RTS	>R	|0 0 1 1 1 0 0 1| {
+	%0 = load i16 , i16* %S
+	%S = add i16 %S , 2
+	br label %0
+}
 ABX	-	|0 0 1 1 1 0 1 0|
 RTI	>R	|0 0 1 1 1 0 1 1|
 CWAI	i	|0 0 1 1 1 1 0 0| i		|
@@ -250,7 +286,10 @@ ANDA	i	|1 0 0 0 0 1 0 0| i		| {
 	FLG -XX0- %A
 }
 BITA	i	|1 0 0 0 0 1 0 1| i		|
-LDA	i	|1 0 0 0 0 1 1 0| i		|
+LDA	i	|1 0 0 0 0 1 1 0| i		| {
+	%A = I
+	FLG -XX0- %A
+}
 EORA	i	|1 0 0 0 1 0 0 0| i		|
 ADCA	i	|1 0 0 0 1 0 0 1| i		|
 ORA	i	|1 0 0 0 1 0 1 0| i		| {
@@ -263,7 +302,11 @@ ADDA	i	|1 0 0 0 1 0 1 1| i		| {
 	FLG XXXXX %A add %1 I
 }
 CMPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
-BSR	r,>C	|1 0 0 0 1 1 0 1| r		|
+BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
+	%S = sub i16 %S , 2
+	store i16 HI, i16* %S
+	br label DST
+}
 LDX	I	|1 0 0 0 1 1 1 0| I1		| I2		| {
 	%X = i16 I16
 	FLG -XX0- %X
@@ -309,7 +352,10 @@ SBCA	E	|1 0 1 1 0 0 1 0| e1		| e2		|
 SUBD	E	|1 0 1 1 0 0 1 1| e1		| e2		|
 ANDA	E	|1 0 1 1 0 1 0 0| e1		| e2		|
 BITA	E	|1 0 1 1 0 1 0 1| e1		| e2		|
-LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		|
+LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		| {
+	%A = load i8, i8* DST
+	FLG -XX0- %A
+}
 STA	E	|1 0 1 1 0 1 1 1| e1		| e2		|
 EORA	E	|1 0 1 1 1 0 0 0| e1		| e2		|
 ADCA	E	|1 0 1 1 1 0 0 1| e1		| e2		|
@@ -317,7 +363,10 @@ ORA	E	|1 0 1 1 1 0 1 0| e1		| e2		|
 ADDA	E	|1 0 1 1 1 0 1 1| e1		| e2		|
 CMPX	E	|1 0 1 1 1 1 0 0| e1		| e2		|
 JSR	E,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
-LDX	E	|1 0 1 1 1 1 1 0| e1		| e2		|
+LDX	E	|1 0 1 1 1 1 1 0| e1		| e2		| {
+	%X = load i16, i16* DST
+	FLG -XX0- %X
+}
 STX	E	|1 0 1 1 1 1 1 1| e1		| e2		|
 
 SUBB	i	|1 1 0 0 0 0 0 0| i		|
@@ -398,15 +447,24 @@ LDD	i	|1 1 0 0 0 1 1 0| i		|0 0 0 1 1 1 0 1|
 CLRD	-	|0 1 0 1 1 1 1 1|0 0 0 1 1 1 0 1|
 ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		|
 ORD	I	|1 0 0 0 1 0 1 0| I1		|1 1 0 0 1 0 1 0| I2		|
-CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1|
-CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1|
+CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1| {
+	%A = i8 0
+	%B = i8 0
+	FLG -0100
+}
+CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
+	%A = i8 0
+	%B = i8 0
+	FLG -0100
+}
 """
 
+
 class mc6809_ins(assy.Instree_ins):
-        def __init__(self, pj, lim, lang):
-                super(mc6809_ins, self).__init__(pj, lim, lang)
+	def __init__(self, pj, lim, lang):
+		super(mc6809_ins, self).__init__(pj, lim, lang)
 		self.isz = "i8"
-                self.icache = {}
+		self.icache = {}
 
 	def assy_d(self, pj):
 		return "$0x%02x" % self['d']
@@ -435,6 +493,7 @@ class mc6809_ins(assy.Instree_ins):
 		return assy.Arg_dst(pj, self.dstadr)
 
 	def assy_s(self, pj):
+		# XXX: if PULL PC fix flow record
 		x = self['i']
 		l = []
 		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
@@ -449,7 +508,6 @@ class mc6809_ins(assy.Instree_ins):
 		if self.mne[:3] == "PSH":
 			l = reversed(l)
 		return ",".join(l)
-
 
 	def assy_P(self, pj):
 		if self['X'] == 1:
@@ -518,12 +576,18 @@ class mc6809_ins(assy.Instree_ins):
 		self.icache["d"] = j
 		return j
 
+	def ilmacro_HI(self):
+		return "0x%x" % self.hi
+
 	def ilmacro_I(self):
 		return "0x%02x" % (self['i'])
 
 	def ilmacro_I16(self):
 		self.isz = "i16"
 		return "0x%02x%02x" % (self['I1'], self['I2'])
+
+	def ilmacro_DST(self):
+		return "0x%04x" % self.dstadr
 
 	def ilfunc_FLG_N(self, arg):
 		c = "0x80"
@@ -542,7 +606,7 @@ class mc6809_ins(assy.Instree_ins):
 			["%CC.v", "=", "i1",
 			    "pyreveng.overflow." + arg[1], "(", arg[2], ",", arg[3], ")"]
 		])
-			
+
 	def ilfunc_FLG_Z(self, arg):
 		self.add_il([
 			["%CC.z", "=", "icmp", "eq", self.isz, arg[0], ",", "0"]
@@ -572,15 +636,68 @@ class mc6809_ins(assy.Instree_ins):
 		a1 = arg.pop(0)
 		for j in "HNZVC":
 			if a1[0] == "0":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "0" ]])
+				self.add_il([["%CC." + j.lower(), "=", "i1", "0"]])
 			elif a1[0] == "1":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "1" ]])
+				self.add_il([["%CC." + j.lower(), "=", "i1", "1"]])
 			elif a1[0] == "U":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "void" ]])
+				self.add_il([["%CC." + j.lower(), "=", "i1", "void"]])
 			elif a1[0] != "-":
 				assert len(arg) > 0
 				f[j](arg)
 			a1 = a1[1:]
+
+	def ilfunc_PULL(self, arg):
+		i = self['i']
+		s = "%" + arg[0]
+		if s == "%S":
+			sa = "%U"
+		else:
+			sa = "%S"
+		j = 0x01
+		for r in ('%CC', '%A', '%B', '%DP'):
+			if i & j:
+				self.add_il([
+					["load", r, "i8*", ",", s],
+					[s, "=", "add", "i16", s, ",", "1"],
+				])
+			j <<= 1
+		for r in ('%X', '%Y', sa):
+			if i & j:
+				self.add_il([
+					["load", r, "i16*", ",", s],
+					[s, "=", "add", "i16", s, ",", "2"],
+				])
+			j <<= 1
+		if i & j:
+			self.add_il([
+				["load", "%0", "i16*", ",", s],
+				[s, "=", "add", "i16", s, ",", "2"],
+				["br", "label", "%0"],
+			])
+
+	def ilfunc_PUSH(self, arg):
+		i = self['i']
+		s = "%" + arg[0]
+		if s == "%S":
+			sa = "%U"
+		else:
+			sa = "%S"
+		j = 0x80
+		for r in ('HI', sa, '%Y', '%X'):
+			if i & j:
+				self.add_il([
+					[s, "=", "sub", "i16", s, ",", "2"],
+					["store", "i16*", s, ",", r],
+				])
+			j >>= 1
+		for r in ('%DP', '%B', '%A', '%CC'):
+			if i & j:
+				self.add_il([
+					[s, "=", "sub", "i16", s, ",", "1"],
+					["store", "i16*", s, ",", r],
+				])
+			j >>= 1
+
 
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
