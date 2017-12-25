@@ -108,7 +108,7 @@ class Instree_ins(Assy):
 	def flow_JC(self, pj):
 		if self.cc == True:
 			self.add_flow(pj, ">", "?", self.dstadr)
-			self.add_flow(pj, ">", "!?", self.hi)
+			self.add_flow(pj, True, "!?", self.hi)
 		else:
 			self.add_flow(pj, ">", self.cc, self.dstadr)
 			self.add_flow(pj, True, "!" + self.cc, self.hi)
