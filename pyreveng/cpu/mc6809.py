@@ -75,33 +75,9 @@ CLR	d	|0 0 0 0 1 1 1 1| d		| {
 	FLG -0100
 }
 
-BRN	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 0 1| R1		| R2		|
-BHI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 0| R1		| R2		|
-BLS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 0 1 1| R1		| R2		|
-BCC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 0| R1		| R2		| {
-	br i1 %CC.c label HI , label DST
+B	R,CC	|0 0 0 1 0 0 0 0|0 0 1 0| cc    | R1		| R2		| {
+	BR
 }
-BCS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 0 1| R1		| R2		| {
-	br i1 %CC.c label DST , label HI
-}
-BNE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 0| R1		| R2		| {
-	br i1 %CC.z label HI , label DST
-}
-BEQ	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 0 1 1 1| R1		| R2		| {
-	br i1 %CC.z label DST , label HI
-}
-BVC	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 0| R1		| R2		| {
-	br i1 %CC.v label HI , label DST
-}
-BVS	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 0 1| R1		| R2		| {
-	br i1 %CC.v label DST , label HI
-}
-BPL	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 0| R1		| R2		|
-BMI	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 0 1 1| R1		| R2		|
-BGE	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 0| R1		| R2		|
-BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 0 1| R1		| R2		|
-BGT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 0| R1		| R2		|
-BLT	R,>JC	|0 0 0 1 0 0 0 0|0 0 1 0 1 1 1 1| R1		| R2		|
 
 SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
 
@@ -168,38 +144,9 @@ TFR	t	|0 0 0 1 1 1 1 1| t		| {
 	TFR
 }
 
-BRA	r,>J	|0 0 1 0 0 0 0 0| r		| {
-	br label DST
+B	r,CC	|0 0 1 0| cc    | r		| {
+	BR
 }
-BRN	r,>JC	|0 0 1 0 0 0 0 1| r		| {
-	%0 = i8 0
-}
-BHI	r,>JC	|0 0 1 0 0 0 1 0| r		|
-BLS	r,>JC	|0 0 1 0 0 0 1 1| r		|
-BCC	r,>JC	|0 0 1 0 0 1 0 0| r		| {
-	br i1 %CC.c label DST , label HI
-}
-BCS	r,>JC	|0 0 1 0 0 1 0 1| r		| {
-	br i1 %CC.c label HI , label DST
-}
-BNE	r,>JC	|0 0 1 0 0 1 1 0| r		| {
-	br i1 %CC.z label HI , label DST
-}
-BEQ	r,>JC	|0 0 1 0 0 1 1 1| r		| {
-	br i1 %CC.z label DST , label HI
-}
-BVC	r,>JC	|0 0 1 0 1 0 0 0| r		| {
-	br i1 %CC.v label HI , label DST
-}
-BVS	r,>JC	|0 0 1 0 1 0 0 1| r		| {
-	br i1 %CC.v label DST , label HI
-}
-BPL	r,>JC	|0 0 1 0 1 0 1 0| r		|
-BMI	r,>JC	|0 0 1 0 1 0 1 1| r		|
-BGE	r,>JC	|0 0 1 0 1 1 0 0| r		|
-BLT	r,>JC	|0 0 1 0 1 1 0 1| r		|
-BGT	r,>JC	|0 0 1 0 1 1 1 0| r		|
-BLE	r,>JC	|0 0 1 0 1 1 1 1| r		|
 
 LEAX	P	|0 0 1 1 0 0 0 0|X| R |i| m	|
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
@@ -490,6 +437,17 @@ class mc6809_ins(assy.Instree_ins):
 	def assy_i(self, pj):
 		return "#0x%02x" % self['i']
 
+	def assy_CC(self, pj):
+		self.cc = [
+			"RA", "RN", "HI", "LS", "CC", "CS", "NE", "EQ",
+			"VC", "VS", "PL", "MI", "GE", "LT", "GT", "LE"
+		][self['cc']]
+		self.mne += self.cc
+		if self['cc'] == 0:
+			self.flow_J(pj)
+		elif self['cc'] > 1:
+			self.flow_JC(pj)
+
 	def assy_I(self, pj):
 		self.dstadr = (self['I1'] << 8) | self['I2']
 		return assy.Arg_dst(pj, self.dstadr, "#")
@@ -587,6 +545,45 @@ class mc6809_ins(assy.Instree_ins):
 		if r[sr][0] == "?" or r[dr][0] == "?":
 			raise assy.Wrong("Wrong arg to TFR (0x%02x)" % val)
 		return r[sr] + "," + r[dr]
+
+	def ilmacro_BR(self):
+		cc = self['cc']
+		if cc == 0:
+			self.add_il([["br", "label", "0x%04x" % self.dstadr ]])
+			return
+		if cc == 1:
+			self.add_il([["%0", "=", "i8", "0"]])
+			return
+		if cc & 1:
+			d1 = "0x%04x" % self.dstadr
+			d2 = "HI"
+		else:
+			d1 = "HI"
+			d2 = "0x%04x" % self.dstadr
+		l = []
+		cc &= 0xe
+		if cc == 2:
+			l.append(["%0", "=", "or", "i1", "%CC.z", ",", "%CC.c"])
+			bb = "%0"
+		elif cc == 4:
+			bb = "%CC.c"
+		elif cc == 6:
+			bb = "%CC.z"
+		elif cc == 8:
+			bb = "%CC.v"
+		elif cc == 10:
+			bb = "%CC.n"
+		elif cc == 12:
+			l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
+			bb = "%0"
+		else:
+			l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
+			l.append(["%1", "=", "or", "i1", "%CC.z", ",", "%0"])
+			bb = "%1"
+		l.append(["br", "i1", bb, "label", d1, ",", "label", d2])
+
+		self.add_il(l)
+			
 
 	def ilmacro_D(self):
 		j = self.icache.get("d")
