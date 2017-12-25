@@ -201,7 +201,7 @@ class Instree_disass(code.Decode):
 				break
 			y = self.decode(pj, adr + x.len, l)
 			if y != None:
-				break
+				return y
 			l.pop(-1)
 		if y != None:
 			if self.il is not False:
