@@ -48,6 +48,7 @@ ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| ea	| {
 	%SR.z = icmp eq SZ %0 , 0
 	%SR.c = pyreveng.carry.add ( EA , DN )
 	%SR.v = pyreveng.overflow.add ( EA , DN )
+	%SR.x = i1 %SR.c
 	LEAS %0
 }
 ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| ea	| {
@@ -56,6 +57,7 @@ ADD		Z,ea,Dn		1f7f	|1 1 0 1| Dn  |0| sz| ea	| {
 	%SR.z = icmp eq SZ %0 , 0
 	%SR.c = pyreveng.carry.add ( DN , EA )
 	%SR.v = pyreveng.overflow.add ( DN , EA )
+	%SR.x = i1 %SR.c
 	DN = %0
 }
 # 111/4-7
@@ -91,7 +93,18 @@ ADDQ		Z,const,ea	037f	|0 1 0 1|const|0| sz| ea	| {
 	LEAS %0
 }
 # 117/4-13
-ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  |
+ADDX		Z,Dy,Dx		0000	|1 1 0 1| Dx  |1| sz|0 0|0| Dy  | {
+	%0 = add SZ DX , DY
+	%1 = zext i1 %SR.x to SZ
+	%2 = add SZ %0 , %1
+	%SR.n = icmp slt SZ %2 , 0
+	%3 = icmp eq SZ %2 , 0
+	%SR.z = and i1 %3 , %SR.z
+	%SR.c = pyreveng.carry.add ( DX , DY , %1 )
+	%SR.v = pyreveng.overflow.add ( DX , DY , %1 )
+	%SR.x = pyreveng.carry.add ( DX , DY , %1 )
+	DX = SZ %2
+}
 ADDX		Z,decAy,decAx	0000	|1 1 0 1| Ax  |1| sz|0 0|1| Ay  |
 # 119/4-15
 # XXX AND.W An,Dn sounds like it should be possible ?
