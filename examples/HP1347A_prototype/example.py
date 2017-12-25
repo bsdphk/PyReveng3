@@ -431,3 +431,8 @@ if __name__ == '__main__':
 	task(pj, cx)
 	output(pj)
 
+	import pyreveng.il
+
+	a = pyreveng.il.analysis(pj)
+	a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))
+
