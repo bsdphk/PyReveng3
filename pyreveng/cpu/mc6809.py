@@ -36,6 +36,9 @@ from __future__ import print_function
 from pyreveng import assy, data
 
 mc6809_instructions = """
++	PFX10	|0 0 0 1 0 0 0 0|
++	PFX11	|0 0 0 1 0 0 0 1|
+
 NEG	d	|0 0 0 0 0 0 0 0| d		| {
 	%1 = load i8 , i8* D
 	%2 = sub i8 %1 , 1
@@ -82,36 +85,11 @@ B	R,CC	|0 0 0 1 0 0 0 0|0 0 1 0| cc    | R1		| R2		| {
 SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
 
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
-CMPY    I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 0 0| I1		| I2		|
-LDY     I	|0 0 0 1 0 0 0 0|1 0 0 0 1 1 1 0| I1		| I2		| {
-	%Y = i16 I16
-	FLG -XX0- %Y
-}
 
 CMPD	d	|0 0 0 1 0 0 0 0|1 0 0 1 0 0 1 1| d		|
-CMPY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 0 0| d		|
-LDY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 0| d		|
-STY	d	|0 0 0 1 0 0 0 0|1 0 0 1 1 1 1 1| d		|
 
 CMPD    P	|0 0 0 1 0 0 0 0|1 0 1 0 0 0 1 1|X| R |i| m     |
-CMPY    P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 0 0|X| R |i| m     |
-LDY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 0|X| R |i| m     |
-STY     P	|0 0 0 1 0 0 0 0|1 0 1 0 1 1 1 1|X| R |i| m     |
 CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| e1		| e2		|
-CMPY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 0 0| e1		| e2		|
-LDY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 0| e1		| e2		|
-STY	E	|0 0 0 1 0 0 0 0|1 0 1 1 1 1 1 1| e1		| e2		|
-
-LDS     I	|0 0 0 1 0 0 0 0|1 1 0 0 1 1 1 0| I1		| I2		| {
-	%S = I16
-	FLG -XX0- %S
-}
-
-LDS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 0| d		|
-STS	d	|0 0 0 1 0 0 0 0|1 1 0 1 1 1 1 1| d		|
-
-LDS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 0|X| R |i| m     |
-STS	P	|0 0 0 1 0 0 0 0|1 1 1 0 1 1 1 1|X| R |i| m     |
 
 SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
@@ -138,7 +116,7 @@ ORCC	i	|0 0 0 1 1 0 1 0| i		|
 ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
 	%CC = and i8 %CC , I
 }
-SEX	-	|0 0 0 1 1 1 0 1|
+SE	XY,-	|0 0 0 1 1 1 0 1|
 EXG	t	|0 0 0 1 1 1 1 0| t		|
 TFR	t	|0 0 0 1 1 1 1 1| t		| {
 	TFR
@@ -148,7 +126,7 @@ B	r,CC	|0 0 1 0| cc    | r		| {
 	BR
 }
 
-LEAX	P	|0 0 1 1 0 0 0 0|X| R |i| m	|
+LEA	XY,P	|0 0 1 1 0 0 0 0|X| R |i| m	|
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
 LEAS	P	|0 0 1 1 0 0 1 0|X| R |i| m     |
 LEAU	P	|0 0 1 1 0 0 1 1|X| R |i| m     |
@@ -169,7 +147,7 @@ RTS	>R	|0 0 1 1 1 0 0 1| {
 	%S = add i16 %S , 2
 	br label %0
 }
-ABX	-	|0 0 1 1 1 0 1 0|
+AB	XY,-	|0 0 1 1 1 0 1 0|
 RTI	>R	|0 0 1 1 1 0 1 1|
 CWAI	i	|0 0 1 1 1 1 0 0| i		|
 MUL	-	|0 0 1 1 1 1 0 1|
@@ -263,15 +241,15 @@ ADDA	i	|1 0 0 0 1 0 1 1| i		| {
 	%A = add i8 %A , I
 	FLG XXXXX %A add %1 I
 }
-CMPX	I	|1 0 0 0 1 1 0 0| I1		| I2		|
+CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	%S = sub i16 %S , 2
 	store i16 HI, i16* %S
 	br label DST
 }
-LDX	I	|1 0 0 0 1 1 1 0| I1		| I2		| {
-	%X = i16 I16
-	FLG -XX0- %X
+LD	XY,I	|1 0 0 0 1 1 1 0| I1		| I2		| {
+	XY = i16 I16
+	FLG -XX0- I16
 }
 
 SUBA	d	|1 0 0 1 0 0 0 0| d		|
@@ -286,10 +264,10 @@ EORA	d	|1 0 0 1 1 0 0 0| d		|
 ADCA	d	|1 0 0 1 1 0 0 1| d		|
 ORA	d	|1 0 0 1 1 0 1 0| d		|
 ADDA	d	|1 0 0 1 1 0 1 1| d		|
-CMPX	d	|1 0 0 1 1 1 0 0| d		|
+CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
 JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
-LDX	d	|1 0 0 1 1 1 1 0| d		|
-STX	d	|1 0 0 1 1 1 1 1| d		|
+LD	XY,d	|1 0 0 1 1 1 1 0| d		|
+ST	XY,d	|1 0 0 1 1 1 1 1| d		|
 
 SUBA	P	|1 0 1 0 0 0 0 0|X| R |i| m	|
 CMPA	P	|1 0 1 0 0 0 0 1|X| R |i| m	|
@@ -303,10 +281,10 @@ EORA	P	|1 0 1 0 1 0 0 0|X| R |i| m	|
 ADCA	P	|1 0 1 0 1 0 0 1|X| R |i| m	|
 ORA	P	|1 0 1 0 1 0 1 0|X| R |i| m	|
 ADDA	P	|1 0 1 0 1 0 1 1|X| R |i| m	|
-CMPX	P	|1 0 1 0 1 1 0 0|X| R |i| m	|
+CMP	XY,P	|1 0 1 0 1 1 0 0|X| R |i| m	|
 JSR	P,>C	|1 0 1 0 1 1 0 1|X| R |i| m	|
-LDX	P	|1 0 1 0 1 1 1 0|X| R |i| m     |
-STX	P	|1 0 1 0 1 1 1 1|X| R |i| m     |
+LD	XY,P	|1 0 1 0 1 1 1 0|X| R |i| m     |
+ST	XY,P	|1 0 1 0 1 1 1 1|X| R |i| m     |
 
 SUBA	E	|1 0 1 1 0 0 0 0| e1		| e2		|
 CMPA	E	|1 0 1 1 0 0 0 1| e1		| e2		|
@@ -323,13 +301,13 @@ EORA	E	|1 0 1 1 1 0 0 0| e1		| e2		|
 ADCA	E	|1 0 1 1 1 0 0 1| e1		| e2		|
 ORA	E	|1 0 1 1 1 0 1 0| e1		| e2		|
 ADDA	E	|1 0 1 1 1 0 1 1| e1		| e2		|
-CMPX	E	|1 0 1 1 1 1 0 0| e1		| e2		|
+CMP	XY,E	|1 0 1 1 1 1 0 0| e1		| e2		|
 JSR	E,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
-LDX	E	|1 0 1 1 1 1 1 0| e1		| e2		| {
+LD	XY,E	|1 0 1 1 1 1 1 0| e1		| e2		| {
 	%X = load i16, i16* DST
 	FLG -XX0- %X
 }
-STX	E	|1 0 1 1 1 1 1 1| e1		| e2		|
+ST	XY,E	|1 0 1 1 1 1 1 1| e1		| e2		|
 
 SUBB	i	|1 1 0 0 0 0 0 0| i		|
 CMPB	i	|1 1 0 0 0 0 0 1| i		|
@@ -350,9 +328,9 @@ ADDB	i	|1 1 0 0 1 0 1 1| i		| {
 	FLG XXXXX %B add %1 I
 }
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
-LDU	I	|1 1 0 0 1 1 1 0| I1		| I2		| {
-	%U = I16
-	FLG -XX0- %U
+LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
+	SU = I16
+	FLG -XX0- I16
 }
 
 SUBB	d	|1 1 0 1 0 0 0 0| d		|
@@ -369,8 +347,8 @@ ORB	d	|1 1 0 1 1 0 1 0| d		|
 ADDB	d	|1 1 0 1 1 0 1 1| d		|
 LDD	d	|1 1 0 1 1 1 0 0| d		|
 STD	d	|1 1 0 1 1 1 0 1| d		|
-LDU	d	|1 1 0 1 1 1 1 0| d		|
-STU	d	|1 1 0 1 1 1 1 1| d		|
+LD	SU,d	|1 1 0 1 1 1 1 0| d		|
+ST	SU,d	|1 1 0 1 1 1 1 1| d		|
 
 SUBB	P	|1 1 1 0 0 0 0 0|X| R |i| m     |
 CMPB	P	|1 1 1 0 0 0 0 1|X| R |i| m     |
@@ -386,8 +364,8 @@ ORB	P	|1 1 1 0 1 0 1 0|X| R |i| m     |
 ADDB	P	|1 1 1 0 1 0 1 1|X| R |i| m     |
 LDD	P	|1 1 1 0 1 1 0 0|X| R |i| m     |
 STD	P	|1 1 1 0 1 1 0 1|X| R |i| m     |
-LDU	P	|1 1 1 0 1 1 1 0|X| R |i| m     |
-STU	P	|1 1 1 0 1 1 1 1|X| R |i| m     |
+LD	SU,P	|1 1 1 0 1 1 1 0|X| R |i| m     |
+ST	SU,P	|1 1 1 0 1 1 1 1|X| R |i| m     |
 
 SUBB	E	|1 1 1 1 0 0 0 0| e1		| e2		|
 CMPB	E	|1 1 1 1 0 0 0 1| e1		| e2		|
@@ -403,8 +381,8 @@ ORB	E	|1 1 1 1 1 0 1 0| e1		| e2		|
 ADDB	E	|1 1 1 1 1 0 1 1| e1		| e2		|
 LDD	E	|1 1 1 1 1 1 0 0| e1		| e2		|
 STD	E	|1 1 1 1 1 1 0 1| e1		| e2		|
-LDU	E	|1 1 1 1 1 1 1 0| e1		| e2		|
-STU	E	|1 1 1 1 1 1 1 1| e1		| e2		|
+LD	SU,E	|1 1 1 1 1 1 1 0| e1		| e2		|
+ST	SU,E	|1 1 1 1 1 1 1 1| e1		| e2		|
 """
 
 mc6809_macro_instructions = """
@@ -430,6 +408,25 @@ class mc6809_ins(assy.Instree_ins):
 		super(mc6809_ins, self).__init__(pj, lim, lang)
 		self.isz = "i8"
 		self.icache = {}
+		self.pfx = None
+
+	def assy_PFX10(self, pj):
+		self.pfx = 0x10
+
+	def assy_PFX11(self, pj):
+		self.pfx = 0x11
+
+	def assy_XY(self, pj):
+		if self.pfx == 0x10:
+			self.mne += "Y"
+		else:
+			self.mne += "X"
+
+	def assy_SU(self, pj):
+		if self.pfx == 0x10:
+			self.mne += "S"
+		else:
+			self.mne += "U"
 
 	def assy_d(self, pj):
 		return "$0x%02x" % self['d']
@@ -549,7 +546,7 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_BR(self):
 		cc = self['cc']
 		if cc == 0:
-			self.add_il([["br", "label", "0x%04x" % self.dstadr ]])
+			self.add_il([["br", "label", "0x%04x" % self.dstadr]])
 			return
 		if cc == 1:
 			self.add_il([["%0", "=", "i8", "0"]])
@@ -583,7 +580,6 @@ class mc6809_ins(assy.Instree_ins):
 		l.append(["br", "i1", bb, "label", d1, ",", "label", d2])
 
 		self.add_il(l)
-			
 
 	def ilmacro_D(self):
 		j = self.icache.get("d")
@@ -606,6 +602,18 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_I16(self):
 		self.isz = "i16"
 		return "0x%02x%02x" % (self['I1'], self['I2'])
+
+	def ilmacro_SU(self):
+		if self.pfx == 0x10:
+			return "%S"
+		else:
+			return "%U"
+
+	def ilmacro_XY(self):
+		if self.pfx == 0x10:
+			return "%Y"
+		else:
+			return "%X"
 
 	def ilfunc_TFR(self, arg):
 		val = self['t']
@@ -633,10 +641,10 @@ class mc6809_ins(assy.Instree_ins):
 		if dr == 0:
 			self.add_il([
 				["%A", "=", "trunc", "i16", r[0], "to", "i8"],
-				["%0", "=", "shr", "i16", r[0], "8"],				
+				["%0", "=", "shr", "i16", r[0], "8"],
 				["%B", "=", "trunc", "i16", "%0", "to", "i8"],
 			])
-			
+
 	def ilfunc_FLG_N(self, arg):
 		c = "0x80"
 		if self.isz == "i16":
@@ -745,7 +753,6 @@ class mc6809_ins(assy.Instree_ins):
 					["store", "i16*", s, ",", r],
 				])
 			j >>= 1
-
 
 
 class mc6809(assy.Instree_disass):
