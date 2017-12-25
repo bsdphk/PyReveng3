@@ -315,7 +315,10 @@ SBCB	i	|1 1 0 0 0 0 1 0| i		|
 ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
 ANDB	i	|1 1 0 0 0 1 0 0| i		|
 BITB	i	|1 1 0 0 0 1 0 1| i		|
-LDB	i	|1 1 0 0 0 1 1 0| i		|
+LDB	i	|1 1 0 0 0 1 1 0| i		| {
+	%B = i8 I
+	FLG -XX0- I
+}
 EORB	i	|1 1 0 0 1 0 0 0| i		|
 ADCB	i	|1 1 0 0 1 0 0 1| i		|
 ORB	i	|1 1 0 0 1 0 1 0| i		| {
@@ -327,7 +330,11 @@ ADDB	i	|1 1 0 0 1 0 1 1| i		| {
 	%B = add i8 %B , I
 	FLG XXXXX %B add %1 I
 }
-LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		|
+LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
+	%A = i8 I1
+	%B = i8 I2
+	FLG -XX0- I16
+}
 LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
 	SU = I16
 	FLG -XX0- I16
@@ -380,7 +387,11 @@ ADCB	E	|1 1 1 1 1 0 0 1| e1		| e2		|
 ORB	E	|1 1 1 1 1 0 1 0| e1		| e2		|
 ADDB	E	|1 1 1 1 1 0 1 1| e1		| e2		|
 LDD	E	|1 1 1 1 1 1 0 0| e1		| e2		|
-STD	E	|1 1 1 1 1 1 0 1| e1		| e2		|
+STD	E	|1 1 1 1 1 1 0 1| e1		| e2		| {
+	MKD
+	store i16* DST , %D
+	FLG -XX0- %D
+}
 LD	SU,E	|1 1 1 1 1 1 1 0| e1		| e2		|
 ST	SU,E	|1 1 1 1 1 1 1 1| e1		| e2		|
 """
@@ -599,9 +610,27 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_I(self):
 		return "0x%02x" % (self['i'])
 
+	def ilmacro_I1(self):
+		return "0x%02x" % (self['I1'])
+
+	def ilmacro_I2(self):
+		return "0x%02x" % (self['I2'])
+
+	def ilmacro_I(self):
+		return "0x%02x" % (self['i'])
+
 	def ilmacro_I16(self):
 		self.isz = "i16"
 		return "0x%02x%02x" % (self['I1'], self['I2'])
+
+	def ilmacro_MKD(self):
+		self.isz = "i16"
+		self.add_il([
+			["%0", "=", "zext", "i8", "%A", "to", "i16"],
+			["%1", "=", "shl", "i16", "%0", ",", "8"],
+			["%2", "=", "zext", "i8", "%B", "to", "i16"],
+			["%D", "=", "or", "i16", "%1", ",", "%2"],
+		])
 
 	def ilmacro_SU(self):
 		if self.pfx == 0x10:
