@@ -973,20 +973,20 @@ class mc6809_ins(assy.Instree_ins):
 		for r in ('%CC', '%A', '%B', '%DP'):
 			if i & j:
 				self.add_il([
-					["load", r, "i8*", ",", s],
+					[r, "=", "load", "i8", ",", "i8*", ",", s],
 					[s, "=", "add", "i16", s, ",", "1"],
 				])
 			j <<= 1
 		for r in ('%X', '%Y', sa):
 			if i & j:
 				self.add_il([
-					["load", r, "i16*", ",", s],
+					[r, "=", "load", "i16", ",", "i16*", ",", s],
 					[s, "=", "add", "i16", s, ",", "2"],
 				])
 			j <<= 1
 		if i & j:
 			self.add_il([
-				["load", "%0", "i16*", ",", s],
+				["%0", "=", "load", "i16", ",", "i16*", ",", s],
 				[s, "=", "add", "i16", s, ",", "2"],
 				["br", "label", "%0"],
 			])
