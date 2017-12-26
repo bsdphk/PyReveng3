@@ -48,10 +48,12 @@ NEG	d	|0 0 0 0 0 0 0 0| d		| {
 	FLG UXXXX %2 sub %1 1
 }
 
-NEG	P	|0 1 1 0 0 0 0 0|X| R |i| m	|
-
-NEG	E	|0 1 1 1 0 0 0 0| e1		| e2		|
-
+NEG	M	|0 1 1|e|0 0 0 0| m		| {
+	%1 = load i8 , i8* M
+	%2 = sub i8 %1 , 1
+	store i8 %2 , i8* M
+	FLG UXXXX %2 sub %1 1
+}
 
 COM	d	|0 0 0 0 0 0 1 1| d		| {
 	%1 = load i8 , i8* D
@@ -60,39 +62,32 @@ COM	d	|0 0 0 0 0 0 1 1| d		| {
 	FLG UXX01 %2
 }
 
-COM	P	|0 1 1 0 0 0 1 1|X| R |i| m	|
-
-COM	E	|0 1 1 1 0 0 1 1| e1		| e2		|
+COM	M	|0 1 1|e|0 0 1 1| m		| {
+	%1 = load i8 , i8* M
+	%2 = xor i8 %1 , 0xff
+	store i8 %2 , i8* M
+	FLG UXX01 %2
+}
 
 LSR	d	|0 0 0 0 0 1 0 0| d		|
 
-LSR	P	|0 1 1 0 0 1 0 0|X| R |i| m	|
-
-LSR	E	|0 1 1 1 0 1 0 0| e1		| e2		|
+LSR	M	|0 1 1|e|0 1 0 0| m		|
 
 ROR	d	|0 0 0 0 0 1 1 0| d		|
 
-ROR	P	|0 1 1 0 0 1 1 0|X| R |i| m	|
-
-ROR	E	|0 1 1 1 0 1 1 0| e1		| e2		|
+ROR	M	|0 1 1|e|0 1 1 0| m		|
 
 ASR	d	|0 0 0 0 0 1 1 1| d		|
 
-ASR	P	|0 1 1 0 0 1 1 1|X| R |i| m	|
-
-ASR	E	|0 1 1 1 0 1 1 1| e1		| e2		|
+ASR	M	|0 1 1|e|0 1 1 1| m		|
 
 ASL	d	|0 0 0 0 1 0 0 0| d		|
 
-ASL	P	|0 1 1 0 1 0 0 0|X| R |i| m	|
-
-ASL	E	|0 1 1 1 1 0 0 0| e1		| e2		|
+ASL	M	|0 1 1|e|1 0 0 0| m		|
 
 ROL	d	|0 0 0 0 1 0 0 1| d		|
 
-ROL	P	|0 1 1 0 1 0 0 1|X| R |i| m	|
-
-ROL	E	|0 1 1 1 1 0 0 1| e1		| e2		|
+ROL	M	|0 1 1|e|1 0 0 1| m		|
 
 DEC	d	|0 0 0 0 1 0 1 0| d		| {
 	%1 = load i8 , i8* D
@@ -101,10 +96,7 @@ DEC	d	|0 0 0 0 1 0 1 0| d		| {
 	FLG -XXX- %2 sub %1 1
 }
 
-DEC	P	|0 1 1 0 1 0 1 0|X| R |i| m	|
-
-DEC	E	|0 1 1 1 1 0 1 0| e1		| e2		|
-
+DEC	M	|0 1 1|e|1 0 1 0| m		|
 
 INC	d	|0 0 0 0 1 1 0 0| d		| {
 	%1 = load i8 , i8* D
@@ -113,10 +105,7 @@ INC	d	|0 0 0 0 1 1 0 0| d		| {
 	FLG -XXX- %2 add %1 1
 }
 
-INC	P	|0 1 1 0 1 1 0 0|X| R |i| m	|
-
-INC	E	|0 1 1 1 1 1 0 0| e1		| e2		|
-
+INC	M	|0 1 1|e|1 1 0 0| m		|
 
 TST	d	|0 0 0 0 1 1 0 1| d		| {
 	%1 = load i8 , i8* D
@@ -127,9 +116,7 @@ JMP	d,>J	|0 0 0 0 1 1 1 0| d		| {
 	br label D
 }
 
-JMP	P,>J	|0 1 1 0 1 1 1 0|X| R |i| m	|
-
-JMP	E,>J	|0 1 1 1 1 1 1 0| e1		| e2		|
+JMP	M,>J	|0 1 1|e|1 1 1 0| m		|
 
 CLR	d	|0 0 0 0 1 1 1 1| d		| {
 	store i8 0 , i8* D
@@ -202,7 +189,7 @@ B	r,CC	|0 0 1 0| cc    | r		| {
 	BR
 }
 
-LEA	XY,P	|0 0 1 1 0 0 0 0|X| R |i| m	|
+LEAX	P	|0 0 1 1 0 0 0 0|X| R |i| m	|
 
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
 
@@ -267,14 +254,9 @@ CLR	AB	|0 1 0|a|1 1 1 1| {
 	FLG -0100
 }
 
-TST	P	|0 1 1 0 1 1 0 1|X| R |i| m	|
+TST	M	|0 1 1|e|1 1 0 1| m		|
 
-TST	E	|0 1 1 1 1 1 0 1| e1		| e2		|
-
-CLR	P	|0 1 1 0 1 1 1 1|X| R |i| m	|
-
-CLR	E	|0 1 1 1 1 1 1 1| e1		| e2		|
-
+CLR	M	|0 1 1|e|1 1 1 1| m		|
 
 SUB	AB,i	|1|a|0 0 0 0 0 0| i		| {
 	%1 = i8 AB
@@ -347,9 +329,17 @@ OR	AB,d	|1|a|0 1 1 0 1 0| d		|
 
 ADD	AB,d	|1|a|0 1 1 0 1 1| d		|
 
-LDD	d	|1 1 0 1 1 1 0 0| d		|
+LDD	d	|1 1 0 1 1 1 0 0| d		| {
+	%D = load i16 , i16* D
+	FLG16 -XX0- %D
+	MKAB
+}
 
-STD	d	|1 1 0 1 1 1 0 1| d		|
+STD	d	|1 1 0 1 1 1 0 1| d		| {
+	MKD
+	store i16* D , %D
+	FLG16 -XX0- %D
+}
 
 CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
 
@@ -359,110 +349,70 @@ LD	XY,d	|1 0 0 1 1 1 1 0| d		|
 
 ST	XY,d	|1 0 0 1 1 1 1 1| d		|
 
-SUB	AB,P	|1|a|1 0 0 0 0 0|X| R |i| m	|
+SUB	AB,M	|1|a|1|e|0 0 0 0| m		|
 
-CMP	AB,P	|1|a|1 0 0 0 0 1|X| R |i| m	|
+CMP	AB,M	|1|a|1|e|0 0 0 1| m		|
 
-SBC	AB,P	|1|a|1 0 0 0 1 0|X| R |i| m	|
+SBC	AB,M	|1|a|1|e|0 0 1 0| m		|
 
-SUBD	P	|1 0 1 0 0 0 1 1|X| R |i| m	|
+SUBD	M	|1 0 1|e|0 0 1 1| m		|
 
-ADDD	P	|1 1 1 0 0 0 1 1|X| R |i| m     |
+ADDD	M	|1 1 1|e|0 0 1 1| m		|
 
-AND	AB,P	|1|a|1 0 0 1 0 0|X| R |i| m	|
+AND	AB,M	|1|a|1|e|0 1 0 0| m		|
 
-BIT	AB,P	|1|a|1 0 0 1 0 1|X| R |i| m	|
+BIT	AB,M	|1|a|1|e|0 1 0 1| m		|
 
-LD	AB,P	|1|a|1 0 0 1 1 0|X| R |i| m	|
+LD	AB,M	|1|a|1|e|0 1 1 0| m		|
 
-ST	AB,P	|1|a|1 0 0 1 1 1|X| R |i| m	|
+ST	AB,M	|1|a|1|e|0 1 1 1| m		|
 
-EOR	AB,P	|1|a|1 0 1 0 0 0|X| R |i| m	|
+EOR	AB,M	|1|a|1|e|1 0 0 0| m		|
 
-ADC	AB,P	|1|a|1 0 1 0 0 1|X| R |i| m	|
+ADC	AB,M	|1|a|1|e|1 0 0 1| m		|
 
-OR	AB,P	|1|a|1 0 1 0 1 0|X| R |i| m	|
+OR	AB,M	|1|a|1|e|1 0 1 0| m		|
 
-ADD	AB,P	|1|a|1 0 1 0 1 1|X| R |i| m	|
+ADD	AB,M	|1|a|1|e|1 0 1 1| m		|
 
-CMP	XY,P	|1 0 1 0 1 1 0 0|X| R |i| m	|
+CMP	XY,M	|1 0 1|e|1 1 0 0| m		|
 
-JSR	P,>C	|1 0 1 0 1 1 0 1|X| R |i| m	|
+JSR	M,>C	|1 0 1|e|1 1 0 1| m		|
 
-LD	XY,P	|1 0 1 0 1 1 1 0|X| R |i| m     |
+LD	XY,M	|1 0 1|e|1 1 1 0| m		|
 
-ST	XY,P	|1 0 1 0 1 1 1 1|X| R |i| m     |
-
-SUB	AB,E	|1|a|1 1 0 0 0 0| e1		| e2		|
-
-CMP	AB,E	|1|a|1 1 0 0 0 1| e1		| e2		|
-
-SBC	AB,E	|1|a|1 1 0 0 1 0| e1		| e2		|
-
-SUBD	E	|1 0 1 1 0 0 1 1| e1		| e2		|
-
-ADDD	E	|1 1 1 1 0 0 1 1| e1		| e2		|
-
-AND	AB,E	|1 0 1 1 0 1 0 0| e1		| e2		|
-
-BIT	AB,E	|1|a|1 1 0 1 0 1| e1		| e2		|
-
-LD	AB,E	|1|a|1 1 0 1 1 0| e1		| e2		|
-
-ST	AB,E	|1|a|1 1 0 1 1 1| e1		| e2		|
-
-EOR	AB,E	|1|a|1 1 1 0 0 0| e1		| e2		|
-
-ADC	AB,E	|1|a|1 1 1 0 0 1| e1		| e2		|
-
-OR	AB,E	|1|a|1 1 1 0 1 0| e1		| e2		|
-
-ADD	AB,E	|1|a|1 1 1 0 1 1| e1		| e2		|
-
-CMP	XY,E	|1 0 1 1 1 1 0 0| e1		| e2		|
-
-JSR	E,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
-
-LD	XY,E	|1 0 1 1 1 1 1 0| e1		| e2		| {
-	%X = load i16, i16* DST
-	FLG -XX0- %X
-}
-
-ST	XY,E	|1 0 1 1 1 1 1 1| e1		| e2		|
+ST	XY,M	|1 0 1|e|1 1 1 1| m		|
 
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
 	%A = i8 I1
 	%B = i8 I2
-	FLG -XX0- I16
+	FLG16 -XX0- I16
 }
 
 LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
 	SU = I16
-	FLG -XX0- I16
+	FLG16 -XX0- I16
 }
 
 LD	SU,d	|1 1 0 1 1 1 1 0| d		|
 
 ST	SU,d	|1 1 0 1 1 1 1 1| d		|
 
-LDD	P	|1 1 1 0 1 1 0 0|X| R |i| m     |
-
-STD	P	|1 1 1 0 1 1 0 1|X| R |i| m     |
-
-LD	SU,P	|1 1 1 0 1 1 1 0|X| R |i| m     |
-
-ST	SU,P	|1 1 1 0 1 1 1 1|X| R |i| m     |
-
-LDD	E	|1 1 1 1 1 1 0 0| e1		| e2		|
-
-STD	E	|1 1 1 1 1 1 0 1| e1		| e2		| {
-	MKD
-	store i16* DST , %D
-	FLG -XX0- %D
+LDD	M	|1 1 1|e|1 1 0 0| m		| {
+	%D = load i16 , i16* M
+	FLG16 -XX0- %D
+	MKAB
 }
-LD	SU,E	|1 1 1 1 1 1 1 0| e1		| e2		|
 
-ST	SU,E	|1 1 1 1 1 1 1 1| e1		| e2		|
+STD	M	|1 1 1|e|1 1 0 1| m		| {
+	MKD
+	store i16* M , %D
+	FLG16 -XX0- %D
+}
+
+LD	SU,M	|1 1 1|e|1 1 1 0| m		|
+
+ST	SU,M	|1 1 1|e|1 1 1 1| m		|
 
 """
 
@@ -506,6 +456,7 @@ class mc6809_ins(assy.Instree_ins):
 		self.isz = "i8"
 		self.icache = {}
 		self.pfx = None
+		self.off = None
 
 	def assy_PFX10(self, pj):
 		self.pfx = 0x10
@@ -515,6 +466,109 @@ class mc6809_ins(assy.Instree_ins):
 
 	def assy_AB(self, pj):
 		self.mne += "AB"[self['a']]
+
+	def assy_M(self, pj):
+		if self['e']:
+			self.hi += 1
+			self.dstadr = pj.m.bu16(self.hi - 2)
+			return assy.Arg_dst(pj, self.dstadr)
+
+		a = self['m']
+		X = a >> 7
+		r = "XYUS"[(a>>5)&3]
+		i = (a >> 4) & 1
+		m = a & 0xf
+		if not X:
+			if i:
+				return("%s-%d" % (r, 16-m))
+			else:
+				return("%s+%d" % (r, m))
+
+		self.hi += [
+		    0, 0, 0, 0, 0, 0, 0, 0,
+		    1, 2, 0, 0, 1, 2, 0, 2][m]
+
+		if m == 0 and i == 0:
+			return r + "+"
+		elif m == 1:
+			s = r + "++"
+		elif m == 2 and i == 0:
+			return "-" + r
+		elif m == 3:
+			s = "--" + r
+		elif m == 4:
+			s = r
+		elif m == 5:
+			s = r + "+B"
+		elif m == 6:
+			s = r + "+A"
+		elif m == 8:
+			self.off = pj.m.s8(self.hi - 1)
+			s = r + "%+d" % self.off
+		elif m == 0x9:
+			self.off = pj.m.bs16(self.hi - 2)
+			s = r + "%+d" % self.off
+		elif m == 0xb:
+			s = r + "+D"
+		elif m == 0xd:
+			self.off = pj.m.bs16(self.hi - 2)
+			s = "0x%x" % ((0x10000 + self.hi + self.off & 0xffff))
+		elif m == 0xf:
+			self.off = pj.m.bs16(self.hi - 2)
+			s = "0x%x" % self.off
+		else:
+			return "XXX"
+		if i:
+			return "[" + s + "]"
+		else:
+			return s
+
+	def assy_P(self, pj):
+		if self['X'] == 1:
+			self.hi += [
+			    0, 0, 0, 0, 0, 0, 0, 0,
+			    1, 2, 0, 0, 1, 2, 0, 2][self['m']]
+		if self['X'] == 1 and self['m'] == 0xf:
+			self.dstadr = pj.m.bu16(self.hi - 2)
+		r = ["X", "Y", "U", "S"][self['R']]
+		if self['X'] == 0:
+			o = self['m']
+			if self['i']:
+				o -= 16
+			return("%s%+d" % (r, o))
+		if self['m'] == 0x0:
+			s = r + "+"
+		elif self['m'] == 0x1:
+			s = r + "++"
+		elif self['m'] == 0x2:
+			s = "-" + r
+		elif self['m'] == 0x3:
+			s = "--" + r
+		elif self['m'] == 0x4:
+			s = r
+		elif self['m'] == 0x5:
+			s = r + "+B"
+		elif self['m'] == 0x6:
+			s = r + "+A"
+		elif self['m'] == 0x8:
+			o = pj.m.s8(self.hi - 1)
+			s = r + "%+d" % o
+		elif self['m'] == 0x9:
+			o = pj.m.bs16(self.hi - 2)
+			s = r + "%+d" % o
+		elif self['m'] == 0xb:
+			s = r + "+D"
+		elif self['m'] == 0xd:
+			o = pj.m.bs16(self.hi - 2)
+			s = "0x%x" % ((0x10000 + self.hi + o & 0xffff))
+		elif self['m'] == 0xf:
+			o = pj.m.bu16(self.hi - 2)
+			s = "0x%x" % o
+		else:
+			raise assy.Wrong("somehow... @ 0x%x" % self.lo + " %d" % self['m'])
+		if self['i']:
+			return "[" + s + "]"
+		return s
 
 	def assy_XY(self, pj):
 		if self.pfx == 0x10:
@@ -582,52 +636,6 @@ class mc6809_ins(assy.Instree_ins):
 			l = reversed(l)
 		return ",".join(l)
 
-	def assy_P(self, pj):
-		if self['X'] == 1:
-			self.hi += [
-			    0, 0, 0, 0, 0, 0, 0, 0,
-			    1, 2, 0, 0, 1, 2, 0, 2][self['m']]
-		if self['X'] == 1 and self['m'] == 0xf:
-			self.dstadr = pj.m.bu16(self.hi - 2)
-		r = ["X", "Y", "U", "S"][self['R']]
-		if self['X'] == 0:
-			o = self['m']
-			if self['i']:
-				o -= 16
-			return("%s%+d" % (r, o))
-		if self['m'] == 0x0:
-			s = r + "+"
-		elif self['m'] == 0x1:
-			s = r + "++"
-		elif self['m'] == 0x2:
-			s = "-" + r
-		elif self['m'] == 0x3:
-			s = "--" + r
-		elif self['m'] == 0x4:
-			s = r
-		elif self['m'] == 0x5:
-			s = r + "+B"
-		elif self['m'] == 0x6:
-			s = r + "+A"
-		elif self['m'] == 0x8:
-			o = pj.m.s8(self.hi - 1)
-			s = r + "%+d" % o
-		elif self['m'] == 0x9:
-			o = pj.m.bs16(self.hi - 2)
-			s = r + "%+d" % o
-		elif self['m'] == 0xb:
-			s = r + "+D"
-		elif self['m'] == 0xd:
-			o = pj.m.bs16(self.hi - 2)
-			s = "0x%x" % ((0x10000 + self.hi + o & 0xffff))
-		elif self['m'] == 0xf:
-			o = pj.m.bs16(self.hi - 2)
-			s = "0x%x" % o
-		else:
-			raise assy.Wrong("somehow... @ 0x%x" % self.lo + " %d" % self['m'])
-		if self['i']:
-			return "[" + s + "]"
-		return s
 
 	def assy_t(self, pj):
 		val = self['t']
@@ -647,13 +655,9 @@ class mc6809_ins(assy.Instree_ins):
 
 	def il_adr(self):
 
-		X = self.get('X')
+		e = self.get('e')
 
-		if X is None:
-			e1 = self.get('e1')
-			if not e1 is None:
-				return "DST"
-
+		if e is None:
 			d = self.get('d')
 			if not d is None:
 				j = self.add_il([
@@ -662,9 +666,15 @@ class mc6809_ins(assy.Instree_ins):
 				return j
 			return None
 
-		r ="%" + "XYUS"[self['R']]
-		m = self['m']
-		i = self['i']
+		if e:
+			return "0x%04x" % self.dstadr
+
+		a = self['m']
+		X = a >> 7
+		r = "%" + "XYUS"[(a>>5)&3]
+		i = (a >> 4) & 1
+		m = a & 0xf
+
 		if X == 0:
 			if i:
 				return self.add_il([
@@ -696,8 +706,32 @@ class mc6809_ins(assy.Instree_ins):
 			adr = r
 		elif m == 4:
 			adr = r
+		elif m == 5:
+			adr = self.add_il([
+				["%1", "=", "zext", "i8", "%B", "to", "i16"],
+				["%0", "=", "add", "i16", "%1", ",", r],
+			], "%0")
+		elif m == 6:
+			adr = self.add_il([
+				["%1", "=", "zext", "i8", "%A", "to", "i16"],
+				["%0", "=", "add", "i16", "%1", ",", r],
+			], "%0")
+		elif m == 8 or m == 9:
+			adr = self.add_il([
+				["%0", "=", "add", "i16", r, ",", "0x%x" % self.off],
+			], "%0")
+		elif m == 11:
+			adr = self.add_il([
+				["%0", "=", "add", "i16", r, ",", "D"],
+			], "%0")
+		elif m == 12 or m == 13:
+			adr = self.add_il([
+				["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
+			], "%0")
+		elif m == 15:
+			adr = "0x%04x" % self.off
 		else:
-			return None
+			return "XXXm%d" % m
 
 		if i:
 			return self.add_il([
@@ -801,6 +835,14 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_AB(self):
 		return "%" + "AB"[self['a']]
 
+	def ilmacro_M(self):
+		m = self.il_adr()
+		if m is None:
+			print(self)
+			print(self.mne)
+		assert not m is None
+		return m
+
 	def ilmacro_BR(self):
 		cc = self['cc']
 		if cc == 0:
@@ -869,6 +911,13 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_I16(self):
 		self.isz = "i16"
 		return "0x%02x%02x" % (self['I1'], self['I2'])
+
+	def ilmacro_MKAB(self):
+		self.add_il([
+			["%B", "=", "trunc", "i16", "%D", "to", "i8"],
+			["%D", "=", "srl", "i16", "%D", "," "8"],
+			["%A", "=", "trunc", "i16", "%D", "to", "i8"],
+		])
 
 	def ilmacro_MKD(self):
 		self.isz = "i16"
@@ -977,6 +1026,10 @@ class mc6809_ins(assy.Instree_ins):
 				assert len(arg) > 0
 				f[j](arg)
 			a1 = a1[1:]
+
+	def ilfunc_FLG16(self, arg):
+		self.isz = "i16"
+		self.ilfunc_FLG(arg)
 
 	def ilfunc_PULL(self, arg):
 		i = self['i']
