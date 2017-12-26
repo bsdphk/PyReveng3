@@ -36,7 +36,9 @@ from __future__ import print_function
 from pyreveng import assy, data
 
 mc6809_instructions = """
+
 +	PFX10	|0 0 0 1 0 0 0 0|
+
 +	PFX11	|0 0 0 1 0 0 0 1|
 
 NEG	d	|0 0 0 0 0 0 0 0| d		| {
@@ -45,34 +47,47 @@ NEG	d	|0 0 0 0 0 0 0 0| d		| {
 	store i8 %2 , i8* D
 	FLG UXXXX %2 sub %1 1
 }
+
 COM	d	|0 0 0 0 0 0 1 1| d		| {
 	%1 = load i8 , i8* D
 	%2 = xor i8 %1 , 0xff
 	store i8 %2 , i8* D
 	FLG UXX01 %2
 }
+
 LSR	d	|0 0 0 0 0 1 0 0| d		|
+
 ROR	d	|0 0 0 0 0 1 1 0| d		|
+
 ASR	d	|0 0 0 0 0 1 1 1| d		|
+
 ASL	d	|0 0 0 0 1 0 0 0| d		|
+
 ROL	d	|0 0 0 0 1 0 0 1| d		|
+
 DEC	d	|0 0 0 0 1 0 1 0| d		| {
 	%1 = load i8 , i8* D
 	%2 = sub i8 %1 , 1
 	store i8 %2 , i8* D
 	FLG -XXX- %2 sub %1 1
 }
+
 INC	d	|0 0 0 0 1 1 0 0| d		| {
 	%1 = load i8 , i8* D
 	%2 = add i8 %1 , 1
 	store i8 %2 , i8* D
 	FLG -XXX- %2 add %1 1
 }
+
 TST	d	|0 0 0 0 1 1 0 1| d		| {
 	%1 = load i8 , i8* D
 	FLG -XX0- %1
 }
-JMP	d,>J	|0 0 0 0 1 1 1 0| d		|
+
+JMP	d,>J	|0 0 0 0 1 1 1 0| d		| {
+	br label D
+}
+
 CLR	d	|0 0 0 0 1 1 1 1| d		| {
 	store i8 0 , i8* D
 	FLG -0100
@@ -92,32 +107,49 @@ CMPD    P	|0 0 0 1 0 0 0 0|1 0 1 0 0 0 1 1|X| R |i| m     |
 CMPD	E	|0 0 0 1 0 0 0 0|1 0 1 1 0 0 1 1| e1		| e2		|
 
 SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
+
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
+
 CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
+
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
+
 CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
+
 CMPU	P	|0 0 0 1 0 0 0 1|1 0 1 0 0 0 1 1|X| R |i| m     |
+
 CMPS	P	|0 0 0 1 0 0 0 1|1 0 1 0 1 1 0 0|X| R |i| m     |
+
 CMPU	E	|0 0 0 1 0 0 0 1|1 0 1 1 0 0 1 1| e1		| e2		|
+
 CMPS	E	|0 0 0 1 0 0 0 1|1 0 1 1 1 1 0 0| e1		| e2		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
+
 SYNC	-	|0 0 0 1 0 0 1 1|
+
 BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		| {
 	br label DST
 }
+
 BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		| {
 	%S = sub i16 %S , 2
 	store i16 HI, i16* %S
 	br label DST
 }
+
 DAA	-	|0 0 0 1 1 0 0 1|
+
 ORCC	i	|0 0 0 1 1 0 1 0| i		|
+
 ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
 	%CC = and i8 %CC , I
 }
-SE	XY,-	|0 0 0 1 1 1 0 1|
+
+SEX	-	|0 0 0 1 1 1 0 1|
+
 EXG	t	|0 0 0 1 1 1 1 0| t		|
+
 TFR	t	|0 0 0 1 1 1 1 1| t		| {
 	TFR
 }
@@ -127,290 +159,489 @@ B	r,CC	|0 0 1 0| cc    | r		| {
 }
 
 LEA	XY,P	|0 0 1 1 0 0 0 0|X| R |i| m	|
+
 LEAY	P	|0 0 1 1 0 0 0 1|X| R |i| m	|
+
 LEAS	P	|0 0 1 1 0 0 1 0|X| R |i| m     |
+
 LEAU	P	|0 0 1 1 0 0 1 1|X| R |i| m     |
+
 PSHS	s	|0 0 1 1 0 1 0 0| i		| {
 	PUSH S
 }
+
 PULS	s	|0 0 1 1 0 1 0 1| i		| {
 	PULL S
 }
+
 PSHU	s	|0 0 1 1 0 1 1 0| i		| {
 	PUSH U
 }
+
 PULU	s	|0 0 1 1 0 1 1 1| i		| {
 	PULL U
 }
+
 RTS	>R	|0 0 1 1 1 0 0 1| {
 	%0 = load i16 , i16* %S
 	%S = add i16 %S , 2
 	br label %0
 }
+
 AB	XY,-	|0 0 1 1 1 0 1 0|
+
 RTI	>R	|0 0 1 1 1 0 1 1|
+
 CWAI	i	|0 0 1 1 1 1 0 0| i		|
+
 MUL	-	|0 0 1 1 1 1 0 1|
+
 SWI	-	|0 0 1 1 1 1 1 1|
 
 NEGA	-	|0 1 0 0 0 0 0 0|
+
 COMA	-	|0 1 0 0 0 0 1 1|
+
 LSRA	-	|0 1 0 0 0 1 0 0|
+
 RORA	-	|0 1 0 0 0 1 1 0|
+
 ASRA	-	|0 1 0 0 0 1 1 1|
+
 ASLA	-	|0 1 0 0 1 0 0 0|
+
 ROLA	-	|0 1 0 0 1 0 0 1|
+
 DECA	-	|0 1 0 0 1 0 1 0|
+
 INCA	-	|0 1 0 0 1 1 0 0| {
 	%1 = i8 %A
 	%A = add i8 %A , 1
 	FLG -XXX- %A add %1 1
 }
+
 TSTA	-	|0 1 0 0 1 1 0 1|
+
 CLRA	-	|0 1 0 0 1 1 1 1| {
 	%A = i8 0
 	FLG -0100
 }
 
 NEGB	-	|0 1 0 1 0 0 0 0|
+
 COMB	-	|0 1 0 1 0 0 1 1|
+
 LSRB	-	|0 1 0 1 0 1 0 0|
+
 RORB	-	|0 1 0 1 0 1 1 0|
+
 ASRB	-	|0 1 0 1 0 1 1 1|
+
 ASLB	-	|0 1 0 1 1 0 0 0|
+
 ROLB	-	|0 1 0 1 1 0 0 1|
+
 DECB	-	|0 1 0 1 1 0 1 0|
+
 INCB	-	|0 1 0 1 1 1 0 0| {
 	%1 = i8 %B
 	%B = add i8 %B , 1
 	FLG -XXX- %B add %1 1
 }
+
 TSTB	-	|0 1 0 1 1 1 0 1|
+
 CLRB	-	|0 1 0 1 1 1 1 1| {
 	%B = i8 0
 	FLG -0100
 }
 
 NEG	P	|0 1 1 0 0 0 0 0|X| R |i| m	|
+
 COM	P	|0 1 1 0 0 0 1 1|X| R |i| m	|
+
 LSR	P	|0 1 1 0 0 1 0 0|X| R |i| m	|
+
 ROR	P	|0 1 1 0 0 1 1 0|X| R |i| m	|
+
 ASR	P	|0 1 1 0 0 1 1 1|X| R |i| m	|
+
 ASL	P	|0 1 1 0 1 0 0 0|X| R |i| m	|
+
 ROL	P	|0 1 1 0 1 0 0 1|X| R |i| m	|
+
 DEC	P	|0 1 1 0 1 0 1 0|X| R |i| m	|
+
 INC	P	|0 1 1 0 1 1 0 0|X| R |i| m	|
+
 TST	P	|0 1 1 0 1 1 0 1|X| R |i| m	|
+
 JMP	P,>J	|0 1 1 0 1 1 1 0|X| R |i| m	|
+
 CLR	P	|0 1 1 0 1 1 1 1|X| R |i| m	|
 
 NEG	E	|0 1 1 1 0 0 0 0| e1		| e2		|
+
 COM	E	|0 1 1 1 0 0 1 1| e1		| e2		|
+
 LSR	E	|0 1 1 1 0 1 0 0| e1		| e2		|
+
 ROR	E	|0 1 1 1 0 1 1 0| e1		| e2		|
+
 ASR	E	|0 1 1 1 0 1 1 1| e1		| e2		|
+
 ASL	E	|0 1 1 1 1 0 0 0| e1		| e2		|
+
 ROL	E	|0 1 1 1 1 0 0 1| e1		| e2		|
+
 DEC	E	|0 1 1 1 1 0 1 0| e1		| e2		|
+
 INC	E	|0 1 1 1 1 1 0 0| e1		| e2		|
+
 TST	E	|0 1 1 1 1 1 0 1| e1		| e2		|
+
 JMP	E,>J	|0 1 1 1 1 1 1 0| e1		| e2		|
+
 CLR	E	|0 1 1 1 1 1 1 1| e1		| e2		|
 
-SUBA	i	|1 0 0 0 0 0 0 0| i		|
-CMPA	i	|1 0 0 0 0 0 0 1| i		|
+SUBA	i	|1 0 0 0 0 0 0 0| i		| {
+	%1 = i8 %A
+	%A = sub i8 %A , I
+	FLG UXXXX %A sub %1 I
+}
+
+CMPA	i	|1 0 0 0 0 0 0 1| i		| {
+	%2 = sub i8 %A , I
+	FLG UXXXX %2 sub %A I
+}
+
 SBCA	i	|1 0 0 0 0 0 1 0| i		|
+
 SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
+
 ANDA	i	|1 0 0 0 0 1 0 0| i		| {
 	%A = and i8 %A , I
 	FLG -XX0- %A
 }
+
 BITA	i	|1 0 0 0 0 1 0 1| i		|
+
 LDA	i	|1 0 0 0 0 1 1 0| i		| {
 	%A = I
 	FLG -XX0- %A
 }
-EORA	i	|1 0 0 0 1 0 0 0| i		|
+
+EORA	i	|1 0 0 0 1 0 0 0| i		| {
+	%A = xor i8 %A , I
+	FLG -XX0- %A
+}
+
 ADCA	i	|1 0 0 0 1 0 0 1| i		|
+
 ORA	i	|1 0 0 0 1 0 1 0| i		| {
 	%A = or i8 %A , I
 	FLG -XX0- %A
 }
+
 ADDA	i	|1 0 0 0 1 0 1 1| i		| {
 	%1 = i8 %A
 	%A = add i8 %A , I
 	FLG XXXXX %A add %1 I
 }
+
 CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
+
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	%S = sub i16 %S , 2
 	store i16 HI, i16* %S
 	br label DST
 }
+
 LD	XY,I	|1 0 0 0 1 1 1 0| I1		| I2		| {
 	XY = i16 I16
 	FLG -XX0- I16
 }
 
 SUBA	d	|1 0 0 1 0 0 0 0| d		|
+
 CMPA	d	|1 0 0 1 0 0 0 1| d		|
+
 SBCA	d	|1 0 0 1 0 0 1 0| d		|
+
 SUBD	d	|1 0 0 1 0 0 1 1| d		|
+
 ANDA	d	|1 0 0 1 0 1 0 0| d		|
+
 BITA	d	|1 0 0 1 0 1 0 1| d		|
+
 LDA	d	|1 0 0 1 0 1 1 0| d		|
+
 STA	d	|1 0 0 1 0 1 1 1| d		|
+
 EORA	d	|1 0 0 1 1 0 0 0| d		|
+
 ADCA	d	|1 0 0 1 1 0 0 1| d		|
+
 ORA	d	|1 0 0 1 1 0 1 0| d		|
+
 ADDA	d	|1 0 0 1 1 0 1 1| d		|
+
 CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
+
 JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
+
 LD	XY,d	|1 0 0 1 1 1 1 0| d		|
+
 ST	XY,d	|1 0 0 1 1 1 1 1| d		|
 
 SUBA	P	|1 0 1 0 0 0 0 0|X| R |i| m	|
+
 CMPA	P	|1 0 1 0 0 0 0 1|X| R |i| m	|
+
 SBCA	P	|1 0 1 0 0 0 1 0|X| R |i| m	|
+
 SUBD	P	|1 0 1 0 0 0 1 1|X| R |i| m	|
+
 ANDA	P	|1 0 1 0 0 1 0 0|X| R |i| m	|
+
 BITA	P	|1 0 1 0 0 1 0 1|X| R |i| m	|
+
 LDA	P	|1 0 1 0 0 1 1 0|X| R |i| m	|
+
 STA	P	|1 0 1 0 0 1 1 1|X| R |i| m	|
+
 EORA	P	|1 0 1 0 1 0 0 0|X| R |i| m	|
+
 ADCA	P	|1 0 1 0 1 0 0 1|X| R |i| m	|
+
 ORA	P	|1 0 1 0 1 0 1 0|X| R |i| m	|
+
 ADDA	P	|1 0 1 0 1 0 1 1|X| R |i| m	|
+
 CMP	XY,P	|1 0 1 0 1 1 0 0|X| R |i| m	|
+
 JSR	P,>C	|1 0 1 0 1 1 0 1|X| R |i| m	|
+
 LD	XY,P	|1 0 1 0 1 1 1 0|X| R |i| m     |
+
 ST	XY,P	|1 0 1 0 1 1 1 1|X| R |i| m     |
 
 SUBA	E	|1 0 1 1 0 0 0 0| e1		| e2		|
+
 CMPA	E	|1 0 1 1 0 0 0 1| e1		| e2		|
+
 SBCA	E	|1 0 1 1 0 0 1 0| e1		| e2		|
+
 SUBD	E	|1 0 1 1 0 0 1 1| e1		| e2		|
+
 ANDA	E	|1 0 1 1 0 1 0 0| e1		| e2		|
+
 BITA	E	|1 0 1 1 0 1 0 1| e1		| e2		|
+
 LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		| {
 	%A = load i8, i8* DST
 	FLG -XX0- %A
 }
-STA	E	|1 0 1 1 0 1 1 1| e1		| e2		|
+
+STA	E	|1 0 1 1 0 1 1 1| e1		| e2		| {
+	store i8* DST , i8 %A
+	FLG -XX0- %A
+}
+
 EORA	E	|1 0 1 1 1 0 0 0| e1		| e2		|
+
 ADCA	E	|1 0 1 1 1 0 0 1| e1		| e2		|
+
 ORA	E	|1 0 1 1 1 0 1 0| e1		| e2		|
+
 ADDA	E	|1 0 1 1 1 0 1 1| e1		| e2		|
+
 CMP	XY,E	|1 0 1 1 1 1 0 0| e1		| e2		|
+
 JSR	E,>C	|1 0 1 1 1 1 0 1| e1		| e2		|
+
 LD	XY,E	|1 0 1 1 1 1 1 0| e1		| e2		| {
 	%X = load i16, i16* DST
 	FLG -XX0- %X
 }
+
 ST	XY,E	|1 0 1 1 1 1 1 1| e1		| e2		|
 
 SUBB	i	|1 1 0 0 0 0 0 0| i		|
+
 CMPB	i	|1 1 0 0 0 0 0 1| i		|
+
 SBCB	i	|1 1 0 0 0 0 1 0| i		|
+
 ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
+
 ANDB	i	|1 1 0 0 0 1 0 0| i		|
+
 BITB	i	|1 1 0 0 0 1 0 1| i		|
+
 LDB	i	|1 1 0 0 0 1 1 0| i		| {
 	%B = i8 I
 	FLG -XX0- I
 }
+
 EORB	i	|1 1 0 0 1 0 0 0| i		|
+
 ADCB	i	|1 1 0 0 1 0 0 1| i		|
+
 ORB	i	|1 1 0 0 1 0 1 0| i		| {
 	%B = or i8 %B , I
 	FLG -XX0- %B
 }
+
 ADDB	i	|1 1 0 0 1 0 1 1| i		| {
 	%1 = i8 %B
 	%B = add i8 %B , I
 	FLG XXXXX %B add %1 I
 }
+
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
 	%A = i8 I1
 	%B = i8 I2
 	FLG -XX0- I16
 }
+
 LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
 	SU = I16
 	FLG -XX0- I16
 }
 
 SUBB	d	|1 1 0 1 0 0 0 0| d		|
+
 CMPB	d	|1 1 0 1 0 0 0 1| d		|
+
 SBCB	d	|1 1 0 1 0 0 1 0| d		|
+
 ADDD	d	|1 1 0 1 0 0 1 1| d		|
+
 ANDB	d	|1 1 0 1 0 1 0 0| d		|
+
 BITB	d	|1 1 0 1 0 1 0 1| d		|
+
 LDB	d	|1 1 0 1 0 1 1 0| d		|
+
 STB	d	|1 1 0 1 0 1 1 1| d		|
+
 EORB	d	|1 1 0 1 1 0 0 0| d		|
+
 ADCB	d	|1 1 0 1 1 0 0 1| d		|
+
 ORB	d	|1 1 0 1 1 0 1 0| d		|
+
 ADDB	d	|1 1 0 1 1 0 1 1| d		|
+
 LDD	d	|1 1 0 1 1 1 0 0| d		|
+
 STD	d	|1 1 0 1 1 1 0 1| d		|
+
 LD	SU,d	|1 1 0 1 1 1 1 0| d		|
+
 ST	SU,d	|1 1 0 1 1 1 1 1| d		|
 
 SUBB	P	|1 1 1 0 0 0 0 0|X| R |i| m     |
+
 CMPB	P	|1 1 1 0 0 0 0 1|X| R |i| m     |
+
 SBCB	P	|1 1 1 0 0 0 1 0|X| R |i| m     |
+
 ADDD	P	|1 1 1 0 0 0 1 1|X| R |i| m     |
+
 ANDB	P	|1 1 1 0 0 1 0 0|X| R |i| m     |
+
 BITB	P	|1 1 1 0 0 1 0 1|X| R |i| m     |
+
 LDB	P	|1 1 1 0 0 1 1 0|X| R |i| m     |
+
 STB	P	|1 1 1 0 0 1 1 1|X| R |i| m     |
+
 EORB	P	|1 1 1 0 1 0 0 0|X| R |i| m     |
+
 ADCB	P	|1 1 1 0 1 0 0 1|X| R |i| m     |
+
 ORB	P	|1 1 1 0 1 0 1 0|X| R |i| m     |
+
 ADDB	P	|1 1 1 0 1 0 1 1|X| R |i| m     |
+
 LDD	P	|1 1 1 0 1 1 0 0|X| R |i| m     |
+
 STD	P	|1 1 1 0 1 1 0 1|X| R |i| m     |
+
 LD	SU,P	|1 1 1 0 1 1 1 0|X| R |i| m     |
+
 ST	SU,P	|1 1 1 0 1 1 1 1|X| R |i| m     |
 
 SUBB	E	|1 1 1 1 0 0 0 0| e1		| e2		|
+
 CMPB	E	|1 1 1 1 0 0 0 1| e1		| e2		|
+
 SBCB	E	|1 1 1 1 0 0 1 0| e1		| e2		|
+
 ADDD	E	|1 1 1 1 0 0 1 1| e1		| e2		|
+
 ANDB	E	|1 1 1 1 0 1 0 0| e1		| e2		|
+
 BITB	E	|1 1 1 1 0 1 0 1| e1		| e2		|
+
 LDB	E	|1 1 1 1 0 1 1 0| e1		| e2		|
+
 STB	E	|1 1 1 1 0 1 1 1| e1		| e2		|
+
 EORB	E	|1 1 1 1 1 0 0 0| e1		| e2		|
+
 ADCB	E	|1 1 1 1 1 0 0 1| e1		| e2		|
+
 ORB	E	|1 1 1 1 1 0 1 0| e1		| e2		|
+
 ADDB	E	|1 1 1 1 1 0 1 1| e1		| e2		|
+
 LDD	E	|1 1 1 1 1 1 0 0| e1		| e2		|
+
 STD	E	|1 1 1 1 1 1 0 1| e1		| e2		| {
 	MKD
 	store i16* DST , %D
 	FLG -XX0- %D
 }
 LD	SU,E	|1 1 1 1 1 1 1 0| e1		| e2		|
+
 ST	SU,E	|1 1 1 1 1 1 1 1| e1		| e2		|
+
 """
 
 mc6809_macro_instructions = """
-LDD	i	|1 1 0 0 0 1 1 0| i		|0 0 0 1 1 1 0 1|
-CLRD	-	|0 1 0 1 1 1 1 1|0 0 0 1 1 1 0 1|
-ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		|
-ORD	I	|1 0 0 0 1 0 1 0| I1		|1 1 0 0 1 0 1 0| I2		|
+LDDx	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
+	%B = i8 I
+	%A = i8 0
+	FLG -0100
+}
+
+ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		| {
+	%A = and i8 %A , I1
+	%B = and i8 %A , I2
+	FLG -XX0- %B
+}
+
+ORD	I	|1 0 0 0 1 0 1 0| I1		|1 1 0 0 1 0 1 0| I2		| {
+	%A = or i8 %A , I1
+	%B = or i8 %A , I2
+	FLG -XX0- %B
+}
+
 CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1| {
 	%A = i8 0
 	%B = i8 0
 	FLG -0100
 }
+
 CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
 	%A = i8 0
 	%B = i8 0
 	FLG -0100
 }
+
 """
 
 
