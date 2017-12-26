@@ -319,10 +319,7 @@ SBCA	i	|1 0 0 0 0 0 1 0| i		|
 
 SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
 
-ANDA	i	|1 0 0 0 0 1 0 0| i		| {
-	%A = and i8 %A , I
-	FLG -XX0- %A
-}
+ANDA	i	|1 0 0 0 0 1 0 0| i		|
 
 BITA	i	|1 0 0 0 0 1 0 1| i		|
 
@@ -331,17 +328,11 @@ LDA	i	|1 0 0 0 0 1 1 0| i		| {
 	FLG -XX0- %A
 }
 
-EORA	i	|1 0 0 0 1 0 0 0| i		| {
-	%A = xor i8 %A , I
-	FLG -XX0- %A
-}
+EORA	i	|1 0 0 0 1 0 0 0| i		|
 
 ADCA	i	|1 0 0 0 1 0 0 1| i		|
 
-ORA	i	|1 0 0 0 1 0 1 0| i		| {
-	%A = or i8 %A , I
-	FLG -XX0- %A
-}
+ORA	i	|1 0 0 0 1 0 1 0| i		|
 
 ADDA	i	|1 0 0 0 1 0 1 1| i		| {
 	%1 = i8 %A
@@ -488,10 +479,7 @@ EORB	i	|1 1 0 0 1 0 0 0| i		|
 
 ADCB	i	|1 1 0 0 1 0 0 1| i		|
 
-ORB	i	|1 1 0 0 1 0 1 0| i		| {
-	%B = or i8 %B , I
-	FLG -XX0- %B
-}
+ORB	i	|1 1 0 0 1 0 1 0| i		|
 
 ADDB	i	|1 1 0 0 1 0 1 1| i		| {
 	%1 = i8 %B
@@ -784,6 +772,43 @@ class mc6809_ins(assy.Instree_ins):
 		if r[sr][0] == "?" or r[dr][0] == "?":
 			raise assy.Wrong("Wrong arg to TFR (0x%02x)" % val)
 		return r[sr] + "," + r[dr]
+
+	def il_logic(self):
+		r = "%" + self.mne[-1]
+		op = {
+			"OR":	"or",
+			"AND":	"and",
+			"EOR":	"xor",
+		}.get(self.mne[:-1])
+		ll = []
+		d = self.get('d')
+		m = self.get('m')
+		i = self.get('i')
+		e1 = self.get('e1')
+		if not d is None:
+			src = self.add_il([
+				[ "%0", "=", "load", "i8", ",", "i8*", "D" ]
+			], "%0")
+		elif not m is None:
+			return
+			src = "XXXm"
+		elif not e1 is None:
+			src = self.add_il([
+				[ "%0", "=", "load", "i8", ",", "i8*", "DST" ]
+			], "%0")
+		elif not i is None:
+			src = "I"
+		else:
+			src = "XXX?"
+			return
+		ll.append([ r, "=", op, 'i8', r, ',', src ])
+		ll.append(["FLG", "-XX0-", r])
+		self.add_il(ll)
+
+	def ildefault(self):
+		mne1 = self.mne[:-1]
+		if mne1 in ('OR', 'AND', 'EOR'):
+			self.il_logic()
 
 	def ilmacro_BR(self):
 		cc = self['cc']
