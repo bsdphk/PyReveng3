@@ -214,11 +214,7 @@ ROLA	-	|0 1 0 0 1 0 0 1|
 
 DECA	-	|0 1 0 0 1 0 1 0|
 
-INCA	-	|0 1 0 0 1 1 0 0| {
-	%1 = i8 %A
-	%A = add i8 %A , 1
-	FLG -XXX- %A add %1 1
-}
+INCA	-	|0 1 0 0 1 1 0 0|
 
 TSTA	-	|0 1 0 0 1 1 0 1|
 
@@ -243,11 +239,7 @@ ROLB	-	|0 1 0 1 1 0 0 1|
 
 DECB	-	|0 1 0 1 1 0 1 0|
 
-INCB	-	|0 1 0 1 1 1 0 0| {
-	%1 = i8 %B
-	%B = add i8 %B , 1
-	FLG -XXX- %B add %1 1
-}
+INCB	-	|0 1 0 1 1 1 0 0|
 
 TSTB	-	|0 1 0 1 1 1 0 1|
 
@@ -334,11 +326,7 @@ ADCA	i	|1 0 0 0 1 0 0 1| i		|
 
 ORA	i	|1 0 0 0 1 0 1 0| i		|
 
-ADDA	i	|1 0 0 0 1 0 1 1| i		| {
-	%1 = i8 %A
-	%A = add i8 %A , I
-	FLG XXXXX %A add %1 I
-}
+ADDA	i	|1 0 0 0 1 0 1 1| i		|
 
 CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
 
@@ -481,11 +469,7 @@ ADCB	i	|1 1 0 0 1 0 0 1| i		|
 
 ORB	i	|1 1 0 0 1 0 1 0| i		|
 
-ADDB	i	|1 1 0 0 1 0 1 1| i		| {
-	%1 = i8 %B
-	%B = add i8 %B , I
-	FLG XXXXX %B add %1 I
-}
+ADDB	i	|1 1 0 0 1 0 1 1| i		|
 
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
 	%A = i8 I1
@@ -773,42 +757,79 @@ class mc6809_ins(assy.Instree_ins):
 			raise assy.Wrong("Wrong arg to TFR (0x%02x)" % val)
 		return r[sr] + "," + r[dr]
 
+	###############################################################
+
+	def il_mem(self):
+
+		m = self.get('m')
+		if not m is None:
+			return None, None
+
+		i = self.get('i')
+		if not i is None:
+			return None, "0x%02x" % (self['i'])
+
+		d = self.get('d')
+		if not d is None:
+			j = self.add_il([
+				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % d]
+			], "%0")
+			return j, None
+
+		e1 = self.get('e1')
+		if not e1 is None:
+			j = self.add_il([
+				[ "%0", "=", "load", "i8", ",", "i8*", "DST" ]
+			], "%0")
+			return j, None
+
+		return None, None
+
+	def il_val8(self):
+		adr,val = self.il_mem()
+		if adr is None and val is None:
+			return None
+		if val is None:
+			val = self.add_il([
+				[ "%0", "=", "load", "i8", ",", "i8*", adr ]
+			], "%0")
+		return val
+
 	def il_logic(self):
+		val = self.il_val8()
+		if val is None:
+			return
 		r = "%" + self.mne[-1]
 		op = {
 			"OR":	"or",
 			"AND":	"and",
 			"EOR":	"xor",
 		}.get(self.mne[:-1])
-		ll = []
-		d = self.get('d')
-		m = self.get('m')
-		i = self.get('i')
-		e1 = self.get('e1')
-		if not d is None:
-			src = self.add_il([
-				[ "%0", "=", "load", "i8", ",", "i8*", "D" ]
-			], "%0")
-		elif not m is None:
+		self.add_il([
+			[ r, "=", op, 'i8', r, ',', val ],
+			["FLG", "-XX0-", r],
+		])
+
+	def il_add8(self, op, flg, val=None):
+		if val is None:
+			val = self.il_val8()
+		if val is None:
 			return
-			src = "XXXm"
-		elif not e1 is None:
-			src = self.add_il([
-				[ "%0", "=", "load", "i8", ",", "i8*", "DST" ]
-			], "%0")
-		elif not i is None:
-			src = "I"
-		else:
-			src = "XXX?"
-			return
-		ll.append([ r, "=", op, 'i8', r, ',', src ])
-		ll.append(["FLG", "-XX0-", r])
-		self.add_il(ll)
+		r = "%" + self.mne[-1]
+		self.add_il([
+			[ "%1", "=", "i8", r ],
+			[ r, "=", op, "i8", r , ",", val ],
+			[ "FLG", flg, r, op, "%1", val ]
+		])
 
 	def ildefault(self):
 		mne1 = self.mne[:-1]
 		if mne1 in ('OR', 'AND', 'EOR'):
 			self.il_logic()
+		if self.mne in ('ADDA', 'ADDB'):
+			self.il_add8("add", "XXXXX")
+		if self.mne in ('INCA', 'INCB'):
+			self.il_add8("add", "-XXX-", "1")
 
 	def ilmacro_BR(self):
 		cc = self['cc']
