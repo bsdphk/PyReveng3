@@ -60,6 +60,9 @@ class Assy(code.Code):
 	def add_il(self, ll, ret=None):
 		return self.il.add_il(self, ll, ret)
 
+	def ildefault(self):
+		return
+
 	def render(self, pj):
 		self.lcmt += self.il.render()
 		s = self.mne + "\t"
@@ -165,6 +168,9 @@ class Instree_ins(Assy):
 		if len(self.flow_out) == 0:
 			self.add_flow(pj, True)
 
+	def get(self, f):
+		return self.lim[-1].get(f)
+
 	def __getitem__(self,f):
 		return self.lim[-1][f]
 
@@ -208,8 +214,8 @@ class Instree_disass(code.Decode):
 				x = y.im.il.ilspec
 				if x is not None:
 					y.add_il(x.split("\n"))
-				elif self.il is not None:
-					y.add_il(["pyreveng.noidea ( )"])
+				else:
+					y.ildefault()
 			for i in self.flow_check:
 				i(pj, y)
 		return y

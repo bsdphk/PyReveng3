@@ -284,6 +284,9 @@ class Insmatch(object):
 		for i in il.flds:
 			self.flds[i] = il.get_field(i, self.words)
 
+	def get(self, f):
+		return self.flds.get(f)
+
 	def __getitem__(self, f):
 		return self.flds[f]
 
