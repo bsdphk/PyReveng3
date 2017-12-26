@@ -203,13 +203,23 @@ B	r,CC	|0 0 1 0| cc    | r		| {
 	BR
 }
 
-LEAX	M	|0 0 1 1 0 0 0 0| m		|
+LEAX	M	|0 0 1 1 0 0 0 0| m		| {
+	%X = i16 M
+	FLG16 --X-- %X
+}
 
-LEAY	M	|0 0 1 1 0 0 0 1| m		|
+LEAY	M	|0 0 1 1 0 0 0 1| m		| {
+	%Y = i16 M
+	FLG16 --X-- %Y
+}
 
-LEAS	M	|0 0 1 1 0 0 1 0| m		|
+LEAS	M	|0 0 1 1 0 0 1 0| m		| {
+	%S = i16 M
+}
 
-LEAU	M	|0 0 1 1 0 0 1 1| m		|
+LEAU	M	|0 0 1 1 0 0 1 1| m		| {
+	%U = i16 M
+}
 
 PSHS	s	|0 0 1 1 0 1 0 0| i		| {
 	PUSH S
@@ -286,19 +296,45 @@ SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
 ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
 
 AND	AB,i	|1|a|0 0 0 1 0 0| i		|
+AND	AB,d	|1|a|0 1 0 1 0 0| d		|
+AND	AB,M	|1|a|1|e|0 1 0 0| m		|
 
-BIT	AB,i	|1|a|0 0 0 1 0 1| i		|
+BIT	AB,i	|1|a|0 0 0 1 0 1| i		| {
+	%0 = and i8 AB , I
+	FLG -XX0- %0
+}
+
+BIT	AB,d	|1|a|0 1 0 1 0 1| d		| {
+	%1 = load i8 , i8* D
+	%0 = and i8 AB , %0
+	FLG -XX0- %0
+}
+
+BIT	AB,M	|1|a|1|e|0 1 0 1| m		| {
+	%1 = load i8 , i8* M
+	%0 = and i8 AB , %1
+	FLG -XX0- %0
+}
 
 LD	AB,i	|1|a|0 0 0 1 1 0| i		|
+LD	AB,d	|1|a|0 1 0 1 1 0| d		|
+LD	AB,M	|1|a|1|e|0 1 1 0| m		|
 
 EOR	AB,i	|1|a|0 0 1 0 0 0| i		|
+EOR	AB,d	|1|a|0 1 1 0 0 0| d		|
+EOR	AB,M	|1|a|1|e|1 0 0 0| m		|
 
 ADC	AB,i	|1|a|0 0 1 0 0 1| i		|
+ADC	AB,d	|1|a|0 1 1 0 0 1| d		|
+ADC	AB,M	|1|a|1|e|1 0 0 1| m		|
 
 OR	AB,i	|1|a|0 0 1 0 1 0| i		|
+OR	AB,d	|1|a|0 1 1 0 1 0| d		|
+OR	AB,M	|1|a|1|e|1 0 1 0| m		|
 
 ADD	AB,i	|1|a|0 0 1 0 1 1| i		|
-
+ADD	AB,d	|1|a|0 1 1 0 1 1| d		|
+ADD	AB,M	|1|a|1|e|1 0 1 1| m		|
 
 CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
 
@@ -333,37 +369,9 @@ ADDD	d	|1 1 0 1 0 0 1 1| d		|
 
 ADDD	M	|1 1 1|e|0 0 1 1| m		|
 
-AND	AB,d	|1|a|0 1 0 1 0 0| d		|
-
-AND	AB,M	|1|a|1|e|0 1 0 0| m		|
-
-BIT	AB,d	|1|a|0 1 0 1 0 1| d		|
-
-BIT	AB,M	|1|a|1|e|0 1 0 1| m		|
-
-LD	AB,d	|1|a|0 1 0 1 1 0| d		|
-
-LD	AB,M	|1|a|1|e|0 1 1 0| m		|
-
 ST	AB,d	|1|a|0 1 0 1 1 1| d		|
 
 ST	AB,M	|1|a|1|e|0 1 1 1| m		|
-
-EOR	AB,d	|1|a|0 1 1 0 0 0| d		|
-
-EOR	AB,M	|1|a|1|e|1 0 0 0| m		|
-
-ADC	AB,d	|1|a|0 1 1 0 0 1| d		|
-
-ADC	AB,M	|1|a|1|e|1 0 0 1| m		|
-
-OR	AB,d	|1|a|0 1 1 0 1 0| d		|
-
-OR	AB,M	|1|a|1|e|1 0 1 0| m		|
-
-ADD	AB,d	|1|a|0 1 1 0 1 1| d		|
-
-ADD	AB,M	|1|a|1|e|1 0 1 1| m		|
 
 LDD	d	|1 1 0 1 1 1 0 0| d		| {
 	%D = load i16 , i16* D
@@ -397,14 +405,25 @@ JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
 
 JSR	M,>C	|1 0 1|e|1 1 0 1| m		|
 
-LD	XY,d	|1 0 0 1 1 1 1 0| d		|
+LD	XY,d	|1 0 0 1 1 1 1 0| d		| {
+	XY = load i16 , i16* D
+	FLG16 -XX0- XY
+}
 
-LD	XY,M	|1 0 1|e|1 1 1 0| m		|
+LD	XY,M	|1 0 1|e|1 1 1 0| m		| {
+	XY = load i16 , i16* M
+	FLG16 -XX0- XY
+}
 
-ST	XY,d	|1 0 0 1 1 1 1 1| d		|
+ST	XY,d	|1 0 0 1 1 1 1 1| d		| {
+	store i16* D , XY
+	FLG16 -XX0- XY
+}
 
-ST	XY,M	|1 0 1|e|1 1 1 1| m		|
-
+ST	XY,M	|1 0 1|e|1 1 1 1| m		| {
+	store i16* M , XY
+	FLG16 -XX0- XY
+}
 
 LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
 	%A = i8 I1
@@ -417,13 +436,25 @@ LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
 	FLG16 -XX0- I16
 }
 
-LD	SU,d	|1 1 0 1 1 1 1 0| d		|
+LD	SU,d	|1 1 0 1 1 1 1 0| d		| {
+	SU = load i16 , i16* D
+	FLG16 -XX0- SU
+}
 
-LD	SU,M	|1 1 1|e|1 1 1 0| m		|
+LD	SU,M	|1 1 1|e|1 1 1 0| m		| {
+	SU = load i16 , i16* M
+	FLG16 -XX0- SU
+}
 
-ST	SU,d	|1 1 0 1 1 1 1 1| d		|
+ST	SU,d	|1 1 0 1 1 1 1 1| d		| {
+	store i16* D , SU
+	FLG16 -XX0- SU
+}
 
-ST	SU,M	|1 1 1|e|1 1 1 1| m		|
+ST	SU,M	|1 1 1|e|1 1 1 1| m		| {
+	store i16* M , SU
+	FLG16 -XX0- SU
+}
 
 """
 
@@ -617,8 +648,9 @@ class mc6809_ins(assy.Instree_ins):
 	def il_adr(self):
 
 		e = self.get('e')
+		a = self.get('m')
 
-		if e is None:
+		if e is None and a is None:
 			d = self.get('d')
 			if not d is None:
 				j = self.add_il([
@@ -627,7 +659,7 @@ class mc6809_ins(assy.Instree_ins):
 				return j
 			return None
 
-		if e:
+		if not e is None and e:
 			return "0x%04x" % self.dstadr
 
 		a = self['m']
