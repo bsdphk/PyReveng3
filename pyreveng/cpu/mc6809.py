@@ -749,22 +749,64 @@ class mc6809_ins(assy.Instree_ins):
 
 	def il_adr(self):
 
-		m = self.get('m')
-		if not m is None:
+		X = self.get('X')
+
+		if X is None:
+			e1 = self.get('e1')
+			if not e1 is None:
+				return "DST"
+
+			d = self.get('d')
+			if not d is None:
+				j = self.add_il([
+					["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % d]
+				], "%0")
+				return j
 			return None
 
-		d = self.get('d')
-		if not d is None:
-			j = self.add_il([
-				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % d]
+		r ="%" + "XYUS"[self['R']]
+		m = self['m']
+		i = self['i']
+		if X == 0:
+			if i:
+				return self.add_il([
+					["%0", "=", "sub", "i16", r, ",", "0x%x" % (16 - m)],
+				], "%0")
+			else:
+				return self.add_il([
+					["%0", "=", "add", "i16", r, ",", "0x%x" % m],
+				], "%0")
+		if m == 0:
+			adr = self.add_il([
+				["%0", "=", "i16", r],
+				[r, "=", "add", "i16", r, ",", "1"],
 			], "%0")
-			return j
+		elif m == 1:
+			adr = self.add_il([
+				["%0", "=", "i16", r],
+				[r, "=", "add", "i16", r, ",", "2"],
+			], "%0")
+		elif m == 2:
+			self.add_il([
+				[r, "=", "sub", "i16", r, ",", "1"],
+			])
+			adr = r
+		elif m == 3:
+			self.add_il([
+				[r, "=", "sub", "i16", r, ",", "2"],
+			])
+			adr = r
+		elif m == 4:
+			adr = r
+		else:
+			return None
 
-		e1 = self.get('e1')
-		if not e1 is None:
-			return "DST"
+		if i:
+			return self.add_il([
+				["%0", "=", "load", "i16", ",", "i16*", adr],
+			], "%0")
 
-		return None
+		return adr
 
 	def il_val8(self):
 		adr = self.il_adr()
