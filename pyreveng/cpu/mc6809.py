@@ -39,8 +39,6 @@ mc6809_instructions = """
 
 +	PFX10	|0 0 0 1 0 0 0 0|
 
-+	PFX11	|0 0 0 1 0 0 0 1|
-
 NEG	d	|0 0 0 0 0 0 0 0| d		| {
 	%1 = load i8 , i8* D
 	%2 = sub i8 %1 , 1
@@ -131,7 +129,9 @@ JMP	d,>J	|0 0 0 0 1 1 1 0| d		| {
 	br label D
 }
 
-JMP	M,>J	|0 1 1|e|1 1 1 0| m		|
+JMP	M,>J	|0 1 1|e|1 1 1 0| m		| {
+	br label M
+}
 
 CLR	d	|0 0 0 0 1 1 1 1| d		| {
 	store i8 0 , i8* D
@@ -149,19 +149,29 @@ B	R,CC	|0 0 0 1 0 0 0 0|0 0 1 0| cc    | R1		| R2		| {
 
 SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
 
-CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
-CMPD	d	|0 0 0 1 0 0 0 0|1 0 0 1 0 0 1 1| d		|
-CMPD    M	|0 0 0 1 0 0 0 0|1 0 1|e|0 0 1 1| m		|
+CMPD    M	|0 0 0 1 0 0 0 0|1 0| M |0 0 1 1| m		| {
+	MKD
+	%0 = i16 V
+	%2 = sub i16 %D , %0
+	FLG -XXXX %2 sub %D %0
+	%D = void
+}
 
 SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
 
-CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
-CMPU	d	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
-CMPU	M	|0 0 0 1 0 0 0 1|1 0 1|e|0 0 1 1| m		|
+CMPU	M	|0 0 0 1 0 0 0 1|1 0| M |0 0 1 1| m		| {
+	%0 = i16 V
+	%2 = sub i16 %U , %0
+	FLG -XXXX %2 sub %U %0
+	%D = void
+}
 
-CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
-CMPS	d	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
-CMPS	M	|0 0 0 1 0 0 0 1|1 0 1|e|1 1 0 0| m		|
+CMPS	M	|0 0 0 1 0 0 0 1|1 0| Me|1 1 0 0| m		| {
+	%0 = i16 V
+	%2 = sub i16 %S , %0
+	FLG -XXXX %2 sub %S %0
+	%D = void
+}
 
 NOP	-	|0 0 0 1 0 0 1 0|
 
@@ -272,94 +282,59 @@ CLR	AB	|0 1 0|a|1 1 1 1| {
 	FLG -0100
 }
 
-SUB	AB,i	|1|a|0 0 0 0 0 0| i		| {
-	%1 = i8 AB
-	AB = sub i8 AB , I
-	FLG UXXXX AB sub %1 I
-}
-SUB	AB,d	|1|a|0 1 0 0 0 0| d		| {
-	%0 = load i8 , i8* D
-	%1 = i8 AB
-	AB = sub i8 AB , %0
-	FLG UXXXX AB sub %1 %0
-}
-SUB	AB,M	|1|a|1|e|0 0 0 0| m		| {
-	%0 = load i8 , i8* M
+SUB	AB,M	|1|a| M |0 0 0 0| m		| {
+	%0 = V
 	%1 = i8 AB
 	AB = sub i8 AB , %0
 	FLG UXXXX AB sub %1 %0
 }
 
-CMP	AB,i	|1|a|0 0 0 0 0 1| i		| {
-	%2 = sub i8 AB , I
-	FLG UXXXX %2 sub AB I
-}
-CMP	AB,d	|1|a|0 1 0 0 0 1| d		| {
-	%0 = load i8 , i8* D
-	%2 = sub i8 AB , %0
-	FLG UXXXX %2 sub AB %0
-}
-CMP	AB,M	|1|a|1|e|0 0 0 1| m		| {
-	%0 = load i8 , i8* M
+CMP	AB,M	|1|a| M |0 0 0 1| m		| {
+	%0 = i8 V
 	%2 = sub i8 AB , %0
 	FLG UXXXX %2 sub AB %0
 }
 
+SBC	AB,M	|1|a| M |0 0 1 0| m		|
 
-SBC	AB,i	|1|a|0 0 0 0 1 0| i		|
-SBC	AB,d	|1|a|0 1 0 0 1 0| d		|
-SBC	AB,M	|1|a|1|e|0 0 1 0| m		|
+SUBD	M	|1 0| M |0 0 1 1| m		|
 
-SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
-SUBD	d	|1 0 0 1 0 0 1 1| d		|
-SUBD	M	|1 0 1|e|0 0 1 1| m		|
+ADDD	M	|1 1| M |0 0 1 1| m		|
 
-ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
-ADDD	d	|1 1 0 1 0 0 1 1| d		|
-ADDD	M	|1 1 1|e|0 0 1 1| m		|
-
-AND	AB,i	|1|a|0 0 0 1 0 0| i		|
-AND	AB,d	|1|a|0 1 0 1 0 0| d		|
-AND	AB,M	|1|a|1|e|0 1 0 0| m		|
-
-BIT	AB,i	|1|a|0 0 0 1 0 1| i		| {
-	%0 = and i8 AB , I
-	FLG -XX0- %0
+AND	AB,M	|1|a| M |0 1 0 0| m		| {
+	AB = and i8 AB , V
+	FLG -XX0- AB
 }
-BIT	AB,d	|1|a|0 1 0 1 0 1| d		| {
-	%1 = load i8 , i8* D
-	%0 = and i8 AB , %0
-	FLG -XX0- %0
-}
-BIT	AB,M	|1|a|1|e|0 1 0 1| m		| {
-	%1 = load i8 , i8* M
-	%0 = and i8 AB , %1
+
+BIT	AB,M	|1|a| M |0 1 0 1| m		| {
+	%0 = and i8 AB , V
 	FLG -XX0- %0
 }
 
-LD	AB,i	|1|a|0 0 0 1 1 0| i		|
-LD	AB,d	|1|a|0 1 0 1 1 0| d		|
-LD	AB,M	|1|a|1|e|0 1 1 0| m		|
+LD	AB,M	|1|a| M |0 1 1 0| m		| {
+	AB = V
+	FLG -XX0- AB
+}
 
-EOR	AB,i	|1|a|0 0 1 0 0 0| i		|
-EOR	AB,d	|1|a|0 1 1 0 0 0| d		|
-EOR	AB,M	|1|a|1|e|1 0 0 0| m		|
+EOR	AB,M	|1|a| M |1 0 0 0| m		| {
+	AB = xor i8 AB , V
+	FLG -XX0- AB
+}
 
-ADC	AB,i	|1|a|0 0 1 0 0 1| i		|
-ADC	AB,d	|1|a|0 1 1 0 0 1| d		|
-ADC	AB,M	|1|a|1|e|1 0 0 1| m		|
+ADC	AB,M	|1|a| M |1 0 0 1| m		|
 
-OR	AB,i	|1|a|0 0 1 0 1 0| i		|
-OR	AB,d	|1|a|0 1 1 0 1 0| d		|
-OR	AB,M	|1|a|1|e|1 0 1 0| m		|
+OR	AB,M	|1|a| M |1 0 1 0| m		| {
+	AB = or i8 AB , V
+	FLG -XX0- AB
+}
 
-ADD	AB,i	|1|a|0 0 1 0 1 1| i		|
-ADD	AB,d	|1|a|0 1 1 0 1 1| d		|
-ADD	AB,M	|1|a|1|e|1 0 1 1| m		|
+ADD	AB,M	|1|a| M |1 0 1 1| m		|
 
-CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
-CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
-CMP	XY,M	|1 0 1|e|1 1 0 0| m		|
+CMP	XY,M	|1 0| M |1 1 0 0| m		| {
+	%0 = i16 V
+	%2 = sub i16 XY , %0
+	FLG -XXXX %2 sub XY %0
+}
 
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	%S = sub i16 %S , 2
@@ -367,90 +342,45 @@ BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	br label DST
 }
 
-LD	XY,I	|1 0 0 0 1 1 1 0| I1		| I2		| {
-	XY = i16 I16
-	FLG -XX0- I16
+LD	XY,M	|1 0| M |1 1 1 0| m		| {
+	XY = i16 V
+	FLG16 -XX0- XY
 }
 
-ST	AB,d	|1|a|0 1 0 1 1 1| d		|
+ST	AB,M	|1|a| M |0 1 1 1| m		| {
+	store i8 AB , i8* M
+	FLG -XX0- AB
+}
 
-ST	AB,M	|1|a|1|e|0 1 1 1| m		|
-
-LDD	d	|1 1 0 1 1 1 0 0| d		| {
-	%D = load i16 , i16* D
+LDD	M	|1 1| M |1 1 0 0| m		| {
+	%D = V
 	FLG16 -XX0- %D
 	MKAB
 }
 
-LDD	M	|1 1 1|e|1 1 0 0| m		| {
-	%D = load i16 , i16* M
-	FLG16 -XX0- %D
-	MKAB
-}
-
-STD	d	|1 1 0 1 1 1 0 1| d		| {
-	MKD
-	store i16* D , %D
-	FLG16 -XX0- %D
-}
-
-STD	M	|1 1 1|e|1 1 0 1| m		| {
+STD	M	|1 1| M |1 1 0 1| m		| {
 	MKD
 	store i16* M , %D
 	FLG16 -XX0- %D
 }
 
-JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
-
-JSR	M,>C	|1 0 1|e|1 1 0 1| m		|
-
-LD	XY,d	|1 0 0 1 1 1 1 0| d		| {
-	XY = load i16 , i16* D
-	FLG16 -XX0- XY
+JSR	M,>C	|1 0| M |1 1 0 1| m		| {
+	%S = sub i16 %S , 2
+	store i16 HI, i16* %S
+	br label M
 }
 
-LD	XY,M	|1 0 1|e|1 1 1 0| m		| {
-	XY = load i16 , i16* M
-	FLG16 -XX0- XY
-}
-
-ST	XY,d	|1 0 0 1 1 1 1 1| d		| {
-	store i16* D , XY
-	FLG16 -XX0- XY
-}
-
-ST	XY,M	|1 0 1|e|1 1 1 1| m		| {
+ST	XY,M	|1 0| M |1 1 1 1| m		| {
 	store i16* M , XY
 	FLG16 -XX0- XY
 }
 
-LDD	I	|1 1 0 0 1 1 0 0| I1		| I2		| {
-	%A = i8 I1
-	%B = i8 I2
-	FLG16 -XX0- I16
-}
-
-LD	SU,I	|1 1 0 0 1 1 1 0| I1		| I2		| {
-	SU = I16
-	FLG16 -XX0- I16
-}
-
-LD	SU,d	|1 1 0 1 1 1 1 0| d		| {
-	SU = load i16 , i16* D
+LD	SU,M	|1 1| M |1 1 1 0| m		| {
+	SU = V
 	FLG16 -XX0- SU
 }
 
-LD	SU,M	|1 1 1|e|1 1 1 0| m		| {
-	SU = load i16 , i16* M
-	FLG16 -XX0- SU
-}
-
-ST	SU,d	|1 1 0 1 1 1 1 1| d		| {
-	store i16* D , SU
-	FLG16 -XX0- SU
-}
-
-ST	SU,M	|1 1 1|e|1 1 1 1| m		| {
+ST	SU,M	|1 1| M |1 1 1 1| m		| {
 	store i16* M , SU
 	FLG16 -XX0- SU
 }
@@ -502,18 +432,31 @@ class mc6809_ins(assy.Instree_ins):
 	def assy_PFX10(self, pj):
 		self.pfx = 0x10
 
-	def assy_PFX11(self, pj):
-		self.pfx = 0x11
-
 	def assy_AB(self, pj):
 		self.mne += "AB"[self['a']]
 
-	def assy_M(self, pj):
-		e = self.get('e')
-		if not e is None and e:
+	def assy_M2(self, pj, mm):
+		if self.mne[-1] in ('U', 'S', 'D', 'X', 'Y'):
+			self.isz = "i16"
+
+		if mm == "I":
+			if self.isz == "i16":
+				self.hi += 1
+				self.off = pj.m.bu16(self.hi - 2)
+				return "#0x%x" % self.off
+			else:
+				self.off = self['m']
+				return "#0x%02x" % self.off
+
+		if mm == "Z":
+			return "$0x%02x" % self['m']
+
+		if mm == "D":
 			self.hi += 1
 			self.dstadr = pj.m.bu16(self.hi - 2)
 			return assy.Arg_dst(pj, self.dstadr)
+
+		assert mm == "C"
 
 		a = self['m']
 		X = a >> 7
@@ -564,6 +507,15 @@ class mc6809_ins(assy.Instree_ins):
 			return "[" + s + "]"
 		else:
 			return s
+
+	def assy_M(self, pj):
+		M = self.get('M')
+		if not M is None:
+			return self.assy_M2(pj, "IZCD"[M])
+		e = self.get('e')
+		if not e is None:
+			return self.assy_M2(pj, "CD"[e])
+		return self.assy_M2(pj, "C")
 
 	def assy_XY(self, pj):
 		if self.pfx == 0x10:
@@ -646,8 +598,21 @@ class mc6809_ins(assy.Instree_ins):
 
 	def il_adr(self):
 
+		N = self.get('N')
+		if not N is None:
+			return "XXXAN"
+		M = self.get('M')
+		if M == 0:
+			return None
+		if M == 1:
+			return self.add_il([
+				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % self['m']]
+			], "%0")
 		e = self.get('e')
 		a = self.get('m')
+		if e is None and not M is None:
+			assert M & 2
+			e = M & 1
 
 		if e is None and a is None:
 			d = self.get('d')
@@ -721,6 +686,8 @@ class mc6809_ins(assy.Instree_ins):
 				["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
 			], "%0")
 		elif m == 15:
+			if self.off is None:
+				print(self, self.mne, self.oper)
 			adr = "0x%04x" % self.off
 		else:
 			return "XXXm%d" % m
@@ -732,97 +699,29 @@ class mc6809_ins(assy.Instree_ins):
 
 		return adr
 
-	def il_val8(self):
-		adr = self.il_adr()
-		if adr is None:
-			i = self.get('i')
-			m = self.get('m')
-			if i is None or not m is None:
-				return
-			return "0x%02x" % i
-		else:
-			return self.add_il([
-				[ "%0", "=", "load", "i8", ",", "i8*", adr ]
-			], "%0")
-
-	def il_logic(self):
-		val = self.il_val8()
-		if val is None:
-			return
-		r = "%" + self.mne[-1]
-		op = {
-			"OR":	"or",
-			"AND":	"and",
-			"EOR":	"xor",
-		}.get(self.mne[:-1])
-		self.add_il([
-			[ r, "=", op, 'i8', r, ',', val ],
-			["FLG", "-XX0-", r],
-		])
-
-	def il_add8(self, op, flg, val=None):
-		if val is None:
-			val = self.il_val8()
-		if val is None:
-			return
-		r = "%" + self.mne[-1]
-		self.add_il([
-			[ "%1", "=", "i8", r ],
-			[ r, "=", op, "i8", r , ",", val ],
-			[ "FLG", flg, r, op, "%1", val ]
-		])
-
-	def il_ld8(self):
-		r = "%" + self.mne[-1]
-		adr = self.il_adr()
-		if not adr is None:
-			self.add_il([
-				[ r, "=", "load", "i8", ",", "i8*", adr ],
-				[ "FLG", "-XX0-", r ],
-			])
-			return
-
-		val = self.il_val8()
-		if val is None:
-			return
-		self.add_il([
-			[ r, "=", val ],
-			[ "FLG", "-XX0-", r ],
-		])
-
-	def il_st8(self):
-		r = "%" + self.mne[-1]
-		adr = self.il_adr()
-		if adr is None:
-			return
-		self.add_il([
-			[ "store", "i8", r, ",", "i8*", adr ],
-			[ "FLG", "-XX0-", r ],
-		])
-
-	def ildefault(self):
-		mne1 = self.mne[:-1]
-		if mne1 in ('OR', 'AND', 'EOR'):
-			self.il_logic()
-		if self.mne in ('ADDA', 'ADDB'):
-			self.il_add8("add", "XXXXX")
-		if self.mne in ('INCA', 'INCB'):
-			self.il_add8("add", "-XXX-", "1")
-		if self.mne in ('LDA', 'LDB'):
-			self.il_ld8()
-		if self.mne in ('STA', 'STB'):
-			self.il_st8()
-
 	def ilmacro_AB(self):
 		return "%" + "AB"[self['a']]
 
 	def ilmacro_M(self):
+		N = self.get('N')
+		if not N is None:
+			return "XXXAN"
 		m = self.il_adr()
 		if m is None:
 			print(self)
 			print(self.mne)
 		assert not m is None
 		return m
+
+	def ilmacro_V(self):
+		sz = self.isz
+		adr = self.il_adr()
+		M = self.get('M')
+		if M == 0:
+			return "0x%x" % self.off
+		return self.add_il([
+			[ "%0", "=", "load", sz, ",", sz + "*", adr ]
+		], "%0")
 
 	def ilmacro_BR(self):
 		cc = self['cc']
