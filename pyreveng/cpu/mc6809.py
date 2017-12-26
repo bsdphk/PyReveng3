@@ -150,23 +150,17 @@ B	R,CC	|0 0 0 1 0 0 0 0|0 0 1 0| cc    | R1		| R2		| {
 SWI2	>J	|0 0 0 1 0 0 0 0|0 0 1 1 1 1 1 1|
 
 CMPD	I	|0 0 0 1 0 0 0 0|1 0 0 0 0 0 1 1| I1		| I2		|
-
 CMPD	d	|0 0 0 1 0 0 0 0|1 0 0 1 0 0 1 1| d		|
-
 CMPD    M	|0 0 0 1 0 0 0 0|1 0 1|e|0 0 1 1| m		|
 
 SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
 
 CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 0 0 0 1 1| I1		| I2		|
-
-CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
-
-CMPU	I	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
-
-CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
-
+CMPU	d	|0 0 0 1 0 0 0 1|1 0 0 1 0 0 1 1| d		|
 CMPU	M	|0 0 0 1 0 0 0 1|1 0 1|e|0 0 1 1| m		|
 
+CMPS	I	|0 0 0 1 0 0 0 1|1 0 0 0 1 1 0 0| I1		| I2		|
+CMPS	d	|0 0 0 1 0 0 0 1|1 0 0 1 1 1 0 0| d		|
 CMPS	M	|0 0 0 1 0 0 0 1|1 0 1|e|1 1 0 0| m		|
 
 NOP	-	|0 0 0 1 0 0 1 0|
@@ -283,17 +277,46 @@ SUB	AB,i	|1|a|0 0 0 0 0 0| i		| {
 	AB = sub i8 AB , I
 	FLG UXXXX AB sub %1 I
 }
+SUB	AB,d	|1|a|0 1 0 0 0 0| d		| {
+	%0 = load i8 , i8* D
+	%1 = i8 AB
+	AB = sub i8 AB , %0
+	FLG UXXXX AB sub %1 %0
+}
+SUB	AB,M	|1|a|1|e|0 0 0 0| m		| {
+	%0 = load i8 , i8* M
+	%1 = i8 AB
+	AB = sub i8 AB , %0
+	FLG UXXXX AB sub %1 %0
+}
 
 CMP	AB,i	|1|a|0 0 0 0 0 1| i		| {
 	%2 = sub i8 AB , I
 	FLG UXXXX %2 sub AB I
 }
+CMP	AB,d	|1|a|0 1 0 0 0 1| d		| {
+	%0 = load i8 , i8* D
+	%2 = sub i8 AB , %0
+	FLG UXXXX %2 sub AB %0
+}
+CMP	AB,M	|1|a|1|e|0 0 0 1| m		| {
+	%0 = load i8 , i8* M
+	%2 = sub i8 AB , %0
+	FLG UXXXX %2 sub AB %0
+}
+
 
 SBC	AB,i	|1|a|0 0 0 0 1 0| i		|
+SBC	AB,d	|1|a|0 1 0 0 1 0| d		|
+SBC	AB,M	|1|a|1|e|0 0 1 0| m		|
 
 SUBD	I	|1 0 0 0 0 0 1 1| I1		| I2		|
+SUBD	d	|1 0 0 1 0 0 1 1| d		|
+SUBD	M	|1 0 1|e|0 0 1 1| m		|
 
 ADDD	I	|1 1 0 0 0 0 1 1| I1		| I2		|
+ADDD	d	|1 1 0 1 0 0 1 1| d		|
+ADDD	M	|1 1 1|e|0 0 1 1| m		|
 
 AND	AB,i	|1|a|0 0 0 1 0 0| i		|
 AND	AB,d	|1|a|0 1 0 1 0 0| d		|
@@ -303,13 +326,11 @@ BIT	AB,i	|1|a|0 0 0 1 0 1| i		| {
 	%0 = and i8 AB , I
 	FLG -XX0- %0
 }
-
 BIT	AB,d	|1|a|0 1 0 1 0 1| d		| {
 	%1 = load i8 , i8* D
 	%0 = and i8 AB , %0
 	FLG -XX0- %0
 }
-
 BIT	AB,M	|1|a|1|e|0 1 0 1| m		| {
 	%1 = load i8 , i8* M
 	%0 = and i8 AB , %1
@@ -337,6 +358,8 @@ ADD	AB,d	|1|a|0 1 1 0 1 1| d		|
 ADD	AB,M	|1|a|1|e|1 0 1 1| m		|
 
 CMP	XY,I	|1 0 0 0 1 1 0 0| I1		| I2		|
+CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
+CMP	XY,M	|1 0 1|e|1 1 0 0| m		|
 
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	%S = sub i16 %S , 2
@@ -348,26 +371,6 @@ LD	XY,I	|1 0 0 0 1 1 1 0| I1		| I2		| {
 	XY = i16 I16
 	FLG -XX0- I16
 }
-
-SUB	AB,d	|1|a|0 1 0 0 0 0| d		|
-
-SUB	AB,M	|1|a|1|e|0 0 0 0| m		|
-
-CMP	AB,d	|1|a|0 1 0 0 0 1| d		|
-
-CMP	AB,M	|1|a|1|e|0 0 0 1| m		|
-
-SBC	AB,d	|1|a|0 1 0 0 1 0| d		|
-
-SBC	AB,M	|1|a|1|e|0 0 1 0| m		|
-
-SUBD	d	|1 0 0 1 0 0 1 1| d		|
-
-SUBD	M	|1 0 1|e|0 0 1 1| m		|
-
-ADDD	d	|1 1 0 1 0 0 1 1| d		|
-
-ADDD	M	|1 1 1|e|0 0 1 1| m		|
 
 ST	AB,d	|1|a|0 1 0 1 1 1| d		|
 
@@ -396,10 +399,6 @@ STD	M	|1 1 1|e|1 1 0 1| m		| {
 	store i16* M , %D
 	FLG16 -XX0- %D
 }
-
-CMP	XY,d	|1 0 0 1 1 1 0 0| d		|
-
-CMP	XY,M	|1 0 1|e|1 1 0 0| m		|
 
 JSR	d,>C	|1 0 0 1 1 1 0 1| d		|
 
