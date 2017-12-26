@@ -315,10 +315,7 @@ ANDA	i	|1 0 0 0 0 1 0 0| i		|
 
 BITA	i	|1 0 0 0 0 1 0 1| i		|
 
-LDA	i	|1 0 0 0 0 1 1 0| i		| {
-	%A = I
-	FLG -XX0- %A
-}
+LDA	i	|1 0 0 0 0 1 1 0| i		|
 
 EORA	i	|1 0 0 0 1 0 0 0| i		|
 
@@ -417,15 +414,9 @@ ANDA	E	|1 0 1 1 0 1 0 0| e1		| e2		|
 
 BITA	E	|1 0 1 1 0 1 0 1| e1		| e2		|
 
-LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		| {
-	%A = load i8, i8* DST
-	FLG -XX0- %A
-}
+LDA	E	|1 0 1 1 0 1 1 0| e1		| e2		|
 
-STA	E	|1 0 1 1 0 1 1 1| e1		| e2		| {
-	store i8* DST , i8 %A
-	FLG -XX0- %A
-}
+STA	E	|1 0 1 1 0 1 1 1| e1		| e2		|
 
 EORA	E	|1 0 1 1 1 0 0 0| e1		| e2		|
 
@@ -458,10 +449,7 @@ ANDB	i	|1 1 0 0 0 1 0 0| i		|
 
 BITB	i	|1 1 0 0 0 1 0 1| i		|
 
-LDB	i	|1 1 0 0 0 1 1 0| i		| {
-	%B = i8 I
-	FLG -XX0- I
-}
+LDB	i	|1 1 0 0 0 1 1 0| i		|
 
 EORB	i	|1 1 0 0 1 0 0 0| i		|
 
@@ -759,41 +747,37 @@ class mc6809_ins(assy.Instree_ins):
 
 	###############################################################
 
-	def il_mem(self):
+	def il_adr(self):
 
 		m = self.get('m')
 		if not m is None:
-			return None, None
-
-		i = self.get('i')
-		if not i is None:
-			return None, "0x%02x" % (self['i'])
+			return None
 
 		d = self.get('d')
 		if not d is None:
 			j = self.add_il([
 				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % d]
 			], "%0")
-			return j, None
+			return j
 
 		e1 = self.get('e1')
 		if not e1 is None:
-			j = self.add_il([
-				[ "%0", "=", "load", "i8", ",", "i8*", "DST" ]
-			], "%0")
-			return j, None
+			return "DST"
 
-		return None, None
+		return None
 
 	def il_val8(self):
-		adr,val = self.il_mem()
-		if adr is None and val is None:
-			return None
-		if val is None:
-			val = self.add_il([
+		adr = self.il_adr()
+		if adr is None:
+			i = self.get('i')
+			m = self.get('m')
+			if i is None or not m is None:
+				return
+			return "0x%02x" % i
+		else:
+			return self.add_il([
 				[ "%0", "=", "load", "i8", ",", "i8*", adr ]
 			], "%0")
-		return val
 
 	def il_logic(self):
 		val = self.il_val8()
@@ -822,6 +806,34 @@ class mc6809_ins(assy.Instree_ins):
 			[ "FLG", flg, r, op, "%1", val ]
 		])
 
+	def il_ld8(self):
+		r = "%" + self.mne[-1]
+		adr = self.il_adr()
+		if not adr is None:
+			self.add_il([
+				[ r, "=", "load", "i8", ",", "i8*", adr ],
+				[ "FLG", "-XX0-", r ],
+			])
+			return
+
+		val = self.il_val8()
+		if val is None:
+			return
+		self.add_il([
+			[ r, "=", val ],
+			[ "FLG", "-XX0-", r ],
+		])
+
+	def il_st8(self):
+		r = "%" + self.mne[-1]
+		adr = self.il_adr()
+		if adr is None:
+			return
+		self.add_il([
+			[ "store", "i8", r, ",", "i8*", adr ],
+			[ "FLG", "-XX0-", r ],
+		])
+
 	def ildefault(self):
 		mne1 = self.mne[:-1]
 		if mne1 in ('OR', 'AND', 'EOR'):
@@ -830,6 +842,10 @@ class mc6809_ins(assy.Instree_ins):
 			self.il_add8("add", "XXXXX")
 		if self.mne in ('INCA', 'INCB'):
 			self.il_add8("add", "-XXX-", "1")
+		if self.mne in ('LDA', 'LDB'):
+			self.il_ld8()
+		if self.mne in ('STA', 'STB'):
+			self.il_st8()
 
 	def ilmacro_BR(self):
 		cc = self['cc']
