@@ -41,9 +41,9 @@ mc6809_instructions = """
 
 NEG	MM	| mm	|0 0 0 0| m		| {
 	%1 = load i8 , i8* M
-	%2 = sub i8 %1 , 1
+	%2 = sub i8 0, %1
 	store i8 %2 , i8* M
-	FLG UXXXX %2 sub %1 1
+	FLG UXXXX %2 sub 0 %1
 }
 
 COM	MM	| mm	|0 0 1 1| m		| {
@@ -53,15 +53,54 @@ COM	MM	| mm	|0 0 1 1| m		| {
 	FLG UXX01 %2
 }
 
-LSR	MM	| mm	|0 1 0 0| m		|
+LSR	MM	| mm	|0 1 0 0| m		| {
+	%1 = load i8 , i8* M
+	%2 = shl i8 %1 , 1
+	store i8 %2 , i8* M
+	%3 = lshr i8 %1 , 7
+	%CC.c = trunc i8 %3 to i1
+	FLG -0X-- %2
+}
 
-ROR	MM	| mm	|0 1 1 0| m		|
+ROR	MM	| mm	|0 1 1 0| m		| {
+	%1 = load i8 , i8* M
+	%2 = lshr i8 %1 , 1
+	%3 = zext i1 %CC.c to i8
+	%4 = shl i8 %3 , 7
+	%5 = or i8 %2 , %4
+	store i8 %5 , i8* M
+	%CC.c = trunc i8 %1 to i1
+	FLG -XX-- %5
+}
 
-ASR	MM	| mm	|0 1 1 1| m		|
+ASR	MM	| mm	|0 1 1 1| m		| {
+	%1 = load i8 , i8* M
+	%2 = ashr i8 %1 , 1
+	store i8 %2 , i8* M
+	%CC.c = trunc i8 %1 to i1
+	FLG UXX-- %2
+}
 
-ASL	MM	| mm	|1 0 0 0| m		|
+ASL	MM	| mm	|1 0 0 0| m		| {
+	%1 = load i8 , i8* M
+	%2 = shl i8 %1 , 1
+	store i8 %2 , i8* M
+	%3 = lshr i8 %1 , 7
+	%CC.c = trunc i8 %3 to i1
+	FLG UXX-- %2
+}
 
-ROL	MM	| mm	|1 0 0 1| m		|
+ROL	MM	| mm	|1 0 0 1| m		| {
+	%1 = load i8 , i8* M
+	%2 = shl i8 %1 , 1
+	%3 = zext i1 %CC.c to i8
+	%4 = or i8 %2 , %3
+	%5 = lshr i8 %1 , 7
+	%CC.c = trunc i8 %5 to i1
+	store i8 %4 , i8* M
+	# XXX U is wrong:
+	FLG -XXU- %4
+}
 
 DEC	MM	| mm	|1 0 1 0| m		| {
 	%1 = load i8 , i8* M
@@ -203,7 +242,15 @@ RTI	>R	|0 0 1 1 1 0 1 1|
 
 CWAI	i	|0 0 1 1 1 1 0 0| i		|
 
-MUL	-	|0 0 1 1 1 1 0 1|
+MUL	-	|0 0 1 1 1 1 0 1| {
+	%0 = zext i8 %A to i16
+	%1 = zext i8 %B to i16
+	%D = mul i16 %0 , %1
+	FLG16 --X-- %D
+	%2 = lshr i16 %D , 7
+	%CC.c = trunc i16 %2 to i1
+	MKAB
+}
 
 SWI	-	|0 0 1 1 1 1 1 1|
 
@@ -257,9 +304,21 @@ CMP	AB,M	|1|a| M |0 0 0 1| m		| {
 
 SBC	AB,M	|1|a| M |0 0 1 0| m		|
 
-SUBD	M	|1 0| M |0 0 1 1| m		|
+SUBD	M	|1 0| M |0 0 1 1| m		| {
+	MKD
+	%0 = i16 %D
+	%D = sub i16 %D , V
+	FLG -XXXX %D sub %D V
+	MKAB
+}
 
-ADDD	M	|1 1| M |0 0 1 1| m		|
+ADDD	M	|1 1| M |0 0 1 1| m		| {
+	MKD
+	%0 = i16 %D
+	%D = add i16 %D , V
+	FLG -XXXX %D add %D V
+	MKAB
+}
 
 AND	AB,M	|1|a| M |0 1 0 0| m		| {
 	AB = and i8 AB , V
@@ -724,7 +783,7 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_MKAB(self):
 		self.add_il([
 			["%B", "=", "trunc", "i16", "%D", "to", "i8"],
-			["%D", "=", "srl", "i16", "%D", "," "8"],
+			["%D", "=", "lshr", "i16", "%D", "," "8"],
 			["%A", "=", "trunc", "i16", "%D", "to", "i8"],
 			["%D", "=", "void"],
 		])
