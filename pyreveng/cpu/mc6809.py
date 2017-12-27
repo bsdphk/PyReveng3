@@ -39,106 +39,54 @@ mc6809_instructions = """
 
 +	PFX10	|0 0 0 1 0 0 0 0|
 
-NEG	d	|0 0 0 0 0 0 0 0| d		| {
-	%1 = load i8 , i8* D
-	%2 = sub i8 %1 , 1
-	store i8 %2 , i8* D
-	FLG UXXXX %2 sub %1 1
-}
-
-NEG	M	|0 1 1|e|0 0 0 0| m		| {
+NEG	MM	| mm	|0 0 0 0| m		| {
 	%1 = load i8 , i8* M
 	%2 = sub i8 %1 , 1
 	store i8 %2 , i8* M
 	FLG UXXXX %2 sub %1 1
 }
 
-COM	d	|0 0 0 0 0 0 1 1| d		| {
-	%1 = load i8 , i8* D
-	%2 = xor i8 %1 , 0xff
-	store i8 %2 , i8* D
-	FLG UXX01 %2
-}
-
-COM	M	|0 1 1|e|0 0 1 1| m		| {
+COM	MM	| mm	|0 0 1 1| m		| {
 	%1 = load i8 , i8* M
 	%2 = xor i8 %1 , 0xff
 	store i8 %2 , i8* M
 	FLG UXX01 %2
 }
 
-LSR	d	|0 0 0 0 0 1 0 0| d		|
+LSR	MM	| mm	|0 1 0 0| m		|
 
-LSR	M	|0 1 1|e|0 1 0 0| m		|
+ROR	MM	| mm	|0 1 1 0| m		|
 
-ROR	d	|0 0 0 0 0 1 1 0| d		|
+ASR	MM	| mm	|0 1 1 1| m		|
 
-ROR	M	|0 1 1|e|0 1 1 0| m		|
+ASL	MM	| mm	|1 0 0 0| m		|
 
-ASR	d	|0 0 0 0 0 1 1 1| d		|
+ROL	MM	| mm	|1 0 0 1| m		|
 
-ASR	M	|0 1 1|e|0 1 1 1| m		|
-
-ASL	d	|0 0 0 0 1 0 0 0| d		|
-
-ASL	M	|0 1 1|e|1 0 0 0| m		|
-
-ROL	d	|0 0 0 0 1 0 0 1| d		|
-
-ROL	M	|0 1 1|e|1 0 0 1| m		|
-
-DEC	d	|0 0 0 0 1 0 1 0| d		| {
-	%1 = load i8 , i8* D
-	%2 = sub i8 %1 , 1
-	store i8 %2 , i8* D
-	FLG -XXX- %2 sub %1 1
-}
-
-DEC	M	|0 1 1|e|1 0 1 0| m		| {
+DEC	MM	| mm	|1 0 1 0| m		| {
 	%1 = load i8 , i8* M
 	%2 = sub i8 %1 , 1
 	store i8 %2 , i8* M
 	FLG -XXX- %2 sub %1 1
 }
 
-INC	d	|0 0 0 0 1 1 0 0| d		| {
-	%1 = load i8 , i8* D
-	%2 = add i8 %1 , 1
-	store i8 %2 , i8* D
-	FLG -XXX- %2 add %1 1
-}
-
-INC	M	|0 1 1|e|1 1 0 0| m		| {
+INC	MM	| mm	|1 1 0 0| m		| {
 	%1 = load i8 , i8* M
 	%2 = add i8 %1 , 1
 	store i8 %2 , i8* M
 	FLG -XXX- %2 add %1 1
 }
 
-TST	d	|0 0 0 0 1 1 0 1| d		| {
-	%1 = load i8 , i8* D
-	FLG -XX0- %1
-}
-
-TST	M	|0 1 1|e|1 1 0 1| m		| {
+TST	MM	| mm	|1 1 0 1| m		| {
 	%1 = load i8 , i8* M
 	FLG -XX0- %1
 }
 
-JMP	d,>J	|0 0 0 0 1 1 1 0| d		| {
-	br label D
-}
-
-JMP	M,>J	|0 1 1|e|1 1 1 0| m		| {
+JMP	MM,>J	| mm	|1 1 1 0| m		| {
 	br label M
 }
 
-CLR	d	|0 0 0 0 1 1 1 1| d		| {
-	store i8 0 , i8* D
-	FLG -0100
-}
-
-CLR	M	|0 1 1|e|1 1 1 1| m		| {
+CLR	MM	| mm	|1 1 1 1| m		| {
 	store i8 0 , i8* M
 	FLG -0100
 }
@@ -183,13 +131,15 @@ BRA	R,>J	|0 0 0 1 0 1 1 0| R1            | R2		| {
 
 BSR	R,>C	|0 0 0 1 0 1 1 1| R1            | R2		| {
 	%S = sub i16 %S , 2
-	store i16 HI, i16* %S
+	store i16 HI , i16* %S
 	br label DST
 }
 
 DAA	-	|0 0 0 1 1 0 0 1|
 
-ORCC	i	|0 0 0 1 1 0 1 0| i		|
+ORCC	i	|0 0 0 1 1 0 1 0| i		| {
+	%CC = or i8 %CC , I
+}
 
 ANDCC	i	|0 0 0 1 1 1 0 0| i		| {
 	%CC = and i8 %CC , I
@@ -271,11 +221,21 @@ ASL	AB	|0 1 0|a|1 0 0 0|
 
 ROL	AB	|0 1 0|a|1 0 0 1|
 
-DEC	AB	|0 1 0|a|1 0 1 0|
+DEC	AB	|0 1 0|a|1 0 1 0| {
+	%0 = i8 AB
+	AB = sub i8 AB , 1
+	FLG -XXX- AB sub %0 1
+}
 
-INC	AB	|0 1 0|a|1 1 0 0|
+INC	AB	|0 1 0|a|1 1 0 0| {
+	%0 = i8 AB
+	AB = add i8 AB , 1
+	FLG -XXX- AB add %0 1
+}
 
-TST	AB	|0 1 0|a|1 1 0 1|
+TST	AB	|0 1 0|a|1 1 0 1| {
+	FLG -XX0- AB
+}
 
 CLR	AB	|0 1 0|a|1 1 1 1| {
 	AB = i8 0
@@ -338,7 +298,7 @@ CMP	XY,M	|1 0| M |1 1 0 0| m		| {
 
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 	%S = sub i16 %S , 2
-	store i16 HI, i16* %S
+	store i16 HI , i16* %S
 	br label DST
 }
 
@@ -366,7 +326,7 @@ STD	M	|1 1| M |1 1 0 1| m		| {
 
 JSR	M,>C	|1 0| M |1 1 0 1| m		| {
 	%S = sub i16 %S , 2
-	store i16 HI, i16* %S
+	store i16 HI , i16* %S
 	br label M
 }
 
@@ -388,7 +348,7 @@ ST	SU,M	|1 1| M |1 1 1 1| m		| {
 """
 
 mc6809_macro_instructions = """
-LDDx	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
+LDD	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
 	%B = i8 I
 	%A = i8 0
 	FLG -0100
@@ -397,12 +357,6 @@ LDDx	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
 ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		| {
 	%A = and i8 %A , I1
 	%B = and i8 %A , I2
-	FLG -XX0- %B
-}
-
-ORD	I	|1 0 0 0 1 0 1 0| I1		|1 1 0 0 1 0 1 0| I2		| {
-	%A = or i8 %A , I1
-	%B = or i8 %A , I2
 	FLG -XX0- %B
 }
 
@@ -419,7 +373,6 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
 }
 
 """
-
 
 class mc6809_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
@@ -438,6 +391,7 @@ class mc6809_ins(assy.Instree_ins):
 	def assy_M2(self, pj, mm):
 		if self.mne[-1] in ('U', 'S', 'D', 'X', 'Y'):
 			self.isz = "i16"
+		self.icache["AM"] = mm
 
 		if mm == "I":
 			if self.isz == "i16":
@@ -517,6 +471,16 @@ class mc6809_ins(assy.Instree_ins):
 			return self.assy_M2(pj, "CD"[e])
 		return self.assy_M2(pj, "C")
 
+	def assy_MM(self, pj):
+		mm = self.get('mm')
+		if mm == 0:
+			return self.assy_M2(pj, "Z")
+		if mm == 6:
+			return self.assy_M2(pj, "C")
+		if mm == 7:
+			return self.assy_M2(pj, "D")
+		raise assy.Invalid()
+
 	def assy_XY(self, pj):
 		if self.pfx == 0x10:
 			self.mne += "Y"
@@ -528,9 +492,6 @@ class mc6809_ins(assy.Instree_ins):
 			self.mne += "S"
 		else:
 			self.mne += "U"
-
-	def assy_d(self, pj):
-		return "$0x%02x" % self['d']
 
 	def assy_i(self, pj):
 		return "#0x%02x" % self['i']
@@ -598,33 +559,20 @@ class mc6809_ins(assy.Instree_ins):
 
 	def il_adr(self):
 
-		N = self.get('N')
-		if not N is None:
-			return "XXXAN"
-		M = self.get('M')
-		if M == 0:
+		am = self.icache["AM"]
+
+		if am == "I":
 			return None
-		if M == 1:
+
+		if am == "Z":
 			return self.add_il([
 				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % self['m']]
 			], "%0")
-		e = self.get('e')
-		a = self.get('m')
-		if e is None and not M is None:
-			assert M & 2
-			e = M & 1
 
-		if e is None and a is None:
-			d = self.get('d')
-			if not d is None:
-				j = self.add_il([
-					["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % d]
-				], "%0")
-				return j
-			return None
-
-		if not e is None and e:
+		if am == "D":
 			return "0x%04x" % self.dstadr
+
+		assert am == "C"
 
 		a = self['m']
 		X = a >> 7
@@ -703,24 +651,21 @@ class mc6809_ins(assy.Instree_ins):
 		return "%" + "AB"[self['a']]
 
 	def ilmacro_M(self):
-		N = self.get('N')
-		if not N is None:
-			return "XXXAN"
-		m = self.il_adr()
+		m = self.icache.get("M")
 		if m is None:
-			print(self)
-			print(self.mne)
+			m = self.il_adr()
+			self.icache["M"] = m
 		assert not m is None
 		return m
 
 	def ilmacro_V(self):
-		sz = self.isz
-		adr = self.il_adr()
-		M = self.get('M')
-		if M == 0:
+		if self.icache["AM"] == "I":
 			return "0x%x" % self.off
+
+		m = self.il_adr()
+		sz = self.isz
 		return self.add_il([
-			[ "%0", "=", "load", sz, ",", sz + "*", adr ]
+			[ "%0", "=", "load", sz, ",", sz + "*", m ]
 		], "%0")
 
 	def ilmacro_BR(self):
@@ -761,23 +706,11 @@ class mc6809_ins(assy.Instree_ins):
 
 		self.add_il(l)
 
-	def ilmacro_D(self):
-		j = self.icache.get("d")
-		if j is None:
-			j = self.add_il([
-				["%1", "=", "add", "i16", "%DP", ",", "0x%02x" % self['d']]
-			], "%1")
-		self.icache["d"] = j
-		return j
-
 	def ilmacro_DST(self):
 		return "0x%04x" % self.dstadr
 
 	def ilmacro_HI(self):
 		return "0x%x" % self.hi
-
-	def ilmacro_I(self):
-		return "0x%02x" % (self['i'])
 
 	def ilmacro_I1(self):
 		return "0x%02x" % (self['I1'])
@@ -787,10 +720,6 @@ class mc6809_ins(assy.Instree_ins):
 
 	def ilmacro_I(self):
 		return "0x%02x" % (self['i'])
-
-	def ilmacro_I16(self):
-		self.isz = "i16"
-		return "0x%02x%02x" % (self['I1'], self['I2'])
 
 	def ilmacro_MKAB(self):
 		self.add_il([

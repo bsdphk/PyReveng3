@@ -28,7 +28,8 @@ from __future__ import print_function
 
 import os
 from pyreveng import job, mem, listing, data, code, assy
-import decompile
+# import decompile
+import pyreveng.cpu.mc6809 as mc6809
 
 fwd="/critter/Doc/TestAndMeasurement/HP8904A/FW/"
 
@@ -719,6 +720,7 @@ def Menu(pj, cpu, a, nm):
 # Markup RAISE
 
 def error_arg(pj, dst, arg, errors):
+	return
 	for i in pj:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
@@ -732,6 +734,7 @@ def error_arg(pj, dst, arg, errors):
 # Markup Number arguments
 
 def num_arg(pj, dst, arg):
+	return
 	for i in pj:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
@@ -752,6 +755,7 @@ def num_arg(pj, dst, arg):
 arg_strings = set()
 
 def str_len_args(pj, dst, args, argl):
+	return
 	for i in pj:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
@@ -1026,9 +1030,10 @@ for pg in (0,1,2,3,4):
 
 	romsum(pj)
 
-	decompile.setup(pj)
+	# decompile.setup(pj)
 
-	cpu = decompile.mc6809a()
+	# cpu = decompile.mc6809a()
+	cpu = mc6809.mc6809()
 
 	hints(pj, cpu)
 
@@ -1041,7 +1046,7 @@ for pg in (0,1,2,3,4):
 	while pj.run():
 		pass
 
-	decompile.analyse(pj, cpu)
+	# decompile.analyse(pj, cpu)
 
 	while pj.run():
 		pass
@@ -1059,7 +1064,7 @@ for pg in (0,1,2,3,4):
 	if pj.pg == 2:
 		str_len_args(pj, 0x44ee, 3, 2)
 
-	decompile.mopup(pj, cpu)
+	# decompile.mopup(pj, cpu)
 
 	code.lcmt_flows(pj)
 
