@@ -598,5 +598,7 @@ if __name__ == '__main__':
 	output(pj)
 
 	import pyreveng.il
+
+	pyreveng.il.Syntax_Check(pj, ptr="i16")
 	a = pyreveng.il.analysis(pj)
 	a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))

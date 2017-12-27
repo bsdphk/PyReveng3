@@ -90,6 +90,7 @@ ASL	MM	| mm	|1 0 0 0| m		| {
 	FLG UXX-- %2
 }
 
+# XXX U flg is wrong
 ROL	MM	| mm	|1 0 0 1| m		| {
 	%1 = load i8 , i8* M
 	%2 = shl i8 %1 , 1
@@ -98,7 +99,6 @@ ROL	MM	| mm	|1 0 0 1| m		| {
 	%5 = lshr i8 %1 , 7
 	%CC.c = trunc i8 %5 to i1
 	store i8 %4 , i8* M
-	# XXX U is wrong:
 	FLG -XXU- %4
 }
 
@@ -141,7 +141,7 @@ CMPD    M	|0 0 0 1 0 0 0 0|1 0| M |0 0 1 1| m		| {
 	%0 = i16 V
 	%2 = sub i16 %D , %0
 	FLG -XXXX %2 sub %D %0
-	%D = void
+	%D = i16 pyreveng.void ( )
 }
 
 SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
@@ -150,14 +150,12 @@ CMPU	M	|0 0 0 1 0 0 0 1|1 0| M |0 0 1 1| m		| {
 	%0 = i16 V
 	%2 = sub i16 %U , %0
 	FLG -XXXX %2 sub %U %0
-	%D = void
 }
 
 CMPS	M	|0 0 0 1 0 0 0 1|1 0| Me|1 1 0 0| m		| {
 	%0 = i16 V
 	%2 = sub i16 %S , %0
 	FLG -XXXX %2 sub %S %0
-	%D = void
 }
 
 NOP	-	|0 0 0 1 0 0 1 0|
@@ -290,7 +288,7 @@ CLR	AB	|0 1 0|a|1 1 1 1| {
 }
 
 SUB	AB,M	|1|a| M |0 0 0 0| m		| {
-	%0 = V
+	%0 = i8 V
 	%1 = i8 AB
 	AB = sub i8 AB , %0
 	FLG UXXXX AB sub %1 %0
@@ -331,7 +329,7 @@ BIT	AB,M	|1|a| M |0 1 0 1| m		| {
 }
 
 LD	AB,M	|1|a| M |0 1 1 0| m		| {
-	AB = V
+	AB = i8 V
 	FLG -XX0- AB
 }
 
@@ -372,14 +370,14 @@ ST	AB,M	|1|a| M |0 1 1 1| m		| {
 }
 
 LDD	M	|1 1| M |1 1 0 0| m		| {
-	%D = V
+	%D = i16 V
 	FLG16 -XX0- %D
 	MKAB
 }
 
 STD	M	|1 1| M |1 1 0 1| m		| {
 	MKD
-	store i16* M , %D
+	store i16 %D , i16* M
 	FLG16 -XX0- %D
 }
 
@@ -390,17 +388,17 @@ JSR	M,>C	|1 0| M |1 1 0 1| m		| {
 }
 
 ST	XY,M	|1 0| M |1 1 1 1| m		| {
-	store i16* M , XY
+	store i16 XY , i16* M
 	FLG16 -XX0- XY
 }
 
 LD	SU,M	|1 1| M |1 1 1 0| m		| {
-	SU = V
+	SU = i16 V
 	FLG16 -XX0- SU
 }
 
 ST	SU,M	|1 1| M |1 1 1 1| m		| {
-	store i16* M , SU
+	store i16 SU , i16* M
 	FLG16 -XX0- SU
 }
 
@@ -686,7 +684,7 @@ class mc6809_ins(assy.Instree_ins):
 			], "%0")
 		elif m == 11:
 			adr = self.add_il([
-				["%0", "=", "add", "i16", r, ",", "D"],
+				["%0", "=", "add", "i16", r, ",", "%D"],
 			], "%0")
 		elif m == 12 or m == 13:
 			adr = self.add_il([
@@ -761,7 +759,7 @@ class mc6809_ins(assy.Instree_ins):
 			l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
 			l.append(["%1", "=", "or", "i1", "%CC.z", ",", "%0"])
 			bb = "%1"
-		l.append(["br", "i1", bb, "label", d1, ",", "label", d2])
+		l.append(["br", "i1", bb, ",", "label", d1, ",", "label", d2])
 
 		self.add_il(l)
 
@@ -783,9 +781,9 @@ class mc6809_ins(assy.Instree_ins):
 	def ilmacro_MKAB(self):
 		self.add_il([
 			["%B", "=", "trunc", "i16", "%D", "to", "i8"],
-			["%D", "=", "lshr", "i16", "%D", "," "8"],
+			["%D", "=", "lshr", "i16", "%D", ",", "8"],
 			["%A", "=", "trunc", "i16", "%D", "to", "i8"],
-			["%D", "=", "void"],
+			["%D", "=", "i16", "pyreveng.void", "(", ")"],
 		])
 
 	def ilmacro_MKD(self):
@@ -822,9 +820,9 @@ class mc6809_ins(assy.Instree_ins):
 		]
 		if sr == 0:
 			r[0] = self.add_il([
-				["%1", "=", "zext", "i16", "%A"],
-				["%2", "=", "zext", "i16", "%B"],
-				["%3", "=", "shl", "i16", "8", "%2"],
+				["%1", "=", "zext", "i8", "%A", "to", "i16"],
+				["%2", "=", "zext", "i8", "%B", "to", "i16"],
+				["%3", "=", "shl", "i16", "8", ",", "%2"],
 				["%0", "=", "or", "i16", "%1", ",", "%3"],
 			], "%0")
 		elif dr == 0:
@@ -835,7 +833,7 @@ class mc6809_ins(assy.Instree_ins):
 		if dr == 0:
 			self.add_il([
 				["%A", "=", "trunc", "i16", r[0], "to", "i8"],
-				["%0", "=", "shr", "i16", r[0], "8"],
+				["%0", "=", "lshr", "i16", r[0], ",", "8"],
 				["%B", "=", "trunc", "i16", "%0", "to", "i8"],
 			])
 
@@ -911,20 +909,20 @@ class mc6809_ins(assy.Instree_ins):
 		for r in ('%CC', '%A', '%B', '%DP'):
 			if i & j:
 				self.add_il([
-					[r, "=", "load", "i8", ",", "i8*", ",", s],
+					[r, "=", "load", "i8", ",", "i8*", s],
 					[s, "=", "add", "i16", s, ",", "1"],
 				])
 			j <<= 1
 		for r in ('%X', '%Y', sa):
 			if i & j:
 				self.add_il([
-					[r, "=", "load", "i16", ",", "i16*", ",", s],
+					[r, "=", "load", "i16", ",", "i16*", s],
 					[s, "=", "add", "i16", s, ",", "2"],
 				])
 			j <<= 1
 		if i & j:
 			self.add_il([
-				["%0", "=", "load", "i16", ",", "i16*", ",", s],
+				["%0", "=", "load", "i16", ",", "i16*", s],
 				[s, "=", "add", "i16", s, ",", "2"],
 				["br", "label", "%0"],
 			])
@@ -941,14 +939,14 @@ class mc6809_ins(assy.Instree_ins):
 			if i & j:
 				self.add_il([
 					[s, "=", "sub", "i16", s, ",", "2"],
-					["store", "i16*", s, ",", r],
+					["store", "i16", r, ",", "i16*", s],
 				])
 			j >>= 1
 		for r in ('%DP', '%B', '%A', '%CC'):
 			if i & j:
 				self.add_il([
 					[s, "=", "sub", "i16", s, ",", "1"],
-					["store", "i16*", s, ",", r],
+					["store", "i8", r, ",", "i8*", s],
 				])
 			j >>= 1
 

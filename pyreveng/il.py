@@ -282,6 +282,213 @@ class IL_BB(object):
 				self.doa.add(i)
 		return nn
 
+#######################################################################
+# XXX Stuff below probably belongs in separate source file(s)
+
+from . import assy
+
+#######################################################################
+
+class ILSyntaxError(Exception):
+	pass
+
+class Syntax_Check(object):
+	def __init__(self, pj, ptr):
+		self.pj = pj
+		self.regs = { "%A": "i8" }
+		self.ptr = ptr
+		self.uverbs = set()
+
+		for j in pj:
+			if isinstance(j, assy.Assy):
+				self.check_ins(j)
+
+	def check_ins(self, j):
+		for x in j.il.il:
+			try:
+				self.check_il(x)
+			except ILSyntaxError as bug:
+				print("")
+				print("TROUBLE:")
+				print("\t", j)
+				print("\t", x)
+				print("\t", bug)
+
+	def do_reg(self, rn, w):
+		if rn[0] != "%":
+			raise ILSyntaxError(
+			    "Expected register got '" + rn + "'")
+		a = self.regs.get(rn)
+		if a is None:
+			self.regs[rn] = w
+		elif a != w:
+			raise ILSyntaxError(
+			    "Inconsistent width " + rn + " " + a + " vs " + w)
+
+	def expect_value(self, l, wid):
+		v = l.pop(0)
+		if v == "void":
+			w = wid
+		elif v[:9] == "pyreveng.":
+			# XXX
+			w = wid
+			while l.pop(0) != ")":
+				continue
+		elif v[:2] == "0x":
+			w = int(v[2:], 16)
+		elif v[0].isdigit():
+			w = int(v, 10)
+		elif v[0] == "%" and wid[-1] == "*":
+			self.do_reg(v, self.ptr)
+		elif v[0] == "%":
+			self.do_reg(v, wid)
+		else:
+			raise ILSyntaxError(
+			    ("Expected " + wid + " value got '" + v + "'"))
+
+	def expect(self, a, b):
+		if a != b:
+			raise ILSyntaxError(
+			    "Expected '" + a + "' got '" + b + "'")
+
+	def expect_type(self, a):
+		if a[0] != 'i':
+			raise ILSyntaxError(
+			    "Expected type got '" + a + "'")
+		b = a[1:]
+		if b[-1] == "*":
+			b = b[:-1]
+		w = int(b, 10)
+		if w not in (1, 8, 16, 32):
+			raise ILSyntaxError(
+			    "Unexpected type width '" + a + "'")
+		return a
+			
+
+	def check_br(self, l):
+		self.expect('br', l.pop(0))
+		if l[0] == "i1":
+			l.pop(0)
+			self.do_reg(l.pop(0), "i1")
+			self.expect(',', l.pop(0))
+			self.expect('label', l.pop(0))
+			l.pop(0)
+			self.expect(',', l.pop(0))
+			self.expect('label', l.pop(0))
+			l.pop(0)
+		else:
+			self.expect('label', l.pop(0))
+			l.pop(0)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on 'br' <%s>" % str(l))
+
+	def check_store(self, l):
+		self.expect('store', l.pop(0))
+		ty = self.expect_type(l.pop(0))
+		self.expect_value(l, ty)
+		self.expect(',', l.pop(0))
+		ty2 = self.expect_type(l.pop(0))
+		if ty2 != ty + "*":
+			raise ILSyntaxError(("Inconsistent types in 'store' %s vs %s" % (ty, ty2)))
+		self.expect_value(l, ty2)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on 'store' <%s>" % str(l))
+
+	def verb_type(self, v, l):
+		ty = self.expect_type(v)
+		self.expect_value(l, ty)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on verb '" + v + "' <%s>" % str(l))
+
+	def verb_binary(self, v, l):
+		t = self.expect_type(l.pop(0))
+		self.expect_value(l, t)
+		self.expect(',', l.pop(0))
+		self.expect_value(l, t)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on binary verb '" + v + "' <%s>" % str(l))
+
+	def verb_load(self, v, l):
+		ty = self.expect_type(l.pop(0))
+		self.expect(',', l.pop(0))
+		ty2 = self.expect_type(l.pop(0))
+		if ty2 != ty + "*":
+			raise ILSyntaxError(("Inconsistent types in 'load' %s vs %s" % (ty, ty2)))
+		self.expect_value(l, ty2)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on 'load' <%s>" % str(l))
+
+	def verb_shift(self, v, l):
+		ty = self.expect_type(l.pop(0))
+		self.expect_value(l, ty)
+		self.expect(',', l.pop(0))
+		self.expect_value(l, ty)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on shift verb '" + v + "' <%s>" % str(l))
+
+	def verb_size(self, v, l):
+		ty = self.expect_type(l.pop(0))
+		self.expect_value(l, ty)
+		self.expect('to', l.pop(0))
+		ty2 = self.expect_type(l.pop(0))
+		if len(l):
+			raise ILSyntaxError("Extra stuff on resize verb '" + v + "' <%s>" % str(l))
+
+	def verb_cond(self, v, l):
+		cc = l.pop(0)
+		if cc not in ('eq', 'ne'):
+			raise ILSyntaxError("Unknown conditional '" + cc + "' <%s>" % str(l))
+		ty = self.expect_type(l.pop(0))
+		self.expect_value(l, ty)
+		self.expect(',', l.pop(0))
+		self.expect_value(l, ty)
+		if len(l):
+			raise ILSyntaxError("Extra stuff on conditional verb '" + v + "' <%s>" % str(l))
+
+	def check_assign(self, l):
+		dst = l.pop(0)
+		self.expect('=', l.pop(0))
+
+		d = {
+			"i1":		self.verb_type,
+			"i8":		self.verb_type,
+			"i16":		self.verb_type,
+			"i32":		self.verb_type,
+			"and":		self.verb_binary,
+			"add":		self.verb_binary,
+			"sub":		self.verb_binary,
+			"or":		self.verb_binary,
+			"mul":		self.verb_binary,
+			"xor":		self.verb_binary,
+			"load":		self.verb_load,
+			"lshr":		self.verb_shift,
+			"ashr":		self.verb_shift,
+			"shl":		self.verb_shift,
+			"trunc":	self.verb_size,
+			"zext":		self.verb_size,
+			"icmp":		self.verb_cond,
+		}
+		v = l.pop(0)
+		h = d.get(v)
+		if h is None and v in self.uverbs:
+			return
+		if h is None:
+			self.uverbs.add(v)
+			raise ILSyntaxError(("Unknown verb '%s'" % v))
+		h(v, l)
+
+	def check_il(self, il):
+		i = 0
+		l = list(il.spec)
+		if l[0] == "br":
+			return self.check_br(l)
+		if l[0] == "store":
+			return self.check_store(l)
+		if l[0][0] == '%' and l[1] == '=':
+			return self.check_assign(l)
+		raise ILSyntaxError("No idea what this is")
+
+#######################################################################
 
 class analysis(object):
 	def __init__(self, pj):
@@ -291,7 +498,6 @@ class analysis(object):
 		noil = {}
 
 		# XXX: This is kind of silly
-		from . import assy
 
 		for j in pj:
 			if not isinstance(j, assy.Assy):
