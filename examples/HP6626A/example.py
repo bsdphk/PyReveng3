@@ -141,11 +141,13 @@ def task(pj, cpu):
 		(0x3000, "slv_sense"),
 		(0x4000, "dip_kbd_sense"),
 		(0x5000, "kbd_dsply_scan"),
+		(0x8100, "B=dsply_needs_update()"),
+		(0x819b, "p4_p5()"),
+		(0x81ac, "p4_p5(B)"),
+		(0x81c0, "dsply_shift_bits(B,Y)"),
 		(0x8236, "task__display"),
 		(0x84e3, "i8291_init"),
 		(0x8465, "MSG(X)"),
-		(0x8824, "HP6626_func_01_key"),
-		(0x8860, "HP6624_func_01_key"),
 		(0x8775, "task__keyboard"),
 		(0x87d0, "HP6626_keytbl"),
 		(0x87f0, "HP6624_keytbl"),
@@ -248,11 +250,11 @@ def task(pj, cpu):
 
 	for a,b in (
 		(0x8002, 0x802a),
-		(0x827b, 0x8287),
 		):
-		y = data.Txt(pj, a, b)
+		y = data.Txt(pj, a, b, align=1)
 
 	for a in (
+		0x827b,
 		0x849b,
 		0x84a7,
 		0x84b3,
@@ -266,7 +268,7 @@ def task(pj, cpu):
 		0xcf01,
 		0xd262,
 		):
-		y = data.Txt(pj, a, a + 12)
+		y = data.Txt(pj, a, a + 12, align=1)
 
 	for a in (
 		0xa183,
@@ -275,11 +277,12 @@ def task(pj, cpu):
 		0xa198,
 		0xaffe,
 		):
-		y = data.Txt(pj, a, pfx=1)
+		y = data.Txt(pj, a, pfx=1, align=1)
 
+	pj.set_label(0x8ec2, "ERROR_TEXTS")
 	n = 0
 	for a in range(0x8ec2, 0x9036, 12):
-		y = data.Txt(pj, a, a + 12)
+		y = data.Txt(pj, a, a + 12, align=1, label=False)
 		err[n] = y.txt
 		n += 1
 
@@ -289,7 +292,7 @@ def task(pj, cpu):
 		b = pj.m.rd(a)
 		if b == 0:
 			break
-		y = data.Txt(pj, a, pfx=1)
+		y = data.Txt(pj, a, pfx=1, align=1, label=False)
 		token[nn] = y.txt
 		a = y.hi
 		nn += 1
@@ -299,21 +302,26 @@ def task(pj, cpu):
 	for a in range(0x87d0, 0x8810, 8):
 		data.Const(pj, a, a + 8)
 
-	def t1(a):
+	def t1(a, l):
+		pj.set_label(a, l)
 		while True:
 			data.Const(pj, a, a + 1)
 			if pj.m.rd(a) == 0:
 				return;
 			a += 1
-			y = data.Txt(pj, a)
+			y = data.Txt(pj, a, align=1, label=False)
 			a = y.hi
 			cpu.codeptr(pj, a)
 			z = pj.m.bu16(a)
+			if False:
+				# XXX: doesn't work for ERROR
+				print("XXX %04x" % (z-3), y.txt)
+				pj.todo(z - 3, cpu.disass)
 			pj.set_label(z, "func_" + y.txt)
 			a += 2
 
-	t1(0x8824)
-	t1(0x8860)
+	t1(0x8824, "HP6626_func_01_key")
+	t1(0x8860, "HP6624_func_01_key")
 
 	n = 1
 	for a in range(0x87b4, 0x87d0, 2):
@@ -394,30 +402,44 @@ def task(pj, cpu):
 		data.Dataptr(pj, a + 4, a + 6, pj.m.bu16(a + 4))
 
 
-	cpu.disass(pj, 0x8631)
-	cpu.disass(pj, 0x8b65)
-	cpu.disass(pj, 0x8b78)
-	cpu.disass(pj, 0x8b86)
-	cpu.disass(pj, 0x8b91)
-	cpu.disass(pj, 0x8e87)
-	cpu.disass(pj, 0x8d76)
+	if True:
+		cpu.disass(pj, 0x8631)
+		cpu.disass(pj, 0x8b64)
+		cpu.disass(pj, 0x8d6d)
+		cpu.disass(pj, 0x8d76)
+		cpu.disass(pj, 0x8e84)
+		cpu.disass(pj, 0x8e87)
+		cpu.disass(pj, 0xab5c)
+		cpu.disass(pj, 0xc7a2)
+		cpu.disass(pj, 0xc7ad)
+		cpu.disass(pj, 0xc7b8)
+		cpu.disass(pj, 0xc7c5)
+		cpu.disass(pj, 0xc7d9)
+		cpu.disass(pj, 0xc7e6)
+		cpu.disass(pj, 0xc7fc)
+		cpu.disass(pj, 0xc809)
+		cpu.disass(pj, 0xc814)
+		cpu.disass(pj, 0xc821)
+		cpu.disass(pj, 0xc835)
+		cpu.disass(pj, 0xc842)
+		cpu.disass(pj, 0xc84b)
+		cpu.disass(pj, 0xcf0d)
+		cpu.disass(pj, 0xc855)
+		cpu.disass(pj, 0xd3b8)
+		cpu.disass(pj, 0xd3f8)
 
-	cpu.disass(pj, 0xc7a2)
-	cpu.disass(pj, 0xc7ad)
-	cpu.disass(pj, 0xc7b8)
-	cpu.disass(pj, 0xc7c5)
-	cpu.disass(pj, 0xc7d9)
-	cpu.disass(pj, 0xc7e6)
-	cpu.disass(pj, 0xc7fc)
-	cpu.disass(pj, 0xc809)
-	cpu.disass(pj, 0xc814)
-	cpu.disass(pj, 0xc821)
-	cpu.disass(pj, 0xc835)
-	cpu.disass(pj, 0xc842)
-	cpu.disass(pj, 0xc84b)
-	cpu.disass(pj, 0xc855)
-	cpu.disass(pj, 0xd3b8)
-	cpu.disass(pj, 0xd3f8)
+	if True:
+		# See above in t1
+		cpu.disass(pj, 0x8b03)
+		cpu.disass(pj, 0x8b14)
+		cpu.disass(pj, 0x8b25)
+		cpu.disass(pj, 0x8b36)
+		cpu.disass(pj, 0x8b44)
+		cpu.disass(pj, 0x8b65)
+		cpu.disass(pj, 0x8b78)
+		cpu.disass(pj, 0x8b86)
+		cpu.disass(pj, 0x8b91)
+
 
 	##############
 
