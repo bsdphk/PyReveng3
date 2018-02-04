@@ -42,10 +42,10 @@ ADD	A,adir		|0 0 1 0 0 1 0 1| adir		|
 ADD	A,iri		|0 0 1 0 0 1 1|i|
 ADD	A,data		|0 0 1 0 0 1 0 0| data		|
 
-ADC	A,Rn		|0 0 1 1 1| rn  |
-ADC	A,adir		|0 0 1 1 0 1 0 1| adir		|
-ADC	A,iri		|0 0 1 1 0 1 1|i|
-ADC	A,imm		|0 0 1 1 0 1 0 0| imm		|
+ADDC	A,Rn		|0 0 1 1 1| rn  |
+ADDC	A,adir		|0 0 1 1 0 1 0 1| adir		|
+ADDC	A,iri		|0 0 1 1 0 1 1|i|
+ADDC	A,data		|0 0 1 1 0 1 0 0| data		|
 
 AJMP	a11,>J		| ahi |0 0 0 0 1| alo		|
 
@@ -81,8 +81,8 @@ DEC	iri		|0 0 0 1 0 1 1|i|
 
 DIV	AB		|1 0 0 0 0 1 0 0|
 
-DJNZ	Rn,arel		|1 1 0 1 1| rn	| arel		|
-DJNZ	adir,arel	|1 1 0 1 0 1 0 1| adir		| arel		|
+DJNZ	Rn,arel,>C	|1 1 0 1 1| rn	| arel		|
+DJNZ	adir,arel,>C	|1 1 0 1 0 1 0 1| adir		| arel		|
 
 INC	A		|0 0 0 0 0 1 0 0|
 INC	Rn		|0 0 0 0 1| rn	|
@@ -148,8 +148,8 @@ ORL	A,iri		|0 1 0 0 0 1 1|i|
 ORL	A,data		|0 1 0 0 0 1 0 0| data		|
 ORL	adir,A		|0 1 0 0 0 0 1 0| adir		|
 ORL	adir,data	|0 1 0 0 0 0 1 1| adir		| data		|
-ORL	C,bit		|0 1 1 1 0 0 1 0| bit		|
-ORL	C,/bit		|1 0 1 0 0 0 0 0| bit		|
+ORL	C,abit		|0 1 1 1 0 0 1 0| abit		|
+ORL	C,/abit		|1 0 1 0 0 0 0 0| abit		|
 
 POP	adir		|1 1 0 1 0 0 0 0| adir		|
 PUSH	adir		|1 1 0 0 0 0 0 0| adir		|
@@ -257,7 +257,9 @@ class mcs51(assy.Instree_disass):
 		self.it.load_string(mcs51_instructions)
 		self.myleaf = mcs51_ins
 		self.amask = 0xffff
-		self.verbatim |= set(("A", "C", "DPTR", "@A+DPTR", "@A+PC"))
+		self.verbatim |= set((
+		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
+		)
 		self.sfr = {
 			0x80:	["P0",
 			    "AD0", "AD1", "AD2", "AD3",
