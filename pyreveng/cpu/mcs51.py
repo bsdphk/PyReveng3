@@ -35,7 +35,11 @@ from pyreveng import assy
 mcs51_instructions = """
 
 #			|. . . . . . . .|. . . . . . . .|
-ACALL	a11,>C		| ahi |1 0 0 0 1| alo		|
+ACALL	a11,>C		| ahi |1 0 0 0 1| alo		| {
+	%S = sub i8 %S , 2
+	store i16 HI , i16* %S
+	br label DST
+}
 
 ADD	A,Rn		|0 0 1 0 1| rn  |
 ADD	A,adir		|0 0 1 0 0 1 0 1| adir		|
@@ -64,9 +68,15 @@ CJNE	A,data,arel,>JC	|1 0 1 1 0 1 0 0| data		| arel		|
 CJNE	Rn,data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
 CJNE	iri,data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
 
-CLR	A		|1 1 1 0 0 1 0 0|
-CLR	C		|1 1 0 0 0 0 1 1|
-CLR	abit		|1 1 0 0 0 0 1 0| abit		|
+CLR	A		|1 1 1 0 0 1 0 0| {
+	%A = i8 0x00
+}
+CLR	C		|1 1 0 0 0 0 1 1| {
+	%C = i1 0
+}
+CLR	abit		|1 1 0 0 0 0 1 0| abit		| {
+	store i1 0 , i1* ABIT
+}
 
 CPL	A		|1 1 1 1 0 1 0 0|
 CPL	C		|1 0 1 1 0 0 1 1|
@@ -109,16 +119,37 @@ LCALL	a16,>C		|0 0 0 1 0 0 1 0| ahi		| alo		|
 
 LJMP	a16,>J		|0 0 0 0 0 0 1 0| ahi		| alo		|
 
-MOV	A,Rn		|1 1 1 0 1| rn	|
-MOV	A,adir		|1 1 1 0 0 1 0 1| adir		|
-MOV	A,iri		|1 1 1 0 0 1 1|i|
-MOV	A,data		|0 1 1 1 0 1 0 0| data		|
-MOV	Rn,A		|1 1 1 1 1| rn	|
-MOV	Rn,adir		|1 0 1 0 1| rn	| adir		|
-MOV	Rn,data	|0 1 1 1 1| rn	| data		|
-MOV	adir,A		|1 1 1 1 0 1 0 1| adir		|
-MOV	adir,Rn		|1 0 0 0 1| rn	| adir		|
-MOV	adir2,adir	|1 0 0 0 0 1 0 1| adir		| adir2		|
+MOV	A,Rn		|1 1 1 0 1| rn	| {
+	%A = i8 RN
+}
+MOV	A,adir		|1 1 1 0 0 1 0 1| adir		| {
+	%A = load i8 , i8* ADIR
+}
+MOV	A,iri		|1 1 1 0 0 1 1|i| {
+	%A = load i8 , i8* RI
+}
+MOV	A,data		|0 1 1 1 0 1 0 0| data		| {
+	%A = i8 DATA
+}
+MOV	Rn,A		|1 1 1 1 1| rn	| {
+	RN = i8 %A
+}
+MOV	Rn,adir		|1 0 1 0 1| rn	| adir		| {
+	RN = load i8 , i8* ADIR
+}
+MOV	Rn,data	|0 1 1 1 1| rn	| data		| {
+	RN = i8 DATA
+}
+MOV	adir,A		|1 1 1 1 0 1 0 1| adir		| {
+	store i8 %A , i8* ADIR
+}
+MOV	adir,Rn		|1 0 0 0 1| rn	| adir		| {
+	store i8 RN , i8* ADIR
+}
+MOV	adir2,adir	|1 0 0 0 0 1 0 1| adir		| adir2		| {
+	%0 = load i8 , i8* ADIR
+	store i8 %0 , i8* ADIR2
+}
 MOV	adir,iri	|1 0 0 0 0 1 1|i| adir		|
 MOV	adir,data	|0 1 1 1 0 1 0 1| adir		| data		|
 MOV	iri,A		|1 1 1 1 0 1 1|i|
@@ -251,12 +282,40 @@ class mcs51_ins(assy.Instree_ins):
 	def assy_nabit(self, pj):
 		return "/" + self.assy_abit(pj)
 
+	def ilmacro_ABIT(self):
+		b = self['abit']
+		if b < 0x80:
+			return "%0x02.%d" % (0x20 + (b >> 3), b & 7)
+		return "b#%0x2x" % b
+
+	def ilmacro_ADIR(self):
+		return "0x%02x" % self['adir']
+
+	def ilmacro_ADIR2(self):
+		return "0x%02x" % self['adir2']
+
+	def ilmacro_DATA(self):
+		return "0x%02x" % self['data']
+
+	def ilmacro_DST(self):
+		return "0x%04x" % self.dstadr
+
+	def ilmacro_HI(self):
+		return "0x%04x" % self.hi
+
+	def ilmacro_RI(self):
+		return "%%R%d" % self['i']
+
+	def ilmacro_RN(self):
+		return "%%R%d" % self['rn']
+
 class mcs51(assy.Instree_disass):
 	def __init__(self, lang="mcs51"):
 		super(mcs51, self).__init__(lang, 8)
 		self.it.load_string(mcs51_instructions)
 		self.myleaf = mcs51_ins
 		self.amask = 0xffff
+		self.il = None
 		self.verbatim |= set((
 		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
 		)
