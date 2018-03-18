@@ -170,6 +170,12 @@ class IL_BB(object):
 	def __repr__(self):
 		return "<BB 0x%x-0x%x>" % (self.lo, self.hi)
 
+	def dot_flow(self, fo, pj):
+		fo.write('L%x [shape="plaintext",label="%04x"]\n' % (self.lo, self.lo))
+		for i in self.goto:
+			if isinstance(i, IL_BB):
+				fo.write("L%x -> L%x\n" % (self.lo, i.lo))
+
 	def dot_def(self, fo, pj):
 		def bb():
 			fo.write('<TR><TD ALIGN="left" BALIGN="left">\n')
@@ -546,6 +552,11 @@ class analysis(object):
 			fo.write("digraph {\n")
 			x.dot_def(fo, self.pj)
 			fo.write("}\n")
+		fo.write("digraph {\n")
+		for j in l:
+			x = self.ilbbs[j]
+			x.dot_flow(fo, self.pj)
+		fo.write("}\n")
 
 	def build_flow(self):
 		#for a,x in self.ilbbs.iteritems():
