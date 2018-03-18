@@ -27,7 +27,7 @@
 from __future__ import print_function
 
 import os
-from pyreveng import job, mem, listing, data, code
+from pyreveng import job, mem, listing, data, code, pil
 import pyreveng.cpu.tms9900 as tms9900
 
 def mem_setup():
@@ -270,7 +270,5 @@ if __name__ == '__main__':
 	task(pj, cx)
 	output(pj)
 
-	import pyreveng.il
-
-	a = pyreveng.il.analysis(pj)
+	a = pil.analysis(pj)
 	a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))

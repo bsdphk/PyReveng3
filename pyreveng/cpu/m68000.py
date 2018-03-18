@@ -1075,20 +1075,20 @@ class m68000_ins(assy.Instree_ins):
 		self.imsk = m
 		self.mne += j
 
-	def ilmacro_AN(self):
+	def pilmacro_AN(self):
 		return "%%A%d" % self['An']
 
-	def ilmacro_AX(self):
+	def pilmacro_AX(self):
 		return "%%A%d" % self['Ax']
 
-	def ilmacro_AY(self):
+	def pilmacro_AY(self):
 		return "%%A%d" % self['Ay']
 
-	def ilmacro_BN(self):
+	def pilmacro_BN(self):
 		j = self['bn'] % (self.sz*8)
 		return "0x%x" % (1 << j)
 
-	def ilmacro_CC(self):
+	def pilmacro_CC(self):
 		cc = self['cc']
 		if cc == 0:
 			return "1"
@@ -1120,23 +1120,23 @@ class m68000_ins(assy.Instree_ins):
 		    ["%0", "=", "xor", "i1", f, ",", "1"],
 		], "%0")
 
-	def ilmacro_HI(self):
+	def pilmacro_HI(self):
 		return "0x%x" % self.hi
 
-	def ilmacro_IBN(self):
+	def pilmacro_IBN(self):
 		j = self['bn'] % (self.sz*8)
 		return "0x%x" % (self.imsk ^ (1 << j))
 
-	def ilmacro_CONST(self):
+	def pilmacro_CONST(self):
 		i = self['const']
 		if i == 0:
 			i = 0
 		return "0x%x" % i
 
-	def ilmacro_DATA(self):
+	def pilmacro_DATA(self):
 		return "0x%x" % self.v
 
-	def ilmacro_DATA8(self):
+	def pilmacro_DATA8(self):
 		i = self['data8']
 		if i & 0x80:
 			i -= 256
@@ -1144,19 +1144,19 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return "0x%x" % i
 
-	def ilmacro_DN(self):
+	def pilmacro_DN(self):
 		return "%%D%d" % self['Dn']
 
-	def ilmacro_DX(self):
+	def pilmacro_DX(self):
 		return "%%D%d" % self['Dx']
 
-	def ilmacro_DY(self):
+	def pilmacro_DY(self):
 		return "%%D%d" % self['Dy']
 
-	def ilmacro_DST(self):
+	def pilmacro_DST(self):
 		return "0x%x" % self.dstadr
 
-	def ilmacro_EA(self):
+	def pilmacro_EA(self):
 		il = self.ea["s"]
 		if len(il) == 1:
 			return il[0]
@@ -1174,7 +1174,7 @@ class m68000_ins(assy.Instree_ins):
 		self.icache["EA"] = j
 		return j
 
-	def ilmacro_PTR_EA(self):
+	def pilmacro_PTR_EA(self):
 		il = self.ea["s"]
 		assert len(il) == 2
 		if len(il[1]) > 0:
@@ -1182,16 +1182,16 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return il[0]
 
-	def ilmacro_ROT(self):
+	def pilmacro_ROT(self):
 		a = self['rot']
 		if a == 0:
 			a = 8
 		return "0x%x" % a
 
-	def ilmacro_SZ(self):
+	def pilmacro_SZ(self):
 		return self.isz
 
-	def ilmacro_WORDSGN(self):
+	def pilmacro_WORDSGN(self):
 		i = self['word']
 		if i & 0x8000:
 			i -= 65536
@@ -1200,7 +1200,7 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return "0x%x" % i
 
-	def ilmacro_WORD(self):
+	def pilmacro_WORD(self):
 		return "0x%x" % self['word']
 
 	def isubr_LEA(self, arg, which):
@@ -1229,13 +1229,13 @@ class m68000_ins(assy.Instree_ins):
 				self.isz + "*", j],
 			])
 
-	def ilfunc_LEAD(self, arg):
+	def pilfunc_LEAD(self, arg):
 		self.isubr_LEA(arg, "d")
 
-	def ilfunc_LEAS(self, arg):
+	def pilfunc_LEAS(self, arg):
 		self.isubr_LEA(arg, "s")
 
-	def ilfunc_MOVEM_RM(self, arg):
+	def pilfunc_MOVEM_RM(self, arg):
 		ll = []
 		eam = self['ea'] >> 3
 		if eam == 3:
@@ -1255,7 +1255,7 @@ class m68000_ins(assy.Instree_ins):
 					    self.isz + "*", dr],
 				]
 		else:
-			x = self.ilmacro_PTR_EA()
+			x = self.pilmacro_PTR_EA()
 			ll += [
 				[ "%0", "=", "SZ", x ],
 			]
@@ -1268,7 +1268,7 @@ class m68000_ins(assy.Instree_ins):
 				]
 		self.add_il(ll)
 
-	def ilfunc_MOVEM_MR(self, arg):
+	def pilfunc_MOVEM_MR(self, arg):
 		ll = []
 		eam = self['ea'] >> 3
 		if eam == 3:
@@ -1296,7 +1296,7 @@ class m68000_ins(assy.Instree_ins):
 			raise assy.Invalid(
 			    "0x%x MOVEM m->r postincrement" % (self.lo))
 		else:
-			x = self.ilmacro_PTR_EA()
+			x = self.pilmacro_PTR_EA()
 			ll += [
 				[ "%0", "=", self.isz + "*", x ],
 			]
@@ -1315,7 +1315,7 @@ class m68000_ins(assy.Instree_ins):
 				]
 		self.add_il(ll)
 
-	def ilfunc_STDF4(self, arg):
+	def pilfunc_STDF4(self, arg):
 		self.add_il([
 			["%SR.n", "=", "icmp", "slt","SZ",arg[0],",","0"],
 			["%SR.z", "=", "icmp", "eq","SZ",arg[0],",","0"],
@@ -1323,7 +1323,7 @@ class m68000_ins(assy.Instree_ins):
 			["%SR.c", "=", "i1", "0"],
 		])
 
-	def ilfunc_MOVEP1(self, arg):
+	def pilfunc_MOVEP1(self, arg):
 		o = self['disp16']
 		if o & 0x8000:
 			o -= 1 << 16
@@ -1341,7 +1341,7 @@ class m68000_ins(assy.Instree_ins):
 			l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
 		self.add_il(l)
 
-	def ilfunc_MOVEP2(self, arg):
+	def pilfunc_MOVEP2(self, arg):
 		o = self['disp16']
 		if o & 0x8000:
 			o -= 1 << 16

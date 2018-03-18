@@ -999,28 +999,28 @@ class mc6800_ins(assy.Instree_ins):
 	def assy_x(self, pj):
 		return "0x%02x+" % self['x'] + self.idx
 
-	def ilmacro_D(self):
+	def pilmacro_D(self):
 		return "0x%02x" % self['d']
 
-	def ilmacro_DST(self):
+	def pilmacro_DST(self):
 		return "0x%04x" % self.dstadr
 
-	def ilmacro_ED(self):
+	def pilmacro_ED(self):
 		return "0x%02x%02x" % (self['e1'], self['e2'])
 
-	def ilmacro_HI(self):
+	def pilmacro_HI(self):
 		return "0x%04x" % self.hi
 
-	def ilmacro_II(self):
+	def pilmacro_II(self):
 		return "0x%02x%02x" % (self['I1'], self['I2'])
 
-	def ilmacro_IM(self):
+	def pilmacro_IM(self):
 		return "0x%02x" % self['i']
 
-	def ilmacro_X(self):
+	def pilmacro_X(self):
 		return "0x%02x" % self['x']
 
-	def ilfunc_FLG(self, arg):
+	def pilfunc_FLG(self, arg):
 		p = arg[0]
 		if arg[1] in ("%S", "%X"):
 			sz = 16
@@ -1061,7 +1061,7 @@ class mc6800(assy.Instree_disass):
 		super(mc6800, self).__init__("mc6800", 8)
 		self.it.load_string(mc6800_instructions)
 		self.mask = mask
-		self.il = True
+		self.pil = True
 		self.myleaf = mc6800_ins
 
 	def codeptr(self, pj, adr):

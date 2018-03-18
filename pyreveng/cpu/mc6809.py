@@ -614,7 +614,7 @@ class mc6809_ins(assy.Instree_ins):
 
 	###############################################################
 
-	def il_adr(self):
+	def pil_adr(self):
 
 		am = self.icache["AM"]
 
@@ -704,28 +704,28 @@ class mc6809_ins(assy.Instree_ins):
 
 		return adr
 
-	def ilmacro_AB(self):
+	def pilmacro_AB(self):
 		return "%" + "AB"[self['a']]
 
-	def ilmacro_M(self):
+	def pilmacro_M(self):
 		m = self.icache.get("M")
 		if m is None:
-			m = self.il_adr()
+			m = self.pil_adr()
 			self.icache["M"] = m
 		assert not m is None
 		return m
 
-	def ilmacro_V(self):
+	def pilmacro_V(self):
 		if self.icache["AM"] == "I":
 			return "0x%x" % self.off
 
-		m = self.il_adr()
+		m = self.pil_adr()
 		sz = self.isz
 		return self.add_il([
 			[ "%0", "=", "load", sz, ",", sz + "*", m ]
 		], "%0")
 
-	def ilmacro_BR(self):
+	def pilmacro_BR(self):
 		cc = self['cc']
 		if cc == 0:
 			self.add_il([["br", "label", "0x%04x" % self.dstadr]])
@@ -763,22 +763,22 @@ class mc6809_ins(assy.Instree_ins):
 
 		self.add_il(l)
 
-	def ilmacro_DST(self):
+	def pilmacro_DST(self):
 		return "0x%04x" % self.dstadr
 
-	def ilmacro_HI(self):
+	def pilmacro_HI(self):
 		return "0x%x" % self.hi
 
-	def ilmacro_I1(self):
+	def pilmacro_I1(self):
 		return "0x%02x" % (self['I1'])
 
-	def ilmacro_I2(self):
+	def pilmacro_I2(self):
 		return "0x%02x" % (self['I2'])
 
-	def ilmacro_I(self):
+	def pilmacro_I(self):
 		return "0x%02x" % (self['i'])
 
-	def ilmacro_MKAB(self):
+	def pilmacro_MKAB(self):
 		self.add_il([
 			["%B", "=", "trunc", "i16", "%D", "to", "i8"],
 			["%D", "=", "lshr", "i16", "%D", ",", "8"],
@@ -786,7 +786,7 @@ class mc6809_ins(assy.Instree_ins):
 			["%D", "=", "i16", "pyreveng.void", "(", ")"],
 		])
 
-	def ilmacro_MKD(self):
+	def pilmacro_MKD(self):
 		self.isz = "i16"
 		self.add_il([
 			["%0", "=", "zext", "i8", "%A", "to", "i16"],
@@ -795,19 +795,19 @@ class mc6809_ins(assy.Instree_ins):
 			["%D", "=", "or", "i16", "%1", ",", "%2"],
 		])
 
-	def ilmacro_SU(self):
+	def pilmacro_SU(self):
 		if self.pfx == 0x10:
 			return "%S"
 		else:
 			return "%U"
 
-	def ilmacro_XY(self):
+	def pilmacro_XY(self):
 		if self.pfx == 0x10:
 			return "%Y"
 		else:
 			return "%X"
 
-	def ilfunc_TFR(self, arg):
+	def pilfunc_TFR(self, arg):
 		val = self['t']
 		sr = val >> 4
 		dr = val & 0xf
@@ -837,7 +837,7 @@ class mc6809_ins(assy.Instree_ins):
 				["%B", "=", "trunc", "i16", "%0", "to", "i8"],
 			])
 
-	def ilfunc_FLG_N(self, arg):
+	def pilfunc_FLG_N(self, arg):
 		c = "0x80"
 		if self.isz == "i16":
 			c += "00"
@@ -846,7 +846,7 @@ class mc6809_ins(assy.Instree_ins):
 			["%CC.n", "=", "icmp", "eq", self.isz, "%1", ",", c]
 		])
 
-	def ilfunc_FLG_V(self, arg):
+	def pilfunc_FLG_V(self, arg):
 		# XXX "Set if the carry from the MSB in the ALU does not match
 		# XXX the carry from the MSB-1"
 		assert len(arg) == 4
@@ -855,31 +855,31 @@ class mc6809_ins(assy.Instree_ins):
 			    "pyreveng.overflow." + arg[1], "(", arg[2], ",", arg[3], ")"]
 		])
 
-	def ilfunc_FLG_Z(self, arg):
+	def pilfunc_FLG_Z(self, arg):
 		self.add_il([
 			["%CC.z", "=", "icmp", "eq", self.isz, arg[0], ",", "0"]
 		])
 
-	def ilfunc_FLG_H(self, arg):
+	def pilfunc_FLG_H(self, arg):
 		# XXX
 		self.add_il([
 			["%CC.h", "=", "i1", "void"]
 		])
 
-	def ilfunc_FLG_C(self, arg):
+	def pilfunc_FLG_C(self, arg):
 		assert len(arg) == 4
 		self.add_il([
 			["%CC.c", "=", "i1",
 			    "pyreveng.carry." + arg[1], "(", arg[2], ",", arg[3], ")"]
 		])
 
-	def ilfunc_FLG(self, arg):
+	def pilfunc_FLG(self, arg):
 		f = {
-			"H": self.ilfunc_FLG_H,
-			"N": self.ilfunc_FLG_N,
-			"Z": self.ilfunc_FLG_Z,
-			"V": self.ilfunc_FLG_V,
-			"C": self.ilfunc_FLG_C,
+			"H": self.pilfunc_FLG_H,
+			"N": self.pilfunc_FLG_N,
+			"Z": self.pilfunc_FLG_Z,
+			"V": self.pilfunc_FLG_V,
+			"C": self.pilfunc_FLG_C,
 		}
 		a1 = arg.pop(0)
 		for j in "HNZVC":
@@ -894,11 +894,11 @@ class mc6809_ins(assy.Instree_ins):
 				f[j](arg)
 			a1 = a1[1:]
 
-	def ilfunc_FLG16(self, arg):
+	def pilfunc_FLG16(self, arg):
 		self.isz = "i16"
-		self.ilfunc_FLG(arg)
+		self.pilfunc_FLG(arg)
 
-	def ilfunc_PULL(self, arg):
+	def pilfunc_PULL(self, arg):
 		i = self['i']
 		s = "%" + arg[0]
 		if s == "%S":
@@ -927,7 +927,7 @@ class mc6809_ins(assy.Instree_ins):
 				["br", "label", "%0"],
 			])
 
-	def ilfunc_PUSH(self, arg):
+	def pilfunc_PUSH(self, arg):
 		i = self['i']
 		s = "%" + arg[0]
 		if s == "%S":
@@ -955,7 +955,7 @@ class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.it.load_string(mc6809_instructions)
-		self.il = None
+		self.pil = None
 		self.myleaf = mc6809_ins
 		if macros:
 			self.it.load_string(mc6809_macro_instructions)

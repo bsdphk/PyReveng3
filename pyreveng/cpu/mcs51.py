@@ -282,31 +282,31 @@ class mcs51_ins(assy.Instree_ins):
 	def assy_nabit(self, pj):
 		return "/" + self.assy_abit(pj)
 
-	def ilmacro_ABIT(self):
+	def pilmacro_ABIT(self):
 		b = self['abit']
 		if b < 0x80:
 			return "%0x02.%d" % (0x20 + (b >> 3), b & 7)
 		return "b#%0x2x" % b
 
-	def ilmacro_ADIR(self):
+	def pilmacro_ADIR(self):
 		return "0x%02x" % self['adir']
 
-	def ilmacro_ADIR2(self):
+	def pilmacro_ADIR2(self):
 		return "0x%02x" % self['adir2']
 
-	def ilmacro_DATA(self):
+	def pilmacro_DATA(self):
 		return "0x%02x" % self['data']
 
-	def ilmacro_DST(self):
+	def pilmacro_DST(self):
 		return "0x%04x" % self.dstadr
 
-	def ilmacro_HI(self):
+	def pilmacro_HI(self):
 		return "0x%04x" % self.hi
 
-	def ilmacro_RI(self):
+	def pilmacro_RI(self):
 		return "%%R%d" % self['i']
 
-	def ilmacro_RN(self):
+	def pilmacro_RN(self):
 		return "%%R%d" % self['rn']
 
 class mcs51(assy.Instree_disass):
@@ -315,7 +315,7 @@ class mcs51(assy.Instree_disass):
 		self.it.load_string(mcs51_instructions)
 		self.myleaf = mcs51_ins
 		self.amask = 0xffff
-		self.il = None
+		self.pil = None
 		self.verbatim |= set((
 		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
 		)

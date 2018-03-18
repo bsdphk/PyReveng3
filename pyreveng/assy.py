@@ -35,7 +35,7 @@ arguments are processed before the instruction.
 
 from __future__ import print_function
 
-from . import instree, code, il
+from . import instree, code, pil
 
 #######################################################################
 
@@ -55,16 +55,16 @@ class Assy(code.Code):
 		super(Assy, self).__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
-		self.il = il.IL_Ins(self)
+		self.pil = pil.PIL_Ins(self)
 
 	def add_il(self, ll, ret=None):
-		return self.il.add_il(self, ll, ret)
+		return self.pil.add_il(self, ll, ret)
 
-	def ildefault(self):
+	def pildefault(self):
 		return
 
 	def render(self, pj):
-		self.lcmt += self.il.render()
+		self.lcmt += self.pil.render()
 		s = self.mne + "\t"
 		l = []
 		for i in self.oper:
@@ -187,7 +187,7 @@ class Instree_disass(code.Decode):
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
 		self.myleaf = Instree_ins
-		self.il = False
+		self.pil = False
 		self.verbatim = set()
 
 	def decode(self, pj, adr, l=None):
@@ -210,12 +210,12 @@ class Instree_disass(code.Decode):
 				return y
 			l.pop(-1)
 		if y != None:
-			if self.il is not False:
-				x = y.im.il.ilspec
+			if self.pil is not False:
+				x = y.im.pil.pilspec
 				if x is not None:
 					y.add_il(x.split("\n"))
 				else:
-					y.ildefault()
+					y.pildefault()
 			for i in self.flow_check:
 				i(pj, y)
 		return y

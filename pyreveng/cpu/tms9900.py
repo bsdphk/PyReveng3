@@ -619,14 +619,14 @@ class Tms9900_ins(assy.Instree_ins):
 	# Methods related to IL output
 	#-----------------------------
 
-	def ilmacro_R(self):
+	def pilmacro_R(self):
 		return "%%R%d" % self['w']
 
-	def ilmacro_RN(self):
+	def pilmacro_RN(self):
 		assert self['w'] != 15
 		return "%%R%d" % (self['w'] + 1)
 
-	def ilmacro_IMM(self):
+	def pilmacro_IMM(self):
 		return "0x%04x" % self['iop']
 
 	def ilarg_ao(self, sd):
@@ -713,34 +713,34 @@ class Tms9900_ins(assy.Instree_ins):
 		])
 		return
 
-	def ilmacro_SZ(self):
+	def pilmacro_SZ(self):
 		return "i%d" % self.sz()
 
-	def ilmacro_AS(self):
+	def pilmacro_AS(self):
 		return self.ilarg_ao('s')
 
-	def ilfunc_LS(self, args):
+	def pilfunc_LS(self, args):
 		self.ilarg_lo('s', args)
 
-	def ilmacro_RS(self):
+	def pilmacro_RS(self):
 		z = self.cache.get("RS")
 		if z is None:
 			z = self.cache["RS"] = self.ilarg_ro('s')
 		return z
 
-	def ilmacro_AD(self):
+	def pilmacro_AD(self):
 		return self.ilarg_ao(self['td'], self['d'], 'Gd')
 
-	def ilfunc_LD(self, args):
+	def pilfunc_LD(self, args):
 		self.ilarg_lo('d', args)
 
-	def ilmacro_RD(self):
+	def pilmacro_RD(self):
 		z = self.cache.get("RD")
 		if z is None:
 			z = self.cache["RD"] = self.ilarg_ro('d')
 		return z
 
-	def ilmacro_CRU(self):
+	def pilmacro_CRU(self):
 		o = self['cru']
 		l = []
 		l.append([ '%0', "=", "lshr", "i16", "%R12", ",", "1"])
@@ -756,25 +756,25 @@ class Tms9900_ins(assy.Instree_ins):
 			    "i1", "address_space", "(", "1", ")", "*"])
 		return self.add_il(l, "%2")
 
-	def ilmacro_SCNT1(self):
+	def pilmacro_SCNT1(self):
 		c = self['c']
 		if c == 0:
 			c = 16
 		return "0x%x" % (c - 1)
 
-	def ilmacro_SCNT(self):
+	def pilmacro_SCNT(self):
 		c = self['c']
 		if c == 0:
 			c = 16
 		return "0x%x" % c
 
-	def ilmacro_BRYES(self):
+	def pilmacro_BRYES(self):
 		return ["label", "0x%04x" % self.flow_out[0].to]
 
-	def ilmacro_BRNO(self):
+	def pilmacro_BRNO(self):
 		return ["label", "0x%04x" % self.flow_out[1].to]
 
-	def ilmacro_NEXT(self):
+	def pilmacro_NEXT(self):
 		return "0x%04x" % self.hi
 
 	def aliasregs(self):
@@ -789,7 +789,7 @@ class Tms9900_ins(assy.Instree_ins):
 			    ["%%R%d" % r, "=", "pyreveng.alias", "(", rr, ")"])
 		return l
 
-	def ilfunc_BLWP(self, args):
+	def pilfunc_BLWP(self, args):
 		l = []
 		l.append(["%0", "=", "i16", "%WP"])
 		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
@@ -801,7 +801,7 @@ class Tms9900_ins(assy.Instree_ins):
 		    "0x%04x" % self.cache['blwp2'] ])
 		self.add_il(l)
 
-	def ilfunc_BLWPDYN(self, args):
+	def pilfunc_BLWPDYN(self, args):
 		l = []
 		l.append(["%0", '=', "i16*", args[0]])
 		l.append(["%1", '=', 'load', 'i16', ',', "i16*", "%0"])
@@ -816,7 +816,7 @@ class Tms9900_ins(assy.Instree_ins):
 		l.append(["br", "label", "i16*", "%3"])
 		self.add_il(l)
 
-	def ilfunc_RTWP(self, args):
+	def pilfunc_RTWP(self, args):
 		l = []
 		l.append(["%status", "=", "i16", "%R15"])
 		l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
@@ -825,7 +825,7 @@ class Tms9900_ins(assy.Instree_ins):
 		l.append(["br", "label", "i16*", "%1"])
 		self.add_il(l)
 
-	def ilfunc_PARITY(self, args):
+	def pilfunc_PARITY(self, args):
 		# args: [result]
 		assert self.sz() == 8
 		sz = "i%d" % self.sz()
@@ -834,7 +834,7 @@ class Tms9900_ins(assy.Instree_ins):
 			    "(", sz, args[0], ')'],
 		])
 
-	def ilfunc_FLAGS3(self, args):
+	def pilfunc_FLAGS3(self, args):
 		# args: [result]
 		sz = "i%d" % self.sz()
 		self.add_il([
@@ -846,7 +846,7 @@ class Tms9900_ins(assy.Instree_ins):
 			    args[0], ',', "0" ],
 		])
 
-	def ilfunc_FLAGS5(self, args):
+	def pilfunc_FLAGS5(self, args):
 		# args: [src, dst, result]
 		sz = "i%d" % self.sz()
 		self.add_il([
@@ -862,7 +862,7 @@ class Tms9900_ins(assy.Instree_ins):
 			    sz, args[2], ")" ],
 		])
 
-	def ilfunc_CMPFLAGS(self, args):
+	def pilfunc_CMPFLAGS(self, args):
 		# args: [sz, src, dst]
 		self.add_il([
 			["%status.lgt", "=", "icmp", "ugt",
@@ -873,17 +873,17 @@ class Tms9900_ins(assy.Instree_ins):
 			    args[0], args[1], ",", args[2]],
 		])
 
-	def ilfunc_LDCR(self, args):
+	def pilfunc_LDCR(self, args):
 		# pg 365
 		c = self['c']
 		if c == 0:
 			c = 16
 		# print(self, "LDCR", c, args)
-		self.ilfunc_FLAGS3(args)
+		self.pilfunc_FLAGS3(args)
 		l = []
 		ty = "i%d" % self.sz()
 		if c <= 8:
-			self.ilfunc_PARITY(args)
+			self.pilfunc_PARITY(args)
 		l.append(["%0", "=", ty, args[0]])
 		l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
 		l.append(["%2", "=", "inttoptr", "i1", "%1",
@@ -897,7 +897,7 @@ class Tms9900_ins(assy.Instree_ins):
 			    "i1", "address_space(1)*", "%2", ",", "1"])
 		self.add_il(l)
 
-	def ilfunc_STCR(self, args):
+	def pilfunc_STCR(self, args):
 		# pg 367
 		c = self['c']
 		if c == 0:
@@ -919,11 +919,11 @@ class Tms9900_ins(assy.Instree_ins):
 			    "i16", "address_space(1)*", "%2", ",", "1"])
 		l.append([args[0], "=", ty, "%0"])
 		self.add_il(l)
-		self.ilfunc_FLAGS3(args)
+		self.pilfunc_FLAGS3(args)
 		if c <= 8:
-			self.ilfunc_PARITY(args)
+			self.pilfunc_PARITY(args)
 
-	def ilfunc_LWPI(self, args):
+	def pilfunc_LWPI(self, args):
 		x = int(args[0], 0)
 		self.add_il([ ["%WP", "=", "i16", args[0]] ])
 		self.add_il(self.aliasregs())

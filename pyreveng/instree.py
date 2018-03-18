@@ -31,7 +31,7 @@ This class turns a textual description close to what is typically used
 for documenting CPUs into a skeleton disassembler.
 
 	instree = * (
-		(assypart (wordmap/bitmap) [ilspec]) \
+		(assypart (wordmap/bitmap) [pilspec]) \
 		('#' comment NL)
 	)
 
@@ -48,7 +48,7 @@ for documenting CPUs into a skeleton disassembler.
 	hex = 2* ( bit / '2' / '3' / ... 'D' / 'E' / 'F' )
 	# Always upper case, at least two digits
 
-	ilspec = '{' NL IL_specificatoin NL '}' NL
+	pilspec = '{' NL IL_specificatoin NL '}' NL
 
 XXX: wordmap has yet to be implemented
 
@@ -120,10 +120,10 @@ def parse_match(fmt):
 # A single entry from the specification
 
 class Insline(object):
-	def __init__(self, width, assy, bits, ilspec=None):
+	def __init__(self, width, assy, bits, pilspec=None):
 		self.assy = assy.split()
 		self.bits = bits
-		self.ilspec = ilspec
+		self.pilspec = pilspec
 
 		s = bits.split("|")
 		s.pop(0)
@@ -274,15 +274,15 @@ class Insbranch(object):
 #
 
 class Insmatch(object):
-	def __init__(self, up, il, adr, words):
-		self.il = il
-		self.assy = il.assy
+	def __init__(self, up, pil, adr, words):
+		self.pil = pil
+		self.assy = pil.assy
 		self.words = words
 		self.adr = adr
-		self.len = il.words * up.width // up.memwidth
+		self.len = pil.words * up.width // up.memwidth
 		self.flds = {}
-		for i in il.flds:
-			self.flds[i] = il.get_field(i, self.words)
+		for i in pil.flds:
+			self.flds[i] = pil.get_field(i, self.words)
 
 	def get(self, f):
 		return self.flds.get(f)
