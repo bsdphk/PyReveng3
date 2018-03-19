@@ -97,6 +97,8 @@ ABA     -       |1B     | {
     FLG AUAAAA %0 + %A %B
     %A = i8 %0
 }
+
+### Bxx
 BRA     r,>J    |20     | r             | {
     br label DST
 }
@@ -150,6 +152,34 @@ BLE     r,>JC   |2F     | r             | {
     %1 = or i1 %0 , %Z
     br i1 %1 , label DST , label HI
 }
+
+### JMP
+JMP     e,>J    |7E     | e1            | e2            | {
+    br label DST
+}
+JMP     x,>J    |6E     | x             | {
+    %1 = add i16 %X , i16 X
+    br label %1
+}
+
+### BSR/JSR
+BSR     r,>C    |8D     | r             | {
+    %S = sub i16 %S , 2
+    store i16 HI , i16* %S
+    br label DST
+}
+JSR     e,>C    |BD     | e1            | e2            | {
+    %S = sub i16 %S , 2
+    store i16 HI , i16* %S
+    br label DST
+}
+JSR     x,>C    |AD     | x             | {
+    %1 = add i16 %X , i16 X
+    %S = sub i16 %S , 2
+    store i16 HI , i16* %S
+    br label %X
+}
+
 TSX     -       |30     | {
     %X = add i16 %S , 1
 }
@@ -215,51 +245,18 @@ SWI     -       |3F     | {
     %1 = load i16 , i16* 0xfffa
     br label %1
 }
+
+### NEG
 NEG     ACC     |0 1 0|A|0 0 0 0| {
     %0 = sub i8 0 , ACC
     FLG UUAA12 %0 - 0 ACC
     ACC = i8 %0
 }
-COM     ACC     |0 1 0|A|0 0 1 1| {
-    ACC = xor i8 ACC , 0xff
-    FLG UUAARS ACC
-}
-LSR     ACC     |0 1 0|A|0 1 0 0| {
-    RIGHT ( 1 , i1 0 , i8 ACC, i1 %C )
-    FLG UURA6U ACC
-}
-ROR     ACC     |0 1 0|A|0 1 1 0| {
-    RIGHT ( 1 , i1 %C , i8 ACC, i1 %C )
-    FLG UUAA6U ACC
-}
-ASR     ACC     |0 1 0|A|0 1 1 1| {
-    RIGHT ( 1 , i8 ACC, i1 %C )
-    FLG UUAA6U ACC
-}
-ASL     ACC     |0 1 0|A|1 0 0 0| {
-    LEFT ( 1 , i1 %C , i8 ACC, i1 0 )
-    FLG UUAA6U ACC
-}
-ROL     ACC     |0 1 0|A|1 0 0 1| {
-    LEFT ( 1 , i1 %C , i8 ACC, i1 %C )
-    FLG UUAA6U ACC
-}
-DEC     ACC     |0 1 0|A|1 0 1 0| {
-    %0 = sub i8 ACC , 1
-    FLG UUAA4U %0 - ACC 1
-    ACC = i8 %0
-}
-INC     ACC     |0 1 0|A|1 1 0 0| {
-    %0 = add i8 ACC , 1
-    FLG UUAA4U %0 + ACC 1
-    ACC = i8 %0
-}
-TST     ACC     |0 1 0|A|1 1 0 1| {
-    FLG UUAARR ACC
-}
-CLR     ACC     |0 1 0|A|1 1 1 1| {
-    ACC = i8 0
-    FLG UURSUU ACC
+NEG     e       |70     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    %1 = sub i8 0 , %0
+    FLG UUAA12 %0 - 0 %0
+    store i8 %1 , i8* ED
 }
 NEG     x       |60     | x             | {
     %0 = add i16 %X , i16 X
@@ -268,12 +265,36 @@ NEG     x       |60     | x             | {
     FLG UUAA12 %0 - 0 %1
     store i8 %2 , i8* %0
 }
+
+### COM
+COM     ACC     |0 1 0|A|0 0 1 1| {
+    ACC = xor i8 ACC , 0xff
+    FLG UUAARS ACC
+}
+COM     e       |73     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    %1 = xor i8 %0 , 0xff
+    FLG UUAARS %1
+    store i8 %0 , i8* ED
+}
 COM     x       |63     | x             | {
     %0 = add i16 %X , i16 X
     %1 = load i8 , i8* %0
     %2 = xor i8 %1 , 0xff
     FLG UUAARS %2
     store i8 %2 , i8* %0
+}
+
+### LSR
+LSR     ACC     |0 1 0|A|0 1 0 0| {
+    RIGHT ( 1 , i1 0 , i8 ACC, i1 %C )
+    FLG UURA6U ACC
+}
+LSR     e       |74     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    RIGHT ( 1 , i1 0 , i8 %0, i1 %C )
+    FLG UUAA6U %0
+    store i8 %0 , i8* ED
 }
 LSR     x       |64     | x             | {
     %0 = add i16 %X , i16 X
@@ -282,12 +303,36 @@ LSR     x       |64     | x             | {
     FLG UUAA6U %1
     store i8 %1 , i8* %0
 }
+
+### ROR
+ROR     ACC     |0 1 0|A|0 1 1 0| {
+    RIGHT ( 1 , i1 %C , i8 ACC, i1 %C )
+    FLG UUAA6U ACC
+}
+ROR     e       |76     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    RIGHT ( 1 , i1 %C , i8 %0, i1 %C )
+    FLG UUAA6U %0
+    store i8 %0 , i8* ED
+}
 ROR     x       |66     | x             | {
     %0 = add i16 %X , i16 X
     %1 = load i8 , i8* %0
     RIGHT ( 1 , i1 %C , i8 %1, i1 %C )
     FLG UUAA6U %0
     store i8 %1 , i8* %0
+}
+
+### ASR
+ASR     ACC     |0 1 0|A|0 1 1 1| {
+    RIGHT ( 1 , i8 ACC, i1 %C )
+    FLG UUAA6U ACC
+}
+ASR     e       |77     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    RIGHT ( 1 , i8 %0, i1 %C )
+    FLG UUAA6U %0
+    store i8 %0 , i8* ED
 }
 ASR     x       |67     | x             | {
     %0 = add i16 %X , i16 X
@@ -296,12 +341,36 @@ ASR     x       |67     | x             | {
     FLG UUAA6U %1
     store i8 %1 , i8* %0
 }
+
+### ASL
+ASL     ACC     |0 1 0|A|1 0 0 0| {
+    LEFT ( 1 , i1 %C , i8 ACC, i1 0 )
+    FLG UUAA6U ACC
+}
+ASL     e       |78     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    LEFT ( 1 , i1 %C , i8 %0, i1 0 )
+    FLG UUAA6U %0
+    store i8 %0 , i8* ED
+}
 ASL     x       |68     | x             | {
     %0 = add i16 %X , i16 X
     %1 = load i8 , i8* %0
     LEFT ( 1 , i1 %C , i8 %1, i1 0 )
     FLG UUAA6U %1
     store i8 %1 , i8* %0
+}
+
+### ROL
+ROL     ACC     |0 1 0|A|1 0 0 1| {
+    LEFT ( 1 , i1 %C , i8 ACC, i1 %C )
+    FLG UUAA6U ACC
+}
+ROL     e       |79     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    LEFT ( 1 , i1 %C , i8 %0, i1 %C )
+    FLG UUAA6U %0
+    store i8 %0 , i8* ED
 }
 ROL     x       |69     | x             | {
     %0 = add i16 %X , i16 X
@@ -310,12 +379,38 @@ ROL     x       |69     | x             | {
     FLG UUAA6U %A
     store i8 %1 , i8* %0
 }
+
+### DEC
+DEC     ACC     |0 1 0|A|1 0 1 0| {
+    %0 = sub i8 ACC , 1
+    FLG UUAA4U %0 - ACC 1
+    ACC = i8 %0
+}
+DEC     e       |7A     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    %1 = sub i8 %0 , 1
+    FLG UUAA4U %1 - %0 1
+    store i8 %1 , i8* ED
+}
 DEC     x       |6A     | x             | {
     %1 = add i16 %X , i16 X
     %2 = load i8 , i8* %1
     %3 = sub i8 %2 , 1
     FLG UUAA4U %3 - %2 1
     store i8 %3 , i8* %1
+}
+
+### INC
+INC     ACC     |0 1 0|A|1 1 0 0| {
+    %0 = add i8 ACC , 1
+    FLG UUAA4U %0 + ACC 1
+    ACC = i8 %0
+}
+INC     e       |7C     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    %1 = add i8 %0 , 1
+    FLG UUAA4U %1 + %0 1
+    store i8 %1 , i8* ED
 }
 INC     x       |6C     | x             | {
     %1 = add i16 %X , i16 X
@@ -324,86 +419,38 @@ INC     x       |6C     | x             | {
     FLG UUAA4U %3 + %2 1
     store i8 %3 , i8* %1
 }
+
+### TST
+TST     ACC     |0 1 0|A|1 1 0 1| {
+    FLG UUAARR ACC
+}
+TST     e       |7D     | e1            | e2            | {
+    %0 = load i8 , i8 * ED
+    FLG UUAARR %0
+}
 TST     x       |6D     | x             | {
     %1 = add i16 %X , i16 X
     %2 = load i8 , i8* %1
     FLG UUAARR %2
 }
-JMP     x,>J    |6E     | x             | {
-    %1 = add i16 %X , i16 X
-    br label %1
+
+
+### CLR
+CLR     ACC     |0 1 0|A|1 1 1 1| {
+    ACC = i8 0
+    FLG UURSUU ACC
+}
+CLR     e       |7F     | e1            | e2            | {
+    store i8 0 , i8* ED
+    FLG UURSUU 0
 }
 CLR     x       |6F     | x             | {
     %1 = add i16 %X , i16 X
     store i8 0 , i8* %1
     FLG UURSUU 0
 }
-NEG     e       |70     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 0 , %0
-    FLG UUAA12 %0 - 0 %0
-    store i8 %1 , i8* ED
-}
-COM     e       |73     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = xor i8 %0 , 0xff
-    FLG UUAARS %1
-    store i8 %0 , i8* ED
-}
-LSR     e       |74     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i1 0 , i8 %0, i1 %C )
-    FLG UUAA6U %0
-    store i8 %0 , i8* ED
-}
-ROR     e       |76     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i1 %C , i8 %0, i1 %C )
-    FLG UUAA6U %0
-    store i8 %0 , i8* ED
-}
-ASR     e       |77     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i8 %0, i1 %C )
-    FLG UUAA6U %0
-    store i8 %0 , i8* ED
-}
-ASL     e       |78     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    LEFT ( 1 , i1 %C , i8 %0, i1 0 )
-    FLG UUAA6U %0
-    store i8 %0 , i8* ED
-}
-ROL     e       |79     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    LEFT ( 1 , i1 %C , i8 %0, i1 %C )
-    FLG UUAA6U %0
-    store i8 %0 , i8* ED
-}
-DEC     e       |7A     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 %0 , 1
-    FLG UUAA4U %1 - %0 1
-    store i8 %1 , i8* ED
-}
-INC     e       |7C     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = add i8 %0 , 1
-    FLG UUAA4U %1 + %0 1
-    store i8 %1 , i8* ED
-}
-TST     e       |7D     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    FLG UUAARR %0
-}
-JMP     e,>J    |7E     | e1            | e2            | {
-    br label DST
-}
-CLR     e       |7F     | e1            | e2            | {
-    store i8 0 , i8* ED
-    FLG UURSUU 0
-}
 
+### SUB
 SUB     ACC,d   |1|A|0 1 0 0 0 0| d             | {
     %0 = load i8 , i8 * D
     %1 = sub i8 ACC , %0
@@ -429,6 +476,7 @@ SUB     ACC,x   |1|A|1 0 0 0 0 0| x             | {
     ACC = i8 %2
 }
 
+### CMP
 CMP     ACC,d   |1|A|0 1 0 0 0 1| d             | {
     %0 = load i8 , i8 * D
     %1 = sub i8 ACC , %0
@@ -450,6 +498,7 @@ CMP     ACC,x   |1|A|1 0 0 0 0 1| x             | {
     FLG UUAAAA %3 - ACC %2
 }
 
+### SBC
 SBC     ACC,d   |1|A|0 1 0 0 1 0| d             | {
     %0 = load i8 , i8 * D
     SBC ACC %0
@@ -467,6 +516,7 @@ SBC     ACC,x   |1|A|1 0 0 0 1 0| x             | {
     SBC ACC %1
 }
 
+### AND
 AND     ACC,d   |1|A|0 1 0 1 0 0| d             | {
     %0 = load i8 , i8 * D
     ACC = and i8 ACC , %0
@@ -488,6 +538,7 @@ AND     ACC,x   |1|A|1 0 0 1 0 0| x             | {
     FLG UUAARU ACC
 }
 
+### BIT
 BIT     ACC,d   |1|A|0 1 0 1 0 1| d             | {
     %0 = load i8 , i8* D
     %1 = and i8 ACC , %0
@@ -509,6 +560,7 @@ BIT     ACC,x   |1|A|1 0 0 1 0 1| x             | {
     FLG UUAARU %2
 }
 
+### LDA
 LDA     ACC,d   |1|A|0 1 0 1 1 0| d             | {
     ACC = load i8 , i8* D
     FLG UUAARU ACC
@@ -527,6 +579,7 @@ LDA     ACC,x   |1|A|1 0 0 1 1 0| x             | {
     FLG UUAARU ACC
 }
 
+### EOR
 EOR     ACC,d   |1|A|0 1 1 0 0 0| d             | {
     %0 = load i8 , i8 * D
     ACC = xor i8 ACC , %0
@@ -548,6 +601,7 @@ EOR     ACC,x   |1|A|1 0 1 0 0 0| x             | {
     FLG UUAARU ACC
 }
 
+### ADC
 ADC     ACC,d   |1|A|0 1 1 0 0 1| d             | {
     %0 = load i8 , i8 * D
     ADC ACC %0
@@ -565,6 +619,7 @@ ADC     ACC,x   |1|A|1 0 1 0 0 1| x             | {
     ADC ACC %1
 }
 
+### ORA
 ORA     ACC,d   |1|A|0 1 1 0 1 0| d             | {
     %0 = load i8 , i8 * D
     ACC = or i8 ACC , %0
@@ -586,6 +641,7 @@ ORA     ACC,x   |1|A|1 0 1 0 1 0| x             | {
     FLG UUAARU ACC
 }
 
+### ADD
 ADD     ACC,d   |1|A|0 1 1 0 1 1| d             | {
     %0 = load i8 , i8* D
     %1 = add i8 ACC , %0
@@ -611,12 +667,8 @@ ADD     ACC,x   |1|A|1 0 1 0 1 1| x             | {
     ACC = i8 %3
 }
 
-BSR     r,>C    |8D     | r             | {
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
-    br label DST
-}
 
+### STA
 STA     ACC,d   |1|A|0 1 0 1 1 1| d             | {
     store i8 ACC , i8* D
     FLG UUAARU ACC
@@ -631,7 +683,7 @@ STA     ACC,x   |1|A|1 0 0 1 1 1| x             | {
     FLG UUAARU ACC
 }
 
-# CPX
+### CPX
 CPX     d       |9C     | d             | {
     %0 = load i16 , i16* D
     %1 = sub i16 %X , %0
@@ -652,7 +704,8 @@ CPX     x       |AC     | x             | {
     %2 = sub i16 %X , %1
     FLG UU1A2U %2
 }
-# LDS
+
+### LDS
 LDS     d       |9E     | d             | {
     %S = load i16 , i16* D
     FLG UU3ARU %S
@@ -670,13 +723,8 @@ LDS     x       |AE     | x             | {
     %S = load i16 , i16* %1
     FLG UU3ARU %S
 }
-JSR     x,>C    |AD     | x             | {
-    %1 = add i16 %X , i16 X
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
-    br label %X
-}
-# STS
+
+### STS
 STS     d       |9F     | d             | {
     store i16 %S , i16* D
     FLG UU3ARU %S
@@ -691,12 +739,7 @@ STS     x       |AF     | x             | {
     FLG UU3ARU %S
 }
 
-JSR     e,>C    |BD     | e1            | e2            | {
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
-    br label DST
-}
-# LDX
+### LDX
 LDX     d       |DE     | d             | {
     %X = load i16 , i16* D
     FLG UU3ARU %X
@@ -714,7 +757,8 @@ LDX     x       |EE     | x             | {
     %X = load i16 , i16* %1
     FLG UU3ARU %X
 }
-# STX
+
+### STX
 STX     d       |DF     | d             | {
     store i16 %X , i16* D
     FLG UU3ARU %X
@@ -737,7 +781,7 @@ class mc6800_ins(assy.Instree_ins):
         super(mc6800_ins, self).__init__(pj, lim, lang)
 
     def assy_ACC(self, pj):
-        self.mne += ["A","B"][self['A']]
+        self.mne += ["A", "B"][self['A']]
 
     def assy_d(self, pj):
         self.dstadr = self['d']
@@ -767,7 +811,7 @@ class mc6800_ins(assy.Instree_ins):
         return "0x%02x+" % self['x'] + self.idx
 
     def pilmacro_ACC(self):
-        return ["%A","%B"][self['A']]
+        return ["%A", "%B"][self['A']]
 
     def pilmacro_D(self):
         return "0x%02x" % self['d']
@@ -806,6 +850,7 @@ class mc6800_ins(assy.Instree_ins):
             sz = 16
         else:
             sz = 8
+        isz = "i%d" % sz
         for i in ('H', 'I', 'N', 'Z', 'V', 'C'):
             a = p[0]
             p = p[1:]
@@ -829,8 +874,8 @@ class mc6800_ins(assy.Instree_ins):
                 ])
             elif i == 'N' and a in ('A', '1', '3'):
                 self.add_il([
-                    ["%0", "=", "lshr", "i%d" % sz, arg[1], ",", "%d" % (sz-1)],
-                    ["%N", "=", "trunc", "i%d" % sz, "%0", "to", "i1"],
+                    ["%0", "=", "lshr", isz, arg[1], ",", "%d" % (sz-1)],
+                    ["%N", "=", "trunc", isz, "%0", "to", "i1"],
                 ])
             elif a != 'U':
                 print(i, a, arg, self)
@@ -859,63 +904,63 @@ class mc6800(assy.Instree_disass):
 
 
 mc68hc11_instructions = """
-IDIV    -               |02     |
-FDIV    -               |03     |
-LSRD    -               |04     |
-ASLD    -               |05     |
+IDIV    -           |02     |
+FDIV    -           |03     |
+LSRD    -           |04     |
+ASLD    -           |05     |
 
-+       Y               |18     |
++       Y           |18     |
 
-BRSET   d,i,r,>C        |12     | d             | i             | r             |
-BRCLR   d,i,r,>C        |13     | d             | i             | r             |
-BSET    d,i             |14     | d             | i             |
-BCLR    d,i             |15     | d             | i             |
+BRSET   d,i,r,>C    |12     | d             | i             | r             |
+BRCLR   d,i,r,>C    |13     | d             | i             | r             |
+BSET    d,i         |14     | d             | i             |
+BCLR    d,i         |15     | d             | i             |
 
-CPD     I               |1A     |83     | I1            | I2            |
-CPD     d               |1A     |93     | d             |
-CPD     x               |1A     |A3     | x             |
-CPD     e               |1A     |B3     | e1            | e2            |
-CPD     y               |CD     |A3     | y             |
+CPD     I           |1A     |83     | I1            | I2            |
+CPD     d           |1A     |93     | d             |
+CPD     x           |1A     |A3     | x             |
+CPD     e           |1A     |B3     | e1            | e2            |
+CPD     y           |CD     |A3     | y             |
 
-LDY     x               |1A     |EE     | x             |
-STY     x               |1A     |EF     | x             |
+LDY     x           |1A     |EE     | x             |
+STY     x           |1A     |EF     | x             |
 
-LDX     y               |CD     |EE     | y             |
-STX     y               |CD     |EF     | y             |
+LDX     y           |CD     |EE     | y             |
+STX     y           |CD     |EF     | y             |
 
 
-BSET    x,i             |1C     | x             | i             |
-BCLR    x,i             |1D     | x             | i             |
-BRSET   x,i,r,>C        |1E     | x             | i             | r             |
-BRCLR   x,i,r,>C        |1F     | x             | i             | r             |
+BSET    x,i         |1C     | x             | i             |
+BCLR    x,i         |1D     | x             | i             |
+BRSET   x,i,r,>C    |1E     | x             | i             | r             |
+BRCLR   x,i,r,>C    |1F     | x             | i             | r             |
 
-ABX     -               |3A     |
+ABX     -           |3A     |
 
-PSHX    -               |3C     |
-MUL     -               |3D     |
+PSHX    -           |3C     |
+MUL     -           |3D     |
 
-PULX    -               |38     |
+PULX    -           |38     |
 
-SUBD    I               |83     | I1            | I2            |
-SUBD    d               |93     | d             |
-SUBD    x               |A3     | x             |
-SUBD    e               |B3     | e1            | e2            |
+SUBD    I           |83     | I1            | I2            |
+SUBD    d           |93     | d             |
+SUBD    x           |A3     | x             |
+SUBD    e           |B3     | e1            | e2            |
 
-ADDD    I               |C3     | I1            | I2            |
-ADDD    d               |D3     | d             |
-ADDD    x               |E3     | x             |
-ADDD    e               |F3     | e1            | e2            |
+ADDD    I           |C3     | I1            | I2            |
+ADDD    d           |D3     | d             |
+ADDD    x           |E3     | x             |
+ADDD    e           |F3     | e1            | e2            |
 
-XGDX    -               |8F     |
+XGDX    -           |8F     |
 
-LDD     I               |CC     | I1            | I2            |
-LDD     d               |DC     | d             |
-LDD     x               |EC     | x             |
-LDD     e               |FC     | e1            | e2            |
+LDD     I           |CC     | I1            | I2            |
+LDD     d           |DC     | d             |
+LDD     x           |EC     | x             |
+LDD     e           |FC     | e1            | e2            |
 
-STD     d               |DD     | d             |
-STD     x               |ED     | x             |
-STD     e               |FD     | e1            | e2            |
+STD     d           |DD     | d             |
+STD     x           |ED     | x             |
+STD     e           |FD     | e1            | e2            |
 
 """
 
