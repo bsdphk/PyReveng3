@@ -38,6 +38,39 @@ from __future__ import print_function
 
 #######################################################################
 
+class PILSyntaxError(Exception):
+    pass
+
+#######################################################################
+
+def pil_lex(t):
+    s = 0
+    l = []
+    for c in t:
+        if s == 1 and (c.isalnum() or c in ('%', '*', '_')):
+            w += c
+            continue
+        if s == 1:
+            l.append(w)
+            s = 0
+        if s == 0 and c.isspace():
+            continue
+        if s == 0 and c in (',', '=', '(', ')', '-', '+'):
+            l.append(c)
+            continue
+        if s == 0 and (c.isalnum() or c in ('%', '_')):
+            s = 1
+            w = c
+            continue
+        raise PILSyntaxError(
+            "PIL syntax error at '%s' state %d\n\t%s" % (c, s, t))
+    if s == 1:
+        l.append(w)
+    return l
+       
+
+#######################################################################
+
 
 class PIL_Stmt(object):
     ''' A single IL statement '''
@@ -107,7 +140,7 @@ class PIL_Ins(object):
             if l is None:
                 continue
             if isinstance(l, str):
-                f = l.split()
+                f = pil_lex(l)
             else:
                 f = l
                 for i in f:
@@ -299,10 +332,6 @@ class PIL_BB(object):
 from . import assy
 
 #######################################################################
-
-
-class PILSyntaxError(Exception):
-    pass
 
 
 class Syntax_Check(object):

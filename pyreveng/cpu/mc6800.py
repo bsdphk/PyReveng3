@@ -41,17 +41,17 @@ NOP     -       |01     | {
     %0 = i1 0
 }
 TAP     -       |06     | {
-    SPLIT ( i8 %A , i1 %H , i1 %I , i1 %N , i1 %Z , i1 %V , i1 %C )
+    split i8 %A, i1 %H, i1 %I, i1 %N, i1 %Z, i1 %V, i1 %C
 }
 TPA     -       |07     | {
-    CAT ( i8 %A , i1 1, i1 1, i1 %H , i1 %I , i1 %N , i1 %Z , i1 %V , i1 %C )
+    %A = cat i8, i1 1, i1 1, i1 %H, i1 %I, i1 %N, i1 %Z, i1 %V, i1 %C
 }
 INX     -       |08     | {
-    %X = add i16 %X , 1
+    %X = add i16 %X, 1
     FLG UUUAUU %X
 }
 DEX     -       |09     | {
-    %X = sub i16 %X , 1
+    %X = sub i16 %X, 1
     FLG UUUAUU %X
 }
 CLV     -       |0A     | {
@@ -73,12 +73,12 @@ SEI     -       |0F     | {
     %I = i1 1
 }
 SBA     -       |10     | {
-    %0 = sub i8 %A , %B
+    %0 = sub i8 %A, %B
     FLG UUAAAA %0 - %A %B
     %A = i8 %0
 }
 CBA     -       |11     | {
-    %0 = sub i8 %A , %B
+    %0 = sub i8 %A, %B
     FLG UUAAAA %0 - %A %B
 }
 TAB     -       |16     | {
@@ -90,10 +90,10 @@ TBA     -       |17     | {
     FLG UUAARU %A
 }
 DAA     -       |19     | {
-    DAA ( i8 %A )
+    daa i8 %A
 }
 ABA     -       |1B     | {
-    %0 = add i8 %A , %B
+    %0 = add i8 %A, %B
     FLG AUAAAA %0 + %A %B
     %A = i8 %0
 }
@@ -103,54 +103,54 @@ BRA     r,>J    |20     | r             | {
     br label DST
 }
 BHI     r,>JC   |22     | r             | {
-    %0 = or i1 %C , %Z
-    br i1 %0 , label HI , label DST
+    %0 = or i1 %C, %Z
+    br i1 %0, label HI, label DST
 }
 BLS     r,>JC   |23     | r             | {
-    %0 = or i1 %C , %Z
-    br i1 %0 , label DST , label HI
+    %0 = or i1 %C, %Z
+    br i1 %0, label DST, label HI
 }
 BCC     r,>JC   |24     | r             | {
-    br i1 %C , label HI , label DST
+    br i1 %C, label HI, label DST
 }
 BCS     r,>JC   |25     | r             | {
-    br i1 %C , label DST , label HI
+    br i1 %C, label DST, label HI
 }
 BNE     r,>JC   |26     | r             | {
-    br i1 %Z , label HI , label DST
+    br i1 %Z, label HI, label DST
 }
 BEQ     r,>JC   |27     | r             | {
-    br i1 %Z , label DST , label HI
+    br i1 %Z, label DST, label HI
 }
 BVC     r,>JC   |28     | r             | {
-    br i1 %V , label HI , label DST
+    br i1 %V, label HI, label DST
 }
 BVS     r,>JC   |29     | r             | {
-    br i1 %V , label DST , label HI
+    br i1 %V, label DST, label HI
 }
 BPL     r,>JC   |2A     | r             | {
-    br i1 %N , label HI , label DST
+    br i1 %N, label HI, label DST
 }
 BMI     r,>JC   |2B     | r             | {
-    br i1 %N , label DST , label HI
+    br i1 %N, label DST, label HI
 }
 BGE     r,>JC   |2C     | r             | {
-    %0 = xor i1 %N , %V
-    br i1 %0 , label HI , label DST
+    %0 = xor i1 %N, %V
+    br i1 %0, label HI, label DST
 }
 BLT     r,>JC   |2D     | r             | {
-    %0 = xor i1 %N , %V
-    br i1 %0 , label DST , label HI
+    %0 = xor i1 %N, %V
+    br i1 %0, label DST, label HI
 }
 BGT     r,>JC   |2E     | r             | {
-    %0 = xor i1 %N , %V
-    %1 = or i1 %0 , %Z
-    br i1 %1 , label HI , label DST
+    %0 = xor i1 %N, %V
+    %1 = or i1 %0, %Z
+    br i1 %1, label HI, label DST
 }
 BLE     r,>JC   |2F     | r             | {
-    %0 = xor i1 %N , %V
-    %1 = or i1 %0 , %Z
-    br i1 %1 , label DST , label HI
+    %0 = xor i1 %N, %V
+    %1 = or i1 %0, %Z
+    br i1 %1, label DST, label HI
 }
 
 ### JMP
@@ -158,266 +158,266 @@ JMP     e,>J    |7E     | e1            | e2            | {
     br label DST
 }
 JMP     x,>J    |6E     | x             | {
-    %1 = add i16 %X , i16 X
+    %1 = add i16 %X, i16 X
     br label %1
 }
 
 ### BSR/JSR
 BSR     r,>C    |8D     | r             | {
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
+    %S = sub i16 %S, 2
+    store i16 HI, i16* %S
     br label DST
 }
 JSR     e,>C    |BD     | e1            | e2            | {
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
+    %S = sub i16 %S, 2
+    store i16 HI, i16* %S
     br label DST
 }
 JSR     x,>C    |AD     | x             | {
-    %1 = add i16 %X , i16 X
-    %S = sub i16 %S , 2
-    store i16 HI , i16* %S
+    %1 = add i16 %X, i16 X
+    %S = sub i16 %S, 2
+    store i16 HI, i16* %S
     br label %X
 }
 
 TSX     -       |30     | {
-    %X = add i16 %S , 1
+    %X = add i16 %S, 1
 }
 INS     -       |31     | {
-    %S = add i16 %S , 1
+    %S = add i16 %S, 1
 }
 PULA    -       |32     | {
-    %A = load i8 , i8* %S
-    %S = add i16 %S , 1
+    %A = load i8, i8* %S
+    %S = add i16 %S, 1
 }
 PULB    -       |33     | {
-    %A = load i8 , i8* %S
-    %S = add i16 %S , 1
+    %A = load i8, i8* %S
+    %S = add i16 %S, 1
 }
 DES     -       |34     | {
-    %S = sub i16 %S , 1
+    %S = sub i16 %S, 1
 }
 TXS     -       |35     | {
-    %S = sub i16 %X , 1
+    %S = sub i16 %X, 1
 }
 PSHA    -       |36     | {
-    %S = sub i16 %S , 1
-    store i8 %A , i8* %S
+    %S = sub i16 %S, 1
+    store i8 %A, i8* %S
 }
 PSHB    -       |37     | {
-    %S = sub i16 %S , 1
-    store i8 %B , i8* %S
+    %S = sub i16 %S, 1
+    store i8 %B, i8* %S
 }
 RTS     >R      |39     | {
-    %0 = load i16 , i16* %S
-    %S = add i16 %S , 2
+    %0 = load i16, i16* %S
+    %S = add i16 %S, 2
     br label %0
 }
 RTI     >R      |3B     | {
-    %S = add i16 %S , 1
-    %0 = load i8 , i8* %S
-    SPLIT ( i8 %0 , i1 %H , i1 %I , i1 %N , i1 %Z , i1 %V , i1 %C )
-    %S = add i16 %S , 1
-    %B = load i8 , i8* %S
-    %S = add i16 %S , 1
-    %A = load i8 , i8* %S
-    %S = add i16 %S , 2
-    %X = load i16 , i16* %S
-    %S = add i16 %S , 2
-    %1 = load i16 , i16* %S
+    %S = add i16 %S, 1
+    %0 = load i8, i8* %S
+    split i8 %0, i1 %H, i1 %I, i1 %N, i1 %Z, i1 %V, i1 %C
+    %S = add i16 %S, 1
+    %B = load i8, i8* %S
+    %S = add i16 %S, 1
+    %A = load i8, i8* %S
+    %S = add i16 %S, 2
+    %X = load i16, i16* %S
+    %S = add i16 %S, 2
+    %1 = load i16, i16* %S
     br label %1
 }
 WAI     -       |3E     | {
     %I = i1 undef
 }
 SWI     -       |3F     | {
-    store i16 HI , i16* %S
-    %S = add i16 %S , 2
-    store i16 %X , i16* %S
-    %S = add i16 %S , 2
-    store i8 %A , i16* %S
-    %S = add i16 %S , 1
-    store i8 %B , i16* %S
-    %S = add i16 %S , 1
-    CAT ( i8 %0 , i1 1, i1 1, i1 %H , i1 %I , i1 %N , i1 %Z , i1 %V , i1 %C )
-    store i8 %0 , i16* %S
-    %S = add i16 %S , 1
-    %1 = load i16 , i16* 0xfffa
+    store i16 HI, i16* %S
+    %S = add i16 %S, 2
+    store i16 %X, i16* %S
+    %S = add i16 %S, 2
+    store i8 %A, i16* %S
+    %S = add i16 %S, 1
+    store i8 %B, i16* %S
+    %S = add i16 %S, 1
+    %0 = cat i8, i1 1, i1 1, i1 %H, i1 %I, i1 %N, i1 %Z, i1 %V, i1 %C
+    store i8 %0, i16* %S
+    %S = add i16 %S, 1
+    %1 = load i16, i16* 0xfffa
     br label %1
 }
 
 ### NEG
 NEG     ACC     |0 1 0|A|0 0 0 0| {
-    %0 = sub i8 0 , ACC
+    %0 = sub i8 0, ACC
     FLG UUAA12 %0 - 0 ACC
     ACC = i8 %0
 }
 NEG     e       |70     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 0 , %0
+    %0 = load i8, i8* ED
+    %1 = sub i8 0, %0
     FLG UUAA12 %0 - 0 %0
-    store i8 %1 , i8* ED
+    store i8 %1, i8* ED
 }
 NEG     x       |60     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    %2 = sub i8 0 , %1
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    %2 = sub i8 0, %1
     FLG UUAA12 %0 - 0 %1
-    store i8 %2 , i8* %0
+    store i8 %2, i8* %0
 }
 
 ### COM
 COM     ACC     |0 1 0|A|0 0 1 1| {
-    ACC = xor i8 ACC , 0xff
+    ACC = xor i8 ACC, 0xff
     FLG UUAARS ACC
 }
 COM     e       |73     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = xor i8 %0 , 0xff
+    %0 = load i8, i8* ED
+    %1 = xor i8 %0, 0xff
     FLG UUAARS %1
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 COM     x       |63     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    %2 = xor i8 %1 , 0xff
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    %2 = xor i8 %1, 0xff
     FLG UUAARS %2
-    store i8 %2 , i8* %0
+    store i8 %2, i8* %0
 }
 
 ### LSR
 LSR     ACC     |0 1 0|A|0 1 0 0| {
-    RIGHT ( 1 , i1 0 , i8 ACC, i1 %C )
+    right 1, i1 0, i8 ACC, i1 %C
     FLG UURA6U ACC
 }
 LSR     e       |74     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i1 0 , i8 %0, i1 %C )
+    %0 = load i8, i8* ED
+    right 1, i1 0, i8 %0, i1 %C
     FLG UUAA6U %0
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 LSR     x       |64     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    RIGHT ( 1 , i1 0 , i8 %1, i1 %C )
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    right 1, i1 0, i8 %1, i1 %C
     FLG UUAA6U %1
-    store i8 %1 , i8* %0
+    store i8 %1, i8* %0
 }
 
 ### ROR
 ROR     ACC     |0 1 0|A|0 1 1 0| {
-    RIGHT ( 1 , i1 %C , i8 ACC, i1 %C )
+    right 1, i1 %C, i8 ACC, i1 %C
     FLG UUAA6U ACC
 }
 ROR     e       |76     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i1 %C , i8 %0, i1 %C )
+    %0 = load i8, i8* ED
+    right 1, i1 %C, i8 %0, i1 %C
     FLG UUAA6U %0
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 ROR     x       |66     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    RIGHT ( 1 , i1 %C , i8 %1, i1 %C )
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    right 1, i1 %C, i8 %1, i1 %C
     FLG UUAA6U %0
-    store i8 %1 , i8* %0
+    store i8 %1, i8* %0
 }
 
 ### ASR
 ASR     ACC     |0 1 0|A|0 1 1 1| {
-    RIGHT ( 1 , i8 ACC, i1 %C )
+    right 1, i8 ACC, i1 %C
     FLG UUAA6U ACC
 }
 ASR     e       |77     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    RIGHT ( 1 , i8 %0, i1 %C )
+    %0 = load i8, i8* ED
+    right 1, i8 %0, i1 %C
     FLG UUAA6U %0
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 ASR     x       |67     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    RIGHT ( 1 , i8 %1, i1 %C )
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    right 1, i8 %1, i1 %C
     FLG UUAA6U %1
-    store i8 %1 , i8* %0
+    store i8 %1, i8* %0
 }
 
 ### ASL
 ASL     ACC     |0 1 0|A|1 0 0 0| {
-    LEFT ( 1 , i1 %C , i8 ACC, i1 0 )
+    left  1, i1 %C, i8 ACC, i1 0
     FLG UUAA6U ACC
 }
 ASL     e       |78     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    LEFT ( 1 , i1 %C , i8 %0, i1 0 )
+    %0 = load i8, i8* ED
+    left  1, i1 %C, i8 %0, i1 0
     FLG UUAA6U %0
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 ASL     x       |68     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    LEFT ( 1 , i1 %C , i8 %1, i1 0 )
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    left  1, i1 %C, i8 %1, i1 0
     FLG UUAA6U %1
-    store i8 %1 , i8* %0
+    store i8 %1, i8* %0
 }
 
 ### ROL
 ROL     ACC     |0 1 0|A|1 0 0 1| {
-    LEFT ( 1 , i1 %C , i8 ACC, i1 %C )
+    left  1, i1 %C, i8 ACC, i1 %C
     FLG UUAA6U ACC
 }
 ROL     e       |79     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    LEFT ( 1 , i1 %C , i8 %0, i1 %C )
+    %0 = load i8, i8* ED
+    left  1, i1 %C, i8 %0, i1 %C
     FLG UUAA6U %0
-    store i8 %0 , i8* ED
+    store i8 %0, i8* ED
 }
 ROL     x       |69     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    LEFT ( 1 , i1 %C , i8 %1, i1 %C )
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    left  1, i1 %C, i8 %1, i1 %C
     FLG UUAA6U %A
-    store i8 %1 , i8* %0
+    store i8 %1, i8* %0
 }
 
 ### DEC
 DEC     ACC     |0 1 0|A|1 0 1 0| {
-    %0 = sub i8 ACC , 1
+    %0 = sub i8 ACC, 1
     FLG UUAA4U %0 - ACC 1
     ACC = i8 %0
 }
 DEC     e       |7A     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 %0 , 1
+    %0 = load i8, i8* ED
+    %1 = sub i8 %0, 1
     FLG UUAA4U %1 - %0 1
-    store i8 %1 , i8* ED
+    store i8 %1, i8* ED
 }
 DEC     x       |6A     | x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    %3 = sub i8 %2 , 1
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    %3 = sub i8 %2, 1
     FLG UUAA4U %3 - %2 1
-    store i8 %3 , i8* %1
+    store i8 %3, i8* %1
 }
 
 ### INC
 INC     ACC     |0 1 0|A|1 1 0 0| {
-    %0 = add i8 ACC , 1
+    %0 = add i8 ACC, 1
     FLG UUAA4U %0 + ACC 1
     ACC = i8 %0
 }
 INC     e       |7C     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = add i8 %0 , 1
+    %0 = load i8, i8* ED
+    %1 = add i8 %0, 1
     FLG UUAA4U %1 + %0 1
-    store i8 %1 , i8* ED
+    store i8 %1, i8* ED
 }
 INC     x       |6C     | x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    %3 = add i8 %2 , 1
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    %3 = add i8 %2, 1
     FLG UUAA4U %3 + %2 1
-    store i8 %3 , i8* %1
+    store i8 %3, i8* %1
 }
 
 ### TST
@@ -425,12 +425,12 @@ TST     ACC     |0 1 0|A|1 1 0 1| {
     FLG UUAARR ACC
 }
 TST     e       |7D     | e1            | e2            | {
-    %0 = load i8 , i8 * ED
+    %0 = load i8, i8* ED
     FLG UUAARR %0
 }
 TST     x       |6D     | x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
     FLG UUAARR %2
 }
 
@@ -441,132 +441,132 @@ CLR     ACC     |0 1 0|A|1 1 1 1| {
     FLG UURSUU ACC
 }
 CLR     e       |7F     | e1            | e2            | {
-    store i8 0 , i8* ED
+    store i8 0, i8* ED
     FLG UURSUU 0
 }
 CLR     x       |6F     | x             | {
-    %1 = add i16 %X , i16 X
-    store i8 0 , i8* %1
+    %1 = add i16 %X, i16 X
+    store i8 0, i8* %1
     FLG UURSUU 0
 }
 
 ### SUB
 SUB     ACC,d   |1|A|0 1 0 0 0 0| d             | {
-    %0 = load i8 , i8 * D
-    %1 = sub i8 ACC , %0
+    %0 = load i8, i8* D
+    %1 = sub i8 ACC, %0
     FLG UUAAAA %1 - ACC %0
     ACC = i8 %1
 }
 SUB     ACC,e   |1|A|1 1 0 0 0 0| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 ACC , %0
+    %0 = load i8, i8* ED
+    %1 = sub i8 ACC, %0
     FLG UUAAAA %1 - ACC %0
     ACC = i8 %1
 }
 SUB     ACC,i   |1|A|0 0 0 0 0 0| i             | {
-    %0 = sub i8 ACC , IM
+    %0 = sub i8 ACC, IM
     FLG UUAAAA %0 - ACC IM
     ACC = i8 %0
 }
 SUB     ACC,x   |1|A|1 0 0 0 0 0| x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    %2 = sub i8 ACC , %1
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    %2 = sub i8 ACC, %1
     FLG UUAAAA %2 - ACC %1
     ACC = i8 %2
 }
 
 ### CMP
 CMP     ACC,d   |1|A|0 1 0 0 0 1| d             | {
-    %0 = load i8 , i8 * D
-    %1 = sub i8 ACC , %0
+    %0 = load i8, i8* D
+    %1 = sub i8 ACC, %0
     FLG UUAAAA %1 - ACC %0
 }
 CMP     ACC,e   |1|A|1 1 0 0 0 1| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = sub i8 ACC , %0
+    %0 = load i8, i8* ED
+    %1 = sub i8 ACC, %0
     FLG UUAAAA %1 - ACC %0
 }
 CMP     ACC,i   |1|A|0 0 0 0 0 1| i             | {
-    %0 = sub i8 ACC , IM
+    %0 = sub i8 ACC, IM
     FLG UUAAAA %0 - ACC IM
 }
 CMP     ACC,x   |1|A|1 0 0 0 0 1| x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    %3 = sub i8 ACC , %2
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    %3 = sub i8 ACC, %2
     FLG UUAAAA %3 - ACC %2
 }
 
 ### SBC
 SBC     ACC,d   |1|A|0 1 0 0 1 0| d             | {
-    %0 = load i8 , i8 * D
+    %0 = load i8, i8* D
     SBC ACC %0
 }
 SBC     ACC,e   |1|A|1 1 0 0 1 0| e1            | e2            | {
-    %0 = load i8 , i8 * ED
+    %0 = load i8, i8* ED
     SBC ACC %0
 }
 SBC     ACC,i   |1|A|0 0 0 0 1 0| i             | {
     SBC ACC IM
 }
 SBC     ACC,x   |1|A|1 0 0 0 1 0| x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
     SBC ACC %1
 }
 
 ### AND
 AND     ACC,d   |1|A|0 1 0 1 0 0| d             | {
-    %0 = load i8 , i8 * D
-    ACC = and i8 ACC , %0
+    %0 = load i8, i8* D
+    ACC = and i8 ACC, %0
     FLG UUAARU ACC
 }
 AND     ACC,e   |1|A|1 1 0 1 0 0| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    ACC = and i8 ACC , %0
+    %0 = load i8, i8* ED
+    ACC = and i8 ACC, %0
     FLG UUAARU ACC
 }
 AND     ACC,i   |1|A|0 0 0 1 0 0| i             | {
-    ACC = and i8 ACC , IM
+    ACC = and i8 ACC, IM
     FLG UUAARU ACC
 }
 AND     ACC,x   |1|A|1 0 0 1 0 0| x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    ACC = and i8 ACC , %2
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    ACC = and i8 ACC, %2
     FLG UUAARU ACC
 }
 
 ### BIT
 BIT     ACC,d   |1|A|0 1 0 1 0 1| d             | {
-    %0 = load i8 , i8* D
-    %1 = and i8 ACC , %0
+    %0 = load i8, i8* D
+    %1 = and i8 ACC, %0
     FLG UUAARU %1
 }
 BIT     ACC,e   |1|A|1 1 0 1 0 1| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    %1 = and i8 ACC , %0
+    %0 = load i8, i8* ED
+    %1 = and i8 ACC, %0
     FLG UUAARU %1
 }
 BIT     ACC,i   |1|A|0 0 0 1 0 1| i             | {
-    %0 = and i8 ACC , IM
+    %0 = and i8 ACC, IM
     FLG UUAARU %0
 }
 BIT     ACC,x   |1|A|1 0 0 1 0 1| x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
-    %2 = and i8 ACC , %1
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
+    %2 = and i8 ACC, %1
     FLG UUAARU %2
 }
 
 ### LDA
 LDA     ACC,d   |1|A|0 1 0 1 1 0| d             | {
-    ACC = load i8 , i8* D
+    ACC = load i8, i8* D
     FLG UUAARU ACC
 }
 LDA     ACC,e   |1|A|1 1 0 1 1 0| e1            | e2            | {
-    ACC = load i8 , i8* ED
+    ACC = load i8, i8* ED
     FLG UUAARU ACC
 }
 LDA     ACC,i   |1|A|0 0 0 1 1 0| i             | {
@@ -574,95 +574,95 @@ LDA     ACC,i   |1|A|0 0 0 1 1 0| i             | {
     FLG UUAARU ACC
 }
 LDA     ACC,x   |1|A|1 0 0 1 1 0| x             | {
-    %1 = add i16 %X , i16 X
-    ACC = load i8 , i8* %1
+    %1 = add i16 %X, i16 X
+    ACC = load i8, i8* %1
     FLG UUAARU ACC
 }
 
 ### EOR
 EOR     ACC,d   |1|A|0 1 1 0 0 0| d             | {
-    %0 = load i8 , i8 * D
-    ACC = xor i8 ACC , %0
+    %0 = load i8, i8* D
+    ACC = xor i8 ACC, %0
     FLG UUAARU ACC
 }
 EOR     ACC,e   |1|A|1 1 1 0 0 0| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    ACC = xor i8 ACC , %0
+    %0 = load i8, i8* ED
+    ACC = xor i8 ACC, %0
     FLG UUAARU ACC
 }
 EOR     ACC,i   |1|A|0 0 1 0 0 0| i             | {
-    ACC = xor i8 ACC , IM
+    ACC = xor i8 ACC, IM
     FLG UUAARU ACC
 }
 EOR     ACC,x   |1|A|1 0 1 0 0 0| x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    ACC = xor i8 ACC , %2
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    ACC = xor i8 ACC, %2
     FLG UUAARU ACC
 }
 
 ### ADC
 ADC     ACC,d   |1|A|0 1 1 0 0 1| d             | {
-    %0 = load i8 , i8 * D
+    %0 = load i8, i8* D
     ADC ACC %0
 }
 ADC     ACC,e   |1|A|1 1 1 0 0 1| e1            | e2            | {
-    %0 = load i8 , i8 * ED
+    %0 = load i8, i8* ED
     ADC ACC %0
 }
 ADC     ACC,i   |1|A|0 0 1 0 0 1| i             | {
     ADC ACC IM
 }
 ADC     ACC,x   |1|A|1 0 1 0 0 1| x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i8 , i8* %0
+    %0 = add i16 %X, i16 X
+    %1 = load i8, i8* %0
     ADC ACC %1
 }
 
 ### ORA
 ORA     ACC,d   |1|A|0 1 1 0 1 0| d             | {
-    %0 = load i8 , i8 * D
-    ACC = or i8 ACC , %0
+    %0 = load i8, i8* D
+    ACC = or i8 ACC, %0
     FLG UUAARU ACC
 }
 ORA     ACC,e   |1|A|1 1 1 0 1 0| e1            | e2            | {
-    %0 = load i8 , i8 * ED
-    ACC = or i8 ACC , %0
+    %0 = load i8, i8* ED
+    ACC = or i8 ACC, %0
     FLG UUAARU ACC
 }
 ORA     ACC,i   |1|A|0 0 1 0 1 0| i             | {
-    ACC = or i8 ACC , IM
+    ACC = or i8 ACC, IM
     FLG UUAARU ACC
 }
 ORA     ACC,x   |1|A|1 0 1 0 1 0| x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    ACC = or i8 ACC , %2
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    ACC = or i8 ACC, %2
     FLG UUAARU ACC
 }
 
 ### ADD
 ADD     ACC,d   |1|A|0 1 1 0 1 1| d             | {
-    %0 = load i8 , i8* D
-    %1 = add i8 ACC , %0
+    %0 = load i8, i8* D
+    %1 = add i8 ACC, %0
     FLG AUAAAA %1 + ACC %0
     ACC = i8 %1
 }
 ADD     ACC,e   |1|A|1 1 1 0 1 1| e1            | e2            | {
-    %0 = load i8 , i8* ED
-    %1 = add i8 ACC , %0
+    %0 = load i8, i8* ED
+    %1 = add i8 ACC, %0
     FLG AUAAAA %1 + ACC %0
     ACC = i8 %1
 }
 ADD     ACC,i   |1|A|0 0 1 0 1 1| i             | {
-    %0 = add i8 ACC , IM
+    %0 = add i8 ACC, IM
     FLG AUAAAA %0 + ACC IM
     ACC = i8 %0
 }
 ADD     ACC,x   |1|A|1 0 1 0 1 1| x             | {
-    %1 = add i16 %X , i16 X
-    %2 = load i8 , i8* %1
-    %3 = add i8 ACC , %2
+    %1 = add i16 %X, i16 X
+    %2 = load i8, i8* %1
+    %3 = add i8 ACC, %2
     FLG AUAAAA %3 + ACC %2
     ACC = i8 %3
 }
@@ -670,48 +670,48 @@ ADD     ACC,x   |1|A|1 0 1 0 1 1| x             | {
 
 ### STA
 STA     ACC,d   |1|A|0 1 0 1 1 1| d             | {
-    store i8 ACC , i8* D
+    store i8 ACC, i8* D
     FLG UUAARU ACC
 }
 STA     ACC,e   |1|A|1 1 0 1 1 1| e1            | e2            | {
-    store i8 ACC , i8* ED
+    store i8 ACC, i8* ED
     FLG UUAARU ACC
 }
 STA     ACC,x   |1|A|1 0 0 1 1 1| x             | {
-    %1 = add i16 %X , i16 X
-    store i8 ACC , i8* %1
+    %1 = add i16 %X, i16 X
+    store i8 ACC, i8* %1
     FLG UUAARU ACC
 }
 
 ### CPX
 CPX     d       |9C     | d             | {
-    %0 = load i16 , i16* D
-    %1 = sub i16 %X , %0
+    %0 = load i16, i16* D
+    %1 = sub i16 %X, %0
     FLG UU1A2U %1
 }
 CPX     e       |BC     | e1            | e2            | {
-    %0 = load i16 , i16* ED
-    %1 = sub i16 %X , %0
+    %0 = load i16, i16* ED
+    %1 = sub i16 %X, %0
     FLG UU1A2U %1
 }
 CPX     I       |8C     | I1            | I2            | {
-    %0 = sub i16 %X , II
+    %0 = sub i16 %X, II
     FLG UU1A2U %0
 }
 CPX     x       |AC     | x             | {
-    %0 = add i16 %X , i16 X
-    %1 = load i16 , i16* %0
-    %2 = sub i16 %X , %1
+    %0 = add i16 %X, i16 X
+    %1 = load i16, i16* %0
+    %2 = sub i16 %X, %1
     FLG UU1A2U %2
 }
 
 ### LDS
 LDS     d       |9E     | d             | {
-    %S = load i16 , i16* D
+    %S = load i16, i16* D
     FLG UU3ARU %S
 }
 LDS     e       |BE     | e1            | e2            | {
-    %S = load i16 , i16* ED
+    %S = load i16, i16* ED
     FLG UU3ARU %S
 }
 LDS     I       |8E     | I1            | I2            | {
@@ -719,33 +719,33 @@ LDS     I       |8E     | I1            | I2            | {
     FLG UU3ARU %S
 }
 LDS     x       |AE     | x             | {
-    %1 = add i16 %X , i16 X
-    %S = load i16 , i16* %1
+    %1 = add i16 %X, i16 X
+    %S = load i16, i16* %1
     FLG UU3ARU %S
 }
 
 ### STS
 STS     d       |9F     | d             | {
-    store i16 %S , i16* D
+    store i16 %S, i16* D
     FLG UU3ARU %S
 }
 STS     e       |BF     | e1            | e2            | {
-    store i16 %S , i16* ED
+    store i16 %S, i16* ED
     FLG UU3ARU %S
 }
 STS     x       |AF     | x             | {
-    %0 = add i16 %X , i16 X
-    store i16 %S , i16* %0
+    %0 = add i16 %X, i16 X
+    store i16 %S, i16* %0
     FLG UU3ARU %S
 }
 
 ### LDX
 LDX     d       |DE     | d             | {
-    %X = load i16 , i16* D
+    %X = load i16, i16* D
     FLG UU3ARU %X
 }
 LDX     e       |FE     | e1            | e2            | {
-    %X = load i16 , i16* ED
+    %X = load i16, i16* ED
     FLG UU3ARU %X
 }
 LDX     I       |CE     | I1            | I2            | {
@@ -753,23 +753,23 @@ LDX     I       |CE     | I1            | I2            | {
     FLG UU3ARU %X
 }
 LDX     x       |EE     | x             | {
-    %1 = add i16 %X , i16 X
-    %X = load i16 , i16* %1
+    %1 = add i16 %X, i16 X
+    %X = load i16, i16* %1
     FLG UU3ARU %X
 }
 
 ### STX
 STX     d       |DF     | d             | {
-    store i16 %X , i16* D
+    store i16 %X, i16* D
     FLG UU3ARU %X
 }
 STX     e       |FF     | e1            | e2            | {
-    store i16 %X , i16* ED
+    store i16 %X, i16* ED
     FLG UU3ARU %X
 }
 STX     x       |EF     | x             | {
-    %1 = add i16 %X , i16 X
-    store i16 %X , i16* %1
+    %1 = add i16 %X, i16 X
+    store i16 %X, i16* %1
     FLG UU3ARU %X
 }
 """
@@ -836,12 +836,13 @@ class mc6800_ins(assy.Instree_ins):
 
     def pilfunc_ADC(self, arg):
         self.add_il([
-            [arg[0], '=', 'i8', 'undef'],
-            ["%C", '=', 'ii', 'undef'],
-            ["%H", '=', 'ii', 'undef'],
-            ["%V", '=', 'ii', 'undef'],
-            ["%N", '=', 'ii', 'undef'],
-            ["%Z", '=', 'ii', 'undef'],
+	    "%0 = add i8 " + arg[0] + ", " + arg[1] + ", %C",
+	    "%C = addcy i1 " + arg[0] + ", " + arg[1] + ", %C",
+            arg[0] + '= i8 %0',
+            "%H = i1 undef",
+            "%V = i1 undef",
+            "%N = trunc i8 " + arg[0] + " to i1",
+            "%Z = icmp eq i8 " + arg[0] + ", 0",
         ])
 
     def pilfunc_FLG(self, arg):
@@ -857,29 +858,29 @@ class mc6800_ins(assy.Instree_ins):
             if a == 'U':
                 continue
             if a == 'R':
-                self.add_il([["%" + i, '=', 'i1', '0']])
+                self.add_il(["%" + i + " = i1 0"])
             elif a == 'S':
-                self.add_il([["%" + i, '=', 'i1', '1']])
+                self.add_il(["%" + i + " = i1 1"])
             elif i == 'C':
                 assert len(arg) == 5
                 assert arg[2] in ('-', '+')
-                self.add_il([["%" + i, '=', 'i1', 'undef']])
+                self.add_il(["%" + i + '= i1 undef'])
             elif i == 'H':
-                self.add_il([["%" + i, '=', 'i1', 'undef']])
+                self.add_il(["%" + i + '= i1 undef'])
             elif i == 'V':
-                self.add_il([["%" + i, '=', 'i1', 'undef']])
+                self.add_il(["%" + i + '= i1 undef'])
             elif i == 'Z' and a == 'A':
                 self.add_il([
-                    ["%Z", "=", "icmp", "eq", "i8", arg[1], ",", "0"],
+                    "%Z = icmp eq i8 " + arg[1] + ", 0",
                 ])
             elif i == 'N' and a in ('A', '1', '3'):
                 self.add_il([
-                    ["%0", "=", "lshr", isz, arg[1], ",", "%d" % (sz-1)],
-                    ["%N", "=", "trunc", isz, "%0", "to", "i1"],
+                    "%0 = lshr " + isz + " " + arg[1] + ", %d" % (sz-1),
+                    "%N = trunc " + isz + " %0 to i1",
                 ])
             elif a != 'U':
                 print(i, a, arg, self)
-                self.add_il([["%" + i, '=', 'i1', 'undef']])
+                self.add_il(["%" + i + '= i1 undef'])
 
 
 class mc6800(assy.Instree_disass):
