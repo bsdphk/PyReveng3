@@ -179,11 +179,8 @@ def task(pj, cx):
 
 	#######################################################################
 
-def output(pj):
-	listing.Listing(pj, ncol = 8)
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol = 8)
 

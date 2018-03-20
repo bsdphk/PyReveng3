@@ -529,10 +529,8 @@ def task(pj, cx):
 
 	pj.set_label(0xf9, "ON_KEY")
 
-def output(pj):
-	listing.Listing(pj, ncol=4)
 
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol=4)

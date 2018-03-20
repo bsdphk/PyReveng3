@@ -56,10 +56,7 @@ def task(pj, cpu):
 	utils.apply_labels(pj, "A")
 	utils.tramp(pj)
 
-def output(pj):
-	listing.Listing(pj)
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj)

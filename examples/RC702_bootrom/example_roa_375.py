@@ -76,12 +76,10 @@ def task(pj, cx):
 
 	pj.set_label(0x7068, "memcpy(BC, DE,  L)")
 
-def output(pj):
-	listing.Listing(pj, ncol = 3)
 
 if __name__ == '__main__':
 	print(__file__)
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol = 3)
 

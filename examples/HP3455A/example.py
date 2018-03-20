@@ -286,11 +286,8 @@ REG9 is returned in the accumulator.
 	line_comment(pj, 0x1B4, "Result so far is positive\n")
 	line_comment(pj, 0x1B4, "Result so far is negative\n")
 
-def output(pj):
-	listing.Listing(pj, "HP3455A_Inguard.lst")
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj)
 

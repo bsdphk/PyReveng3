@@ -142,12 +142,9 @@ def task(pj, cx):
 	#data--- pj.set_label(0x5e, "timeout")
 	#######################################################################
 
-def output(pj):
-	listing.Listing(pj, ncol = 3)
-
 if __name__ == '__main__':
 	print(__file__)
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol = 3)
 

@@ -92,12 +92,9 @@ def task(pj, cx):
 		gpu.disass(pj, a)
 	hp1345_render.svg(pj, 0x31e, 0x400)
 
-def output(pj):
-	listing.Listing(pj, ncol=2)
-
 if __name__ == '__main__':
 	print(__file__)
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol=2)
 

@@ -422,10 +422,7 @@ def task(pj, cpu):
 	pj.set_label(0xfbcb, "DIAG_PIKES_PEAK()")
 	pj.set_label(0xfbdc, "DIAG_FOCUS()")
 
-def output(pj):
-	listing.Listing(pj)
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj)

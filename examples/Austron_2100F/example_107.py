@@ -288,11 +288,8 @@ def task(pj, cx):
 	for a in range(8):
 		pj.set_label(0xa000 + a, "IEEE488_R%d" % a)
 
-def output(pj):
-	listing.Listing(pj, ncol = 3)
-
 if __name__ == '__main__':
 	print(__file__)
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj, ncol = 3)

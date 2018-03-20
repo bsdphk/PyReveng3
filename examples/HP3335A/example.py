@@ -189,12 +189,9 @@ def task(pj, cpu):
 	while pj.run():
 		pass
 
-def output(pj):
-	listing.Listing(pj)
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
+	listing.Listing(pj)
 
 

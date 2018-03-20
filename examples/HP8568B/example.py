@@ -1334,14 +1334,7 @@ def task(pj, cpu):
 	###############################################################
 
 
-def output(pj):
-	listing.Listing(pj, ncol=8)
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
-
-	a = pil.analysis(pj)
-	a.dump_bbs(open("/tmp/_raw_bb.dot", "w"))
-
+	listing.Listing(pj, ncol=8)
