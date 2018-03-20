@@ -99,10 +99,11 @@ class Render_mem(object):
 		return l
 
 class Listing(object):
-	def __init__(self, pj, fn=None, ascii=True, ncol=None, fmt="x"):
+	def __init__(self, pj, fn=None, ascii=True, pil=True, ncol=None, fmt="x"):
 		self.pj = pj
 		self.fmt = fmt
 		self.ascii = ascii
+		self.pil = pil
 
 		self.render_mem = Render_mem(pj, fmt, ascii, ncol).render
 
@@ -131,7 +132,7 @@ class Listing(object):
 				continue
 			else:
 				self.render_chunk(
-				    i.lo, i.hi, rx, i.lcmt, i.compact)
+				    i.lo, i.hi, rx, i.lcmt, i.pil, i.compact)
 				a0 = i.hi
 
 		if a0 < pj.m.hi:
@@ -156,17 +157,22 @@ class Listing(object):
 					return
 		except mem.MemError:
 			self.render_chunk(lo, hi,
-			    ".UNDEF\t[0x%x]" % (hi - lo), "", True)
+			    ".UNDEF\t[0x%x]" % (hi - lo), "", compact=True)
 			return
 
 		self.render_chunk(lo, hi,
-		    ".XXX\t0x%02x[0x%x]" % (x, hi - lo), "", True)
+		    ".XXX\t0x%02x[0x%x]" % (x, hi - lo), "", compact=True)
 
-	def render_chunk(self, lo, hi, rx=".XXX", lcmt="", compact=False):
+	def render_chunk(self, lo, hi, rx=".XXX", lcmt="", pil=None, compact=False):
 		rx = rx.strip().split("\n")
-		lcmt = lcmt.rstrip("\n").split("\n")
-		if lcmt[-1] == "":
-			lcmt.pop()
+		lx = lcmt.split("\n")
+		if self.pil and pil is not None:
+			lx += pil.render().split("\n")
+		lcmt = []
+		for i in lx:
+			j = i.rstrip()
+			if j != "":
+				lcmt.append(j)
 		hex = self.render_mem(self.pj, lo, hi)
 		i = 0
 		m = max(len(rx), len(lcmt))

@@ -46,6 +46,7 @@ class Leaf(object):
 		self.lo = lo
 		self.hi = hi
 		self.tag = tag
+		self.pil = None
 		self.lcmt = ""
 		self.rendered = None
 		self.compact = False

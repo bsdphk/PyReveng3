@@ -64,7 +64,6 @@ class Assy(code.Code):
 		return
 
 	def render(self, pj):
-		self.lcmt += self.pil.render()
 		s = self.mne + "\t"
 		l = []
 		for i in self.oper:
