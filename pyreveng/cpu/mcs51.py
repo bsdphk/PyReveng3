@@ -315,7 +315,6 @@ class mcs51(assy.Instree_disass):
 		self.it.load_string(mcs51_instructions)
 		self.myleaf = mcs51_ins
 		self.amask = 0xffff
-		self.pil = None
 		self.verbatim |= set((
 		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
 		)

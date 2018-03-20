@@ -456,16 +456,16 @@ JOP	r,>JC	|0 0 0 1 1 1 0 0| disp		| {
 
 # 6-53 / 363
 SBO	cru	|0 0 0 1 1 1 0 1| cru		| {
-	store i1 1, i1 address_space(1) * CRU
+	store i1 1, i1* address_space(1) CRU
 }
 
 # 6-54 / 364
 SBZ	cru	|0 0 0 1 1 1 1 0| cru		| {
-	store i1 0, i1 address_space(1) * CRU
+	store i1 0, i1* address_space(1) CRU
 }
 # NB special flags
 TB	cru	|0 0 0 1 1 1 1 1| cru		| {
-	%status.eq = load i1 , i1 address_space(1) * CRU
+	%status.eq = load i1 , i1* address_space(1) CRU
 }
 
 # 6-55 / 365

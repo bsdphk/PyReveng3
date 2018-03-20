@@ -59,7 +59,7 @@ LSR	MM	| mm	|0 1 0 0| m		| {
 	store i8 %2 , i8* M
 	%3 = lshr i8 %1 , 7
 	%CC.c = trunc i8 %3 to i1
-	FLG -0X-- %2
+	FLG U0XUU %2
 }
 
 ROR	MM	| mm	|0 1 1 0| m		| {
@@ -70,7 +70,7 @@ ROR	MM	| mm	|0 1 1 0| m		| {
 	%5 = or i8 %2 , %4
 	store i8 %5 , i8* M
 	%CC.c = trunc i8 %1 to i1
-	FLG -XX-- %5
+	FLG UXXUU %5
 }
 
 ASR	MM	| mm	|0 1 1 1| m		| {
@@ -78,7 +78,7 @@ ASR	MM	| mm	|0 1 1 1| m		| {
 	%2 = ashr i8 %1 , 1
 	store i8 %2 , i8* M
 	%CC.c = trunc i8 %1 to i1
-	FLG UXX-- %2
+	FLG UXXUU %2
 }
 
 ASL	MM	| mm	|1 0 0 0| m		| {
@@ -87,7 +87,7 @@ ASL	MM	| mm	|1 0 0 0| m		| {
 	store i8 %2 , i8* M
 	%3 = lshr i8 %1 , 7
 	%CC.c = trunc i8 %3 to i1
-	FLG UXX-- %2
+	FLG UXXUU %2
 }
 
 # XXX U flg is wrong
@@ -99,26 +99,26 @@ ROL	MM	| mm	|1 0 0 1| m		| {
 	%5 = lshr i8 %1 , 7
 	%CC.c = trunc i8 %5 to i1
 	store i8 %4 , i8* M
-	FLG -XXU- %4
+	FLG UXXUU %4
 }
 
 DEC	MM	| mm	|1 0 1 0| m		| {
 	%1 = load i8 , i8* M
 	%2 = sub i8 %1 , 1
 	store i8 %2 , i8* M
-	FLG -XXX- %2 sub %1 1
+	FLG UXXXU %2 sub %1 1
 }
 
 INC	MM	| mm	|1 1 0 0| m		| {
 	%1 = load i8 , i8* M
 	%2 = add i8 %1 , 1
 	store i8 %2 , i8* M
-	FLG -XXX- %2 add %1 1
+	FLG UXXXU %2 add %1 1
 }
 
 TST	MM	| mm	|1 1 0 1| m		| {
 	%1 = load i8 , i8* M
-	FLG -XX0- %1
+	FLG UXX0U %1
 }
 
 JMP	MM,>J	| mm	|1 1 1 0| m		| {
@@ -127,7 +127,7 @@ JMP	MM,>J	| mm	|1 1 1 0| m		| {
 
 CLR	MM	| mm	|1 1 1 1| m		| {
 	store i8 0 , i8* M
-	FLG -0100
+	FLG U0100
 }
 
 B	R,CC	|0 0 0 1 0 0 0 0|0 0 1 0| cc    | R1		| R2		| {
@@ -140,7 +140,7 @@ CMPD    M	|0 0 0 1 0 0 0 0|1 0| M |0 0 1 1| m		| {
 	MKD
 	%0 = i16 V
 	%2 = sub i16 %D , %0
-	FLG -XXXX %2 sub %D %0
+	FLG UXXXX %2 sub %D %0
 	%D = i16 pyreveng.void ( )
 }
 
@@ -149,13 +149,13 @@ SWI3	>J	|0 0 0 1 0 0 0 1|0 0 1 1 1 1 1 1|
 CMPU	M	|0 0 0 1 0 0 0 1|1 0| M |0 0 1 1| m		| {
 	%0 = i16 V
 	%2 = sub i16 %U , %0
-	FLG -XXXX %2 sub %U %0
+	FLG UXXXX %2 sub %U %0
 }
 
 CMPS	M	|0 0 0 1 0 0 0 1|1 0| Me|1 1 0 0| m		| {
 	%0 = i16 V
 	%2 = sub i16 %S , %0
-	FLG -XXXX %2 sub %S %0
+	FLG UXXXX %2 sub %S %0
 }
 
 NOP	-	|0 0 0 1 0 0 1 0|
@@ -196,12 +196,12 @@ B	r,CC	|0 0 1 0| cc    | r		| {
 
 LEAX	M	|0 0 1 1 0 0 0 0| m		| {
 	%X = i16 M
-	FLG16 --X-- %X
+	FLG16 UUXUU %X
 }
 
 LEAY	M	|0 0 1 1 0 0 0 1| m		| {
 	%Y = i16 M
-	FLG16 --X-- %Y
+	FLG16 UUXUU %Y
 }
 
 LEAS	M	|0 0 1 1 0 0 1 0| m		| {
@@ -244,7 +244,7 @@ MUL	-	|0 0 1 1 1 1 0 1| {
 	%0 = zext i8 %A to i16
 	%1 = zext i8 %B to i16
 	%D = mul i16 %0 , %1
-	FLG16 --X-- %D
+	FLG16 UUXUU %D
 	%2 = lshr i16 %D , 7
 	%CC.c = trunc i16 %2 to i1
 	MKAB
@@ -269,22 +269,22 @@ ROL	AB	|0 1 0|a|1 0 0 1|
 DEC	AB	|0 1 0|a|1 0 1 0| {
 	%0 = i8 AB
 	AB = sub i8 AB , 1
-	FLG -XXX- AB sub %0 1
+	FLG UXXXU AB sub %0 1
 }
 
 INC	AB	|0 1 0|a|1 1 0 0| {
 	%0 = i8 AB
 	AB = add i8 AB , 1
-	FLG -XXX- AB add %0 1
+	FLG UXXXU AB add %0 1
 }
 
 TST	AB	|0 1 0|a|1 1 0 1| {
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 CLR	AB	|0 1 0|a|1 1 1 1| {
 	AB = i8 0
-	FLG -0100
+	FLG U0100
 }
 
 SUB	AB,M	|1|a| M |0 0 0 0| m		| {
@@ -306,7 +306,7 @@ SUBD	M	|1 0| M |0 0 1 1| m		| {
 	MKD
 	%0 = i16 %D
 	%D = sub i16 %D , V
-	FLG -XXXX %D sub %D V
+	FLG UXXXX %D sub %D V
 	MKAB
 }
 
@@ -314,35 +314,35 @@ ADDD	M	|1 1| M |0 0 1 1| m		| {
 	MKD
 	%0 = i16 %D
 	%D = add i16 %D , V
-	FLG -XXXX %D add %D V
+	FLG UXXXX %D add %D V
 	MKAB
 }
 
 AND	AB,M	|1|a| M |0 1 0 0| m		| {
 	AB = and i8 AB , V
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 BIT	AB,M	|1|a| M |0 1 0 1| m		| {
 	%0 = and i8 AB , V
-	FLG -XX0- %0
+	FLG UXX0U %0
 }
 
 LD	AB,M	|1|a| M |0 1 1 0| m		| {
 	AB = i8 V
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 EOR	AB,M	|1|a| M |1 0 0 0| m		| {
 	AB = xor i8 AB , V
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 ADC	AB,M	|1|a| M |1 0 0 1| m		|
 
 OR	AB,M	|1|a| M |1 0 1 0| m		| {
 	AB = or i8 AB , V
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 ADD	AB,M	|1|a| M |1 0 1 1| m		|
@@ -350,7 +350,7 @@ ADD	AB,M	|1|a| M |1 0 1 1| m		|
 CMP	XY,M	|1 0| M |1 1 0 0| m		| {
 	%0 = i16 V
 	%2 = sub i16 XY , %0
-	FLG -XXXX %2 sub XY %0
+	FLG UXXXX %2 sub XY %0
 }
 
 BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
@@ -361,24 +361,24 @@ BSR	r,>C	|1 0 0 0 1 1 0 1| r		| {
 
 LD	XY,M	|1 0| M |1 1 1 0| m		| {
 	XY = i16 V
-	FLG16 -XX0- XY
+	FLG16 UXX0U XY
 }
 
 ST	AB,M	|1|a| M |0 1 1 1| m		| {
 	store i8 AB , i8* M
-	FLG -XX0- AB
+	FLG UXX0U AB
 }
 
 LDD	M	|1 1| M |1 1 0 0| m		| {
 	%D = i16 V
-	FLG16 -XX0- %D
+	FLG16 UXX0U %D
 	MKAB
 }
 
 STD	M	|1 1| M |1 1 0 1| m		| {
 	MKD
 	store i16 %D , i16* M
-	FLG16 -XX0- %D
+	FLG16 UXX0U %D
 }
 
 JSR	M,>C	|1 0| M |1 1 0 1| m		| {
@@ -389,17 +389,17 @@ JSR	M,>C	|1 0| M |1 1 0 1| m		| {
 
 ST	XY,M	|1 0| M |1 1 1 1| m		| {
 	store i16 XY , i16* M
-	FLG16 -XX0- XY
+	FLG16 UXX0U XY
 }
 
 LD	SU,M	|1 1| M |1 1 1 0| m		| {
 	SU = i16 V
-	FLG16 -XX0- SU
+	FLG16 UXX0U SU
 }
 
 ST	SU,M	|1 1| M |1 1 1 1| m		| {
 	store i16 SU , i16* M
-	FLG16 -XX0- SU
+	FLG16 UXX0U SU
 }
 
 """
@@ -408,25 +408,25 @@ mc6809_macro_instructions = """
 LDD	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
 	%B = i8 I
 	%A = i8 0
-	FLG -0100
+	FLG U0100
 }
 
 ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		| {
 	%A = and i8 %A , I1
 	%B = and i8 %A , I2
-	FLG -XX0- %B
+	FLG UXX0U %B
 }
 
 CLRD	-	|0 1 0 1 1 1 1 1|0 1 0 0 1 1 1 1| {
 	%A = i8 0
 	%B = i8 0
-	FLG -0100
+	FLG U0100
 }
 
 CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
 	%A = i8 0
 	%B = i8 0
-	FLG -0100
+	FLG U0100
 }
 
 """
@@ -955,7 +955,6 @@ class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.it.load_string(mc6809_instructions)
-		self.pil = None
 		self.myleaf = mc6809_ins
 		if macros:
 			self.it.load_string(mc6809_macro_instructions)

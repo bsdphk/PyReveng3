@@ -39,7 +39,7 @@ HP 48 Calculator.
 
 from __future__ import print_function
 
-from . import job
+from . import job, pil
 
 #######################################################################
 
@@ -143,6 +143,7 @@ class Decode(object):
 	def __init__(self, name):
 		assert isinstance(name, str)
 		self.name = name
+		self.pil = pil.PIL_State(self)
 
 	def init_code(self, pj, x):
 		"""

@@ -888,7 +888,6 @@ class mc6800(assy.Instree_disass):
         super(mc6800, self).__init__("mc6800", 8)
         self.it.load_string(mc6800_instructions)
         self.mask = mask
-        self.pil = True
         self.myleaf = mc6800_ins
 
     def codeptr(self, pj, adr):

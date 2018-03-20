@@ -187,7 +187,6 @@ class Instree_disass(code.Decode):
 		self.it = instree.Instree(ins_word, mem_word, endian)
 		self.flow_check = []
 		self.myleaf = Instree_ins
-		self.pil = False
 		self.verbatim = set()
 
 	def decode(self, pj, adr, l=None):
@@ -210,12 +209,11 @@ class Instree_disass(code.Decode):
 				return y
 			l.pop(-1)
 		if y != None:
-			if self.pil is not False:
-				x = y.im.pil.pilspec
-				if x is not None:
-					y.add_il(x.split("\n"))
-				else:
-					y.pildefault()
+			x = y.im.pil.pilspec
+			if x is not None:
+				y.add_il(x.split("\n"))
+			else:
+				y.pildefault()
 			for i in self.flow_check:
 				i(pj, y)
 		return y

@@ -321,7 +321,7 @@ DBF		Dn,disp16,>JC	0000	|0 1 0 1|0 0 0 1|1 1 0 0 1| Dn  | disp16			| {
 }
 DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			| {
 	br i1 CC label HI , label %0
-%0 :
+%0:
 	DN = sub i16 DN , 1
 	%2 = icmp eq i16 DN , 0xffff
 	br i1 %2 label DST , label HI
@@ -576,7 +576,7 @@ ORI		W,word,CCR	0000	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|0 0 0 0|0 0 0 0| word		| {
 # 263/4-159
 PEA		L,ea		0f64	|0 1 0 0|1 0 0|0 0 1| ea	| {
 	%A7 = sub i32 %A7 , 4
-	store i32 PTR_EA , i32 * %A7
+	store i32 PTR_EA , i32* %A7
 }
 # 264/4-160
 ROL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 1| Dy  |
@@ -680,7 +680,7 @@ TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	| {
 # 298/4-194
 UNLK		An		0000	|0 1 0 0|1 1 1 0|0 1 0 1|1| An  | {
 	%A7 = i32 AN
-	AN = load i32 , i32 * %A7
+	AN = load i32 , i32* %A7
 	%A7 = add i32 %A7 , 4
 }
 # 456/6-2

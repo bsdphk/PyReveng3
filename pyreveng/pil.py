@@ -38,56 +38,63 @@ from __future__ import print_function
 
 #######################################################################
 
+
 class PILSyntaxError(Exception):
     pass
 
+
 #######################################################################
 
-def pil_lex(t):
-    s = 0
-    l = []
-    for c in t:
-        if s == 1 and (c.isalnum() or c in ('%', '*', '_')):
-            w += c
-            continue
-        if s == 1:
-            l.append(w)
-            s = 0
-        if s == 0 and c.isspace():
-            continue
-        if s == 0 and c in (',', '=', '(', ')', '-', '+'):
-            l.append(c)
-            continue
-        if s == 0 and (c.isalnum() or c in ('%', '_')):
-            s = 1
-            w = c
-            continue
-        raise PILSyntaxError(
-            "PIL syntax error at '%s' state %d\n\t%s" % (c, s, t))
-    if s == 1:
-        l.append(w)
-    return l
-       
+
+class PIL_Var(object):
+    def __init__(self, nam):
+        self.nam = nam
+        self.read = set()
+        self.write = set()
+
+    def __repr__(self):
+        return "<PIV %s>" % self.nam
+
+#######################################################################
+
+
+class PIL_State(object):
+    ''' The common PIL state for a language '''
+    def __init__(self, lang):
+        self.vars = {}
+        self.lang = lang
+
+    def var(self, n):
+        i = self.vars.get(n)
+        if i is None:
+            i = PIL_Var(n)
+            self.vars[n] = i
+        return i
 
 #######################################################################
 
 
 class PIL_Stmt(object):
     ''' A single IL statement '''
-    def __init__(self, spec):
+    def __init__(self, spec, state):
+        assert isinstance(state, PIL_State)
+        self.state = state
         self.spec = spec
         self.decorate = None
 
     def render(self):
-        return " ".join(self.spec)
+        l = []
+        for i in self.spec:
+            l.append(str(i))
+        return " ".join(l)
 
-    def outputs(self):
+    def Xoutputs(self):
         l = []
         if self.spec[1] == "=":
             l.append(self.spec[0])
         return l
 
-    def inputs(self):
+    def Xinputs(self):
         l = []
         if self.spec[1] == "=":
             for i in self.spec[2:]:
@@ -99,22 +106,126 @@ class PIL_Stmt(object):
                     l.append(i)
         return l
 
-    def __getitem__(self, i):
+    def X__getitem__(self, i):
         return self.spec[i]
 
-    def __repr__(self):
+    def X__repr__(self):
         return "<PIL %s>" % self.render()
+
+#######################################################################
+
+
+class PIL_Stmt_Assign(PIL_Stmt):
+    def __init__(self, spec, state):
+        super(PIL_Stmt_Assign, self).__init__(spec, state)
+        v = state.var(spec[0])
+        v.write.add(self)
+        spec[0] = v
+        for i in range(1, len(spec)):
+            if spec[i][0] == '%':
+                v = state.var(spec[i])
+                v.read.add(self)
+                spec[i] = v
+
+class PIL_Stmt_Flow(PIL_Stmt):
+    def __init__(self, spec, state):
+        super(PIL_Stmt_Flow, self).__init__(spec, state)
+        for i in range(0, len(spec)):
+            if spec[i][0] == '%':
+                v = state.var(spec[i])
+                v.read.add(self)
+                spec[i] = v
+
+class PIL_Stmt_Store(PIL_Stmt):
+    def __init__(self, spec, state):
+        super(PIL_Stmt_Store, self).__init__(spec, state)
+        for i in range(0, len(spec)):
+            if spec[i][0] == '%':
+                v = state.var(spec[i])
+                v.read.add(self)
+                spec[i] = v
+
+
+class PIL_Stmt_Shift(PIL_Stmt):
+    def __init__(self, spec, state):
+        super(PIL_Stmt_Shift, self).__init__(spec, state)
+        for i in range(0, len(spec)):
+            if spec[i][0] == '%':
+                v = state.var(spec[i])
+                v.read.add(self)
+                spec[i] = v
+
+
+class PIL_Stmt_Split(PIL_Stmt):
+    def __init__(self, spec, state):
+        super(PIL_Stmt_Split, self).__init__(spec, state)
+        v = state.var(spec[2])
+        v.read.add(self)
+        spec[2] = v
+        for i in range(3, len(spec)):
+            if spec[i][0] == '%':
+                v = state.var(spec[i])
+                v.write.add(self)
+                spec[i] = v
+
+
+#######################################################################
+
+
+def pil_lex(t):
+    s = 0
+    l = []
+    for c in t:
+        if s == 1 and (c.isalnum() or c in ('%', '*', '_', '.', ':')):
+            w += c
+            continue
+        if s == 1:
+            l.append(w)
+            s = 0
+        if s == 0 and c.isspace():
+            continue
+        if s == 0 and c in (',', '=', '(', ')', '-', '+'):
+            l.append(c)
+            continue
+        if s == 0 and (c.isalnum() or c in ('%', '_', '.')):
+            s = 1
+            w = c
+            continue
+        raise PILSyntaxError(
+            "PIL syntax error at '%s' state %d\n\t%s" % (c, s, t))
+    if s == 1:
+        l.append(w)
+    return l
+
+#######################################################################
+
+STYP = {
+    'br':       PIL_Stmt_Flow,
+    'left':     PIL_Stmt_Shift,
+    'right':    PIL_Stmt_Shift,
+    'split':    PIL_Stmt_Split,
+    'store':    PIL_Stmt_Store,
+    'switch':   PIL_Stmt_Flow,
+}
+
+def pil_parse(v, state):
+    x = STYP.get(v[0])
+    if x is not None:
+        return x(v, state)
+    if len(v) > 1 and v[1] == '=':
+        return PIL_Stmt_Assign(v, state)
+    print("UNP", v)
+    return PIL_Stmt(v, state)
 
 #######################################################################
 
 
 class PIL_Ins(object):
     ''' IL statements related to a single assy/code object '''
-    def __init__(self, ins=None):
+    def __init__(self, ins):
         self.ins = ins
         self.pil = []
         self.pil_c = 0
-        # self.add_il(ins, [["0x%x" % ins.lo, ":"]])
 
     def pil_reg(self, r, d):
         if r[0] != "%":
@@ -132,6 +243,7 @@ class PIL_Ins(object):
         names along the way.  'ret' can be one of these and
         the new unique name will be returned.
         '''
+        assert isinstance(ins.lang.pil, PIL_State)
         if ll is None:
             assert ret is None
             return
@@ -178,9 +290,8 @@ class PIL_Ins(object):
             try:
                 j = getattr(ins, "pilfunc_" + v[0])
             except AttributeError:
-                self.pil.append(PIL_Stmt(v))
+                self.pil.append(pil_parse(v, ins.lang.pil))
                 continue
-            # self.tl.append(["/* FUNC " + " ".join(v) + " */" ])
             j(v[1:])
         return d.get(ret)
 
@@ -325,344 +436,352 @@ class PIL_BB(object):
                 self.doa.add(i)
         return nn
 
-#######################################################################
-# XXX Stuff below probably belongs in separate source file(s)
 
+if False:
+    #######################################################################
+    # XXX Stuff below probably belongs in separate source file(s)
 
-from . import assy
+    from . import assy
 
-#######################################################################
+    #######################################################################
 
+    class Syntax_Check(object):
+        def __init__(self, pj, ptr):
+            self.pj = pj
+            self.regs = {"%A": "i8"}
+            self.ptr = ptr
+            self.uverbs = set()
 
-class Syntax_Check(object):
-    def __init__(self, pj, ptr):
-        self.pj = pj
-        self.regs = {"%A": "i8"}
-        self.ptr = ptr
-        self.uverbs = set()
+            for j in pj:
+                if isinstance(j, assy.Assy):
+                    self.check_ins(j)
 
-        for j in pj:
-            if isinstance(j, assy.Assy):
-                self.check_ins(j)
-
-    def check_ins(self, j):
-        for x in j.pil.pil:
-            try:
-                self.check_il(x)
-            except PILSyntaxError as bug:
-                print("")
-                print("TROUBLE:")
-                print("\t", j)
-                print("\t", x)
-                print("\t", bug)
-
-    def do_reg(self, rn, w):
-        if rn[0] != "%":
-            raise PILSyntaxError(
-                "Expected register got '" + rn + "'")
-        a = self.regs.get(rn)
-        if a is None:
-            self.regs[rn] = w
-        elif a != w:
-            raise PILSyntaxError(
-                "Inconsistent width " + rn + " " + a + " vs " + w)
-
-    def expect_value(self, l, wid):
-        v = l.pop(0)
-        if v == "void":
-            w = wid
-        elif v[:9] == "pyreveng.":
-            # XXX
-            w = wid
-            while l.pop(0) != ")":
-                continue
-        elif v[:2] == "0x":
-            w = int(v[2:], 16)
-        elif v[0].isdigit():
-            w = int(v, 10)
-        elif v[0] == "%" and wid[-1] == "*":
-            self.do_reg(v, self.ptr)
-        elif v[0] == "%":
-            self.do_reg(v, wid)
-        else:
-            raise PILSyntaxError(
-                ("Expected " + wid + " value got '" + v + "'"))
-
-    def expect(self, a, b):
-        if a != b:
-            raise PILSyntaxError(
-                "Expected '" + a + "' got '" + b + "'")
-
-    def expect_type(self, a):
-        if a[0] != 'i':
-            raise PILSyntaxError("Expected type got '" + a + "'")
-        b = a[1:]
-        if b[-1] == "*":
-            b = b[:-1]
-        w = int(b, 10)
-        if w not in (1, 8, 16, 32):
-            raise PILSyntaxError(
-                "Unexpected type width '" + a + "'")
-        return a
-
-    def check_br(self, l):
-        self.expect('br', l.pop(0))
-        if l[0] == "i1":
-            l.pop(0)
-            self.do_reg(l.pop(0), "i1")
-            self.expect(',', l.pop(0))
-            self.expect('label', l.pop(0))
-            l.pop(0)
-            self.expect(',', l.pop(0))
-            self.expect('label', l.pop(0))
-            l.pop(0)
-        else:
-            self.expect('label', l.pop(0))
-            l.pop(0)
-        if len(l):
-            raise PILSyntaxError("Extra stuff on 'br' <%s>" % str(l))
-
-    def check_store(self, l):
-        self.expect('store', l.pop(0))
-        ty = self.expect_type(l.pop(0))
-        self.expect_value(l, ty)
-        self.expect(',', l.pop(0))
-        ty2 = self.expect_type(l.pop(0))
-        if ty2 != ty + "*":
-            raise PILSyntaxError(
-                "Inconsistent types in 'store' %s vs %s" % (ty, ty2))
-        self.expect_value(l, ty2)
-        if len(l):
-            raise PILSyntaxError("Extra stuff on 'store' <%s>" % str(l))
-
-    def verb_type(self, v, l):
-        ty = self.expect_type(v)
-        self.expect_value(l, ty)
-        if len(l):
-            raise PILSyntaxError(
-                "Extra stuff on verb '" + v + "' <%s>" % str(l))
-
-    def verb_binary(self, v, l):
-        t = self.expect_type(l.pop(0))
-        self.expect_value(l, t)
-        self.expect(',', l.pop(0))
-        self.expect_value(l, t)
-        if len(l):
-            raise PILSyntaxError(
-                "Extra stuff on binary verb '" + v + "' <%s>" % str(l))
-
-    def verb_load(self, v, l):
-        ty = self.expect_type(l.pop(0))
-        self.expect(',', l.pop(0))
-        ty2 = self.expect_type(l.pop(0))
-        if ty2 != ty + "*":
-            raise PILSyntaxError(
-                "Inconsistent types in 'load' %s vs %s" % (ty, ty2))
-        self.expect_value(l, ty2)
-        if len(l):
-            raise PILSyntaxError("Extra stuff on 'load' <%s>" % str(l))
-
-    def verb_shift(self, v, l):
-        ty = self.expect_type(l.pop(0))
-        self.expect_value(l, ty)
-        self.expect(',', l.pop(0))
-        self.expect_value(l, ty)
-        if len(l):
-            raise PILSyntaxError(
-                "Extra stuff on shift verb '" + v + "' <%s>" % str(l))
-
-    def verb_size(self, v, l):
-        ty = self.expect_type(l.pop(0))
-        self.expect_value(l, ty)
-        self.expect('to', l.pop(0))
-        ty2 = self.expect_type(l.pop(0))
-        if len(l):
-            raise PILSyntaxError(
-                "Extra stuff on resize verb '" + v + "' <%s>" % str(l))
-
-    def verb_cond(self, v, l):
-        cc = l.pop(0)
-        if cc not in ('eq', 'ne'):
-            raise PILSyntaxError(
-                "Unknown conditional '" + cc + "' <%s>" % str(l))
-        ty = self.expect_type(l.pop(0))
-        self.expect_value(l, ty)
-        self.expect(',', l.pop(0))
-        self.expect_value(l, ty)
-        if len(l):
-            raise PILSyntaxError(
-                "Extra stuff on conditional verb '" + v + "' <%s>" % str(l))
-
-    def check_assign(self, l):
-        dst = l.pop(0)
-        self.expect('=', l.pop(0))
-
-        d = {
-            "i1":       self.verb_type,
-            "i8":       self.verb_type,
-            "i16":      self.verb_type,
-            "i32":      self.verb_type,
-            "and":      self.verb_binary,
-            "add":      self.verb_binary,
-            "sub":      elf.verb_binary,
-            "or":       self.verb_binary,
-            "mul":      self.verb_binary,
-            "xor":      self.verb_binary,
-            "load":     self.verb_load,
-            "lshr":     self.verb_shift,
-            "ashr":     self.verb_shift,
-            "shl":      self.verb_shift,
-            "trunc":    self.verb_size,
-            "zext":     self.verb_size,
-            "icmp":     self.verb_cond,
-        }
-        v = l.pop(0)
-        h = d.get(v)
-        if h is None and v in self.uverbs:
-            return
-        if h is None:
-            self.uverbs.add(v)
-            raise PILSyntaxError(("Unknown verb '%s'" % v))
-        h(v, l)
-
-    def check_il(self, il):
-        i = 0
-        l = list(il.spec)
-        if l[0] == "br":
-            return self.check_br(l)
-        if l[0] == "store":
-            return self.check_store(l)
-        if l[0][0] == '%' and l[1] == '=':
-            return self.check_assign(l)
-        raise PILSyntaxError("No idea what this is")
-
-#######################################################################
-
-
-class analysis(object):
-    def __init__(self, pj):
-        self.pilbbs = {}
-        self.pj = pj
-
-        noil = {}
-
-        # XXX: This is kind of silly
-
-        for j in pj:
-            if not isinstance(j, assy.Assy):
-                continue
-            y = PIL_BB()
+        def check_ins(self, j):
             for x in j.pil.pil:
-                y.pils.append(x)
-            if len(y.pils) == 0:
-                a = j.render(pj).expandtabs()
-                b = j.lim[-1].assy[0]
-                if b not in noil:
-                    noil[b] = 1
-                else:
-                    noil[b] += 1
-                z = PIL_Stmt(["pyreveng.void", "(", '"' + a + '"', ")"])
-                z.decorate = "magenta"
-                y.pils.append(z)
-            y.lo = j.lo
-            y.hi = j.hi
-            y.pilins.append(j)
-            self.pilbbs[j.lo] = y
+                try:
+                    self.check_il(x)
+                except PILSyntaxError as bug:
+                    print("")
+                    print("TROUBLE:")
+                    print("\t", j)
+                    print("\t", x)
+                    print("\t", bug)
 
-        #l = list(noil.iteritems())
-        l = list(noil.items())
-        l.sort(key=lambda x: -x[1])
-        print("Top twenty IL-deficient instructions:")
-        for i,j in l[:20]:
-            print("\t", i, j)
+        def do_reg(self, rn, w):
+            if rn[0] != "%":
+                raise PILSyntaxError(
+                    "Expected register got '" + rn + "'")
+            a = self.regs.get(rn)
+            if a is None:
+                self.regs[rn] = w
+            elif a != w:
+                raise PILSyntaxError(
+                    "Inconsistent width " + rn + " " + a + " vs " + w)
 
-        self.build_flow()
-        #for a,x in self.pilbbs.iteritems():
-        for a, x in self.pilbbs.items():
-            x.build_doa()
-        self.propagate_doa("red")
-        self.propagate_doa("green")
-        for i in range(10):
-            if self.propagate_doa("brown") == 0:
-                break
+        def expect_value(self, l, wid):
+            v = l.pop(0)
+            if v == "void":
+                w = wid
+            elif v[:9] == "pyreveng.":
+                # XXX
+                w = wid
+                while l.pop(0) != ")":
+                    continue
+            elif v[:2] == "0x":
+                w = int(v[2:], 16)
+            elif v[0].isdigit():
+                w = int(v, 10)
+            elif v[0] == "%" and wid[-1] == "*":
+                self.do_reg(v, self.ptr)
+            elif v[0] == "%":
+                self.do_reg(v, wid)
+            else:
+                raise PILSyntaxError(
+                    ("Expected " + wid + " value got '" + v + "'"))
 
-    def dump_bbs(self, fo):
-        l = list(self.pilbbs.keys())
-        l.sort()
-        for j in l:
-            x = self.pilbbs[j]
+        def expect(self, a, b):
+            if a != b:
+                raise PILSyntaxError(
+                    "Expected '" + a + "' got '" + b + "'")
+
+        def expect_type(self, a):
+            if a[0] != 'i':
+                raise PILSyntaxError("Expected type got '" + a + "'")
+            b = a[1:]
+            if b[-1] == "*":
+                b = b[:-1]
+            w = int(b, 10)
+            if w not in (1, 8, 16, 32):
+                raise PILSyntaxError(
+                    "Unexpected type width '" + a + "'")
+            return a
+
+        def check_br(self, l):
+            self.expect('br', l.pop(0))
+            if l[0] == "i1":
+                l.pop(0)
+                self.do_reg(l.pop(0), "i1")
+                self.expect(',', l.pop(0))
+                self.expect('label', l.pop(0))
+                l.pop(0)
+                self.expect(',', l.pop(0))
+                self.expect('label', l.pop(0))
+                l.pop(0)
+            else:
+                self.expect('label', l.pop(0))
+                l.pop(0)
+            if len(l):
+                raise PILSyntaxError("Extra stuff on 'br' <%s>" % str(l))
+
+        def check_store(self, l):
+            self.expect('store', l.pop(0))
+            ty = self.expect_type(l.pop(0))
+            self.expect_value(l, ty)
+            self.expect(',', l.pop(0))
+            ty2 = self.expect_type(l.pop(0))
+            if ty2 != ty + "*":
+                raise PILSyntaxError(
+                    "Inconsistent types in 'store' %s vs %s" % (ty, ty2))
+            self.expect_value(l, ty2)
+            if len(l):
+                raise PILSyntaxError("Extra stuff on 'store' <%s>" % str(l))
+
+        def verb_type(self, v, l):
+            ty = self.expect_type(v)
+            self.expect_value(l, ty)
+            if len(l):
+                raise PILSyntaxError(
+                    "Extra stuff on verb '" + v + "' <%s>" % str(l))
+
+        def verb_binary(self, v, l):
+            t = self.expect_type(l.pop(0))
+            self.expect_value(l, t)
+            self.expect(',', l.pop(0))
+            self.expect_value(l, t)
+            if len(l):
+                raise PILSyntaxError(
+                    "Extra stuff on binary verb '" + v + "' <%s>" % str(l))
+
+        def verb_load(self, v, l):
+            ty = self.expect_type(l.pop(0))
+            self.expect(',', l.pop(0))
+            ty2 = self.expect_type(l.pop(0))
+            if ty2 != ty + "*":
+                raise PILSyntaxError(
+                    "Inconsistent types in 'load' %s vs %s" % (ty, ty2))
+            self.expect_value(l, ty2)
+            if len(l):
+                raise PILSyntaxError("Extra stuff on 'load' <%s>" % str(l))
+
+        def verb_shift(self, v, l):
+            ty = self.expect_type(l.pop(0))
+            self.expect_value(l, ty)
+            self.expect(',', l.pop(0))
+            self.expect_value(l, ty)
+            if len(l):
+                raise PILSyntaxError(
+                    "Extra stuff on shift verb '" + v + "' <%s>" % str(l))
+
+        def verb_size(self, v, l):
+            ty = self.expect_type(l.pop(0))
+            self.expect_value(l, ty)
+            self.expect('to', l.pop(0))
+            ty2 = self.expect_type(l.pop(0))
+            if len(l):
+                raise PILSyntaxError(
+                    "Extra stuff on resize verb '" + v + "' <%s>" % str(l))
+
+        def verb_cond(self, v, l):
+            cc = l.pop(0)
+            if cc not in ('eq', 'ne'):
+                raise PILSyntaxError(
+                    "Unknown conditional '" + cc + "' <%s>" % str(l))
+            ty = self.expect_type(l.pop(0))
+            self.expect_value(l, ty)
+            self.expect(',', l.pop(0))
+            self.expect_value(l, ty)
+            if len(l):
+                raise PILSyntaxError(
+                    "Extra stuff on conditional verb '" + v + "' <%s>" % str(l))
+
+        def check_assign(self, l):
+            dst = l.pop(0)
+            self.expect('=', l.pop(0))
+
+            d = {
+                "i1":       self.verb_type,
+                "i8":       self.verb_type,
+                "i16":      self.verb_type,
+                "i32":      self.verb_type,
+                "and":      self.verb_binary,
+                "add":      self.verb_binary,
+                "sub":      elf.verb_binary,
+                "or":       self.verb_binary,
+                "mul":      self.verb_binary,
+                "xor":      self.verb_binary,
+                "load":     self.verb_load,
+                "lshr":     self.verb_shift,
+                "ashr":     self.verb_shift,
+                "shl":      self.verb_shift,
+                "trunc":    self.verb_size,
+                "zext":     self.verb_size,
+                "icmp":     self.verb_cond,
+            }
+            v = l.pop(0)
+            h = d.get(v)
+            if h is None and v in self.uverbs:
+                return
+            if h is None:
+                self.uverbs.add(v)
+                raise PILSyntaxError(("Unknown verb '%s'" % v))
+            h(v, l)
+
+        def check_il(self, il):
+            i = 0
+            l = list(il.spec)
+            if l[0] == "br":
+                return self.check_br(l)
+            if l[0] == "store":
+                return self.check_store(l)
+            if l[0][0] == '%' and l[1] == '=':
+                return self.check_assign(l)
+            raise PILSyntaxError("No idea what this is")
+
+    #######################################################################
+
+
+    class analysis(object):
+        def __init__(self, pj):
+            self.pilbbs = {}
+            self.pj = pj
+
+            noil = {}
+
+            # XXX: This is kind of silly
+
+            for j in pj:
+                if not isinstance(j, assy.Assy):
+                    continue
+                y = PIL_BB()
+                for x in j.pil.pil:
+                    y.pils.append(x)
+                if len(y.pils) == 0:
+                    a = j.render(pj).expandtabs()
+                    b = j.lim[-1].assy[0]
+                    if b not in noil:
+                        noil[b] = 1
+                    else:
+                        noil[b] += 1
+                    z = PIL_Stmt(["pyreveng.void", "(", '"' + a + '"', ")"],
+                                 j.lang.pil)
+                    z.decorate = "magenta"
+                    y.pils.append(z)
+                y.lo = j.lo
+                y.hi = j.hi
+                y.pilins.append(j)
+                self.pilbbs[j.lo] = y
+
+            #l = list(noil.iteritems())
+            l = list(noil.items())
+            l.sort(key=lambda x: -x[1])
+            print("Top twenty IL-deficient instructions:")
+            for i,j in l[:20]:
+                print("\t", i, j)
+
+            self.build_flow()
+            #for a,x in self.pilbbs.iteritems():
+            for a, x in self.pilbbs.items():
+                x.build_doa()
+            self.propagate_doa("red")
+            self.propagate_doa("green")
+            for i in range(10):
+                if self.propagate_doa("brown") == 0:
+                    break
+
+        def dump_bbs(self, fo):
+            l = list(self.pilbbs.keys())
+            l.sort()
+            for j in l:
+                x = self.pilbbs[j]
+                fo.write("digraph {\n")
+                x.dot_def(fo, self.pj)
+                fo.write("}\n")
             fo.write("digraph {\n")
-            x.dot_def(fo, self.pj)
+            for j in l:
+                x = self.pilbbs[j]
+                x.dot_flow(fo, self.pj)
             fo.write("}\n")
-        fo.write("digraph {\n")
-        for j in l:
-            x = self.pilbbs[j]
-            x.dot_flow(fo, self.pj)
-        fo.write("}\n")
 
-    def build_flow(self):
-        #for a,x in self.pilbbs.iteritems():
-        for a, x in self.pilbbs.items():
-            d = x.whereto()
-            for j in d:
-                if isinstance(j, int):
-                    y = self.pilbbs.get(j)
-                    if y is None:
-                        print("None bbs", j)
-                        continue
-                    assert y is not None
-                    y.comefrom.append(x)
-                    x.goto.append(y)
-                else:
-                    x.goto.append(None)
-                    # print(x, j)
-        l = list(self.pilbbs.keys())
-        l.sort()
-        for j in l:
-                while True:
-                    x = self.pilbbs.get(j)
-                    if x is None:
-                        break
-                    if len(x.goto) > 1:
-                        break
-                    if len(x.goto) == 0:
-                        print("No goto", x)
-                        break
-                    z = x.goto[0]
-                    if z is None:
-                        break
-                    if z.lo != x.hi:
-                        break
-                    y = self.pilbbs.get(x.hi)
-                    assert y is not None
-                    if len(y.comefrom) != 1:
-                        break
-                    assert y.comefrom[0] == x
-                    x.pils += y.pils
-                    x.hi = y.hi
-                    x.pilins += y.pilins
-                    for i in y.goto:
-                        if isinstance(i, PIL_BB):
-                            i.comefrom.remove(y)
-                            i.comefrom.append(x)
-                    x.goto = y.goto
-                    del self.pilbbs[y.lo]
+        def build_flow(self):
+            #for a,x in self.pilbbs.iteritems():
+            for a, x in self.pilbbs.items():
+                d = x.whereto()
+                for j in d:
+                    if isinstance(j, int):
+                        y = self.pilbbs.get(j)
+                        if y is None:
+                            print("None bbs", j)
+                            continue
+                        assert y is not None
+                        y.comefrom.append(x)
+                        x.goto.append(y)
+                    else:
+                        x.goto.append(None)
+                        # print(x, j)
+            l = list(self.pilbbs.keys())
+            l.sort()
+            for j in l:
+                    while True:
+                        x = self.pilbbs.get(j)
+                        if x is None:
+                            break
+                        if len(x.goto) > 1:
+                            break
+                        if len(x.goto) == 0:
+                            print("No goto", x)
+                            break
+                        z = x.goto[0]
+                        if z is None:
+                            break
+                        if z.lo != x.hi:
+                            break
+                        y = self.pilbbs.get(x.hi)
+                        assert y is not None
+                        if len(y.comefrom) != 1:
+                            break
+                        assert y.comefrom[0] == x
+                        x.pils += y.pils
+                        x.hi = y.hi
+                        x.pilins += y.pilins
+                        for i in y.goto:
+                            if isinstance(i, PIL_BB):
+                                i.comefrom.remove(y)
+                                i.comefrom.append(x)
+                        x.goto = y.goto
+                        del self.pilbbs[y.lo]
 
-    def propagate_doa(self, color):
-        n = 0
-        for a, x in self.pilbbs.items():
-            #print("PROP", x)
-            if len(x.goto) == 0:
-                continue
-            if None in x.goto:
-                continue
-            dd = x.goto[0].doa
-            for j in x.goto:
-                #print("\t", j, j.doa)
-                dd = dd.intersection(j.doa)
-            if len(dd) == 0:
-                continue
-            #print("  ", dd)
-            n += x.build_doa(dd, color)
-        print("PROP eliminated", n)
-        return n
+        def propagate_doa(self, color):
+            n = 0
+            for a, x in self.pilbbs.items():
+                #print("PROP", x)
+                if len(x.goto) == 0:
+                    continue
+                if None in x.goto:
+                    continue
+                dd = x.goto[0].doa
+                for j in x.goto:
+                    #print("\t", j, j.doa)
+                    dd = dd.intersection(j.doa)
+                if len(dd) == 0:
+                    continue
+                #print("  ", dd)
+                n += x.build_doa(dd, color)
+            print("PROP eliminated", n)
+            return n
+
+
+def pil_debug(state):
+    for i in state.vars.values():
+        if len(i.write) == 0 or len(i.read) == 0:
+            print(i, "W", len(i.write), "R", len(i.read))
+

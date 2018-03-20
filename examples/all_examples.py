@@ -54,3 +54,4 @@ for i in l:
 	y.task(pj, cx)
 	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 8, fn = "_output/" + pj.name + ".txt")
+	sys.stdout.flush()
