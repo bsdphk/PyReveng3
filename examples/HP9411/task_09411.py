@@ -106,8 +106,6 @@ def do_one(fn, alist):
 	for i in labels:
 		pj.set_label(i, labels[i])
 
-	if True:
-		code.lcmt_flows(pj)
 	listing.Listing(pj, fn="/tmp/_.HP" + fn, fmt="o", ncol=1)
 
 do_one("09411-17002_Rev-2640.src",

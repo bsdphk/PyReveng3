@@ -1066,8 +1066,6 @@ for pg in (0,1,2,3,4):
 
 	# decompile.mopup(pj, cpu)
 
-	code.lcmt_flows(pj)
-
 	listing.Listing(pj)
 
 #######################################################################

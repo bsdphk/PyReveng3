@@ -57,7 +57,6 @@ def task(pj, cpu):
 	utils.tramp(pj)
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj)
 
 if __name__ == '__main__':

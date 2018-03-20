@@ -1335,7 +1335,6 @@ def task(pj, cpu):
 
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol=8)
 
 if __name__ == '__main__':

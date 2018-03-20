@@ -423,7 +423,6 @@ def task(pj, cpu):
 	pj.set_label(0xfbdc, "DIAG_FOCUS()")
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj)
 
 if __name__ == '__main__':

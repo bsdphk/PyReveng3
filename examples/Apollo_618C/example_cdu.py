@@ -80,8 +80,6 @@ def task(pj, cx):
 		pass
 
 
-	code.lcmt_flows(pj)
-
 	#######################################################################
 	def cmd_func(a1, a2, n):
 		pj.set_label(a1, "DO_CMD%d" % n)
@@ -145,7 +143,6 @@ def task(pj, cx):
 	#######################################################################
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 3)
 
 if __name__ == '__main__':

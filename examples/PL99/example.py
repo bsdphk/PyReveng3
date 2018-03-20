@@ -530,7 +530,6 @@ def task(pj, cx):
 	pj.set_label(0xf9, "ON_KEY")
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol=4)
 
 if __name__ == '__main__':

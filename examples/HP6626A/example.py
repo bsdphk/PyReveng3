@@ -611,7 +611,6 @@ def task(pj, cpu):
 	# discover.Discover(pj, cpu)
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj)
 
 if __name__ == '__main__':

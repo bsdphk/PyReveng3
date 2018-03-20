@@ -289,7 +289,6 @@ def task(pj, cx):
 		pj.set_label(0xa000 + a, "IEEE488_R%d" % a)
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 3)
 
 if __name__ == '__main__':

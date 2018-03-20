@@ -262,7 +262,6 @@ def task(pj, cx):
 
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 4)
 
 if __name__ == '__main__':

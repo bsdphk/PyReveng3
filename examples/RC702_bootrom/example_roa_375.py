@@ -77,7 +77,6 @@ def task(pj, cx):
 	pj.set_label(0x7068, "memcpy(BC, DE,  L)")
 
 def output(pj):
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 3)
 
 if __name__ == '__main__':

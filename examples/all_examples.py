@@ -52,6 +52,5 @@ for i in l:
 	y = importlib.import_module(j[0] + "." + k)
 	pj, cx = y.setup()
 	y.task(pj, cx)
-	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol = 8, fn = "_output/" + pj.name + ".txt")
 	sys.stdout.flush()
