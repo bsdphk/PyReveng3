@@ -74,12 +74,12 @@ SEI     -       |0F     | {
 }
 SBA     -       |10     | {
     %0 = sub i8 %A, %B
-    FLG UUAAAA %0 - %A %B
+    FLG UUAAAA %0 sub %A %B
     %A = i8 %0
 }
 CBA     -       |11     | {
     %0 = sub i8 %A, %B
-    FLG UUAAAA %0 - %A %B
+    FLG UUAAAA %0 sub %A %B
 }
 TAB     -       |16     | {
     %B = i8 %A
@@ -90,11 +90,20 @@ TBA     -       |17     | {
     FLG UUAARU %A
 }
 DAA     -       |19     | {
-    daa i8 %A
+    %0 = and i8 %A, 0x0f
+    %1 = icmp ugt i8 %0 , 0x09
+    %2 = or i1 %1, %H
+    %3 = select i1 %2, i8 0x06, i8 0x00
+    %4 = add i8 %A, %3
+    %5 = icmp ugt i8 %4 , 0x99
+    %6 = or i1 %5, %C
+    %7 = select i1 %6, i8 0x60, i8 0x00
+    %A = add i8 %4, %7
+    %C = or i1 %C , %6
 }
 ABA     -       |1B     | {
     %0 = add i8 %A, %B
-    FLG AUAAAA %0 + %A %B
+    FLG AUAAAA %0 add %A %B
     %A = i8 %0
 }
 
@@ -249,20 +258,20 @@ SWI     -       |3F     | {
 ### NEG
 NEG     ACC     |0 1 0|A|0 0 0 0| {
     %0 = sub i8 0, ACC
-    FLG UUAA12 %0 - 0 ACC
+    FLG UUAAA2 %0 sub 0 ACC
     ACC = i8 %0
 }
 NEG     e       |70     | e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = sub i8 0, %0
-    FLG UUAA12 %0 - 0 %0
+    FLG UUAAA2 %0 sub 0 %0
     store i8 %1, i8* ED
 }
 NEG     x       |60     | x             | {
     %0 = add i16 %X, i16 X
     %1 = load i8, i8* %0
     %2 = sub i8 0, %1
-    FLG UUAA12 %0 - 0 %1
+    FLG UUAAA2 %0 sub 0 %1
     store i8 %2, i8* %0
 }
 
@@ -383,40 +392,40 @@ ROL     x       |69     | x             | {
 ### DEC
 DEC     ACC     |0 1 0|A|1 0 1 0| {
     %0 = sub i8 ACC, 1
-    FLG UUAA4U %0 - ACC 1
+    FLG UUAAAU %0 sub ACC 1
     ACC = i8 %0
 }
 DEC     e       |7A     | e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = sub i8 %0, 1
-    FLG UUAA4U %1 - %0 1
+    FLG UUAAAU %1 sub %0 1
     store i8 %1, i8* ED
 }
 DEC     x       |6A     | x             | {
     %1 = add i16 %X, i16 X
     %2 = load i8, i8* %1
     %3 = sub i8 %2, 1
-    FLG UUAA4U %3 - %2 1
+    FLG UUAAAU %3 sub %2 1
     store i8 %3, i8* %1
 }
 
 ### INC
 INC     ACC     |0 1 0|A|1 1 0 0| {
     %0 = add i8 ACC, 1
-    FLG UUAA4U %0 + ACC 1
+    FLG UUAAAU %0 add ACC 1
     ACC = i8 %0
 }
 INC     e       |7C     | e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = add i8 %0, 1
-    FLG UUAA4U %1 + %0 1
+    FLG UUAAAU %1 add %0 1
     store i8 %1, i8* ED
 }
 INC     x       |6C     | x             | {
     %1 = add i16 %X, i16 X
     %2 = load i8, i8* %1
     %3 = add i8 %2, 1
-    FLG UUAA4U %3 + %2 1
+    FLG UUAAAU %3 add %2 1
     store i8 %3, i8* %1
 }
 
@@ -454,25 +463,25 @@ CLR     x       |6F     | x             | {
 SUB     ACC,d   |1|A|0 1 0 0 0 0| d             | {
     %0 = load i8, i8* D
     %1 = sub i8 ACC, %0
-    FLG UUAAAA %1 - ACC %0
+    FLG UUAAAA %1 sub ACC %0
     ACC = i8 %1
 }
 SUB     ACC,e   |1|A|1 1 0 0 0 0| e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = sub i8 ACC, %0
-    FLG UUAAAA %1 - ACC %0
+    FLG UUAAAA %1 sub ACC %0
     ACC = i8 %1
 }
 SUB     ACC,i   |1|A|0 0 0 0 0 0| i             | {
     %0 = sub i8 ACC, IM
-    FLG UUAAAA %0 - ACC IM
+    FLG UUAAAA %0 sub ACC IM
     ACC = i8 %0
 }
 SUB     ACC,x   |1|A|1 0 0 0 0 0| x             | {
     %0 = add i16 %X, i16 X
     %1 = load i8, i8* %0
     %2 = sub i8 ACC, %1
-    FLG UUAAAA %2 - ACC %1
+    FLG UUAAAA %2 sub ACC %1
     ACC = i8 %2
 }
 
@@ -480,40 +489,48 @@ SUB     ACC,x   |1|A|1 0 0 0 0 0| x             | {
 CMP     ACC,d   |1|A|0 1 0 0 0 1| d             | {
     %0 = load i8, i8* D
     %1 = sub i8 ACC, %0
-    FLG UUAAAA %1 - ACC %0
+    FLG UUAAAA %1 sub ACC %0
 }
 CMP     ACC,e   |1|A|1 1 0 0 0 1| e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = sub i8 ACC, %0
-    FLG UUAAAA %1 - ACC %0
+    FLG UUAAAA %1 sub ACC %0
 }
 CMP     ACC,i   |1|A|0 0 0 0 0 1| i             | {
     %0 = sub i8 ACC, IM
-    FLG UUAAAA %0 - ACC IM
+    FLG UUAAAA %0 sub ACC IM
 }
 CMP     ACC,x   |1|A|1 0 0 0 0 1| x             | {
     %1 = add i16 %X, i16 X
     %2 = load i8, i8* %1
     %3 = sub i8 ACC, %2
-    FLG UUAAAA %3 - ACC %2
+    FLG UUAAAA %3 sub ACC %2
 }
 
 ### SBC
 SBC     ACC,d   |1|A|0 1 0 0 1 0| d             | {
     %0 = load i8, i8* D
-    SBC ACC %0
+    %1 = sub i8 ACC, %0, %C
+    FLG UUAAAA %3 sub ACC %0 %C
+    ACC = i8 %1
 }
 SBC     ACC,e   |1|A|1 1 0 0 1 0| e1            | e2            | {
     %0 = load i8, i8* ED
-    SBC ACC %0
+    %1 = sub i8 ACC, %0, %C
+    FLG UUAAAA %3 sub ACC %0 %C
+    ACC = i8 %1
 }
 SBC     ACC,i   |1|A|0 0 0 0 1 0| i             | {
-    SBC ACC IM
+    %0 = sub i8 ACC, IM, %C
+    FLG UUAAAA %3 sub ACC %0 %C
+    ACC = i8 %0
 }
 SBC     ACC,x   |1|A|1 0 0 0 1 0| x             | {
     %0 = add i16 %X, i16 X
     %1 = load i8, i8* %0
-    SBC ACC %1
+    %2 = sub i8 ACC, %1, %C
+    FLG UUAAAA %3 sub ACC %1 %C
+    ACC = i8 %2
 }
 
 ### AND
@@ -604,19 +621,27 @@ EOR     ACC,x   |1|A|1 0 1 0 0 0| x             | {
 ### ADC
 ADC     ACC,d   |1|A|0 1 1 0 0 1| d             | {
     %0 = load i8, i8* D
-    ADC ACC %0
+    %1 = add i8 ACC, %0, %C
+    FLG AUAAAA %1 add ACC %0 %C
+    ACC = i8 %1
 }
 ADC     ACC,e   |1|A|1 1 1 0 0 1| e1            | e2            | {
     %0 = load i8, i8* ED
-    ADC ACC %0
+    %1 = add i8 ACC, %0, %C
+    FLG AUAAAA %1 add ACC %0 %C
+    ACC = i8 %1
 }
 ADC     ACC,i   |1|A|0 0 1 0 0 1| i             | {
-    ADC ACC IM
+    %0 = add i8 ACC, IM, %C
+    FLG AUAAAA %0 add ACC IM %C
+    ACC = i8 %0
 }
 ADC     ACC,x   |1|A|1 0 1 0 0 1| x             | {
     %0 = add i16 %X, i16 X
     %1 = load i8, i8* %0
-    ADC ACC %1
+    %2 = add i8 ACC, %1, %C
+    FLG AUAAAA %2 add ACC %1 %C
+    ACC = i8 %2
 }
 
 ### ORA
@@ -645,25 +670,25 @@ ORA     ACC,x   |1|A|1 0 1 0 1 0| x             | {
 ADD     ACC,d   |1|A|0 1 1 0 1 1| d             | {
     %0 = load i8, i8* D
     %1 = add i8 ACC, %0
-    FLG AUAAAA %1 + ACC %0
+    FLG AUAAAA %1 add ACC %0
     ACC = i8 %1
 }
 ADD     ACC,e   |1|A|1 1 1 0 1 1| e1            | e2            | {
     %0 = load i8, i8* ED
     %1 = add i8 ACC, %0
-    FLG AUAAAA %1 + ACC %0
+    FLG AUAAAA %1 add ACC %0
     ACC = i8 %1
 }
 ADD     ACC,i   |1|A|0 0 1 0 1 1| i             | {
     %0 = add i8 ACC, IM
-    FLG AUAAAA %0 + ACC IM
+    FLG AUAAAA %0 add ACC IM
     ACC = i8 %0
 }
 ADD     ACC,x   |1|A|1 0 1 0 1 1| x             | {
     %1 = add i16 %X, i16 X
     %2 = load i8, i8* %1
     %3 = add i8 ACC, %2
-    FLG AUAAAA %3 + ACC %2
+    FLG AUAAAA %3 add ACC %2
     ACC = i8 %3
 }
 
@@ -687,22 +712,22 @@ STA     ACC,x   |1|A|1 0 0 1 1 1| x             | {
 CPX     d       |9C     | d             | {
     %0 = load i16, i16* D
     %1 = sub i16 %X, %0
-    FLG UU1A2U %1
+    FLG UU1A8U %1
 }
 CPX     e       |BC     | e1            | e2            | {
     %0 = load i16, i16* ED
     %1 = sub i16 %X, %0
-    FLG UU1A2U %1
+    FLG UU1A8U %1
 }
 CPX     I       |8C     | I1            | I2            | {
     %0 = sub i16 %X, II
-    FLG UU1A2U %0
+    FLG UU1A8U %0
 }
 CPX     x       |AC     | x             | {
     %0 = add i16 %X, i16 X
     %1 = load i16, i16* %0
     %2 = sub i16 %X, %1
-    FLG UU1A2U %2
+    FLG UU1A8U %2
 }
 
 ### LDS
@@ -834,17 +859,6 @@ class mc6800_ins(assy.Instree_ins):
     def pilmacro_X(self):
         return "0x%02x" % self['x']
 
-    def pilfunc_ADC(self, arg):
-        self.add_il([
-	    "%0 = add i8 " + arg[0] + ", " + arg[1] + ", %C",
-	    "%C = addcy i1 " + arg[0] + ", " + arg[1] + ", %C",
-            arg[0] + '= i8 %0',
-            "%H = i1 undef",
-            "%V = i1 undef",
-            "%N = trunc i8 " + arg[0] + " to i1",
-            "%Z = icmp eq i8 " + arg[0] + ", 0",
-        ])
-
     def pilfunc_FLG(self, arg):
         p = arg[0]
         if arg[1] in ("%S", "%X"):
@@ -861,14 +875,34 @@ class mc6800_ins(assy.Instree_ins):
                 self.add_il(["%" + i + " = i1 0"])
             elif a == 'S':
                 self.add_il(["%" + i + " = i1 1"])
-            elif i == 'C':
-                assert len(arg) == 5
-                assert arg[2] in ('-', '+')
-                self.add_il(["%" + i + '= i1 undef'])
-            elif i == 'H':
-                self.add_il(["%" + i + '= i1 undef'])
-            elif i == 'V':
-                self.add_il(["%" + i + '= i1 undef'])
+            elif i == 'C' and a == 'A':
+                assert len(arg) >= 5
+                assert arg[2] in ('add', 'sub')
+                self.add_il([
+                    "%C = " + arg[2] + '.cy i1 ' + ",".join(arg[3:])
+                ])
+            elif i == 'C' and a == '2':
+                self.add_il([
+                    "%C = icmp eq i8 " + arg[1] + ' , 0'
+                ])
+            elif i == 'H' and a == 'A':
+                assert len(arg) >= 5
+                assert arg[2] in ('add', 'sub')
+                self.add_il([
+                    "%H = " + arg[2] + '.hcy i1 ' + ",".join(arg[3:])
+                ])
+            elif i == 'V' and a == 'A':
+                assert arg[2] in ('add', 'sub')
+                self.add_il([
+                    "%V = " + arg[2] + '.ofl i1 ' + ",".join(arg[3:])
+                ])
+            elif i == 'V' and a == '6':
+                self.add_il([
+                    "%V = or i1 %C , %N"
+                ])
+            elif i == 'V' and a == '8':
+                # XXX Overflow from Low byte subtraction in CPX ?
+                self.add_il(["%V = i1 undef"])
             elif i == 'Z' and a == 'A':
                 self.add_il([
                     "%Z = icmp eq i8 " + arg[1] + ", 0",
@@ -879,7 +913,7 @@ class mc6800_ins(assy.Instree_ins):
                     "%N = trunc " + isz + " %0 to i1",
                 ])
             elif a != 'U':
-                print(i, a, arg, self)
+                print("MC6800_FLG", i, a, arg, self)
                 self.add_il(["%" + i + '= i1 undef'])
 
 
