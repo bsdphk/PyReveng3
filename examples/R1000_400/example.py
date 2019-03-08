@@ -77,6 +77,8 @@ def inline_text(pj, ins):
 		0x80002aa8,
 	):
 		return
+	if ins.lo == 0x8000001c:
+		return
 	y = data.Txt(pj, ins.hi, label=False)
 	pj.todo(y.hi, ins.lang.disass)
 
@@ -106,6 +108,11 @@ def task(pj, cpu):
 		0x80002a24,
 		0x80002a2c,
 		0x800033ce,
+		0x80003690,
+		0x80004afe,
+		0x80004b42,
+		0x80004b68,
+		0x80007e0b,
 	):
 		data.Txt(pj, a, label=False)
 
@@ -114,8 +121,12 @@ def task(pj, cpu):
 			y = data.Txt(pj, a, label=False, align=align)
 			a = y.hi
 
+	txts(0x800010cc, 0x80001122)
+	txts(0x80001bb0, 0x80001bc2)
 	txts(0x8000221c, 0x800024a8)
 	txts(0x80002c14, 0x80002e04, align=1)
+	txts(0x80004ece, 0x80004fbf, align=1)
+	txts(0x800027ee, 0x800028ca, align=1)
 
 	for a in (
 		0x8000000c,
@@ -127,6 +138,15 @@ def task(pj, cpu):
 		0x800001f6,
 		0x80000208,
 		0x8000021a,
+		0x80001524,
+		0x80001566,
+		0x800015a8,
+		0x80001628,
+		0x800016c2,
+		0x800027ca,
+		0x80002bbe,
+		0x80002bc4,
+		0x800040a0,
 	):
 		pj.todo(a, cpu.disass)
 
@@ -149,19 +169,23 @@ def task(pj, cpu):
 		w >>= 4
 		w &= 0xffe
 		d = 0x800043aa + w
-		print("TBL %08x" % a, "%x" % w, "%x" % d)
 		pj.todo(d, cpu.disass)
 
 
 	for a in range(0x80004a7a, 0x80004a98, 4):
 		d = pj.m.bu32(a)
 		data.Dataptr(pj, a, a + 4, d)
-		data.Txt(pj, d)
+		data.Txt(pj, d, align=1)
 
 	for a in range(0x800036e8, 0x800036fc, 4):
 		d = pj.m.bu32(a)
 		data.Dataptr(pj, a, a + 4, d)
 		data.Txt(pj, d)
+
+	data.Const(pj, 0x80001ffa, 0x80002000)
+	data.Const(pj, 0x80003ffa, 0x80004000)
+	data.Const(pj, 0x80005ffa, 0x80006000)
+	data.Const(pj, 0x80007dfa, 0x80007e00)
 
 	while pj.run():
 		pass
@@ -173,4 +197,5 @@ def task(pj, cpu):
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
+	code.lcmt_flows(pj)
 	listing.Listing(pj, ncol=8, pil=False)
