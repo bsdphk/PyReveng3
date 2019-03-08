@@ -354,11 +354,11 @@ class byte_mem(word_mem):
 			self.wr(first, i)
 			first += step
 
-	def load_binfile(self, first, step, filename):
+	def load_binfile(self, first, step, filename, lo=0, hi=-1):
 		fi = open(filename, "rb")
 		d = bytearray(fi.read())
 		fi.close()
-		self.load_data(first, step, d)
+		self.load_data(first, step, d[lo:hi])
 
 	def render(self, pj, lo, hi):
 		"""
