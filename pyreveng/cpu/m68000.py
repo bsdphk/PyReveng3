@@ -369,10 +369,6 @@ EXTW		L,Dn		0000	|0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  | {
 	DN = exts i16 DN to i32
 	STDF4 DN
 }
-EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  | {
-	DN = exts i8 DN to i32
-	STDF4 DN
-}
 # 211/4-107
 iLLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
 # 212/4-108
@@ -1028,7 +1024,10 @@ class m68000_ins(assy.Instree_ins):
 		    "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
 	def assy_ea(self, pj):
-		j = self['ea']
+		try:
+			j = self['ea']
+		except KeyError:
+			raise assy.Invalid("0x%x no EA?" % self.lo)
 		return self.assy_eax(pj, "s", j >> 3, j & 7)
 
 	def assy_ead(self, pj):
@@ -1438,3 +1437,10 @@ class m68000(assy.Instree_disass):
 			else:
 				pj.set_label(i, "VECTORS_%d" % mv)
 				mv += 1
+
+	def codeptr(self, pj, adr):
+		t = pj.m.bu32(adr)
+		c = data.Codeptr(pj, adr, adr + 4, t)
+		pj.todo(t, self.disass)
+		return c
+
