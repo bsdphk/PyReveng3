@@ -173,9 +173,9 @@ class Decode(object):
 		y = pj.find(adr)
 		if len(y) > 0:
 			return y
-		x = self.decode(pj, adr)
+		x,err = self.decode(pj, adr)
 		if x is None:
-			print(pj.afmt(adr) + ": disass(%s) failed" % self.name)
+			print(pj.afmt(adr) + ": disass(%s) failed" % self.name, err)
 		else:
 			assert isinstance(x, Code)
 			self.commit(pj, x)

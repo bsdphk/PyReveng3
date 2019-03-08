@@ -281,6 +281,7 @@ class Insmatch(object):
 		self.adr = adr
 		self.len = pil.words * up.width // up.memwidth
 		self.flds = {}
+		self.il = None
 		for i in pil.flds:
 			self.flds[i] = pil.get_field(i, self.words)
 
@@ -298,8 +299,9 @@ class Insmatch(object):
 		s += " @0x%x:" % self.adr
 		s += "0x%x" % (self.adr + self.len)
 		s += " " + " ".join(self.assy)
-		for i in self.il.flds:
-			s += " | " + i + "=" + str(self.__dict__["F_" + i])
+		if self.il:
+			for i in self.il.flds:
+				s += " | " + i + "=" + str(self.__dict__["F_" + i])
 		s += ">"
 		return s
 

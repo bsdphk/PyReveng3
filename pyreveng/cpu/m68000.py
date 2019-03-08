@@ -724,6 +724,8 @@ class m68000_ins(assy.Instree_ins):
 		self.ea = {}
 		self.isz = "i32"
 		self.icache = {}
+		self.ea_fullext = lang.ea_fullext
+		self.ea_scale = lang.ea_scale
 
 	def subr_rlist(self):
 		v = self['rlist']
@@ -830,6 +832,8 @@ class m68000_ins(assy.Instree_ins):
 		elif x == 0xff:
 			self.dstadr = self.hi + pj.m.bs32(self.hi)
 			self.hi += 4
+		elif x & 0x01:
+			raise assy.Invalid("Odd numbered destination address")
 		elif x & 0x80:
 			self.dstadr = self.hi + x - 0x100
 		else:
@@ -848,16 +852,43 @@ class m68000_ins(assy.Instree_ins):
 		iltyp = self.isz + "*"
 		ll = [None]
 		ew = pj.m.bu16(self.hi)
-
-		if ew & 0x100:
-			print("0x%x FULL EXT WORD" % self.lo, self)
-			raise assy.Invalid("FULL EXT WORD")
-
-		if ew & 0x600:
-			print("0x%x Non-zero SCALE" % self.lo, self)
-			raise assy.Invalid("BAD BRIEF EXT WORD")
-
 		self.hi += 2
+
+		if ew & 0x100 and not self.ea_fullext:
+			raise assy.Invalid("Full extension word")
+
+		if ew & 0x600 and not self.ea_scale:
+			raise assy.Invalid("Non-zero scale in extension word")
+
+		basedisp = 0
+		outherdisp = 0
+		nobase = 0
+		noidx = 0
+		if ew & 0x100:
+			# Full extension word
+			bd = (ew >> 4) & 3
+			if bd == 2:
+				basedisp = pj.m.bu16(self.hi)
+				self.hi += 2
+			elif bd == 3:
+				basedisp = pj.m.bu32(self.hi)
+				self.hi += 4
+
+			IS = (ew >> 6) & 1
+			IIS = (ew & 7)
+			if (IIS & 2) and (not IS or IIS < 4):
+				if ew & 1:
+					outherdisp = pj.m.bu32(self.hi)
+					self.hi += 4
+				else:
+					outherdisp = pj.m.bu16(self.hi)
+					self.hi += 2
+		else:
+			basedisp = ew & 0xff
+			if basedisp & 0x80:
+				basedisp -= 0x100
+
+		scale = (ew >> 9) & 3
 
 		if ew & 0x8000:
 			reg = "A"
@@ -883,27 +914,22 @@ class m68000_ins(assy.Instree_ins):
 			wl = ".W"
 		ll[0] = "%2"
 
-		scl = (ew >> 9) & 3
-		sc = 1 << scl
-		if scl != 0:
+		if scale != 0:
 			ll.append(
-				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scl]
+				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
 			)
 			ll[0] = "%3"
 
-		d = ew & 0xff
-		if d & 0x80:
-			d -= 0x100
-		if d > 0:
+		if basedisp > 0:
 			ll.append(
 				["%4", "=", "add", iltyp, ll[0], ",",
-				    "0x%x" % d]
+				    "0x%x" % basedisp]
 			)
 			ll[0] = "%4"
-		if d < 0:
+		if basedisp < 0:
 			ll.append(
 				["%4", "=", "sub", iltyp, ll[0], ",",
-				    "0x%x" % -d]
+				    "0x%x" % -basedisp]
 			)
 			ll[0] = "%4"
 
@@ -914,16 +940,18 @@ class m68000_ins(assy.Instree_ins):
 
 		s = "("
 		if ref == "PC":
-			s += "#0x%x" % (d + self.hi - 2)
-		elif d != 0:
-			s += "#0x%x+" % d + ref
+			s += "#0x%x" % (basedisp + self.hi - 2)
+		elif basedisp != 0:
+			s += "#0x%x+" % basedisp + ref
 		else:
 			s += ref
 		s += "+" + reg + wl
-		if sc > 1:
-			s += "*%d" % sc
+		if scale:
+			s += "*%d" % (1 << scale)
 		s += ")"
 		il += [ll[0], ll[1:]]
+		if outherdisp:
+			s += " {XXX: outherdisp=0x%x} " % outherdisp
 		return s
 
 
@@ -935,9 +963,8 @@ class m68000_ins(assy.Instree_ins):
 			eax = 0x100 << ear
 		eamask = int(self.im.assy[-1], 16)
 		if not eax & eamask:
-			print ("0x%x Wrong EA mode m=%d/r=%d" % (self.lo, eam, ear))
 			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
-			    self.lo, eam, ear))
+			    self.lo, eam, ear), self.im)
 		if eax == 0x0001:
 			il += ["%%D%d" % ear]
 			return "D%d" % ear
@@ -1019,15 +1046,14 @@ class m68000_ins(assy.Instree_ins):
 			self.hi += 4
 			il += ["0x%x" % v]
 			return "#0x%08x" % v
-		print("0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 		raise assy.Invalid(
 		    "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
 	def assy_ea(self, pj):
 		try:
 			j = self['ea']
-		except KeyError:
-			raise assy.Invalid("0x%x no EA?" % self.lo)
+		except KeyError as e:
+			raise assy.Invalid("0x%x no EA?" % self.lo, e, self.lim)
 		return self.assy_eax(pj, "s", j >> 3, j & 7)
 
 	def assy_ead(self, pj):
@@ -1063,7 +1089,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def assy_Z(self, pj):
 		if self['sz'] == 3:
-			raise assy.Invalid('0x%x F_sz == 3' % self.lo)
+			raise assy.Invalid('0x%x F_sz == 3' % self.lo, self.lim)
 		i, j, m = [
 			[1, ".B", 0xff],
 			[2, ".W", 0xffff],
@@ -1372,6 +1398,8 @@ class m68000(assy.Instree_disass):
 		self.il = None
 		self.myleaf = m68000_ins
 		self.verbatim |= set(["CCR", "SR", "USP"])
+		self.ea_fullext = False
+		self.ea_scale = False
 
 	def set_adr_mask(self, a):
 		self.amask = a

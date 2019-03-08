@@ -192,18 +192,20 @@ class Instree_disass(code.Decode):
 		if l is None:
 			l = []
 		y = None
+		err = None
 		for x in self.it.find(pj, adr):
 			l.append(x)
 			try:
 				y = self.myleaf(pj, l, self)
 				y.parse(pj)
-			except Invalid:
+			except Invalid as e:
+				err = '0x%x %s' % (adr, str(e))
 				y = None
 				l.pop(-1)
 				continue
 			if not y.prefix:
 				break
-			y = self.decode(pj, adr + x.len, l)
+			y,err = self.decode(pj, adr + x.len, l)
 			if y != None:
 				return y
 			l.pop(-1)
@@ -215,7 +217,7 @@ class Instree_disass(code.Decode):
 				y.pildefault()
 			for i in self.flow_check:
 				i(pj, y)
-		return y
+		return y, err
 
 
 #######################################################################

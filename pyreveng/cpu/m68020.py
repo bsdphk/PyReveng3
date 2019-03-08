@@ -38,13 +38,24 @@ from pyreveng.cpu.m68010 import *
 
 m68020_instructions = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
+
+# 141/4.37
+BFEXTS		L,ea,Dn,XXX	f75	|1 1 1 0 1 0 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+
+# 144/4.40
+BFEXTU		L,ea,Dn,XXX	f75	|1 1 1 0 1 0 0 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+
+# 150/4.46
+BFINS 		L,Dn,ea,XXX	375	|1 1 1 0 1 1 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+
+
 # 196/4.92
-DIVS.L          ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 1| eam | ear |0| Dy  |1|0|0 0 0 0 0 0 0| Dx  |
-DIVSL.L         ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 1| eam | ear |0| Dy  |1|1|0 0 0 0 0 0 0| Dx  |
+DIVS		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 1| ea        |0| Dy  |1|0|0 0 0 0 0 0 0| Dx  |
+DIVSL		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 1| ea        |0| Dy  |1|1|0 0 0 0 0 0 0| Dx  |
 
 # 200/4.96
-DIVU.L          ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 1| eam | ear |0| Dy  |0|0|0 0 0 0 0 0 0| Dx  |
-DIVUL.L         ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 1| eam | ear |0| Dy  |0|1|0 0 0 0 0 0 0| Dx  |
+DIVU		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 1| ea        |0| Dy  |0|0|0 0 0 0 0 0 0| Dx  |
+DIVUL		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 1| ea        |0| Dy  |0|1|0 0 0 0 0 0 0| Dx  |
 
 # 210/4.106
 EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  | {
@@ -53,12 +64,12 @@ EXTB		L,Dn		0000	|0 1 0 0|1 0 0|1 1 1|0 0 0| Dn  | {
 }
 
 # 239/4.135
-MULS.L          ea,Dy           1f7d    |0 1 0 0 1 1 0 0 0 0| eam | ear |0| Dy  |1|0|0 0 0 0 0 0 0| Dx  |
-mULS.L          ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 0| eam | ear |0| Dy  |1|1|0 0 0 0 0 0 0| Dx  |
+MULS		L,ea,Dy		1f7d    |0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |1|0|0 0 0 0 0 0 0| Dx  |
+mULS		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |1|1|0 0 0 0 0 0 0| Dx  |
 
 # 242/4.138
-mULU.L          ea,Dy           1f7d    |0 1 0 0 1 1 0 0 0 0| eam | ear |0| Dy  |0|0|0 0 0 0 0 0 0| Dx  |
-mULU.L          ea,Dx,Dy        1f7d    |0 1 0 0 1 1 0 0 0 0| eam | ear |0| Dy  |0|1|0 0 0 0 0 0 0| Dx  |
+mULU		L,ea,Dy		1f7d    |0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |0|0|0 0 0 0 0 0 0| Dx  |
+mULU		L,ea,Dx,Dy	1f7d	|0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |0|1|0 0 0 0 0 0 0| Dx  |
 
 
 """
@@ -75,3 +86,5 @@ class m68020(m68010):
 		super().__init__(lang)
 		self.it.load_string(m68020_instructions)
 		self.myleaf = m68020_ins
+		self.ea_fullext = True
+		self.ea_scale = True

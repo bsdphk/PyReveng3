@@ -46,11 +46,10 @@ mOVEC           An,Rc           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|1|1| An  
 
 # 478/6.24
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
-MOVES.Z         ea,Dn           037c    |0 0 0 0|1 1 1 0| sz| eam | ear |0| Dn  |0|0 0 0 0 0 0 0 0 0 0 0|
-MOVES.Z         Dn,ea           037c    |0 0 0 0|1 1 1 0| sz| eam | ear |0| An  |1|0 0 0 0 0 0 0 0 0 0 0|
-MOVES.Z         ea,An           037c    |0 0 0 0|1 1 1 0| sz| eam | ear |1| Dn  |0|0 0 0 0 0 0 0 0 0 0 0|
-MOVES.Z         An,ea           037c    |0 0 0 0|1 1 1 0| sz| eam | ear |1| An  |1|0 0 0 0 0 0 0 0 0 0 0|
-
+MOVES		Z,ea,Dn		037c	|0 0 0 0|1 1 1 0| sz| ea        |0| Dn  |0|0 0 0 0 0 0 0 0 0 0 0|
+MOVES		Z,Dn,ea		037c	|0 0 0 0|1 1 1 0| sz| ea        |0| An  |1|0 0 0 0 0 0 0 0 0 0 0|
+MOVES		Z,ea,An		037c	|0 0 0 0|1 1 1 0| sz| ea        |1| Dn  |0|0 0 0 0 0 0 0 0 0 0 0|
+MOVES		Z,An,ea		037c	|0 0 0 0|1 1 1 0| sz| ea        |1| An  |1|0 0 0 0 0 0 0 0 0 0 0|
 
 """
 
