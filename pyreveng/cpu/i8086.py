@@ -518,8 +518,7 @@ class i8086(assy.Instree_disass):
 		self.myleaf = i8086_ins
 
 	def has_8087(self):
-		self.it.load_string(i8087_instructions)
-		self.myleaf = i808687_ins
+		self.it.load_string(i8087_instructions, i808687_ins)
 
 	def disass(self, pj, adr):
 		y = pj.find(adr, self.name)

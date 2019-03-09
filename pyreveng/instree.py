@@ -119,18 +119,19 @@ def parse_match(fmt):
 #######################################################################
 # A single entry from the specification
 
-class Insline():
-	def __init__(self, wordsize, assy, bits, pilspec=None):
+class InsLine():
+	def __init__(self, wordsize, assy, bits, pilspec=None, handler=None):
 		self.assy = assy.split()
 		self.bits = bits
 		self.pilspec = pilspec
+		self.handler = handler
 
 		s = bits.split("|")
 		s.pop(0)
 		s.pop(-1)
 
 		b = 0
-		f = list()
+		fspec = list()
 		for i in s:
 			w, fm, fb = parse_match(i)
 			if fm is None and len(i.split()) != 1:
@@ -145,7 +146,7 @@ class Insline():
 				raise SyntaxTrouble(assy,
 				    "Field from bit %d spans words:\n" % b +
 				    "\t|%s|\n" % i)
-			f.append((b, w, i, fm, fb))
+			fspec.append((b, w, i, fm, fb))
 			b += w
 
 		if b % wordsize != 0:
@@ -153,14 +154,17 @@ class Insline():
 			    "Missing bits to fill wordsize\n" +
 			    "\t%s\n" % bits)
 
-		# self.wordsize = b
 		self.words = b // wordsize
 
 		self.mask = [0] * self.words
 		self.bits = [0] * self.words
 		self.flds = dict()
 
-		for b, w, i, fm, fb in f:
+		self.init_fields(wordsize, fspec)
+
+	def init_fields(self, wordsize, fspec):
+
+		for b, w, i, fm, fb in fspec:
 			j = b // wordsize
 			o = (10 * wordsize - (b + w)) % wordsize
 			#print("B", b, "W", w, "I", i, "J", j, "O", o, "X", x)
@@ -170,15 +174,11 @@ class Insline():
 				self.mask[j] |= fm << o
 				self.bits[j] |= fb << o
 
-
 	def get_field(self, fld, words):
 		if fld not in self.flds:
-			raise UsageTrouble(
-			   "In %s:\n" % self.assy +
-			   "    No field '%s'\n" % fld)
+			raise UsageTrouble('In %s:\n' % self.assy + '    No field "%s"\n' % fld)
 		x = self.flds[fld]
-		v = (words[x[0]] >> x[1]) & x[2]
-		return v
+		return (words[x[0]] >> x[1]) & x[2]
 
 	def __repr__(self):
 		s = '<InsLine "'
@@ -203,7 +203,7 @@ class Insline():
 #######################################################################
 #  Branch-point
 
-class Insbranch():
+class InsBranch():
 	def __init__(self, lvl):
 		self.lvl = lvl
 		self.t = list()
@@ -229,10 +229,10 @@ class Insbranch():
 				d[xb] = x
 				return
 			y = d[xb]
-			if isinstance(y, Insbranch):
+			if isinstance(y, InsBranch):
 				y.insert(last, x)
 				return
-			z = Insbranch(self.lvl + 1)
+			z = InsBranch(self.lvl + 1)
 			z.insert(last, x)
 			z.insert(last, y)
 			d[xb] = z
@@ -252,7 +252,7 @@ class Insbranch():
 			a.sort()
 			for j in a:
 				y = x[j]
-				if isinstance(y, Insline):
+				if isinstance(y, InsLine):
 					fo.write(pfx + '      =' + fmt % j + '\t' + str(y) + '\n')
 				else:
 					fo.write(pfx + '      =' + fmt % j + ':\n')
@@ -277,9 +277,10 @@ class Insbranch():
 #######################################################################
 #
 
-class Insmatch():
+class InsMatch():
 	def __init__(self, pil, adr, words):
 		self.pil = pil
+		self.handler = pil.handler
 		self.assy = pil.assy
 		self.words = words[0:self.pil.words]
 		self.adr = adr
@@ -329,9 +330,9 @@ class InsTree():
 
 	def __init__(self, wordsize=8):
 		self.wordsize = wordsize
-		self.root = Insbranch(0)
+		self.root = InsBranch(0)
 
-	def load_string(self, s):
+	def load_string(self, s, handler=None):
 		i = 0
 		banned = False
 		s = s.expandtabs()
@@ -380,7 +381,7 @@ class InsTree():
 			j = bm.rfind('{')
 			if j == -1:
 				self.root.insert(last,
-				    Insline(self.wordsize, assy, bm))
+				    InsLine(self.wordsize, assy, bm, handler=handler))
 				continue
 
 			# Isolate tail-part
@@ -396,12 +397,12 @@ class InsTree():
 			banned = True
 
 			self.root.insert(last,
-			    Insline(self.wordsize, assy, bm, tail))
+			    InsLine(self.wordsize, assy, bm, tail, handler=handler))
 
 		assert i == len(s)
 
-	def load_file(self, filename):
-		self.load_string(open(filename).read())
+	def load_file(self, filename, handler=None):
+		self.load_string(open(filename).read(), handler)
 
 	def dump(self, fo=sys.stdout):
 		fmt = "%0" + "%dx" % ((self.wordsize + 3) // 4)
@@ -413,7 +414,7 @@ class InsTree():
 		b = v[lvl]
 
 		for i in r.find(b):
-			if isinstance(i, Insbranch):
+			if isinstance(i, InsBranch):
 				for x in self.dive(pj, adr, lvl + 1, v, getmore, i):
 					yield x
 				continue
@@ -430,7 +431,7 @@ class InsTree():
 	def find(self, pj, adr, getmore):
 		a = []
 		for x in self.dive(pj, adr, 0, a, getmore, self.root):
-			yield Insmatch(x, adr, a)
+			yield InsMatch(x, adr, a)
 
 #######################################################################
 

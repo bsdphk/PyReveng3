@@ -216,7 +216,10 @@ class Instree_disass(code.Decode):
 		for x in self.it.find(pj, adr, getmore=self.getmore):
 			l.append(x)
 			try:
-				y = self.myleaf(pj, l, self)
+				if x.handler is None:
+					y = self.myleaf(pj, l, self)
+				else:
+					y = x.handler(pj, l, self)
 				y.parse(pj)
 			except Invalid as e:
 				err = '0x%x %s' % (adr, str(e))
