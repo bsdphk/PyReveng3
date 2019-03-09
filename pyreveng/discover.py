@@ -86,7 +86,7 @@ class Discover(object):
 		for lx, hx in self.pj.gaps():
 			for adr in range(lx, hx):
 				try:
-					x = self.cx.decode(self.pj, adr)
+					x,e = self.cx.decode(self.pj, adr)
 				except mem.MemError:
 					continue
 				except assy.Invalid:

@@ -163,7 +163,7 @@ class Decode(object):
 
 		Default always fails
 		"""
-		return None
+		return None, "No Decoder"
 
 	def disass(self, pj, adr):
 		"""

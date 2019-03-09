@@ -34,24 +34,27 @@ import glob, os, sys, importlib
 from pyreveng import code, listing
 
 if len(sys.argv) == 1:
-    l = glob.glob("*/example*.py")
+	l = glob.glob("*/example*.py")
 else:
-    l = glob.glob(sys.argv[1] + "/example*.py")
+	l = glob.glob(sys.argv[1] + "/example*.py")
 
 try:
-    os.mkdir("_output")
+	os.mkdir("_output")
 except:
-    pass
+	pass
 
 l.sort()
 
 for i in l:
-    j = i.split("/")
-    k = j[1].replace(".py", "")
-    print(j[0], k)
-    y = importlib.import_module(j[0] + "." + k)
-    pj, cx = y.setup()
-    y.task(pj, cx)
-    listing.Listing(pj, ncol = 8, fn = "_output/" + pj.name + ".asm", pil=False)
-    listing.Listing(pj, ncol = 8, fn = "_output/" + pj.name + ".pil", pil=True)
-    sys.stdout.flush()
+	j = i.split("/")
+	k = j[1].replace(".py", "")
+	print(j[0], k)
+
+	y = importlib.import_module(j[0] + "." + k)
+	pj, cx = y.setup()
+	y.task(pj, cx)
+	listing.Listing(pj, ncol = 8, 
+			fn = "_output/" + pj.name + ".asm", pil=False)
+	listing.Listing(pj, ncol = 8,
+			fn = "_output/" + pj.name + ".pil", pil=True)
+	sys.stdout.flush()

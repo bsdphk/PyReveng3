@@ -35,6 +35,8 @@ def mem_setup():
 	o = 1<<31
 	m = mem.byte_mem(o, o | 0x8000)
 
+	filename=os.path.join(os.path.dirname(__file__), "IOC_EEPROM.bin")
+
 	# The PCB layout swaps the top two address lines to the EEPROM
 	for oo, lo, hi in (
 		(0x0000, 0x0000, 0x2000),
@@ -45,7 +47,7 @@ def mem_setup():
 		m.load_binfile(
 			first = o + oo,
 			step = 0x1,
-			filename="IOC_EEPROM.bin",
+			filename=filename,
 			lo = lo,
 			hi = hi);
 	return m

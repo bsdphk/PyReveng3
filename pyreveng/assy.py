@@ -207,7 +207,7 @@ class Instree_disass(code.Decode):
 				break
 			y,err = self.decode(pj, adr + x.len, l)
 			if y != None:
-				return y
+				return y, None
 			l.pop(-1)
 		if y != None:
 			x = y.im.pil.pilspec
