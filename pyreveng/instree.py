@@ -246,7 +246,7 @@ class Insbranch(object):
 		print(pfx, "[%d]" % self.lvl)
 		for i, x in self.t:
 			print(pfx, "    ", "&" + fmt % i)
-			a = x.keys()
+			a = list(x.keys())
 			a.sort()
 			for j in a:
 				y = x[j]

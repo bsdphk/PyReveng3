@@ -38,10 +38,10 @@ from . import job
 #######################################################################
 
 class Data(job.Leaf):
-	def __init__(self, pj, lo, hi, t="data"):
+	def __init__(self, pj, lo, hi, t="data", fmt=None):
 		super(Data, self).__init__(pj, lo, hi, t)
 		pj.insert(self)
-		self.fmt = None
+		self.fmt = fmt
 
 	def render(self, pj):
 		if self.fmt is None:
