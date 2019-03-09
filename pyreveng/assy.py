@@ -209,11 +209,21 @@ class Instree_disass(code.Decode):
 		v.append(pj.m.bu16(adr + len(v) * 2))
 
 	def decode(self, pj, adr, l=None):
+		hdl = set()
+		hdl.add(None)
 		if l is None:
 			l = []
+		else:
+			for i in l:
+				hdl.add(i.handler)
+			if len(hdl) > 1:
+				hdl.discard(None)
 		y = None
 		err = None
 		for x in self.it.find(pj, adr, getmore=self.getmore):
+			if l and x.handler not in hdl:
+				print("PFX handler", hdl, x.handler, l)
+				continue
 			l.append(x)
 			try:
 				if x.handler is None:

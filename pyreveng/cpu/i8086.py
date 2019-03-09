@@ -341,10 +341,10 @@ i8087_instructions = fixup_mod_reg_rm(i8087_instructions)
 if __name__ == "__main__":
 	print(i8086_instructions)
 	print(i8087_instructions)
-	it = instree.Instree(8)
+	it = instree.InsTree(8)
 	it.load_string(i8086_instructions)
 	it.load_string(i8087_instructions)
-	it.print()
+	it.dump()
 
 wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
 breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
@@ -502,8 +502,8 @@ class i8086_ins(assy.Instree_ins):
 		self['rm'] = 6
 		return self.assy_ea(pj)
 
-class i808687_ins(i8086_ins):
-	pass
+#class i808687_ins(i8086_ins):
+#	pass
 
 	def assy_st(self, pj):
 		return "%%st(%d)" % self['st']
@@ -518,7 +518,8 @@ class i8086(assy.Instree_disass):
 		self.myleaf = i8086_ins
 
 	def has_8087(self):
-		self.it.load_string(i8087_instructions, i808687_ins)
+		#self.it.load_string(i8087_instructions, i808687_ins)
+		self.it.load_string(i8087_instructions)
 
 	def disass(self, pj, adr):
 		y = pj.find(adr, self.name)
