@@ -613,5 +613,4 @@ def task(pj, cpu):
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	output(pj)
 	listing.Listing(pj)

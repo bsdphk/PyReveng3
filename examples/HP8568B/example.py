@@ -58,8 +58,10 @@ from pyreveng import job, mem, listing, data, code, assy, pil
 import pyreveng.cpu.m68000 as m68000
 import pyreveng.cpu.hp85662a as hp85662a
 
-from . import hp856x_cmds
-# import hp856x_cmds
+try:
+	from . import hp856x_cmds
+except:
+	import hp856x_cmds
 
 class mycpu(m68000.m68000):
 	def __init__(self):

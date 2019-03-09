@@ -183,17 +183,39 @@ class Instree_disass(code.Decode):
 		super(Instree_disass, self).__init__(name)
 		if mem_word is None:
 			mem_word = ins_word
-		self.it = instree.Instree(ins_word, mem_word, endian)
+
+		self.ins_word = ins_word
+		self.mem_word = mem_word
+		self.endian = endian
+
+		if ins_word == mem_word:
+			self.getmore = self.getmore_word
+		elif ins_word == 16 and mem_word == 8 and endian == ">":
+			self.getmore = self.getmore_bu16
+		else:
+			raise Exception("XXX: No getmore() [%d/%d/%s]" %
+					(ins_word, mem_word, endian))
+
 		self.flow_check = []
 		self.myleaf = Instree_ins
 		self.verbatim = set()
+		self.it = instree.Instree(
+					  ins_word=ins_word,
+					  mem_word=mem_word
+		)
+
+	def getmore_word(self, pj, adr, v):
+		v.append(pj.m.rd(adr + len(v)))
+
+	def getmore_bu16(self, pj, adr, v):
+		v.append(pj.m.bu16(adr + len(v) * 2))
 
 	def decode(self, pj, adr, l=None):
 		if l is None:
 			l = []
 		y = None
 		err = None
-		for x in self.it.find(pj, adr):
+		for x in self.it.find(pj, adr, getmore=self.getmore):
 			l.append(x)
 			try:
 				y = self.myleaf(pj, l, self)

@@ -136,19 +136,19 @@ class hp85662a(assy.Instree_disass):
 		super(hp85662a, self).__init__(lang, 16, 8, ">")
 		self.myleaf = hp85662a_ins
 
-		self.itc = instree.Instree(16, 8, ">")
+		self.itc = instree.Instree(16, 8)
 		self.itc.load_string(hp85662a_instructions)
 		self.itc.load_string(hp85662a_c_instructions)
 
-		self.itg = instree.Instree(16, 8, ">")
+		self.itg = instree.Instree(16, 8)
 		self.itg.load_string(hp85662a_instructions)
 		self.itg.load_string(hp85662a_g_instructions)
 
-		self.itl = instree.Instree(16, 8, ">")
+		self.itl = instree.Instree(16, 8)
 		self.itl.load_string(hp85662a_instructions)
 		self.itl.load_string(hp85662a_l_instructions)
 
-		self.itv = instree.Instree(16, 8, ">")
+		self.itv = instree.Instree(16, 8)
 		self.itv.load_string(hp85662a_instructions)
 		self.itv.load_string(hp85662a_v_instructions)
 

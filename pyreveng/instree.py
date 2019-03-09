@@ -308,20 +308,11 @@ class Insmatch(object):
 #######################################################################
 
 class Instree(object):
-	def __init__(self, ins_word=8, mem_word=8, endian=None):
+	def __init__(self, ins_word=8, mem_word=8):
 		self.width = ins_word
 		self.memwidth = mem_word
-		self.endian = endian
 		assert self.width % self.memwidth == 0
 		self.root = Insbranch(0)
-		if self.width == self.memwidth:
-			self.gw = self.gw1
-		elif self.width == 16 and self.memwidth == 8:
-			self.gw = self.gw16
-		else:
-			raise UsageTrouble(
-			    "ins_word = %d, mem_word = %d not auto-supported" %
-			    (self.width, self.memwidth))
 
 	def load_string(self, s):
 		i = 0
@@ -399,30 +390,18 @@ class Instree(object):
 		m = "%0" + "%dx" % ((self.width + 3) // 4)
 		self.root.print(m)
 
-	def gw1(self, pj, adr, n):
-		return pj.m.rd(adr + n)
-
-	def gw16(self, pj, adr, n):
-		if self.endian == ">":
-			return pj.m.bu16(adr + n * 2)
-		else:
-			return pj.m.lu16(adr + n * 2)
-
-	def dive(self, pj, adr, lvl, v, r):
-		if len(v) <= lvl:
-			b = self.gw(pj, adr, lvl)
-			v.append(b)
-		else:
-			b = v[lvl]
+	def dive(self, pj, adr, lvl, v, getmore, r):
+		while len(v) <= lvl:
+			getmore(pj, adr, v)
+		b = v[lvl]
 
 		for i in r.find(b):
 			if isinstance(i, Insbranch):
-				for x in self.dive(pj, adr, lvl + 1, v, i):
+				for x in self.dive(pj, adr, lvl + 1, v, getmore, i):
 					yield x
 				continue
-			for j in range(len(v), len(i.mask)):
-				b = self.gw(pj, adr, j)
-				v.append(b)
+			while len(v) < len(i.mask):
+				getmore(pj, adr, v)
 			m = True
 			for j in range(lvl, len(i.mask)):
 				if i.mask[j] & v[j] != i.bits[j]:
@@ -431,9 +410,9 @@ class Instree(object):
 			if m:
 				yield i
 
-	def find(self, pj, adr):
+	def find(self, pj, adr, getmore):
 		a = []
-		for x in self.dive(pj, adr, 0, a, self.root):
+		for x in self.dive(pj, adr, 0, a, getmore, self.root):
 			yield Insmatch(self, x, adr, a)
 
 #######################################################################
