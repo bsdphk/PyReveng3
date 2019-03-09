@@ -88,3 +88,7 @@ class m68020(m68010):
 		self.myleaf = m68020_ins
 		self.ea_fullext = True
 		self.ea_scale = True
+
+if __name__ == '__main__':
+	m = m68020()
+	m.it.dump()

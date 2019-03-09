@@ -687,12 +687,14 @@ class mc6809_ins(assy.Instree_ins):
 				["%0", "=", "add", "i16", r, ",", "%D"],
 			], "%0")
 		elif m == 12 or m == 13:
+			if self.off is None:
+				print("??? No .off", self, self.mne, self.oper)
 			adr = self.add_il([
 				["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
 			], "%0")
 		elif m == 15:
 			if self.off is None:
-				print(self, self.mne, self.oper)
+				print("??? No .off", self, self.mne, self.oper)
 			adr = "0x%04x" % self.off
 		else:
 			return "XXXm%d" % m
@@ -974,3 +976,7 @@ class mc6809(assy.Instree_disass):
 			c = self.codeptr(pj, adr)
 			pj.set_label(c.dst, "VEC" + v)
 			adr += 2
+
+if __name__ == '__main__':
+	m = mc6809()
+	m.it.dump()

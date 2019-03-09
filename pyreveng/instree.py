@@ -25,7 +25,7 @@
 # SUCH DAMAGE.
 
 """
-Instree -- A class for disassembling
+InsTree -- A class for disassembling
 
 This class turns a textual description close to what is typically used
 for documenting CPUs into a skeleton disassembler.
@@ -54,7 +54,7 @@ XXX: wordmap has yet to be implemented
 
 """
 
-from __future__ import print_function
+import sys
 
 class UsageTrouble(Exception):
 	pass
@@ -119,8 +119,8 @@ def parse_match(fmt):
 #######################################################################
 # A single entry from the specification
 
-class Insline(object):
-	def __init__(self, width, assy, bits, pilspec=None):
+class Insline():
+	def __init__(self, wordsize, assy, bits, pilspec=None):
 		self.assy = assy.split()
 		self.bits = bits
 		self.pilspec = pilspec
@@ -141,28 +141,28 @@ class Insline(object):
 				raise SyntaxTrouble(assy,
 				    "Field from bit %d has a half bit:\n" % b +
 				    "\t|%s|\n" % i)
-			if b // width != (b + w - 1) // width:
+			if b // wordsize != (b + w - 1) // wordsize:
 				raise SyntaxTrouble(assy,
 				    "Field from bit %d spans words:\n" % b +
 				    "\t|%s|\n" % i)
 			f.append((b, w, i, fm, fb))
 			b += w
 
-		if b % width != 0:
+		if b % wordsize != 0:
 			raise SyntaxTrouble(assy,
 			    "Missing bits to fill wordsize\n" +
 			    "\t%s\n" % bits)
 
-		self.width = b
-		self.words = b // width
+		# self.wordsize = b
+		self.words = b // wordsize
 
 		self.mask = [0] * self.words
 		self.bits = [0] * self.words
 		self.flds = dict()
 
 		for b, w, i, fm, fb in f:
-			j = b // width
-			o = (10 * width - (b + w)) % width
+			j = b // wordsize
+			o = (10 * wordsize - (b + w)) % wordsize
 			#print("B", b, "W", w, "I", i, "J", j, "O", o, "X", x)
 			if fm is None:
 				self.flds[i.split()[0]] = (j, o, (1 << w) - 1)
@@ -181,27 +181,29 @@ class Insline(object):
 		return v
 
 	def __repr__(self):
-		s = "w%d <" % self.words
-		s += " ".join(self.assy)
-		s += "> <"
+		s = '<InsLine "'
+		s += ' '.join(self.assy)
+		s += '" ['
 		t = ""
 		for i in range(len(self.mask)):
-			s += t + "%02x:%02x" % (self.mask[i], self.bits[i])
+			s += t + '%02x:%02x' % (self.mask[i], self.bits[i])
 			t = ", "
-		s += "> <"
+		s += '] ['
 		t = ""
 		for i in self.flds:
 			j = self.flds[i]
 			s += t + i
-			s += "@%d.%d:%x" % (j[0], j[1], j[2])
+			s += '@%d.%d:%x' % (j[0], j[1], j[2])
 			t = ", "
-		s += ">"
-		return s
+		s += ']'
+		if self.pilspec:
+			s += ' PIL'
+		return s + '>'
 
 #######################################################################
 #  Branch-point
 
-class Insbranch(object):
+class Insbranch():
 	def __init__(self, lvl):
 		self.lvl = lvl
 		self.t = list()
@@ -211,7 +213,7 @@ class Insbranch(object):
 	def insert(self, last, x):
 		#print("?  ", self.lvl, "%02x" % self.mask, x)
 		if len(x.mask) == self.lvl:
-			if self.wildcard != None:
+			if self.wildcard is not None:
 				raise SyntaxTrouble(last,
 				    "Colliding entries:\n" +
 				    "\t" + str(self.wildcard) + "\n" +
@@ -242,21 +244,23 @@ class Insbranch(object):
 		self.t.sort(key=lambda x: -bcount(x[0]))
 		return
 
-	def print(self, fmt="%x", pfx=""):
-		print(pfx, "[%d]" % self.lvl)
+	def dump(self, fo, fmt="%x", pfx=""):
+		fo.write(pfx + '[%d]' % self.lvl + '\n')
 		for i, x in self.t:
-			print(pfx, "    ", "&" + fmt % i)
+			fo.write(pfx + '    &' + fmt % i + '\n')
 			a = list(x.keys())
 			a.sort()
 			for j in a:
 				y = x[j]
 				if isinstance(y, Insline):
-					print(pfx, "      ", "=" + fmt % j, y)
+					fo.write(pfx + '      =' + fmt % j + '\t' + str(y) + '\n')
 				else:
-					print(pfx, "      ", "=" + fmt % j, ":")
-					y.print(fmt, pfx + "        ")
-		if self.wildcard != None:
-			print(pfx, "    ", "*", self.wildcard)
+					fo.write(pfx + '      =' + fmt % j + ':\n')
+					y.dump(fo, fmt, pfx + '        ')
+		if self.wildcard is None:
+			fo.write(pfx + '    *\n')
+			fo.write(pfx + '      =' + '?' * len(fmt % 0) + '\t')
+			fo.write(str(self.wildcard) + '\n')
 
 	def __repr__(self):
 		return "<Branch %d>" % self.lvl
@@ -266,20 +270,19 @@ class Insbranch(object):
 			x = v & i
 			if x in d:
 				yield d[x]
-		if self.wildcard != None:
+		if self.wildcard is not None:
 			yield self.wildcard
 
 
 #######################################################################
 #
 
-class Insmatch(object):
-	def __init__(self, up, pil, adr, words):
+class Insmatch():
+	def __init__(self, pil, adr, words):
 		self.pil = pil
 		self.assy = pil.assy
-		self.words = words
+		self.words = words[0:self.pil.words]
 		self.adr = adr
-		self.len = pil.words * up.width // up.memwidth
 		self.flds = {}
 		self.il = None
 		for i in pil.flds:
@@ -296,9 +299,12 @@ class Insmatch(object):
 
 	def __repr__(self):
 		s = "<InsMatch"
-		s += " @0x%x:" % self.adr
-		s += "0x%x" % (self.adr + self.len)
-		s += " " + " ".join(self.assy)
+		s += " @0x%x: [" % self.adr
+		words = []
+		for i in self.words:
+			words.append("0x%x" % i)
+		s += ", ".join(words)
+		s += "] " + " ".join(self.assy)
 		if self.il:
 			for i in self.il.flds:
 				s += " | " + i + "=" + str(self.__dict__["F_" + i])
@@ -307,11 +313,22 @@ class Insmatch(object):
 
 #######################################################################
 
-class Instree(object):
-	def __init__(self, ins_word=8, mem_word=8):
-		self.width = ins_word
-		self.memwidth = mem_word
-		assert self.width % self.memwidth == 0
+class InsTree():
+
+	'''
+	An Instruction Tree is used to find the descriptions
+	of all instruction patterns which match a particular
+	memory address.
+
+	The matching patterns are returned in most-to-least specific
+	order, where more specific is defined as "more words and
+	bits examined".
+
+	Templates are always [1:N]*wordsize wide.
+	'''
+
+	def __init__(self, wordsize=8):
+		self.wordsize = wordsize
 		self.root = Insbranch(0)
 
 	def load_string(self, s):
@@ -363,7 +380,7 @@ class Instree(object):
 			j = bm.rfind('{')
 			if j == -1:
 				self.root.insert(last,
-				    Insline(self.width, assy, bm))
+				    Insline(self.wordsize, assy, bm))
 				continue
 
 			# Isolate tail-part
@@ -379,16 +396,16 @@ class Instree(object):
 			banned = True
 
 			self.root.insert(last,
-			    Insline(self.width, assy, bm, tail))
+			    Insline(self.wordsize, assy, bm, tail))
 
 		assert i == len(s)
 
 	def load_file(self, filename):
 		self.load_string(open(filename).read())
 
-	def print(self):
-		m = "%0" + "%dx" % ((self.width + 3) // 4)
-		self.root.print(m)
+	def dump(self, fo=sys.stdout):
+		fmt = "%0" + "%dx" % ((self.wordsize + 3) // 4)
+		self.root.dump(fo, fmt)
 
 	def dive(self, pj, adr, lvl, v, getmore, r):
 		while len(v) <= lvl:
@@ -413,14 +430,14 @@ class Instree(object):
 	def find(self, pj, adr, getmore):
 		a = []
 		for x in self.dive(pj, adr, 0, a, getmore, self.root):
-			yield Insmatch(self, x, adr, a)
+			yield Insmatch(x, adr, a)
 
 #######################################################################
 
 if __name__ == "__main__":
 
-	it = Instree(8)
-	it.load_string("""
+	IT = InsTree(8)
+	IT.load_string("""
 
 	# This is a comment line
 Foo_00	|1 1 0 0| reg	| imm		|
@@ -437,4 +454,4 @@ Foo   |0 1 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
 Foo2  |0 ? 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
 #Foo_05	| ca | data		|0 0 0 0|foo	|
 """)
-	it.print()
+	IT.dump()

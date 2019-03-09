@@ -85,7 +85,7 @@ class Assy(code.Code):
 class Instree_ins(Assy):
 	def __init__(self, pj, lim, lang):
 		lo = lim[0].adr
-		hi = lim[-1].adr + lim[-1].len
+		hi = lim[-1].adr + len(lim[-1].words) * lang.scale
 		super(Instree_ins, self).__init__(pj, lo, hi, lang)
 		self.prefix = False
 		self.cc = True
@@ -187,6 +187,7 @@ class Instree_disass(code.Decode):
 		self.ins_word = ins_word
 		self.mem_word = mem_word
 		self.endian = endian
+		self.scale = ins_word // mem_word
 
 		if ins_word == mem_word:
 			self.getmore = self.getmore_word
@@ -199,10 +200,7 @@ class Instree_disass(code.Decode):
 		self.flow_check = []
 		self.myleaf = Instree_ins
 		self.verbatim = set()
-		self.it = instree.Instree(
-					  ins_word=ins_word,
-					  mem_word=mem_word
-		)
+		self.it = instree.InsTree(ins_word)
 
 	def getmore_word(self, pj, adr, v):
 		v.append(pj.m.rd(adr + len(v)))
@@ -227,7 +225,7 @@ class Instree_disass(code.Decode):
 				continue
 			if not y.prefix:
 				break
-			y,err = self.decode(pj, adr + x.len, l)
+			y,err = self.decode(pj, adr + len(x.words) * self.scale, l)
 			if y != None:
 				return y, None
 			l.pop(-1)
