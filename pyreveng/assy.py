@@ -140,7 +140,7 @@ class Instree_ins(Assy):
 				x = None
 		if x is None:
 			x = "?" + arg + "?"
-			print("ERROR: ARG <%s> not translated" % arg)
+			print(self.im, "ERROR: ARG <%s> not translated" % arg)
 		if not isinstance(x, str):
 			x = x(pj)
 		if isinstance(x, str):
@@ -222,7 +222,7 @@ class Instree_disass(code.Decode):
 		err = None
 		for x in self.it.find(pj, adr, getmore=self.getmore):
 			if l and x.handler not in hdl:
-				print("PFX handler", hdl, x.handler, l)
+				# print("PFX handler", hdl, x.handler, l)
 				continue
 			l.append(x)
 			try:

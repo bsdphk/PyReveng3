@@ -214,7 +214,7 @@ def pil_parse(v, state):
         return x(v, state)
     if len(v) > 1 and v[1] == '=':
         return PIL_Stmt_Assign(v, state)
-    print("UNP", v)
+    # print("UNP", v)
     return PIL_Stmt(v, state)
 
 #######################################################################

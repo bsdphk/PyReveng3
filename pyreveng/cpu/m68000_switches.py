@@ -166,12 +166,12 @@ class m68000_switch_ins(assy.Instree_ins):
 				if j is not None:
 					if j & 0x80:
 						j -= 0x100
-					return self.lo + j + int(im.assy[2])
+					return im.adr + j + int(im.assy[2])
 				j = im.get('jj')
 				if j is not None:
 					if j & 0x8000:
 						j -= 0x10000
-					return self.lo + j + 2 + int(im.assy[2])
+					return im.adr + j + int(im.assy[2])
 
 			self.sz.add(im.assy[1])
 			if im.assy[0] == "+LOW":
@@ -211,6 +211,12 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.wordtable(pj)
 		self.range(pj)
 
+	def assy_L(self, pj):
+		return
+
+	def assy_W(self, pj):
+		return
+
 	def wordtable(self, pj):
 		pj.set_label(self.hi, self.nm + '_TAB')
 		hh = self.hi
@@ -221,7 +227,6 @@ class m68000_switch_ins(assy.Instree_ins):
 			hh = y.hi
 
 	def range(self, pj):
-
 		if self.go_lo == self.go_hi:
 			pj.set_label(self.go_lo, self.nm + "_DEFAULT")
 			pj.todo(self.go_lo, self.lang.disass)
@@ -238,15 +243,6 @@ class m68000_switch_ins(assy.Instree_ins):
 
 	def render(self, pj):
 		return "SWITCH(D7.%s)" % self.sz
-		txt = ""
-		txt += ".LOW=%s\n" % str(self.low)
-		txt += ".HIGH=%s\n" % str(self.high)
-		txt += ".SZ=%s\n" % str(self.sz)
-		n = 0
-		for i in self.lim:
-			txt += '[%d]' % n + " ".join(i.assy) + "\n"
-			n += 1
-		return txt
 
 def m68000_switches(disass):
 	disass.it.load_string(switches, m68000_switch_ins)

@@ -71,6 +71,11 @@ mULS		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |1|1|0 0 0 0 0 
 mULU		L,ea,Dy		1f7d    |0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |0|0|0 0 0 0 0 0 0| Dx  |
 mULU		L,ea,Dx,Dy	1f7d	|0 1 0 0 1 1 0 0 0 0| ea        |0| Dy  |0|1|0 0 0 0 0 0 0| Dx  |
 
+# 260/4.156
+PACK		XXX		-	|1 0 0 0| Dy  |1 0 1 0 0|R| reg | adj				|
+
+# 300/4.196
+UNPK		XXX		-	|1 0 0 0| Dy  |1 1 0 0 0|R| reg | adj				|
 
 """
 

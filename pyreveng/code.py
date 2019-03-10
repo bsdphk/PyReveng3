@@ -67,7 +67,7 @@ class Flow(object):
 			del pj.pending_flows[self.fm.lo]
 			x.propagate(pj)
 
-		if not self.to is None:
+		if self.to is not None:
 			pj.todo(self.to, self.lang.disass)
 
 	def __repr__(self):
