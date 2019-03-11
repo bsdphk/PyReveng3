@@ -95,7 +95,13 @@ high1a =	' 62		| j		|'	# BHI     L_range
 high1b =	' 62		| 00		|'	# BHI     L_range
 high1b +=	' jj				|'
 
-for i in (high1a, high1b):
+high1c =	' 6E		| j		|'	# BGT     L_range
+
+high1d =	' 6E		| 00		|'	# BGT     L_range
+high1d +=	' jj				|'
+
+
+for i in (high1a, high1b, high1c, high1d):
 	switches += high0 + i + '\n'
 
 #######################################################################
@@ -109,15 +115,22 @@ low1a =		' 65		| j		|'	# BCS     L_range
 low1b =		' 65		| 00		|'	# BCS     L_range
 low1b +=	' jj				|'
 
+low1c =		' 6D		| j		|'	# BLT     L_range
+
+low1d =		' 6D		| 00		|'	# BLT     L_range
+low1d +=	' jj				|'
+
 low2a =		'0 1 0 1| sl  |1|0 1|0 0 0|1 1 1|'	# SUBQ.W  #lowest,D7
 
 low2b =		' 0447				|'	# SUBI.W  #lowest,D7
 low2b +=	' sl				|'
 
-low2c =		''
+low2c =		'0 1 0 1| al  |0|0 1|0 0 0|1 1 1|'	# ADDQ.W  #lowest,D7
 
-for i in (low1a, low1b):
-	for j in (low2a, low2b, low2c):
+low2d =		''
+
+for i in (low1a, low1b, low1c, low1d):
+	for j in (low2a, low2b, low2c, low2d):
 		switches += low0 + i + j + '\n'
 
 #######################################################################
@@ -159,6 +172,10 @@ class m68000_switch_ins(assy.Instree_ins):
 					fh = im.get(x + 'h')
 					if fh is not None:
 						fl |= fh << 16
+						if fl & 0x80000000:
+							fl -= 0x100000000
+					elif fl & 0x8000:
+						fl -= 0x10000
 				return fl
 
 			def getjmp():
@@ -210,6 +227,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.mne = "SWITCH(D7.%s)" % self.sz
 		self.wordtable(pj)
 		self.range(pj)
+		# raise assy.Invalid()
 
 	def assy_L(self, pj):
 		return
@@ -246,3 +264,12 @@ class m68000_switch_ins(assy.Instree_ins):
 
 def m68000_switches(disass):
 	disass.it.load_string(switches, m68000_switch_ins)
+
+if __name__ == "__main__":
+
+	from pyreveng import instree
+
+	IT = instree.InsTree(16)
+	IT.load_string(switches)
+	IT.dump()
+	
