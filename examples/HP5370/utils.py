@@ -401,7 +401,7 @@ def key_dispatch(pj, cx, start, end):
 			if l[:4] == "CMD_" and l[4:] in cmd_desc:
 				c.lcmt = n + " = " + cmd_desc[l[4:]]
 			else:
-				c.lcmt = n + " = " + pj.labels[c.dst]
+				c.lcmt = n + " = " + str(pj.labels[c.dst])
 			a += 2
 	x = pj.add(start, a, "KEY_DISPATCH")
 	pj.set_label(start, "KEY_DISPATCH")
@@ -498,7 +498,9 @@ def tramp(pj):
 			ly = pj.labels.get(da)
 			if lx != None:
 				if ly != None:
-					assert lx == ly
+					print("LX", lx)
+					print("LY", ly)
+					# assert str(lx) == str(ly)
 				else:
 					#print(pj.afmt(i.lo), "->", pj.afmt(da), lx)
 					pj.set_label(da, lx)

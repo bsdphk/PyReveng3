@@ -666,7 +666,7 @@ SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  | {
 # 290/4-186
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| ea	|
 # 292/4-188
-TRAP		vect		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
+TRAP		vect,>J		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 # 295/4-191
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
@@ -1076,6 +1076,9 @@ class m68000_ins(assy.Instree_ins):
 		return "#0x%x" % a
 
 	def assy_vect(self, pj):
+		if self['vect'] in self.lang.trap_returns:
+			# XXX: use flow
+			pj.todo(self.hi, self.lang.disass)
 		return "#%d" % self['vect']
 
 	def assy_W(self, pj):
@@ -1400,6 +1403,7 @@ class m68000(assy.Instree_disass):
 		self.verbatim |= set(["CCR", "SR", "USP"])
 		self.ea_fullext = False
 		self.ea_scale = False
+		self.trap_returns = {}
 
 	def set_adr_mask(self, a):
 		self.amask = a

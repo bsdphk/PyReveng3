@@ -191,11 +191,10 @@ class Listing(object):
 		lbl = self.pj.labels.get(lo)
 		if lbl is None:
 			lbl = "\t"
-		elif len(lbl) > 6:
-			self.fo.write("%s\t%s:\n" % (" " * len(hex[0]), lbl))
-			lbl = "\t"
 		else:
-			lbl += ":\t"
+			for x in lbl:
+				self.fo.write("%s\t%s:\n" % (" " * len(hex[0]), x))
+			lbl = "\t"
 
 		for i in range(m):
 			if i < len(hex):

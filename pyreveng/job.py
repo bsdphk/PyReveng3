@@ -84,7 +84,8 @@ class Job(object):
 		self.banks = []
 
 	def set_label(self, adr, lbl):
-		self.labels[adr] = lbl
+		x = self.labels.setdefault(adr, [])
+		x.append(lbl)
 
 	def set_block_comment(self, adr, cmt):
 		if not adr in self.block_comments:
@@ -99,9 +100,9 @@ class Job(object):
 
 	def render_adr(self, a):
 		x = self.labels.get(a)
-		if x != None:
-			return x
-		return self.afmt(a)
+		if x is None:
+			return self.afmt(a)
+		return x[0]
 
 	def __iter__(self):
 		for i in self.t:

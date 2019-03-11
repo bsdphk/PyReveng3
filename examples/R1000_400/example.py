@@ -91,6 +91,7 @@ def setup():
 	cpu = my68k20()
 	cpu.set_adr_mask(0x7fffffff)
 	cpu.flow_check.append(inline_text)
+	cpu.trap_returns[0] = True
 	return pj, cpu
 
 
