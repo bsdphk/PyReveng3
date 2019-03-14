@@ -445,6 +445,6 @@ def svg(pj, lo, hi, fn=None, l=None):
 			l.append(pj.m.bu16(a))
 	if fn is None:
 		fn = "/tmp/_.%s.%x.svg" % (pj.name, lo)
-	pj.set_block_comment(lo, "HP1345A graphics Rendered to " + fn)
+	pj.set_block_comment(lo, "HP1345A graphics Rendered to " + fn + " [0x%x-0x%x]" % (lo, hi))
 	svg_wl(fn, l)
 	print("HP1345A graphics %x-%x rendered to %s" % (lo, hi, fn))
