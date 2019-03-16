@@ -721,6 +721,8 @@ cond_code = (
 class m68000_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
 		super(m68000_ins, self).__init__(pj, lim, lang)
+		if self.lo & 1:
+			raise assy.Invalid("Odd Address")
 		self.ea = {}
 		self.isz = "i32"
 		self.icache = {}
@@ -1273,6 +1275,7 @@ class m68000_ins(assy.Instree_ins):
 			dr = "%%A%d" % (self['ea'] & 7)
 			rl = self.subr_rlist()
 			if dr[1:] in rl:
+				return
 				raise assy.Missing(
 				    "0x%x MOVEM push(SP)" % (self.lo))
 			for r in self.subr_rlist():
@@ -1460,7 +1463,7 @@ class m68000(assy.Instree_disass):
 		for i in vn:
 			for v in vn[i]:
 				k = self.vector_name(v)
-				if vi[i] != None:
+				if vi[i] != None and isinstance(vi[i], self.myleaf):
 					vi[i].lcmt += "--> " + k + "\n"
 
 			if len(vn[i]) == 1:

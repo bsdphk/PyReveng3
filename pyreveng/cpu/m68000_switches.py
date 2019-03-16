@@ -156,6 +156,8 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.sub = 0
 		self.add = 0
 
+		if self.lo & 1:
+			raise Invalid("Odd Address")
 		# Our prefixes are only valid if the lead up to a switch
 		if self.lim[-1].assy[0][0] == "+":
 			self.mne = "+"
