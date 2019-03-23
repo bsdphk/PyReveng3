@@ -134,12 +134,15 @@ def stringify(pj, lo, length=None, term=None):
 
 class Txt(Data):
 	def __init__(self, pj, lo, hi=None,
-	    label=True, term=None, pfx=None, align=2):
+	    label=True, term=None, pfx=None, align=2, splitnl=False):
+		self.splitnl = splitnl
 		self.pre = ""
 		if pfx == 1:
 			x = pj.m.rd(lo)
 			self.pre = '%d,' % x
 			hi, s, v = stringify(pj, lo + 1, length=x)
+		elif pfx is not None:
+			raise Exception("unknown pfx")
 		elif hi is None:
 			hi, s, v = stringify(pj, lo, term=term)
 		else:
@@ -155,7 +158,22 @@ class Txt(Data):
 		self.compact = True
 
 	def render(self, pj):
-		return ".TXT\t" + self.pre + "'" + self.txt + "'"
+		if not self.splitnl:
+			return ".TXT\t" + self.pre + "'" + self.txt + "'"
+
+		l = self.txt.split('\\n')
+		if len(l) == 1:
+			return ".TXT\t" + self.pre + "'" + self.txt + "'"
+
+		txt = ''
+		p = self.pre
+		
+		for i in l[:-1]:
+			txt += '.TXT\t' + p + "'" + i + "\\n'\n"
+			p = ''
+		if l[-1]:
+			txt += '.TXT\t' + p + "'" + l[-1] + "'"
+		return txt
 
 	def arg_render(self, pj):
 		return "'" + self.txt + "'"
