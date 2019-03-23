@@ -84,6 +84,7 @@ class Job(object):
 		self.banks = []
 
 	def set_label(self, adr, lbl):
+		assert type(lbl) == str
 		x = self.labels.setdefault(adr, [])
 		x.append(lbl)
 
