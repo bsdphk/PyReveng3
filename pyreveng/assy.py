@@ -236,6 +236,9 @@ class Instree_disass(code.Decode):
 				y = None
 				l.pop(-1)
 				continue
+			except KeyError as e:
+				print("KeyError in", x)
+				raise
 			if not y.prefix:
 				break
 			y,err = self.decode(pj, adr + len(x.words) * self.scale, l)
