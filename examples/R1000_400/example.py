@@ -28,7 +28,7 @@
 from __future__ import print_function
 
 import os
-from pyreveng import job, mem, listing, data, code, assy, pil
+from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020
 
 def mem_setup():
@@ -61,7 +61,7 @@ INLTXT		inltxt		0	|0 1 0 0 1 1 1 0 1 0 0 1 0 1 1 0| a1            | a2          
 class my68k20_ins(m68020.m68020_ins):
 
 	def assy_inltxt(self, pj):
-		y = data.Txt(pj, self.lo + 2, label=False)
+		y = data.Txt(pj, self.lo + 2, label=False, splitnl=True)
 		pj.todo(y.hi, self.lang.disass)
 		raise assy.Invalid("Inline text hack")
 
@@ -79,9 +79,12 @@ def inline_text(pj, ins):
 		0x80002aa8,
 	):
 		return
-	if ins.lo == 0x8000001c:
+	if ins.lo in (
+		0x8000001c,
+		0x80002028,
+	):
 		return
-	y = data.Txt(pj, ins.hi, label=False)
+	y = data.Txt(pj, ins.hi, label=False, splitnl=True)
 	pj.todo(y.hi, ins.lang.disass)
 
 def setup():
@@ -98,6 +101,35 @@ def setup():
 #######################################################################
 
 def task(pj, cpu):
+
+	pj.set_label(0x80000024, "RESET")
+	pj.set_label(0x8000016c, "checksum")
+	pj.set_label(0xffff9000, "IO_UART")
+	pj.set_label(0x8000038a, "ramtest")
+	pj.set_label(0x800003aa, "ramtest_1")
+	pj.set_label(0x800003e4, "ramtest_2")
+	pj.set_label(0x8000040e, "ramtest_3")
+	pj.set_label(0x8000043a, "ramtest_4")
+	pj.set_label(0x80000464, "ramtest_5")
+	pj.set_label(0x800004fe, "ramtest_6")
+	pj.set_label(0x80000088, "failure")
+	pj.set_label(0x80000072, "txt_FAILURE")
+	pj.set_label(0x80000018, "puts(A0)")
+	pj.set_label(0x8000001c, "puts(inline)")
+	pj.set_label(0x800000e2, "_puts(inline)")
+	pj.set_label(0x800000d8, "_puts(A0)")
+	pj.set_label(0x800000f8, "_outstring(A0)")
+
+	pj.set_label(0x8000000c, "print_OK()")
+	pj.set_label(0x80000142, "_print_OK()")
+
+	pj.set_label(0x80000010, "failure()")
+
+	pj.set_label(0x80000014, "delay()")
+	pj.set_label(0x8000015e, "_delay()")
+
+	pj.set_label(0x80000020, "print_CRLF()")
+	pj.set_label(0x8000014c, "_print_CRLF()")
 
 	#cpu.vectors(pj, hi=0x28)
 	pj.todo(0x80000024, cpu.disass)
@@ -121,15 +153,39 @@ def task(pj, cpu):
 
 	def txts(a, b, align=2):
 		while a < b:
-			y = data.Txt(pj, a, label=False, align=align)
+			y = data.Txt(pj, a, label=False, align=align, splitnl=True)
 			a = y.hi
 
 	txts(0x800010cc, 0x80001122)
 	txts(0x80001bb0, 0x80001bc2)
-	txts(0x8000221c, 0x800024a8)
 	txts(0x80002c14, 0x80002e04, align=1)
 	txts(0x80004ece, 0x80004fbf, align=1)
 	txts(0x800027ee, 0x800028ca, align=1)
+
+	##########
+	data.Txt(pj, 0x8000221c, align=1)
+	data.Txt(pj, 0x80002232, align=1, splitnl=True)
+	data.Txt(pj, 0x8000223d, align=1, splitnl=True)
+	l = []
+	for a in range(0x8000228f, 0x800024a8):
+		x = pj.m.rd(a)
+		if not x:
+			l.append(a)
+			break
+		if x & 0x80:
+			l.append(a)
+	for i in range(len(l)-1):
+		data.Txt(pj, l[i], l[i+1], align=1, label=not i)
+	data.Txt(pj, l[-1] + 1, align=1, label=False)
+
+	# 0x8000298e
+	y = data.Txt(pj, 0x8000240c, splitnl=True, align=1)
+	y = data.Txt(pj, 0x80002481, splitnl=True, align=1)
+	y = data.Txt(pj, 0x8000254e, splitnl=True, align=1)
+	y = data.Txt(pj, 0x8000256e, splitnl=True, align=1)
+	y = data.Txt(pj, 0x8000257d, splitnl=True, align=1)
+	y = data.Txt(pj, 0x8000258c, splitnl=True, align=1)
+	y = data.Txt(pj, 0x8000259b, splitnl=True, align=1)
 
 	for a in (
 		0x8000000c,
@@ -146,6 +202,7 @@ def task(pj, cpu):
 		0x800015a8,
 		0x80001628,
 		0x800016c2,
+		0x80002796,
 		0x800027ca,
 		0x80002bbe,
 		0x80002bc4,
@@ -189,6 +246,14 @@ def task(pj, cpu):
 	data.Const(pj, 0x80003ffa, 0x80004000)
 	data.Const(pj, 0x80005ffa, 0x80006000)
 	data.Const(pj, 0x80007dfa, 0x80007e00)
+
+	# See 0x800039e0
+	data.Const(pj, 0x80003a2a, 0x80003a2a + 0x16)
+
+	while pj.run():
+		pass
+
+	d = discover.Discover(pj, cpu)
 
 	while pj.run():
 		pass
