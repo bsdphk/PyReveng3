@@ -192,7 +192,11 @@ class Listing(object):
 		if lbl is None:
 			lbl = "\t"
 		else:
+			s = set()
 			for x in lbl:
+				if x in s:
+					continue
+				s.add(x)
 				self.fo.write("%s\t%s:\n" % (" " * len(hex[0]), x))
 			lbl = "\t"
 
