@@ -195,8 +195,8 @@ OUTI	-		|1 1 1 0 1 1 0 1|1 0 1 0 0 0 1 1|
 OUTIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 1 1|
 OUTD	-		|1 1 1 0 1 1 0 1|1 0 1 0 1 0 1 1|
 OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
-+IX	iIX		|1 1 1 1 1 1 0 1|
-+IY	iIX		|1 1 0 1 1 1 0 1|
++IY	iIY		|1 1 1 1 1 1 0 1|
++IX	iIX		|1 1 0 1 1 1 0 1|
 """
 
 class z80_ins(assy.Instree_ins):
@@ -286,5 +286,12 @@ class z80(assy.Instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
-	def vectors(self, pj):
-		return
+	def vectors(self, pj, mode=1):
+		for m, a,l in (
+			(None, 0x0000, "VEC_RESET"),
+			(1, 0x0038, "VEC_IRQ"),
+			(None, 0x0066, "VEC_NMI"),
+		):
+			if m is None or m == mode:
+				pj.todo(a, self.disass)
+				pj.set_label(a, l)
