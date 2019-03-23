@@ -503,11 +503,13 @@ def tramp(pj):
 					# assert str(lx) == str(ly)
 				else:
 					#print(pj.afmt(i.lo), "->", pj.afmt(da), lx)
-					pj.set_label(da, lx)
+					for j in lx:
+						pj.set_label(da, j)
 					did += 1
 			elif ly != None:
 				#print(pj.afmt(i.lo), "<-", pj.afmt(da), ly)
-				pj.set_label(i.lo, ly)
+				for j in ly:
+					pj.set_label(i.lo, j)
 				did += 1
 		if did == 0:
 			break
