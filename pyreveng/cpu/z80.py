@@ -286,12 +286,17 @@ class z80(assy.Instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
-	def vectors(self, pj, mode=1):
+	def vectors(self, pj):
 		for m, a,l in (
 			(None, 0x0000, "VEC_RESET"),
-			(1, 0x0038, "VEC_IRQ"),
+			(None, 0x0008, "VEC_RST08"),
+			(None, 0x0010, "VEC_RST10"),
+			(None, 0x0018, "VEC_RST18"),
+			(None, 0x0020, "VEC_RST20"),
+			(None, 0x0028, "VEC_RST28"),
+			(None, 0x0030, "VEC_RST30"),
+			(None, 0x0038, "VEC_RST38_IRQ"),
 			(None, 0x0066, "VEC_NMI"),
 		):
-			if m is None or m == mode:
-				pj.todo(a, self.disass)
-				pj.set_label(a, l)
+			pj.todo(a, self.disass)
+			pj.set_label(a, l)
