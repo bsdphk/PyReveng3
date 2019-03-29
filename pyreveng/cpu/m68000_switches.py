@@ -76,19 +76,27 @@ for i in (low1a, low1b):
 
 #######################################################################
 
-switches +=	'SWITCH	L			|'
+switches +=	'+DBL	L			|'
 switches +=	' E387				|'	# ASL.L   #0x1,D7
+switches +=	'\n'
+
+switches +=	'SWITCH	L			|'
 switches +=	' 3E3B				|'	# MOVE.W  (#.+8+D7.L),D7
 switches +=	' 7806				|'
-switches +=	' 4EFB				|'	# JMP     (#.+4+D7.W)
-switches +=	' 7002				|'
+switches +=	' 4EFB				|'	# JMP     (#.+4+D?.W)
+switches +=	'0|1 1 1|0 0 0 0|0 0 0 0|0 0 1 0|'
 switches +=	'\n'
 
 #######################################################################
 
-high0 =		'+HIGH	W 6			|'
-high0 +=	' 0C47				|'	# CMPI.W  #highest,D7
-high0 +=	' hl				|'
+high0a =	'+HIGH	W 6			|'
+high0a +=	'0 0 0 0 1 1 0 0 0 1 0 0 0| dr0 |'	# CMPI.W  #highest,D?
+high0a +=	' hl				|'
+
+high0b =	'+HIGH	W 8			|'
+high0b +=	'0 0 0 0 1 1 0 0 1 0 0 0 0| dr0 |'	# CMPI.L  #highest,D?
+high0b +=	'0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0|'
+high0b +=	' hl				|'
 
 high1a =	' 62		| j		|'	# BHI     L_range
 
@@ -101,13 +109,14 @@ high1d =	' 6E		| 00		|'	# BGT     L_range
 high1d +=	' jj				|'
 
 
-for i in (high1a, high1b, high1c, high1d):
-	switches += high0 + i + '\n'
+for j in (high0a, high0b):
+	for i in (high1a, high1b, high1c, high1d):
+		switches += j + i + '\n'
 
 #######################################################################
 
 low0 =		'+LOW	W 6			|'
-low0 +=		' 0C47				|'	# CMPI.W  #lowest,D7
+low0 +=		'0 0 0 0 1 1 0 0 0 1 0 0 0| dr0 |'	# CMPI.W  #lowest,D?
 low0 +=		' ll				|'
 
 low1a =		' 65		| j		|'	# BCS     L_range
@@ -135,12 +144,24 @@ for i in (low1a, low1b, low1c, low1d):
 
 #######################################################################
 
-switches +=	'SWITCH	W			|'
-switches +=	' E347				|'	# ASL.W   #0x1,D7
-switches +=	' 3E3B				|'	# MOVE.W  (#.+8+D7.L),D7
-switches +=	' 7006				|'
-switches +=	' 4EFB				|'	# JMP     (#.+4+D7.W)
-switches +=	' 7002				|'
+switches +=	'+DBL	W	|'
+switches +=	'1 1 1 0 0 0 1 1 0 1 0 0 0| dr0 |'	# ASL.W   #0x1,D?
+switches +=	'\n'
+
+switches +=	'+DBL	W	|'
+switches +=	'1 1 0 1| dr1 |0|0 1 0 0 0| dr2 |'	# ADD.W	D?,D?
+switches +=	'\n'
+
+switches +=	'SWITCH W 	|'
+switches +=	'0 0 1 1| dr0 |0 0 0 1 1 1 0 1 1|'	# MOVE.W  (#.+8+D?.L),D?
+switches +=	'0| dr1 |0 0 0 0 0 0 0 0 0 1 1 0|'
+switches +=	' 4EFB				|' 	# JMP	  (#.+4+D?.W)
+switches +=	'0| dr2 |0 0 0 0 0 0 0 0 0 0 1 0|'
+switches +=	'\n'
+
+switches +=	'BARE W		|'
+switches +=	' 4EFB				|' 	# JMP	  (#.+4+D?.W)
+switches +=	'0| dr2 |0 0 0 0 0 0 0 0 0 0 1 0|'
 switches +=	'\n'
 
 #######################################################################
@@ -155,14 +176,55 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.high = None
 		self.sub = 0
 		self.add = 0
+		self.reg = None
+		self.nm = "SWITCH_%x" % self.lo
 
 		if self.lo & 1:
-			raise Invalid("Odd Address")
+			raise assy.Invalid("Odd Address")
 		# Our prefixes are only valid if the lead up to a switch
 		if self.lim[-1].assy[0][0] == "+":
 			self.mne = "+"
 			return
+
+		# All dr%d must match
+		rset = set()
+		for i in self.lim:
+			for j in i.flds:
+				if j[:2] == "dr":
+					rset.add(i[j])
+					if len(rset) > 1:
+						raise assy.Invalid()
+		if rset:
+			self.reg = rset.pop()
+		else:
+			self.reg = 7
+
+		if len(self.lim) == 1 and self.lim[-1].assy[0] == "BARE":
+			a = self.hi
+			top = 128
+			n = 0
+			while True:
+				d = pj.m.bs16(self.hi + n * 2)
+				if d < 0:
+					raise assy.Invalid()
+				top = min(d, top)
+				a += 2
+				n += 1
+				if n * 2 >= top:
+					break
+			self.low = 0
+			self.high = n - 1
+			self.wordtable(pj)
+			raise assy.Invalid()
+
+		if len(self.lim) < 2:
+			raise assy.Invalid()
+
+		if self.lim[-2].assy[0] != "+DBL":
+			raise assy.Invalid()
 		if self.lim[-1].assy[0] != "SWITCH":
+			raise assy.Invalid()
+		if self.lim[-1].assy[1] != self.lim[-2].assy[1]:
 			raise assy.Invalid()
 
 		self.sz = set()
@@ -217,7 +279,15 @@ class m68000_switch_ins(assy.Instree_ins):
 					self.high = x
 				self.go_hi = getjmp()
 
+
+		if self.low is None and self.high is not None:
+			self.low = 0
+
 		if self.low is None or self.high is None:
+			print("XXX %x" % self.lo, self)
+			for i in self.lim:
+				print("--- %s" % str(i))
+			print("LOW", self.low, "HIGH", self.high)
 			raise assy.Invalid()
 
 		assert len(self.sz) == 1
@@ -226,7 +296,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.nm = "SWITCH_%x" % self.lo
 		pj.set_label(self.lo, self.nm)
 
-		self.mne = "SWITCH(D7.%s)" % self.sz
+		self.mne = "SWITCH(D%d.%s)" % (self.reg, self.sz)
 		self.wordtable(pj)
 		self.range(pj)
 		# raise assy.Invalid()
@@ -250,9 +320,11 @@ class m68000_switch_ins(assy.Instree_ins):
 		if self.go_lo == self.go_hi:
 			pj.set_label(self.go_lo, self.nm + "_DEFAULT")
 			pj.todo(self.go_lo, self.lang.disass)
-		else:
+			return
+		if self.go_lo is not None:
 			pj.set_label(self.go_lo, self.nm + "_LOW")
 			pj.todo(self.go_lo, self.lang.disass)
+		if self.go_hi is not None:
 			pj.set_label(self.go_hi, self.nm + "_HIGH")
 			pj.todo(self.go_hi, self.lang.disass)
 
@@ -262,7 +334,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		pj.set_label(dst, self.nm + "_CASE_%d" % no)
 
 	def render(self, pj):
-		return "SWITCH(D7.%s)" % self.sz
+		return "SWITCH(D%d.%s)" % (self.reg, self.sz)
 
 def m68000_switches(disass):
 	disass.it.load_string(switches, m68000_switch_ins)
