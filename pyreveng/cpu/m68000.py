@@ -426,8 +426,8 @@ LSR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 1| Dn  | {
 	%SR.x = XXX
 	%SR.c = XXX
 }
-LSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	| {
-	%0 = shl SZ EA , 1
+LSL		W,ead		037c	|1 1 1 0|0 0 1|1|1 1| ead	| {
+	%0 = shl SZ EAD , 1
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
 	%SR.v = i1 0
@@ -435,8 +435,8 @@ LSL		W,ea		037c	|1 1 1 0|0 0 1|1|1 1| ea	| {
 	%SR.c = XXX
 	LEAD %0
 }
-LSR		W,ea		037c	|1 1 1 0|0 0 1|0|1 1| ea	| {
-	%0 = lshr SZ EA , 1
+LSR		W,ead		037c	|1 1 1 0|0 0 1|0|1 1| ead	| {
+	%0 = lshr SZ EAD , 1
 	%SR.n = icmp slt SZ %0 , 0
 	%SR.z = icmp eq SZ %0 , 0
 	%SR.v = i1 0
@@ -1235,7 +1235,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def isubr_LEA(self, arg, which):
 		if not which in self.ea:
-			raise assy.Invalid("0x%x No '%s' in EA" % (self.lo, which))
+			raise assy.Invalid("0x%x No '%s' in EA %s" % (self.lo, which, str(self.im)))
 		il = self.ea[which]
 		if len(il) == 1:
 			self.add_il([
@@ -1478,4 +1478,8 @@ class m68000(assy.Instree_disass):
 		c = data.Codeptr(pj, adr, adr + 4, t)
 		pj.todo(t, self.disass)
 		return c
+
+	def dataptr(self, pj, adr):
+		return data.Dataptr(pj, adr, adr + 4, pj.m.bu32(adr))
+		
 
