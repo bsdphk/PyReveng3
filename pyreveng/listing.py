@@ -85,7 +85,7 @@ class Render_mem(object):
 			s += "  |" + t + "|"
 		return s
 
-	def render(self, pj, lo, hi):
+	def render(self, pj, lo, hi, compact=False):
 		"""
 		Render 'ncol' words per line
 		"""
@@ -96,6 +96,8 @@ class Render_mem(object):
 			s += self.render_word(pj, lo, hi)
 			l.append(s)
 			lo += self.ncol
+			if compact:
+				break
 		return l
 
 class Listing(object):
@@ -173,7 +175,7 @@ class Listing(object):
 			j = i.rstrip()
 			if j != "":
 				lcmt.append(j)
-		hex = self.render_mem(self.pj, lo, hi)
+		hex = self.render_mem(self.pj, lo, hi, compact=compact)
 		i = 0
 		m = max(len(rx), len(lcmt))
 		if not compact:
