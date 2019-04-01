@@ -31,12 +31,15 @@ from pyreveng import job, mem, listing, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():
-	m = mem.byte_mem(0x6800, 0x8000)
-	dn = os.path.dirname(__file__)
-	m.load_binfile(0x6800, 1, os.path.join(dn, "A13U2.bin"))
-	m.load_binfile(0x7000, 1, os.path.join(dn, "A13U3.bin"))
-	m.load_binfile(0x7800, 1, os.path.join(dn, "A13U4.bin"))
-	return m
+	return mem.stackup(
+		(
+			"A13U2.bin",
+			"A13U3.bin",
+			"A13U4.bin",
+		),
+		lo = 0x6800,
+		prefix = os.path.dirname(__file__) + "/"
+	)
 
 def setup():
 	pj = job.Job(mem_setup(), "HP3335A")

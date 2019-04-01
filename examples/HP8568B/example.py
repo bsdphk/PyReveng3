@@ -83,16 +83,13 @@ class mycpu(m68000.m68000):
 		self.it.load_string(s)
 
 def mem_setup():
-	m = mem.byte_mem(0x0, 0x20000)
-	for b,n in (
-		(0x00000, "85680-80116.BIN"),
-		(0x00001, "85680-80115.BIN"),
-		(0x10000, "85680-80114.BIN"),
-		(0x10001, "85680-80113.BIN"),
-	):
-		m.load_binfile(first = b, step = 0x2,
-		    filename=os.path.join(os.path.dirname(__file__), n))
-	return m
+	return mem.stackup(
+		(
+			( "85680-80115.BIN", "85680-80116.BIN" ),
+			( "85680-80113.BIN", "85680-80114.BIN" ),
+		),
+		prefix=os.path.dirname(__file__) + "/"
+	)
 
 def setup():
 	m = mem_setup()

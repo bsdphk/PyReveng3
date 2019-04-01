@@ -360,6 +360,55 @@ class byte_mem(word_mem):
 		else:
 			self.load_data(first, step, d[lo:])
 
+def stackup(files, lo=0, prefix=""):
+	"""
+	Convenience function to stack a set of eproms into byte_mem.
+	'files' indicate the layout desired, and each element can be
+	just a filename or an iterable of filenames:
+
+		files = (
+			"singlelane",
+			("highbyte", "lowbyte"),
+			("topbyte", "midhibyte", "midlobyte", "lobyte"),
+		)
+
+	'prefix' is used for all filenames.
+
+	See also:
+		examples/HP3335A
+		examples/HP8568A
+
+	"""
+	l = []
+	hi = lo
+	for r in files:
+		l.append([])
+		if type(r) == str:
+			b = open(prefix + r, "rb").read()
+			hi += len(b)
+			l[-1].append(b)
+		else:
+			for i in r:
+				b = open(prefix + i, "rb").read()
+				hi += len(b)
+				l[-1].append(b)
+	m = byte_mem(lo, hi)
+	p = lo
+	for r in l:
+		stride = len(r)
+		ll = len(r[0])
+		o = stride
+		for i in r:
+			o -= 1
+			pp = p + o
+			for j in i:
+				m[pp] = j
+				pp += stride
+		p += stride * ll
+	print(m)
+	return m
+	
+
 if __name__ == "__main__":
 	m = word_mem(0x0000, 0x1000, bits=64, attr=3)
 	print(m)
