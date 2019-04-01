@@ -50,7 +50,9 @@ for i in l:
 	k = j[1].replace(".py", "")
 	print(j[0], k)
 
+	sys.path.append(j[0])
 	y = importlib.import_module(j[0] + "." + k)
+	sys.path.pop(-1)
 	pj, cx = y.setup()
 	y.task(pj, cx)
 	listing.Listing(pj, ncol = 8, 

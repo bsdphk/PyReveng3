@@ -148,7 +148,7 @@ def task(pj, cx):
 		while pj.run():
 			pass
 		more = False
-		for lo,hi in pj.gaps():
+		for lo,hi,aspace in pj.gaps():
 			if lo + 1 == hi:
 				continue
 			if pj.m.rd(lo) == 0x55:

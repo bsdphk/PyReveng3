@@ -1315,7 +1315,7 @@ def task(pj, cpu):
 
 		while True:
 			l = []
-			for b,e in pj.gaps():
+			for b,e,aspace in pj.gaps():
 				if b in nondisc:
 					continue
 				if e - b < 2:
