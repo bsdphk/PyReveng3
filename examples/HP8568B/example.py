@@ -51,8 +51,6 @@
 #	pg 280 ln 5392 -> 0x7e86
 
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, listing, data, code, assy, pil
 import pyreveng.cpu.m68000 as m68000

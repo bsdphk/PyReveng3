@@ -32,8 +32,6 @@ Presently supported variants:
         MC68HC11 (incomplete)
 """
 
-from __future__ import print_function
-
 from pyreveng import assy, data
 
 mc6800_instructions = """

@@ -33,7 +33,6 @@ Presently supported variants:
 	68000
 """
 
-from __future__ import print_function
 from pyreveng import assy, data, mem
 
 m68000_instructions = """

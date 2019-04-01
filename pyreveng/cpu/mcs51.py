@@ -28,8 +28,6 @@
 Disassembler for Intel mcs-51 microprocessor family
 """
 
-from __future__ import print_function
-
 from pyreveng import assy
 
 mcs51_instructions = """

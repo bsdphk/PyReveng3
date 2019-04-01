@@ -24,11 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from __future__ import print_function
-
 from pyreveng import listing, code, data, seven_segment
 from . import utils
-
 
 def setup():
 	return utils.setup("HP5370B", "HP5370B.ROM", -1)

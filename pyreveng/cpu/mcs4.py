@@ -28,8 +28,6 @@
 Disassembler for Intel MCS4 ("Worlds first") microprocessor
 """
 
-from __future__ import print_function
-
 from pyreveng import assy
 
 mcs4_instructions="""

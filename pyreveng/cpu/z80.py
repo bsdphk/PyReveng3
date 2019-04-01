@@ -29,8 +29,6 @@
 Partial disassembler for Z80
 """
 
-from __future__ import print_function
-
 from pyreveng import assy, data
 
 z80_instructions = """

@@ -33,8 +33,6 @@ Prefix instructions are marked with mnemonic "+" and their
 arguments are processed before the instruction.
 """
 
-from __future__ import print_function
-
 from . import instree, code, pil
 
 #######################################################################

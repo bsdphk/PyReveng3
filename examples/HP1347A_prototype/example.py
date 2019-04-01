@@ -56,8 +56,6 @@
 #	$0xe1		Plotter-ID (last char in plotter_table)
 #
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, listing, data, code, assy, discover
 import pyreveng.cpu.mc6809 as mc6809

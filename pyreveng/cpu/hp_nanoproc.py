@@ -37,8 +37,6 @@ This disassembler is prepared for bank-switching, in that it
 assumes that the upper (0xf800) address bits are preserved.
 """
 
-from __future__ import print_function
-
 from pyreveng import assy
 
 # Lower-case means we guessed

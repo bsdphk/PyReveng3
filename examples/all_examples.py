@@ -28,15 +28,20 @@
 Run all examples
 """
 
-from __future__ import print_function
-
 import glob, os, sys, importlib
 from pyreveng import code, listing
 
+import cProfile
+
+l = []
 if len(sys.argv) == 1:
-	l = glob.glob("*/example*.py")
+	l += glob.glob("*/example*.py")
 else:
-	l = glob.glob(sys.argv[1] + "/example*.py")
+	for i in sys.argv[1:]:
+		if os.path.isdir(i):
+			l += glob.glob(i + "/example*.py")
+		else:
+			l += glob.glob(i)
 
 try:
 	os.mkdir("_output")
@@ -45,18 +50,25 @@ except:
 
 l.sort()
 
-for i in l:
-	j = i.split("/")
-	k = j[1].replace(".py", "")
-	print(j[0], k)
-
-	sys.path.append(j[0])
-	y = importlib.import_module(j[0] + "." + k)
+def one_example(dir, example):
+	sys.path.append(dir)
+	y = importlib.import_module(dir + "." + example)
 	sys.path.pop(-1)
 	pj, cx = y.setup()
+	# return
 	y.task(pj, cx)
 	listing.Listing(pj, ncol = 8, 
 			fn = "_output/" + pj.name + ".asm", pil=False)
 	listing.Listing(pj, ncol = 8,
 			fn = "_output/" + pj.name + ".pil", pil=True)
 	sys.stdout.flush()
+
+def all_examples():
+	for i in l:
+		j = i.split("/")
+		k = j[1].replace(".py", "")
+		print(j[0], k)
+		one_example(j[0], k)
+
+#cProfile.run("all_examples()", sort=1)
+all_examples()

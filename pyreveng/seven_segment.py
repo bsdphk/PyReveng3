@@ -28,8 +28,6 @@
 # Render 7-segment decoding tables
 #
 
-from __future__ import print_function
-
 from . import job, mem
 
 default_map = (1, 2, 4, 8, 16, 32, 64, 128, 0)

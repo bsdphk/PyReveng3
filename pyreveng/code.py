@@ -37,8 +37,6 @@ instance the CHIP-8 'language' on RCA1802 CPUs or the RPN code of a
 HP 48 Calculator.
 """
 
-from __future__ import print_function
-
 from . import job, pil
 
 #######################################################################

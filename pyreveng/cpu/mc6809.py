@@ -31,8 +31,6 @@ Presently supported variants:
 	6809
 """
 
-from __future__ import print_function
-
 from pyreveng import assy, data
 
 mc6809_instructions = """

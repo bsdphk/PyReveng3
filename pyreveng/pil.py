@@ -34,8 +34,6 @@ LLVM IL a trivial exercise in dumb text-processing
 
 """
 
-from __future__ import print_function
-
 #######################################################################
 
 

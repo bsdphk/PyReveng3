@@ -24,8 +24,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, listing, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800

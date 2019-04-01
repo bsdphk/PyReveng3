@@ -10,8 +10,6 @@
 # HP1345A display emulation
 #
 
-from __future__ import print_function
-
 import math
 
 # Dump of 01347-80001 EPROM

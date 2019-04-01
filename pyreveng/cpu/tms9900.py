@@ -32,9 +32,6 @@
 Disassembler for TI TMS9900 microprocessor
 """
 
-
-from __future__ import print_function
-
 from pyreveng import assy, data
 
 tms9900_instructions = """

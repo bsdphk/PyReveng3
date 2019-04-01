@@ -31,8 +31,6 @@
 # P3.3 tied to P3.4 T0->INT1
 # P3.2 INT0 probably from main CPU
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.mcs51 as mcs51

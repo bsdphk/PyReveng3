@@ -25,8 +25,6 @@
 # SUCH DAMAGE.
 #
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020

@@ -28,8 +28,6 @@
 HP9411 series VHF switches
 """
 
-from __future__ import print_function
-
 from pyreveng import pyreveng, mem, code, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 

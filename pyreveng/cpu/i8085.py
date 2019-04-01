@@ -28,8 +28,6 @@
 Disassembler for Intel i8085 microprocessor
 """
 
-from __future__ import print_function
-
 from pyreveng import instree, assy, data
 
 i8085_instructions="""

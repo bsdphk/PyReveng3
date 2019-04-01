@@ -44,8 +44,6 @@ rather than the interval they cover, but for now it seems to work
 pretty ok.
 """
 
-from __future__ import print_function
-
 class Tree(object):
 	def __init__(self, lo, hi, lim=128):
 		# lim is only a performance parameter, it does not change

@@ -28,8 +28,6 @@
 Disassembler for HP1345A graphical primitives
 """
 
-from __future__ import print_function
-
 from pyreveng import instree, assy
 
 hp85662a_instructions = """

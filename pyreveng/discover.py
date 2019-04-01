@@ -39,8 +39,6 @@ Things to do:
 
 """
 
-from __future__ import print_function
-
 from pyreveng import mem, assy
 
 class Discover(object):

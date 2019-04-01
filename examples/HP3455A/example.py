@@ -25,8 +25,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from __future__ import print_function
-
 import os
 from pyreveng import job, mem, code, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
