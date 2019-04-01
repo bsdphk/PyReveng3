@@ -243,63 +243,63 @@ class byte_mem(word_mem):
 
 	def u8(self, a):
 		"""Unsigned 8-bit byte"""
-		return self.rd(a)
+		return self[a]
 
 	def bu16(self, a):
 		"""Big Endian Unsigned 16-bit half-word"""
-		b = self.rd(a) << 8
-		b |= self.rd(a + 1)
+		b = self[a] << 8
+		b |= self[a + 1]
 		return b
 
 	def bu32(self, a):
 		"""Big Endian Unsigned 32-bit word"""
-		b = self.rd(a) << 24
-		b |= self.rd(a + 1) << 16
-		b |= self.rd(a + 2) << 8
-		b |= self.rd(a + 3)
+		b = self[a] << 24
+		b |= self[a + 1] << 16
+		b |= self[a + 2] << 8
+		b |= self[a + 3]
 		return b
 
 	def bu64(self, a):
 		"""Big Endian Unsigned 64-bit double-word"""
-		b = self.rd(a) << 56
-		b |= self.rd(a + 1) << 48
-		b |= self.rd(a + 2) << 40
-		b |= self.rd(a + 3) << 32
-		b |= self.rd(a + 4) << 24
-		b |= self.rd(a + 5) << 16
-		b |= self.rd(a + 6) << 8
-		b |= self.rd(a + 7)
+		b = self[a] << 56
+		b |= self[a + 1] << 48
+		b |= self[a + 2] << 40
+		b |= self[a + 3] << 32
+		b |= self[a + 4] << 24
+		b |= self[a + 5] << 16
+		b |= self[a + 6] << 8
+		b |= self[a + 7]
 		return b
 
 	def lu16(self, a):
 		"""Little Endian Unsigned 16-bit half-word"""
-		b = self.rd(a)
-		b |= self.rd(a + 1) << 8
+		b = self[a]
+		b |= self[a + 1] << 8
 		return b
 
 	def lu32(self, a):
 		"""Little Endian Unsigned 32-bit word"""
-		b = self.rd(a)
-		b |= self.rd(a + 1) << 8
-		b |= self.rd(a + 2) << 16
-		b |= self.rd(a + 3) << 24
+		b = self[a]
+		b |= self[a + 1] << 8
+		b |= self[a + 2] << 16
+		b |= self[a + 3] << 24
 		return b
 
 	def lu64(self, a):
 		"""Little Endian Unsigned 64-bit double-word"""
-		b = self.rd(a)
-		b |= self.rd(a + 1) << 8
-		b |= self.rd(a + 2) << 16
-		b |= self.rd(a + 3) << 24
-		b |= self.rd(a + 4) << 32
-		b |= self.rd(a + 5) << 40
-		b |= self.rd(a + 6) << 48
-		b |= self.rd(a + 7) << 56
+		b = self[a]
+		b |= self[a + 1] << 8
+		b |= self[a + 2] << 16
+		b |= self[a + 3] << 24
+		b |= self[a + 4] << 32
+		b |= self[a + 5] << 40
+		b |= self[a + 6] << 48
+		b |= self[a + 7] << 56
 		return b
 
 	def s8(self, a):
 		"""Signed 8-bit byte"""
-		b = self.rd(a)
+		b = self[a]
 		if b & 0x80:
 			b -= 256
 		return b
@@ -348,7 +348,7 @@ class byte_mem(word_mem):
 
 	def load_data(self, first, step, data):
 		for i in data:
-			self.wr(first, i)
+			self[first] = i
 			first += step
 
 	def load_binfile(self, first, step, filename, lo=0, hi=None):
@@ -365,7 +365,7 @@ if __name__ == "__main__":
 	print(m)
 	print(type(m.m), ctypes.sizeof(m.m))
 	m.wr(0x100, 0x123456789)
-	print("%x" % m.rd(0x100))
+	print("%x" % m[0x100])
 	print(m.get_attr(0x100))
 	print(m.get_attr(0x101))
 	print(m.set_attr(0x101, 4))
