@@ -32,9 +32,7 @@ The reason for not relying on global variables is that it can be very
 useful to analyse multiple versions of a given image in parallel.
 """
 
-from __future__ import print_function
-
-from . import tree, mem
+from . import mem
 
 class Leaf(object):
 	"""
@@ -69,38 +67,35 @@ class Job(object):
 	def __init__(self, m, name="xxx"):
 		self.name = name
 		self.m = m
-		self.t = tree.Tree(m.lo, m.hi)
-		l = max(len("%x" % m.lo), len("%x" % (m.hi - 1)))
-		self.apct = "0x%%0%dx" % l
+		self.t = m.t
+		self.apct = m.apct
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
-		self.labels = dict()
-		self.block_comments = dict()
-		self.comment_prefix = "; "
+		self.labels = m.labels
+		self.block_comments = m.block_comments
+		self.comment_prefix = m.comment_prefix
+
 		# Banks are valid but presently unavailable memory ranges
 		# such as overlay areas in bank-switching.
 		# use as:  pj.banks.append([0x1000, 0x2000])
 		# This supresses WARNING about todo's into these banks
 		self.banks = []
 
-	def set_label(self, adr, lbl):
-		assert type(lbl) == str
-		x = self.labels.setdefault(adr, [])
-		x.append(lbl)
+	def set_label(self, *args, **kwargs):
+		self.m.set_label(*args, **kwargs)
 
-	def set_block_comment(self, adr, cmt):
-		if not adr in self.block_comments:
-			self.block_comments[adr] = ""
-		self.block_comments[adr] += cmt + "\n"
+	def set_block_comment(self, *args, **kwargs):
+		self.m.set_block_comment(*args, **kwargs)
 
 	def set_comment_prefix(self, prefix):
-		self.comment_prefix = prefix
+		self.m.comment_prefix = prefix
+		self.comment_prefix = m.comment_prefix
 
 	def afmt(self, a):
-		return self.apct % a
+		return self.m.apct % a
 
 	def render_adr(self, a):
-		x = self.labels.get(a)
+		x = self.m.labels.get(a)
 		if x is None:
 			return self.afmt(a)
 		return x[0]
@@ -127,15 +122,7 @@ class Job(object):
 		return l
 
 	def gaps(self):
-		l = list()
-		ll = self.m.lo
-		for i in self.t:
-			if i.lo > ll:
-				l.append((ll, i.lo))
-			ll = i.hi
-		if self.m.hi > ll:
-			l.append((ll, self.m.hi))
-		return l
+		return self.m.gaps()
 
 	def todo(self, adr, func):
 		assert isinstance(adr, int)

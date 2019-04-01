@@ -40,64 +40,91 @@ XXX: Need resolution of who controls rendering...
 
 """
 
-from __future__ import print_function
-
 import ctypes
+
+from . import tree
 
 DEFINED = (1 << 7)
 
 class MemError(Exception):
+
 	def __init__(self, adr, reason):
-		super(MemError, self).__init__()
+		super().__init__()
 		self.adr = adr
 		self.reason = reason
 		self.value = ("0x%x:" % adr + str(self.reason),)
+
 	def __str__(self):
 		return repr(self.value)
 
 class address_space(object):
+
 	"""
 	A vacuous address-space and base-class for actual address-spaces
 	and memory types
 	"""
+
 	def __init__(self, lo, hi, name=""):
 		assert lo <= hi
 		self.lo = lo
 		self.hi = hi
 		self.name = name
+		self.labels = dict()
+		self.block_comments = dict()
+		l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+		self.apct = "0x%%0%dx" % l
+		self.t = tree.Tree(self.lo, self.hi)
+		self.comment_prefix = "; "
 
 	def __repr__(self):
 		return "<address_space %s 0x%x-0x%x>" % (
 		    self.name, self.lo, self.hi
 		)
 
-	def __getitem__(self, a):
-		a = self._off(a)
-		raise MemError(a, "Undefined")
+	def __getitem__(self, adr):
+		b = self._off(adr)
+		raise MemError(adr, "Undefined")
 
-	def __setitem__(self, a, d):
-		a = self._off(a)
-		raise MemError(a, "Undefined")
+	def __setitem__(self, adr, data):
+		b = self._off(adr)
+		raise MemError(adr, "Undefined")
 
-	def _off(self, a):
-		if a < self.lo:
-			raise MemError(a, "Address too low")
-		if a >= self.hi:
-			raise MemError(a, "Address too high")
-		return a - self.lo
+	def _off(self, adr):
+		if adr < self.lo:
+			raise MemError(adr, "Address too low")
+		if adr >= self.hi:
+			raise MemError(adr, "Address too high")
+		return adr - self.lo
 
+	def set_label(self, adr, lbl):
+		assert type(lbl) == str
+		self.labels.setdefault(adr, []).append(lbl)
+
+	def set_block_comment(self, adr, cmt):
+		self.block_comments.setdefault(adr, '')
+		self.block_comments[adr] += cmt + '\n'
+
+	def gaps(self):
+		ll = self.lo
+		for i in self.t:
+			if i.lo > ll:
+				yield ll, i.lo, self
+			ll = i.hi
+		if self.hi > ll:
+			yield ll, self.hi, self
 
 class word_mem(address_space):
+
 	"""
 	Word memory is characteristic for a lot of the earliest computers,
 	they could access exactly one word at a time, or possibly fractions
 	of a word, but the instruction set did not support any "super-size"
 	data types or access spanning multiple words.
 
-	Typical examples:  Pretty much any ancestor of Von Neumans early
-	computers down to most of the minicomputers from DEC and DG.
+	Typical examples:  Pretty much any decendant of Von Neumans early
+	computers down to most of the minicomputers from DEC and DG etc.
 
-	Largest supported word-width is 64 bits.
+	Largest supported word-width is 64 bits and 8 attributes.
 	"""
 
 	def __init__(self, lo, hi, bits=8, attr=0):
@@ -107,7 +134,7 @@ class word_mem(address_space):
 		assert attr >= 0
 		assert attr <= 7
 
-		super(word_mem, self).__init__(lo, hi)
+		super().__init__(lo, hi)
 
 		self.bits = bits
 		self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
@@ -135,51 +162,48 @@ class word_mem(address_space):
 		self.at = ctypes.c_uint8
 		self.a = (self.at * l)()
 
-		#self.pm = ctypes.pointer(self.m[0])
-		#self.pa = ctypes.pointer(self.a[0])
-
 	def __repr__(self):
 		return "<word_mem 0x%x-0x%x, @%d bits, %d attr>" % (
 		    self.lo, self.hi, self.bits, self.attr)
 
-	def __getitem__(self, a):
+	def __getitem__(self, adr):
 		"""Read location"""
-		b = self._off(a)
+		b = self._off(adr)
 		if not self.a[b] & DEFINED:
-			raise MemError(a, "Undefined")
+			raise MemError(adr, "Undefined")
 		return self.m[b]
 
-	def rd(self, a):
-		return self[a]
+	def rd(self, adr):
+		return self[adr]
 
-	def __setitem__(self, a, d):
+	def __setitem__(self, adr, dat):
 		"""Write location"""
-		if d & ~self.msk:
-			raise MemError(a, "Data too big (0x%x)" % d)
-		b = self._off(a)
-		self.m[b] = self.mt(d)
+		if dat & ~self.msk:
+			raise MemError(adr, "Data too wide (0x%x)" % dat)
+		b = self._off(adr)
+		self.m[b] = self.mt(dat)
 		self.a[b] |= DEFINED
 
-	def wr(self, a, d):
-		self[a] = d
+	def wr(self, adr, dat):
+		self[adr] = dat
 
-	def get_attr(self, a):
+	def get_attr(self, adr):
 		"""Get attributes"""
-		b = self._off(a)
+		b = self._off(adr)
 		return self.a[b] & self.amsk
 
-	def set_attr(self, a, x):
+	def set_attr(self, adr, x):
 		"""Set attributes"""
 		if x & ~self.amsk:
-			raise MemError(a, "Attribute too big (0x%x)" % x)
-		b = self._off(a)
+			raise MemError(adr, "Attribute too wide (0x%x)" % x)
+		b = self._off(adr)
 		self.a[b] |= x
 
-	def clr_attr(self, a, x):
+	def clr_attr(self, adr, x):
 		"""Clear attributes"""
 		if x & ~self.amsk:
-			raise MemError(a, "Attribute too big (0x%x)" % x)
-		b = self._off(a)
+			raise MemError(adr, "Attribute too big (0x%x)" % x)
+		b = self._off(adr)
 		self.a[b] &= ~x
 
 	def do_ascii(self, w):
@@ -198,45 +222,18 @@ class word_mem(address_space):
 			b -= 8
 		return s + "|"
 
-	def render(self, pj, lo, hi):
-		"""
-		Render a location
-
-		XXX: The PJ gets to render the address, but mem
-		XXX: renders the value.  Make it consistent.
-		"""
-		l = list()
-		while lo < hi:
-			s = pj.afmt(lo) + " "
-			try:
-				w = self.rd(lo)
-				s += self.fmt % w
-			except MemError:
-				w = None
-				s += self.undef
-
-			if self.amsk > 0x0f:
-				s += " /%02x " % self.get_attr(lo)
-			elif self.amsk > 0x0:
-				s += " /%x " % self.get_attr(lo)
-
-			if self.ascii:
-				s += self.do_ascii(w)
-			lo += 1
-			l.append(s)
-		return l
-
-
 class byte_mem(word_mem):
-	"""
-	Byte memory is characteristic of microcomputers, which typically
-	had very narrow busses, 4 or 8 bits, but which had instructions
-	for operating on wider types than the buswidth.
 
-	This introduces the issue of which "endianess" but this is not
-	really attribute of the memory, it is an attribute of the CPU,
-	instruction set or interpreted code, so we provide both "sexes"
-	and leave it up to everybody else to use the right one.
+	"""
+	Byte memory is characteristic for microcomputers, which
+	typically had very narrow busses, 4 or 8 bits, but instructions
+	for operating on wider types than the width of the bus.
+
+	This introduces the issue of "endianess" but this is not
+	really attribute of the memory, it is an attribute of the
+	CPU, instruction set or interpreted code, so we provide
+	both "sexes" and leave it up to everybody else to use the
+	right one.
 	"""
 
 	def __init__(self, lo, hi, attr=0):
@@ -247,13 +244,6 @@ class byte_mem(word_mem):
 	def u8(self, a):
 		"""Unsigned 8-bit byte"""
 		return self.rd(a)
-
-	def s8(self, a):
-		"""Signed 8-bit byte"""
-		b = self.rd(a)
-		if b & 0x80:
-			b -= 256
-		return b
 
 	def bu16(self, a):
 		"""Big Endian Unsigned 16-bit half-word"""
@@ -305,6 +295,13 @@ class byte_mem(word_mem):
 		b |= self.rd(a + 5) << 40
 		b |= self.rd(a + 6) << 48
 		b |= self.rd(a + 7) << 56
+		return b
+
+	def s8(self, a):
+		"""Signed 8-bit byte"""
+		b = self.rd(a)
+		if b & 0x80:
+			b -= 256
 		return b
 
 	def bs16(self, a):
@@ -362,41 +359,6 @@ class byte_mem(word_mem):
 			self.load_data(first, step, d[lo:hi])
 		else:
 			self.load_data(first, step, d[lo:])
-
-	def render(self, pj, lo, hi):
-		"""
-		Render 'ncol' bytes per line
-
-		XXX: ncol should be parameterized
-
-		XXX: The PJ gets to render the address, but mem
-		XXX: renders the value.  Make it consistent.
-		"""
-		l = list()
-		while lo < hi:
-			s = ""
-			t = ""
-			s += pj.afmt(lo) + " "
-			for i in range(self.ncol):
-				if lo + i < hi:
-					try:
-						v = self.rd(lo + i)
-						s += " %02x" % v
-						if v < 32 or v > 126:
-							t += " "
-						else:
-							t += "%c" % v
-					except MemError:
-						s += " --"
-						t += " "
-				else:
-					s += "   "
-					t += " "
-			if self.ascii:
-				s += "  |" + t + "|"
-			l.append(s)
-			lo += self.ncol
-		return l
 
 if __name__ == "__main__":
 	m = word_mem(0x0000, 0x1000, bits=64, attr=3)

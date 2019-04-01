@@ -28,9 +28,7 @@
 Misc generally usable functions which don't reallly belong anywhere else
 """
 
-from __future__ import print_function
-
-from . import mem
+from pyreveng import mem
 
 def fill_gaps(pj):
 	# First GAPs, where mem cannot be read
@@ -43,12 +41,10 @@ def fill_gaps(pj):
 
 	gaps = 0
 	ngaps = 0
-	for i in pj.gaps():
-		a = i[0]
-		b = i[1]
-		g0 = a
+	for lo, hi, aspace in pj.gaps():
+		g0 = lo
 		g1 = False
-		for j in range(a, b):
+		for j in range(lo, hi):
 			try:
 				pj.m.rd(j)
 				if g1:
@@ -61,9 +57,9 @@ def fill_gaps(pj):
 					g1 = True
 					g0 = j
 		if g1:
-			add_gap(pj, g0, b)
+			add_gap(pj, g0, hi)
 			ngaps += 1
-			gaps += b - g0
+			gaps += hi - g0
 
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
