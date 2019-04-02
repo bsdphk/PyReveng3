@@ -1434,7 +1434,7 @@ class m68000(assy.Instree_disass):
 		return "VECTOR_%d" % v
 
 	def vectors(self, pj, hi=0x400):
-		y = data.Const(pj, 0, 4, "0x%08x", pj.m.bu32, 4)
+		y = self.dataptr(pj, 0)
 		y.lcmt = "Reset SP"
 		vn = {}
 		vi = {}
@@ -1442,18 +1442,21 @@ class m68000(assy.Instree_disass):
 		while a < hi:
 			x = pj.m.bu32(a)
 			if x in (0x0, 0xffffffff):
-				y = data.Const(pj, a, a + 4,
-				    "0x%04x", pj.m.bu32, 4)
+				y = self.dataptr(pj, a)
+				#y = data.Const(pj, a, a + 4,
+				#    "0x%04x", pj.m.bu32, 4)
 			else:
 				if x not in vn:
 					try:
 						vi[x] = self.disass(pj, x)
 						vn[x] = []
 						vn[x].append(a >> 2)
+					except assy.Invalid:
+						pass
 					except mem.MemError:
 						pass
 				if x > a:
-					y = data.Codeptr(pj, a, a + 4, x)
+					y = self.codeptr(pj, a)
 			y.lcmt = self.vector_name(a >> 2)
 			hi = min(hi, x)
 			a += 4

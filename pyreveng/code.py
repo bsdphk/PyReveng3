@@ -157,14 +157,14 @@ class Decode(object):
 		"""
 		Attempt to decode at adr.
 
-		This should return a code object or None
+		This should return a Code object or raise Invalid
 
 		The object shall not be pj.insert()'ed, since this function
 		is used for speculative disassembly.
 
 		Default always fails
 		"""
-		return None, "No Decoder"
+		raise Invalid("No decoder for " + self.lang)
 
 	def disass(self, pj, adr):
 		"""
@@ -174,16 +174,8 @@ class Decode(object):
 		y = pj.find(adr)
 		if len(y) > 0:
 			return y
-		try:
-			x,err = self.decode(pj, adr)
-		except Invalid as e:
-			x = None
-			err = e
-			
-		if x is None:
-			print(pj.afmt(adr) + ": disass(%s) failed" % self.name, err)
-		else:
-			assert isinstance(x, Code)
-			x.commit(pj)
-			pj.insert(x)
+		x = self.decode(pj, adr)
+		assert isinstance(x, Code)
+		x.commit(pj)
+		pj.insert(x)
 		return x

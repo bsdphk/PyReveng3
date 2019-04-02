@@ -39,7 +39,7 @@ Things to do:
 
 """
 
-from pyreveng import mem, assy
+from pyreveng import mem, assy, code
 
 class Discover(object):
 	def __init__(self, pj, cx):
@@ -84,15 +84,14 @@ class Discover(object):
 		for lx, hx, aspace in self.pj.gaps():
 			for adr in range(lx, hx):
 				try:
-					x,e = self.cx.decode(self.pj, adr)
-				except mem.MemError:
+					x = self.cx.decode(self.pj, adr)
+				except code.Invalid:
 					continue
-				except assy.Invalid:
+				except mem.MemError:
 					continue
 				except assy.Missing:
 					continue
-				if x is None:
-					continue
+				assert x is not None
 				self.code[adr] = x
 				self.trust[adr] = 1
 				self.prob[adr] = .25

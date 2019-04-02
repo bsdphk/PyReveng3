@@ -226,12 +226,12 @@ class Instree_disass(code.Decode):
 				raise
 			if y.prefix:
 				try:
-					y,e = self.decode(pj, adr + len(x.words) * self.scale, l)
+					y = self.decode(pj, adr + len(x.words) * self.scale, l)
 				except Invalid as e:
 					l.pop(-1)
 					continue
 				assert y is not None
-				return y,e
+				return y
 				
 			z = y.im.pil.pilspec
 			if z is not None:
@@ -240,7 +240,7 @@ class Instree_disass(code.Decode):
 				y.pildefault()
 			for i in self.flow_check:
 				i(pj, y)
-			return y, None
+			return y
 		raise Invalid(pj.afmt(adr) + 
 		    " No matching " + self.name + " instruction")
 

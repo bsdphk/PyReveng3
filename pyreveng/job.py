@@ -32,7 +32,7 @@ The reason for not relying on global variables is that it can be very
 useful to analyse multiple versions of a given image in parallel.
 """
 
-from . import mem
+from . import mem, code
 
 class Leaf(object):
 	"""
@@ -142,9 +142,23 @@ class Job(object):
 			adr, func = self.dolist.pop()
 			try:
 				func(self, adr)
-			except mem.MemError:
-				print("Fail: memory error",
-				    self.afmt(adr), func)
+				err = None
+			except code.Invalid as e:
+				err = e
+				pass
+				print("Todo fail " + self.afmt(adr) +
+				    ": " + str(e))
+			except mem.MemError as e:
+				err = e
+				pass
+				print("Todo fail " + self.afmt(adr) +
+				    ": memory error",
+				    self.afmt(adr), func, e)
 			except:
+				err = None
 				raise
+			if err is None:
+				continue
+			print("Todo fail: " + str(err) + "\n" +
+			    "    adr= " + self.afmt(adr) + " func=",func)
 		return rv
