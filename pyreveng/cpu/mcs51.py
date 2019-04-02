@@ -30,7 +30,7 @@ Disassembler for Intel mcs-51 microprocessor family
 
 from pyreveng import assy
 
-mcs51_instructions = """
+mcs51_desc = """
 
 #			|. . . . . . . .|. . . . . . . .|
 ACALL	a11,>C		| ahi |1 0 0 0 1| alo		| {
@@ -309,9 +309,8 @@ class mcs51_ins(assy.Instree_ins):
 
 class mcs51(assy.Instree_disass):
 	def __init__(self, lang="mcs51"):
-		super(mcs51, self).__init__(lang, 8)
-		self.it.load_string(mcs51_instructions)
-		self.myleaf = mcs51_ins
+		super().__init__(lang, 8)
+		self.it.load_string(mcs51_desc, mcs51_ins)
 		self.amask = 0xffff
 		self.verbatim |= set((
 		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")

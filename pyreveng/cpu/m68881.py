@@ -35,7 +35,7 @@ Page numbers with '*' reference MC68881/68882 USER's MANUAL (MC68881UM/AD Rev2)
 from pyreveng import assy, data, mem
 from pyreveng.cpu.m68000 import *
 
-m68881_instructions = '''
+m68881_desc = '''
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 
 # *88/4-30
@@ -174,4 +174,4 @@ class m68881_ins(m68000_ins):
 		self.mne += "." + "LSXPWDB?"[self['fmt']]
 
 def m68881(cpu):
-	cpu.it.load_string(m68881_instructions, m68881_ins)
+	cpu.add_ins(m68881_desc, m68881_ins)

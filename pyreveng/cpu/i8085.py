@@ -30,7 +30,7 @@ Disassembler for Intel i8085 microprocessor
 
 from pyreveng import instree, assy, data
 
-i8085_instructions="""
+i8085_desc="""
 #			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
 MOV	r1,r2		|0 1| ddd | sss |
 MOV	(HL),r2		|0 1 1 1 0| sss |
@@ -189,9 +189,8 @@ class i8085_ins(assy.Instree_ins):
 
 class i8085(assy.Instree_disass):
 	def __init__(self):
-		super(i8085, self).__init__("i8085", 8)
-		self.it.load_string(i8085_instructions)
-		self.myleaf = i8085_ins
+		super().__init__("i8085", 8)
+		self.add_ins(i8085_desc, i8085_ins)
 		self.verbatim |= set ((
 		    "(HL)",
 		    "SP",

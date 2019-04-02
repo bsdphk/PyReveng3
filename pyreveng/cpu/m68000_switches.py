@@ -333,7 +333,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		pj.set_label(dst, self.nm + "_CASE_%d" % no)
 
 def m68000_switches(disass):
-	disass.it.load_string(switches, m68000_switch_ins)
+	disass.add_ins(switches, m68000_switch_ins)
 
 if __name__ == "__main__":
 

@@ -30,7 +30,7 @@ Disassembler for HP1345A graphical primitives
 
 from pyreveng import assy
 
-hp1345a_instructions = """
+hp1345a_desc = """
 _SET	i,l,s,>R	|0 1 1| i | ? | l |0|?| s | ?	|
 _LOADX	c,>R		|0 0 0 0|p| c			|
 _PLOTY	c,p,>R		|0 0 0 1|p| c			|
@@ -85,8 +85,7 @@ class hp1345_ins(assy.Instree_ins):
 class hp1345a(assy.Instree_disass):
 	def __init__(self, lang="hp1345a"):
 		super(hp1345a, self).__init__(lang, 16, 8, ">")
-		self.it.load_string(hp1345a_instructions)
-		self.myleaf = hp1345_ins
+		self.add_ins(hp1345a_desc, hp1345_ins)
 		self.amask_ = 0xfff
 
 	def set_adr_mask(self, a):

@@ -35,7 +35,7 @@ Presently supported variants:
 
 from pyreveng import assy, data, mem
 
-m68000_instructions = """
+m68000_desc = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
 aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
@@ -1399,9 +1399,8 @@ class m68000(assy.Instree_disass):
 		    ins_word=16,
 		    mem_word=8,
 		    endian=">")
-		self.it.load_string(m68000_instructions)
+		self.it.load_string(m68000_desc, m68000_ins)
 		self.il = None
-		self.myleaf = m68000_ins
 		self.verbatim |= set(["CCR", "SR", "USP"])
 		self.ea_fullext = False
 		self.ea_scale = False
@@ -1462,7 +1461,7 @@ class m68000(assy.Instree_disass):
 		for i in vn:
 			for v in vn[i]:
 				k = self.vector_name(v)
-				if vi[i] != None and isinstance(vi[i], self.myleaf):
+				if vi[i] != None and isinstance(vi[i], m68000_ins):
 					vi[i].lcmt += "--> " + k + "\n"
 
 			if len(vn[i]) == 1:

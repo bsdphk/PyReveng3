@@ -42,7 +42,7 @@ from pyreveng import assy
 # Lower-case means we guessed
 # Uppercase came from 09411 listing
 
-hp_nanoproc_instructions="""
+hp_nanoproc_desc="""
 INB	-		|0 0 0 0|0 0 0 0|		Increment A
 DEB	-		|0 0 0 0|0 0 0 1|		Decrement A
 IND	-		|0 0 0 0|0 0 1 0|		Increment BCD
@@ -127,8 +127,7 @@ class hp_nanoproc_ins(assy.Instree_ins):
 class hp_nanoproc(assy.Instree_disass):
 	def __init__(self):
 		super(hp_nanoproc, self).__init__("HP nanoprocessor", 8)
-		self.it.load_string(hp_nanoproc_instructions)
-		self.myleaf = hp_nanoproc_ins
+		self.add_ins(hp_nanoproc_desc, hp_nanoproc_ins)
 
 		self.reg = list()
 		self.dev = list()
@@ -144,7 +143,7 @@ class hp_nanoproc(assy.Instree_disass):
 # This is a subclass which implements the bank-switching circuitry
 # used in the HP3325A and HP3336
 
-hp_nanoproc_pg_instructions="""
+hp_nanoproc_pg_desc="""
 LJMP pgadr,>J |1 1 0 0 1 0 0 0|0 0 1 1 0| pgno|1 0 0 0|0| ahi | alo           |
 LRET >R	      |0 1 1 0 1 1 1 1|0 1 0 1 1 0 0 0|1 0 1 1 1 0 0 0|
 MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
@@ -178,9 +177,8 @@ class hp_nanoproc_pg_ins(hp_nanoproc_ins):
 class hp_nanoproc_pg(hp_nanoproc):
 	def __init__(self):
 		super(hp_nanoproc_pg, self).__init__()
-		self.it.load_string(hp_nanoproc_pg_instructions)
+		self.add_ins(hp_nanoproc_pg_desc, hp_nanoproc_pg_ins)
 		# self.it.print()
-		self.myleaf = hp_nanoproc_pg_ins
 
 if __name__ == "__main__":
 	h = hp_nanoproc()

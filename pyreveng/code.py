@@ -174,7 +174,12 @@ class Decode(object):
 		y = pj.find(adr)
 		if len(y) > 0:
 			return y
-		x,err = self.decode(pj, adr)
+		try:
+			x,err = self.decode(pj, adr)
+		except Invalid as e:
+			x = None
+			err = e
+			
 		if x is None:
 			print(pj.afmt(adr) + ": disass(%s) failed" % self.name, err)
 		else:

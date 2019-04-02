@@ -30,7 +30,7 @@ Disassembler for Intel MCS4 ("Worlds first") microprocessor
 
 from pyreveng import assy
 
-mcs4_instructions="""
+mcs4_desc="""
 NOP	-		|0 0 0 0|0 0 0 0|
 JCN	cc,adr,>JC	|0 0 0 1| cc    | adr		|
 FIM	rr,data		|0 0 1 0| rr  |0| data		|
@@ -120,7 +120,6 @@ class mcs4_ins(assy.Instree_ins):
 
 class mcs4(assy.Instree_disass):
 	def __init__(self):
-		super(mcs4, self).__init__("mcs4", 8)
-		self.it.load_string(mcs4_instructions)
+		super().__init__("mcs4", 8)
+		self.it.load_string(mcs4_desc, mcs4_ins)
 		self.verbatim.add("(rr0)")
-		self.myleaf = mcs4_ins

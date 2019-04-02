@@ -36,7 +36,7 @@ Presently supported variants:
 from pyreveng import assy
 from pyreveng.cpu.m68010 import *
 
-m68020_instructions = """
+m68020_desc = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 
 # 141/4.37
@@ -91,8 +91,7 @@ class m68020_ins(m68010_ins):
 class m68020(m68010):
 	def __init__(self, lang="m68020"):
 		super().__init__(lang)
-		self.it.load_string(m68020_instructions)
-		self.myleaf = m68020_ins
+		self.it.load_string(m68020_desc, m68020_ins)
 		self.ea_fullext = True
 		self.ea_scale = True
 

@@ -36,7 +36,7 @@ Presently supported variants:
 from pyreveng import assy
 from pyreveng.cpu.m68000 import *
 
-m68010_instructions = """
+m68010_desc = """
 # 476/6-22
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 mOVEC           Rc,Dn           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|0|0| Dn  | Rc                    |
@@ -63,5 +63,4 @@ class m68010_ins(m68000_ins):
 class m68010(m68000):
 	def __init__(self, lang="m68010"):
 		super().__init__(lang)
-		self.it.load_string(m68010_instructions)
-		self.myleaf = m68010_ins
+		self.add_ins(m68010_desc, m68010_ins)

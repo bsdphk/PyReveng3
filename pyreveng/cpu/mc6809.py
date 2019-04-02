@@ -33,7 +33,7 @@ Presently supported variants:
 
 from pyreveng import assy, data
 
-mc6809_instructions = """
+mc6809_desc = """
 
 +	PFX10	|0 0 0 1 0 0 0 0|
 
@@ -402,7 +402,7 @@ ST	SU,M	|1 1| M |1 1 1 1| m		| {
 
 """
 
-mc6809_macro_instructions = """
+mc6809_macro_desc = """
 LDD	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
 	%B = i8 I
 	%A = i8 0
@@ -954,10 +954,9 @@ class mc6809_ins(assy.Instree_ins):
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=True):
 		super(mc6809, self).__init__("mc6809", 8)
-		self.it.load_string(mc6809_instructions)
-		self.myleaf = mc6809_ins
+		self.add_ins(mc6809_desc, mc6809_ins)
 		if macros:
-			self.it.load_string(mc6809_macro_instructions)
+			self.add_ins(mc6809_macro_desc, mc6809_ins)
 		self.mask = mask
 
 	def codeptr(self, pj, adr):

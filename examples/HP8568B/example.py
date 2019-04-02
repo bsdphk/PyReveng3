@@ -61,6 +61,9 @@ try:
 except:
 	import hp856x_cmds
 
+class myins(m68000.m68000_ins):
+	pass
+
 class mycpu(m68000.m68000):
 	def __init__(self):
 		super(mycpu, self).__init__()
@@ -78,7 +81,7 @@ class mycpu(m68000.m68000):
 				(j >> 0) & 1
 			)
 		s += "|\n"
-		self.it.load_string(s)
+		self.add_ins(s, myins)
 
 def mem_setup():
 	return mem.stackup(

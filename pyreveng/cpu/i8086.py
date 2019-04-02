@@ -30,7 +30,7 @@ Disassembler for Intel i8086 microprocessor
 
 from pyreveng import instree, assy, binutils
 
-i8086_instructions="""
+i8086_desc="""
 #		|- - - - - - - -|- - - - - - - -|- - - - - - - -|
 MOV	r,ea	|1 0 0 0 1 0|0|w|mod| reg | rm  |
 MOV	ea,r	|1 0 0 0 1 0|1|w|mod| reg | rm  |
@@ -224,7 +224,7 @@ ESC	-	|1 1 0 1 1| xxx |mod| yyy | rm  |
 
 """
 
-i8087_instructions = """
+i8087_desc = """
 FLDa	mf,ea	|1 1 0 1 1|mf |1|mod|0 0 0| rm	|
 FLDb	ea	|1 1 0 1 1|1 1 1|mod|1 0 1| rm	|
 FLDc	ea	|1 1 0 1 1|0 1 1|mod|1 0 1| rm	|
@@ -334,14 +334,14 @@ def fixup_mod_reg_rm(ins):
 			ins_list.append(k)
 	return "\n".join(ins_list)
 
-i8086_instructions = fixup_mod_reg_rm(i8086_instructions)
-i8087_instructions = fixup_mod_reg_rm(i8087_instructions)
+i8086_desc = fixup_mod_reg_rm(i8086_desc)
+i8087_desc = fixup_mod_reg_rm(i8087_desc)
 if __name__ == "__main__":
-	print(i8086_instructions)
-	print(i8087_instructions)
+	print(i8086_desc)
+	print(i8087_desc)
 	it = instree.InsTree(8)
-	it.load_string(i8086_instructions)
-	it.load_string(i8087_instructions)
+	it.load_string(i8086_desc)
+	it.load_string(i8087_desc)
 	it.dump()
 
 wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
@@ -512,12 +512,10 @@ class i8086_ins(assy.Instree_ins):
 class i8086(assy.Instree_disass):
 	def __init__(self):
 		super(i8086, self).__init__("i8086", 8)
-		self.it.load_string(i8086_instructions)
-		self.myleaf = i8086_ins
+		self.add_ins(i8086_desc, i8086_ins)
 
 	def has_8087(self):
-		#self.it.load_string(i8087_instructions, i808687_ins)
-		self.it.load_string(i8087_instructions)
+		self.add_ins(i8087_desc, i8086_ins)
 
 	def disass(self, pj, adr):
 		y = pj.find(adr, self.name)

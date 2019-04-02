@@ -66,8 +66,7 @@ class my68k20_ins(m68020.m68020_ins):
 class my68k20(m68020.m68020):
 	def __init__(self, lang="my68k20"):
 		super().__init__(lang)
-		self.it.load_string(my68k20_instructions)
-		self.myleaf = my68k20_ins
+		self.add_ins(my68k20_instructions, my68k20_ins)
 
 def inline_text(pj, ins):
 	if not ins.dstadr in (

@@ -34,7 +34,7 @@ Disassembler for TI TMS9900 microprocessor
 
 from pyreveng import assy, data
 
-tms9900_instructions = """
+tms9900_desc = """
 
 # Page numbers referst to:
 #	9900 Family Systems Design
@@ -487,7 +487,7 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):
-		super(vector, self).__init__(pj, adr, adr + 4)
+		super().__init__(pj, adr, adr + 4)
 		self.ws = data.Dataptr(pj, adr + 0x00, adr + 0x02,
 		    pj.m.bu16(adr))
 		self.ip = cx.codeptr(pj, adr + 0x02)
@@ -927,10 +927,9 @@ class Tms9900_ins(assy.Instree_ins):
 
 class Tms9900(assy.Instree_disass):
 	def __init__(self):
-		super(Tms9900, self).__init__("TMS 9900", 16, 8, ">")
-		self.it.load_string(tms9900_instructions)
+		super().__init__("TMS 9900", 16, 8, ">")
+		self.add_ins(tms9900_desc, Tms9900_ins)
 		self.n_interrupt = 16
-		self.myleaf = Tms9900_ins
 		self.il = True
 
 	def codeptr(self, pj, adr):
@@ -957,7 +956,7 @@ class Tms9900(assy.Instree_disass):
 
 class Tms9981(Tms9900):
 	def __init__(self):
-		super(Tms9981, self).__init__()
+		super().__init__()
 		self.n_interrupt = 5
 
 if __name__ == "__main__":

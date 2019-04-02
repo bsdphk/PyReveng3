@@ -34,7 +34,7 @@ Presently supported variants:
 
 from pyreveng import assy, data
 
-mc6800_instructions = """
+mc6800_desc = """
 NOP     -       |01     | {
     %0 = i1 0
 }
@@ -914,13 +914,22 @@ class mc6800_ins(assy.Instree_ins):
                 print("MC6800_FLG", i, a, arg, self)
                 self.add_il(["%" + i + '= i1 undef'])
 
+    # 68HC11 only
+    def assy_y(self, pj):
+        return "0x%02x+Y" % self['y']
+
+    # 68HC11 only
+    def assy_Y(self, pj):
+        if self.mne[-1] == "X":
+            self.mne = self.mne[:-1] + "Y"
+        self.idx = "Y"
+
 
 class mc6800(assy.Instree_disass):
     def __init__(self, mask=0xffff):
         super(mc6800, self).__init__("mc6800", 8)
-        self.it.load_string(mc6800_instructions)
+        self.add_ins(mc6800_desc, mc6800_ins)
         self.mask = mask
-        self.myleaf = mc6800_ins
 
     def codeptr(self, pj, adr):
         t = pj.m.bu16(adr)
@@ -935,7 +944,7 @@ class mc6800(assy.Instree_disass):
             adr += 2
 
 
-mc68hc11_instructions = """
+mc68hc11_desc = """
 IDIV    -           |02     |
 FDIV    -           |03     |
 LSRD    -           |04     |
@@ -996,24 +1005,10 @@ STD     e           |FD     | e1            | e2            |
 
 """
 
-
-class mc68hc11_ins(mc6800_ins):
-    pass
-
-    def assy_y(self, pj):
-        return "0x%02x+Y" % self['y']
-
-    def assy_Y(self, pj):
-        if self.mne[-1] == "X":
-            self.mne = self.mne[:-1] + "Y"
-        self.idx = "Y"
-
-
 class mc68hc11(mc6800):
     def __init__(self, mask=0xffff):
         super(mc68hc11, self).__init__(mask=mask)
-        self.it.load_string(mc68hc11_instructions)
-        self.myleaf = mc68hc11_ins
+        self.it.load_string(mc68hc11_desc, mc6800_ins)
 
     def register_labels(self, pj):
         pj.set_label(0x1000, "PORTA")

@@ -37,8 +37,7 @@ from . import instree, code, pil
 
 #######################################################################
 
-class Invalid(Exception):
-	pass
+Invalid = code.Invalid
 
 class Wrong(Exception):
 	pass
@@ -178,7 +177,7 @@ class Instree_ins(Assy):
 
 class Instree_disass(code.Decode):
 	def __init__(self, name, ins_word=8, mem_word=None, endian=None):
-		super(Instree_disass, self).__init__(name)
+		super().__init__(name)
 		if mem_word is None:
 			mem_word = ins_word
 
@@ -196,9 +195,12 @@ class Instree_disass(code.Decode):
 					(ins_word, mem_word, endian))
 
 		self.flow_check = []
-		self.myleaf = Instree_ins
 		self.verbatim = set()
 		self.it = instree.InsTree(ins_word)
+
+	def add_ins(self, desc, ins):
+		assert issubclass(ins, Instree_ins)
+		self.it.load_string(desc, ins)
 
 	def getmore_word(self, pj, adr, v):
 		v.append(pj.m.rd(adr + len(v)))
@@ -207,51 +209,40 @@ class Instree_disass(code.Decode):
 		v.append(pj.m.bu16(adr + len(v) * 2))
 
 	def decode(self, pj, adr, l=None):
-		hdl = set()
-		hdl.add(None)
 		if l is None:
 			l = []
-		else:
-			for i in l:
-				hdl.add(i.handler)
-			if len(hdl) > 1:
-				hdl.discard(None)
-		y = None
-		err = None
 		for x in self.it.find(pj, adr, getmore=self.getmore):
-			if l and x.handler not in hdl:
-				# print("PFX handler", hdl, x.handler, l)
+			assert x.handler is not None
+			if l and not issubclass(x.handler, l[-1].handler):
 				continue
 			l.append(x)
 			try:
-				if x.handler is None:
-					y = self.myleaf(pj, l, self)
-				else:
-					y = x.handler(pj, l, self)
+				y = x.handler(pj, l, self)
 				y.parse(pj)
 			except Invalid as e:
-				err = '0x%x %s' % (adr, str(e))
-				y = None
 				l.pop(-1)
 				continue
 			except KeyError as e:
-				print("KeyError in", x)
 				raise
-			if not y.prefix:
-				break
-			y,err = self.decode(pj, adr + len(x.words) * self.scale, l)
-			if y != None:
-				return y, None
-			l.pop(-1)
-		if y != None:
-			x = y.im.pil.pilspec
-			if x is not None:
-				y.add_il(x.split("\n"))
+			if y.prefix:
+				try:
+					y,e = self.decode(pj, adr + len(x.words) * self.scale, l)
+				except Invalid as e:
+					l.pop(-1)
+					continue
+				assert y is not None
+				return y,e
+				
+			z = y.im.pil.pilspec
+			if z is not None:
+				y.add_il(z.split("\n"))
 			else:
 				y.pildefault()
 			for i in self.flow_check:
 				i(pj, y)
-		return y, err
+			return y, None
+		raise Invalid(pj.afmt(adr) + 
+		    " No matching " + self.name + " instruction")
 
 
 #######################################################################

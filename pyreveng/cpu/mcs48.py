@@ -30,7 +30,7 @@ Disassembler for Intel mcs-48 microprocessor family
 
 from pyreveng import assy
 
-mcs48_instructions = """
+mcs48_desc = """
 # 4-8
 ADD	A,r		|0 1 1 0|1|  r  |
 ADD	A,ar		|0 1 1 0|0 0 0|r|
@@ -211,9 +211,8 @@ class mcs48_ins(assy.Instree_ins):
 
 class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
-		super(mcs48, self).__init__(lang, 8)
-		self.it.load_string(mcs48_instructions)
-		self.myleaf = mcs48_ins
+		super().__init__(lang, 8)
+		self.it.load_string(mcs48_desc, mcs48_ins)
 
 		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",
 			"I", "F0", "F1",))
