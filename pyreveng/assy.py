@@ -49,7 +49,7 @@ class Missing(Exception):
 
 class Assy(code.Code):
 	def __init__(self, pj, lo, hi, lang):
-		super(Assy, self).__init__(pj, lo, hi, lang)
+		super().__init__(pj, lo, hi, lang)
 		self.mne = "???"
 		self.oper = []
 		self.pil = pil.PIL_Ins(self)
@@ -83,7 +83,7 @@ class Instree_ins(Assy):
 	def __init__(self, pj, lim, lang):
 		lo = lim[0].adr
 		hi = lim[-1].adr + len(lim[-1].words) * lang.scale
-		super(Instree_ins, self).__init__(pj, lo, hi, lang)
+		super().__init__(pj, lo, hi, lang)
 		self.prefix = False
 		self.cc = True
 		self.dstadr = None
@@ -146,8 +146,8 @@ class Instree_ins(Assy):
 			return
 		if not isinstance(x, Arg):
 			print(self)
-			print(lim)
-			print(lang)
+			print(self.lim)
+			print(self.lang)
 			raise Wrong("Not Arg, type '%s', str '%s'" %
 			    (str(type(x)), str(x)))
 		self.oper.append(x)
@@ -167,10 +167,10 @@ class Instree_ins(Assy):
 	def get(self, f):
 		return self.lim[-1].get(f)
 
-	def __getitem__(self,f):
+	def __getitem__(self, f):
 		return self.lim[-1][f]
 
-	def __setitem__(self,f,v):
+	def __setitem__(self, f, v):
 		self.lim[-1][f] = v
 
 #######################################################################
@@ -232,7 +232,7 @@ class Instree_disass(code.Decode):
 					continue
 				assert y is not None
 				return y
-				
+
 			z = y.im.pil.pilspec
 			if z is not None:
 				y.add_il(z.split("\n"))
@@ -241,13 +241,13 @@ class Instree_disass(code.Decode):
 			for i in self.flow_check:
 				i(pj, y)
 			return y
-		raise Invalid(pj.afmt(adr) + 
+		raise Invalid(pj.afmt(adr) +
 		    " No matching " + self.name + " instruction")
 
 
 #######################################################################
 
-class Arg(object):
+class Arg():
 	def __init__(self, pj):
 		self.pj = pj
 
@@ -256,7 +256,7 @@ class Arg(object):
 
 class Arg_verbatim(Arg):
 	def __init__(self, pj, txt):
-		super(Arg_verbatim, self).__init__(pj)
+		super().__init__(pj)
 		self.txt = txt
 
 	def __str__(self):
@@ -264,7 +264,7 @@ class Arg_verbatim(Arg):
 
 class Arg_dst(Arg):
 	def __init__(self, pj, dst, pfx="", sfx=""):
-		super(Arg_dst, self).__init__(pj)
+		super().__init__(pj)
 		self.dst = dst
 		self.pfx = pfx
 		self.sfx = sfx
@@ -280,7 +280,7 @@ class Arg_dst(Arg):
 
 class Arg_ref(Arg):
 	def __init__(self, pj, obj):
-		super(Arg_ref, self).__init__(pj)
+		super().__init__(pj)
 		self.obj = obj
 
 	def __str__(self):
@@ -292,7 +292,7 @@ class Arg_ref(Arg):
 
 class Arg_imm(Arg):
 	def __init__(self, pj, val, wid=0):
-		super(Arg_imm, self).__init__(pj)
+		super().__init__(pj)
 		self.val = val
 		self.wid = wid
 		assert wid & 3 == 0

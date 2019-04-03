@@ -44,7 +44,7 @@ class Invalid(Exception):
 
 #######################################################################
 
-class Flow(object):
+class Flow():
 	"""
 	Flows connect code leaves together and captures where
 	execution can go next and under what condition.
@@ -113,7 +113,7 @@ class Code(job.Leaf):
 	def __init__(self, pj, lo, hi, lang):
 		assert isinstance(lang, Decode)
 		self.lang = lang
-		super(Code, self).__init__(pj, lo, hi, lang.name)
+		super().__init__(pj, lo, hi, lang.name)
 		self.flow_in = []
 		self.flow_out = []
 		lang.init_code(pj, self)
@@ -137,7 +137,7 @@ class Code(job.Leaf):
 
 #######################################################################
 
-class Decode(object):
+class Decode():
 	"""
 	Base class for decoding code.
 	"""

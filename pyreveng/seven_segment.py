@@ -158,7 +158,7 @@ class digit(job.Leaf):
 		if map is None:
 			map = default_map
 		assert len(map) == 9
-		super(digit, self).__init__(pj, adr, adr+1, "7seg")
+		super().__init__(pj, adr, adr+1, "7seg")
 		k, l = resolve(pj, adr, map, inv)
 		self.resolv = k
 		s = ".7SEG"

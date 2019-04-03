@@ -44,7 +44,7 @@ rather than the interval they cover, but for now it seems to work
 pretty ok.
 """
 
-class Tree(object):
+class Tree():
 	def __init__(self, lo, hi, lim=128):
 		# lim is only a performance parameter, it does not change
 		# funcationality in any way.
@@ -165,7 +165,7 @@ class Tree(object):
 if __name__ == "__main__":
 	# Minimal test cases
 
-	class Leaf(object):
+	class Leaf():
 		def __init__(self, lo, hi, tag):
 			self.lo = lo
 			self.hi = hi

@@ -26,7 +26,7 @@
 
 from . import mem, misc
 
-class Render_mem(object):
+class Render_mem():
 	def __init__(self, pj, fmt="x", ascii=True, ncol=None):
 
 		self.ascii = ascii
@@ -97,7 +97,7 @@ class Render_mem(object):
 			nlin -= 1
 		return l
 
-class Listing(object):
+class Listing():
 	def __init__(self, pj, fn=None, ascii=True, pil=True, ncol=None, fmt="x"):
 		self.pj = pj
 		self.fmt = fmt

@@ -37,7 +37,7 @@ from . import job
 
 class Data(job.Leaf):
 	def __init__(self, pj, lo, hi, t="data", fmt=None):
-		super(Data, self).__init__(pj, lo, hi, t)
+		super().__init__(pj, lo, hi, t)
 		pj.insert(self)
 		self.fmt = fmt
 
@@ -48,7 +48,7 @@ class Data(job.Leaf):
 
 class Const(Data):
 	def __init__(self, pj, lo, hi, fmt=None, func=None, size=1):
-		super(Const, self).__init__(pj, lo, hi, "const")
+		super().__init__(pj, lo, hi, "const")
 		if func is None:
 			func = pj.m.rd
 		if fmt is None:
@@ -68,7 +68,7 @@ class Pstruct(Data):
 	''' Uses python struct.* to untangle data '''
 	def __init__(self, pj, lo, spec, fmt=None, typ=".PSTRUCT"):
 		hi = lo + struct.calcsize(spec)
-		super(Pstruct, self).__init__(pj, lo, hi, "const")
+		super().__init__(pj, lo, hi, "const")
 		v = []
 		for i in range(lo, hi):
 			v.append(pj.m.rd(i))
@@ -84,7 +84,7 @@ class Pstruct(Data):
 
 class Codeptr(Data):
 	def __init__(self, pj, lo, hi, dst):
-		super(Codeptr, self).__init__(pj, lo, hi, "codeptr")
+		super().__init__(pj, lo, hi, "codeptr")
 		self.dst = dst
 
 	def render(self, pj):
@@ -95,7 +95,7 @@ class Codeptr(Data):
 
 class Dataptr(Data):
 	def __init__(self, pj, lo, hi, dst):
-		super(Dataptr, self).__init__(pj, lo, hi, "dataptr")
+		super().__init__(pj, lo, hi, "dataptr")
 		self.dst = dst
 
 	def render(self, pj):
@@ -148,7 +148,7 @@ class Txt(Data):
 
 		while hi % align:
 			hi += 1
-		super(Txt, self).__init__(pj, lo, hi, "txt")
+		super().__init__(pj, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"
 		if label:

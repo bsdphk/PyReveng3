@@ -34,7 +34,7 @@ useful to analyse multiple versions of a given image in parallel.
 
 from . import mem, code
 
-class Leaf(object):
+class Leaf():
 	"""
 	These are the leaves we hang into the tree class.
 
@@ -59,7 +59,7 @@ class Leaf(object):
 	def arg_render(self, pj):
 		return ""
 
-class Job(object):
+class Job():
 	"""
 	A single analysis job
 

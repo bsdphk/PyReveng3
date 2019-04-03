@@ -57,7 +57,7 @@ class MemError(Exception):
 	def __str__(self):
 		return repr(self.value)
 
-class address_space(object):
+class address_space():
 
 	"""
 	A vacuous address-space and base-class for actual address-spaces
@@ -237,7 +237,7 @@ class byte_mem(word_mem):
 	"""
 
 	def __init__(self, lo, hi, attr=0):
-		super(byte_mem, self).__init__(lo, hi, 8, attr)
+		super().__init__(lo, hi, 8, attr)
 		self.ncol = 4
 		self.ascii = True
 
