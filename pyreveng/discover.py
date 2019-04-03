@@ -41,7 +41,7 @@ Things to do:
 
 from pyreveng import mem, assy, code
 
-class Discover(object):
+class Discover():
 	def __init__(self, pj, cx):
 		self.pj = pj
 		self.cx = cx

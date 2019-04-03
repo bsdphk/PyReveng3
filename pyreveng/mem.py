@@ -97,7 +97,7 @@ class address_space():
 		return adr - self.lo
 
 	def set_label(self, adr, lbl):
-		assert type(lbl) == str
+		assert isinstance(lbl, str)
 		self.labels.setdefault(adr, []).append(lbl)
 
 	def set_block_comment(self, adr, cmt):
@@ -383,7 +383,7 @@ def stackup(files, lo=0, prefix=""):
 	hi = lo
 	for r in files:
 		l.append([])
-		if type(r) == str:
+		if isinstance(r, str):
 			b = open(prefix + r, "rb").read()
 			hi += len(b)
 			l[-1].append(b)

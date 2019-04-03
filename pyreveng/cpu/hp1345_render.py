@@ -227,7 +227,7 @@ CHARIDX_1816_1500 = [
 ]
 
 
-class font(object):
+class font():
 	def __init__(self, romfile = "01347-80012.bin"):
 		self.v = [[]] * 256
 
