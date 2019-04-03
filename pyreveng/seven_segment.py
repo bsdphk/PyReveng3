@@ -30,10 +30,11 @@
 
 from . import job, mem
 
-default_map = (1, 2, 4, 8, 16, 32, 64, 128, 0)
+# Default driver layout (A, B, C, D, E ,F, G, RDP, LDP)
+default_drive = (1, 2, 4, 8, 16, 32, 64, 128, 0)
 
 known = {
-	# Index is A-G with canonical (ie: default_map) values
+	# Index is A-G with canonical (ie: default_drive) values
 	# DPs are handled separately
 	0x00:	"blank",
 	0x40:	'-',
@@ -130,14 +131,14 @@ def lcmt(segs):
 	r += " "
 	return r
 
-def resolve(pj, adr, map, inv):
-	assert len(map) == 9
+def resolve(pj, adr, drive, inv):
+	assert len(drive) == 9
 	x = pj.m.rd(adr)
 	if inv:
 		x ^= 255
 	l = list()
 	n = 0
-	for i in map:
+	for i in drive:
 		n >>= 1
 		if x & i:
 			l.append(True)
@@ -151,15 +152,15 @@ def resolve(pj, adr, map, inv):
 	return k, l
 
 class digit(job.Leaf):
-	def __init__(self, pj, adr, map=None, inv=False, verbose=False):
+	def __init__(self, pj, adr, drive=None, inv=False, verbose=False):
 		"""
-		map = [A, B, C, D, E, F, G, RDP, LDP]
+		drive = [A, B, C, D, E, F, G, RDP, LDP]
 		"""
-		if map is None:
-			map = default_map
-		assert len(map) == 9
+		if drive is None:
+			drive = default_drive
+		assert len(drive) == 9
 		super().__init__(pj, adr, adr+1, "7seg")
-		k, l = resolve(pj, adr, map, inv)
+		k, l = resolve(pj, adr, drive, inv)
 		self.resolv = k
 		s = ".7SEG"
 		if k is not None:
@@ -181,17 +182,17 @@ class digit(job.Leaf):
 		self.rendered = s
 		pj.insert(self)
 
-def table(pj, lo, hi, map=None, inv=False, verbose=False):
+def table(pj, lo, hi, drive=None, inv=False, verbose=False):
 	"""
-	map = [A, B, C, D, E, F, G, RDP, LDP]
+	drive = [A, B, C, D, E, F, G, RDP, LDP]
 	"""
-	if map is None:
-		map = default_map
-	assert len(map) == 9
+	if drive is None:
+		drive = default_drive
+	assert len(drive) == 9
 	c = pj.add(lo, hi, "7segtable")
 	t = []
 	for a in range(lo, hi):
-		t.append(digit(pj, a, map, inv, verbose).resolv)
+		t.append(digit(pj, a, drive, inv, verbose).resolv)
 	return t
 
 #######################################################################
@@ -237,10 +238,10 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		else:
 			continue
 
-		map = [255] * 8
+		drive = [255] * 8
 		adr = a
 
-		# Prune map based on recognized pattern
+		# Prune drive based on recognized pattern
 		for i, z in enumerate(pattern):
 			j = known_rev[z]
 			yy = y[i]
@@ -250,23 +251,23 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 			m = 0
 			while k < 0x80:
 				if j & k:
-					map[m] &= yy
+					drive[m] &= yy
 				k <<= 1
 				m += 1
 
-		# Refine and validate map:
+		# Refine and validate drive:
 		#    Any zeros disqualifies
 		#    Any single bits filters that bit everywhere else
 		f = False
 		while True:
 			d = True
-			for i, z in enumerate(map):
+			for i, z in enumerate(drive):
 				if z == 0:
 					f = True
 					break
 				if bc(z) != 1:
 					continue
-				for j, w in enumerate(map):
+				for j, w in enumerate(drive):
 					if j != i and w & z:
 						w &= ~z
 						d = False
@@ -278,16 +279,16 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 			continue
 
 		# We don't know which DP it might be
-		map.append(map[-1])
+		drive.append(drive[-1])
 
 		# Report
 		print("\tCandidate 7seg table at 0x%x" % adr)
 		if inv:
 			print("\t\tInverted levels")
-		print("\t\tPossible map bits:", map)
+		print("\t\tPossible drive bits:", drive)
 		s = "\t\tProbable table contents:"
 		while True:
-			x, y = resolve(pj, adr, map, inv)
+			x, y = resolve(pj, adr, drive, inv)
 			if x is None:
 				break
 			s += " " + x

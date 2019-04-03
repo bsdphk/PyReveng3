@@ -126,9 +126,9 @@ def task(pj, cx):
 
 	#######################################################################
 
-	led_map = [1, 2, 4, 128, 64, 16, 32, 8, 0]
+	led_drive = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
-	seven_segment.table(pj, 0xecb4, 0xecd4, map=led_map, verbose=False)
+	seven_segment.table(pj, 0xecb4, 0xecd4, drive=led_drive, verbose=False)
 	pj.set_label(0xecb4, "7SEG_TBL")
 
 	LED_lbl = {
@@ -211,7 +211,7 @@ def task(pj, cx):
 	}
 
 	for a in range(0xf94d, 0xfdfe, 16):
-		c = seven_segment.table(pj, a, a + 16, map=led_map, verbose=False)
+		c = seven_segment.table(pj, a, a + 16, drive=led_drive, verbose=False)
 		t = LED_lbl.get(a)
 		assert t != None
 		if t == None:

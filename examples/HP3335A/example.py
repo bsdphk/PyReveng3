@@ -177,7 +177,7 @@ def task(pj, cpu):
 	#seven_segment.hunt(pj, 0x6800, 0x8000)
 
 	seven_segment.table(pj, 0x7800, 0x7810,
-	    map = ( 128, 64, 32, 16, 8, 4, 2, 1, 0),
+	    drive = ( 128, 64, 32, 16, 8, 4, 2, 1, 0),
 	    inv=True, verbose=False)
 
 
