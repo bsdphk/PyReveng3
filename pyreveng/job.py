@@ -137,7 +137,7 @@ class Job():
 
 	def run(self):
 		rv = False
-		while len(self.dolist) > 0:
+		while self.dolist:
 			rv = True
 			adr, func = self.dolist.pop()
 			try:
@@ -145,18 +145,8 @@ class Job():
 				err = None
 			except code.Invalid as e:
 				err = e
-				pass
-				print("Todo fail " + self.afmt(adr) +
-				    ": " + str(e))
 			except mem.MemError as e:
 				err = e
-				pass
-				print("Todo fail " + self.afmt(adr) +
-				    ": memory error",
-				    self.afmt(adr), func, e)
-			except:
-				err = None
-				raise
 			if err is None:
 				continue
 			print("Todo fail: " + str(err) + "\n" +

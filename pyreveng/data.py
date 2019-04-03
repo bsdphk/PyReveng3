@@ -165,7 +165,7 @@ class Txt(Data):
 
 		txt = ''
 		p = self.pre
-		
+
 		for i in l[:-1]:
 			txt += '.TXT\t' + p + "'" + i + "\\n'\n"
 			p = ''

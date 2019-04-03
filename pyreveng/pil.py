@@ -255,7 +255,7 @@ class PIL_Ins():
 				f = l
 				for i in f:
 					assert i == i.strip()
-			if len(f) == 0:
+			if not f:
 				continue
 			v = []
 			for i in f:
@@ -282,7 +282,7 @@ class PIL_Ins():
 					assert isinstance(k, str)
 					x = self.pil_reg(k, d)
 					v.append(x)
-			if len(v) == 0:
+			if not v:
 				continue
 
 			try:
@@ -598,7 +598,7 @@ if False:
 			self.expect_value(l, ty)
 			self.expect(',', l.pop(0))
 			self.expect_value(l, ty)
-			if len(l):
+			if l:
 				raise PILSyntaxError(
 					"Extra stuff on conditional verb '" + v + "' <%s>" % str(l))
 
@@ -663,7 +663,7 @@ if False:
 				y = PIL_BB()
 				for x in j.pil.pil:
 					y.pils.append(x)
-				if len(y.pils) == 0:
+				if not y.pils:
 					a = j.render(pj).expandtabs()
 					b = j.lim[-1].assy[0]
 					if b not in noil:
@@ -762,7 +762,7 @@ if False:
 			n = 0
 			for a, x in self.pilbbs.items():
 				#print("PROP", x)
-				if len(x.goto) == 0:
+				if not x.gogo:
 					continue
 				if None in x.goto:
 					continue
@@ -770,7 +770,7 @@ if False:
 				for j in x.goto:
 					#print("\t", j, j.doa)
 					dd = dd.intersection(j.doa)
-				if len(dd) == 0:
+				if not dd:
 					continue
 				#print("  ", dd)
 				n += x.build_doa(dd, color)
@@ -780,6 +780,6 @@ if False:
 
 def pil_debug(state):
 	for i in state.vars.values():
-		if len(i.write) == 0 or len(i.read) == 0:
+		if not i.write or not i.read:
 			print(i, "W", len(i.write), "R", len(i.read))
 

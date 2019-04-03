@@ -407,7 +407,7 @@ def stackup(files, lo=0, prefix=""):
 		p += stride * ll
 	print(m)
 	return m
-	
+
 
 if __name__ == "__main__":
 	m = word_mem(0x0000, 0x1000, bits=64, attr=3)

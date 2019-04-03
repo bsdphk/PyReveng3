@@ -172,7 +172,7 @@ class Decode():
 		Complain if it fails.
 		"""
 		y = pj.find(adr)
-		if len(y) > 0:
+		if y:
 			return y
 		x = self.decode(pj, adr)
 		assert isinstance(x, Code)

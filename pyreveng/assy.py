@@ -161,7 +161,7 @@ class Instree_ins(Assy):
 			for j in i[1].split(","):
 				self.arg(pj, j)
 
-		if len(self.flow_out) == 0:
+		if not self.flow_out:
 			self.add_flow(pj, True)
 
 	def get(self, f):
