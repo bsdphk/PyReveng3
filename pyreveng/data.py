@@ -78,7 +78,7 @@ class Pstruct(Data):
 		self.typ = typ
 
 	def render(self, pj):
-		if self.fmt != None:
+		if self.fmt is not None:
 			return self.typ + "\t" + self.fmt % self.data
 		return self.typ + "\t" + self.spec + " = " + str(self.data)
 
@@ -125,7 +125,7 @@ def stringify(pj, lo, length=None, term=None):
 		else:
 			s += "\\x%02x" % x
 			v += "%%%02x" % x
-		if length != None:
+		if length is not None:
 			length -= 1
 			if length == 0:
 				return lo, s, v

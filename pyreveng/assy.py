@@ -105,7 +105,7 @@ class Instree_ins(Assy):
 		self.add_flow(pj, True, "!" + self.cc, self.hi)
 
 	def flow_JC(self, pj):
-		if self.cc == True:
+		if self.cc is True:
 			self.add_flow(pj, ">", "?", self.dstadr)
 			self.add_flow(pj, True, "!?", self.hi)
 		else:
@@ -271,7 +271,7 @@ class Arg_dst(Arg):
 
 	def __str__(self):
 		l = self.pj.labels.get(self.dst)
-		if l != None:
+		if l is not None:
 			return self.pfx + "%s" % l[0] + self.sfx
 		elif self.dst is None:
 			return self.pfx + "0x?" + self.sfx

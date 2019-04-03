@@ -162,7 +162,7 @@ class digit(job.Leaf):
 		k, l = resolve(pj, adr, map, inv)
 		self.resolv = k
 		s = ".7SEG"
-		if k != None:
+		if k is not None:
 			if len(k) == 1:
 				s += ' "' + k + '"'
 			else:

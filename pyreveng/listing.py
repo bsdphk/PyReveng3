@@ -41,7 +41,7 @@ class Render_mem():
 		self.space = " " * len(j)
 		self.aspace = " " * (pj.m.bits//8)
 
-		if ncol != None:
+		if ncol is not None:
 			self.ncol = ncol
 		elif pj.m.bits == 8:
 			self.ncol = 4
@@ -139,7 +139,7 @@ class Listing():
 			nxxx += 1
 			cxxx += pj.m.hi - a0
 
-		if fn != None:
+		if fn is not None:
 			self.fo.close()
 
 		print("%d XXXs containing %d bytes" % (nxxx, cxxx))
@@ -178,7 +178,7 @@ class Listing():
 			m = max(len(hex), m)
 
 		cmt = self.pj.block_comments.get(lo)
-		if cmt != None:
+		if cmt is not None:
 			w = 72 - len(self.pj.comment_prefix)
 			self.fo.write(self.pj.comment_prefix + "-" * w + "\n")
 			self.fo.write(self.pj.comment_prefix)

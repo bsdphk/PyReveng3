@@ -196,7 +196,7 @@ class Discover(object):
 				n += 1
 				continue
 			x = self.trust.get(f.to)
-			if x != None and x > 0:
+			if x is not None and x > 0:
 				n += 1
 		p *= n / float(len(c.flow_out))
 

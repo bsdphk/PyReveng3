@@ -129,7 +129,7 @@ class Job():
 		if adr >= self.m.lo and adr < self.m.hi:
 			self.dolist.append((adr, func))
 			return
-		for lo,hi in self.banks:
+		for lo, hi in self.banks:
 			if adr >= lo and adr < hi:
 				return
 		print("WARNING: Ignoring todo at illegal address " +
@@ -160,5 +160,5 @@ class Job():
 			if err is None:
 				continue
 			print("Todo fail: " + str(err) + "\n" +
-			    "    adr= " + self.afmt(adr) + " func=",func)
+			    "    adr= " + self.afmt(adr) + " func=", func)
 		return rv

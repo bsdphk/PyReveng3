@@ -528,7 +528,7 @@ if False:
 			else:
 				self.expect('label', l.pop(0))
 				l.pop(0)
-			if len(l):
+			if l:
 				raise PILSyntaxError("Extra stuff on 'br' <%s>" % str(l))
 
 		def check_store(self, l):
@@ -541,13 +541,13 @@ if False:
 				raise PILSyntaxError(
 					"Inconsistent types in 'store' %s vs %s" % (ty, ty2))
 			self.expect_value(l, ty2)
-			if len(l):
+			if l:
 				raise PILSyntaxError("Extra stuff on 'store' <%s>" % str(l))
 
 		def verb_type(self, v, l):
 			ty = self.expect_type(v)
 			self.expect_value(l, ty)
-			if len(l):
+			if l:
 				raise PILSyntaxError(
 					"Extra stuff on verb '" + v + "' <%s>" % str(l))
 
@@ -556,7 +556,7 @@ if False:
 			self.expect_value(l, t)
 			self.expect(',', l.pop(0))
 			self.expect_value(l, t)
-			if len(l):
+			if l:
 				raise PILSyntaxError(
 					"Extra stuff on binary verb '" + v + "' <%s>" % str(l))
 
@@ -568,7 +568,7 @@ if False:
 				raise PILSyntaxError(
 					"Inconsistent types in 'load' %s vs %s" % (ty, ty2))
 			self.expect_value(l, ty2)
-			if len(l):
+			if l:
 				raise PILSyntaxError("Extra stuff on 'load' <%s>" % str(l))
 
 		def verb_shift(self, v, l):
@@ -576,7 +576,7 @@ if False:
 			self.expect_value(l, ty)
 			self.expect(',', l.pop(0))
 			self.expect_value(l, ty)
-			if len(l):
+			if l:
 				raise PILSyntaxError(
 					"Extra stuff on shift verb '" + v + "' <%s>" % str(l))
 
@@ -585,7 +585,7 @@ if False:
 			self.expect_value(l, ty)
 			self.expect('to', l.pop(0))
 			ty2 = self.expect_type(l.pop(0))
-			if len(l):
+			if l:
 				raise PILSyntaxError(
 					"Extra stuff on resize verb '" + v + "' <%s>" % str(l))
 
@@ -735,7 +735,7 @@ if False:
 						break
 					if len(x.goto) > 1:
 						break
-					if len(x.goto) == 0:
+					if not x.goto:
 						print("No goto", x)
 						break
 					z = x.goto[0]

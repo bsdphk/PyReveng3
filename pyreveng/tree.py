@@ -87,7 +87,7 @@ class Tree():
 		assert lo < hi
 		if l is None:
 			l = [[], [], [], []]
-		if lo < self.mid and self.less != None:
+		if lo < self.mid and self.less is not None:
 			self.less.find_range(lo, hi, l)
 		for i in self.cuts:
 			if i.hi <= lo or i.lo >= hi:
@@ -100,7 +100,7 @@ class Tree():
 				l[2].append(i)
 			else:
 				l[3].append(i)
-		if hi > self.mid and self.more != None:
+		if hi > self.mid and self.more is not None:
 			self.more.find_range(lo, hi, l)
 		return l
 
@@ -110,12 +110,12 @@ class Tree():
 		"""
 		if l is None:
 			l = []
-		if lo < self.mid and self.less != None:
+		if lo < self.mid and self.less is not None:
 			self.less.find_lo(lo, l)
 		for i in self.cuts:
 			if lo == i.lo:
 				l.append(i)
-		if lo >= self.mid and self.more != None:
+		if lo >= self.mid and self.more is not None:
 			self.more.find_lo(lo, l)
 		return l
 
@@ -125,12 +125,12 @@ class Tree():
 		"""
 		if l is None:
 			l = []
-		if hi <= self.mid and self.less != None:
+		if hi <= self.mid and self.less is not None:
 			self.less.find_hi(hi, l)
 		for i in self.cuts:
 			if hi == i.hi:
 				l.append(i)
-		if hi > self.mid and self.more != None:
+		if hi > self.mid and self.more is not None:
 			self.more.find_hi(hi, l)
 		return l
 
@@ -146,20 +146,20 @@ class Tree():
 		lst = []
 		while True:
 			lst.extend(t.cuts)
-			if t.more != None:
+			if t.more is not None:
 				stk.append(t.more)
-			if t.less != None:
+			if t.less is not None:
 				t = t.less
 				continue
 			lst.sort(key=lambda x: (x.lo, x.lo - x.hi))
-			while len(lst) > 0 and lst[0].lo < t.mid:
+			while lst and lst[0].lo < t.mid:
 				yield lst.pop(0)
-			if len(stk) == 0:
+			if not stk:
 				break
 			t = stk.pop()
-			while len(lst) > 0 and lst[0].lo < t.lo:
+			while lst and lst[0].lo < t.lo:
 				yield lst.pop(0)
-		while len(lst) > 0:
+		while lst:
 			yield lst.pop(0)
 
 if __name__ == "__main__":
