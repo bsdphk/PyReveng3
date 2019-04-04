@@ -76,7 +76,7 @@ class Tree():
 		else:
 			self.cuts.append(o)
 
-	def find_range(self, lo, hi, l=None):
+	def find_range(self, lo, hi, lst=None):
 		"""
 		Return four lists of objects:
 			Objects which the range is inside
@@ -85,84 +85,78 @@ class Tree():
 			Objects which are both inside and outside the range
 		"""
 		assert lo < hi
-		if l is None:
-			l = [[], [], [], []]
+		if lst is None:
+			lst = [[], [], [], []]
 		if lo < self.mid and self.less is not None:
-			self.less.find_range(lo, hi, l)
+			self.less.find_range(lo, hi, lst)
 		for i in self.cuts:
 			if i.hi <= lo or i.lo >= hi:
 				continue
 			if lo == i.lo and hi == i.hi:
-				l[1].append(i)
+				lst[1].append(i)
 			elif lo >= i.lo and hi <= i.hi:
-				l[0].append(i)
+				lst[0].append(i)
 			elif lo <= i.lo and hi >= i.hi:
-				l[2].append(i)
+				lst[2].append(i)
 			else:
-				l[3].append(i)
+				lst[3].append(i)
 		if hi > self.mid and self.more is not None:
-			self.more.find_range(lo, hi, l)
-		return l
+			self.more.find_range(lo, hi, lst)
+		return lst
 
-	def find_lo(self, lo, l=None):
+	def find_lo(self, lo, lst=None):
 		"""
 		Return list of objects with given .lo
 		"""
-		if l is None:
-			l = []
+		if lst is None:
+			lst = []
 		if lo < self.mid and self.less is not None:
-			self.less.find_lo(lo, l)
+			self.less.find_lo(lo, lst)
 		for i in self.cuts:
 			if lo == i.lo:
-				l.append(i)
+				lst.append(i)
 		if lo >= self.mid and self.more is not None:
-			self.more.find_lo(lo, l)
-		return l
+			self.more.find_lo(lo, lst)
+		return lst
 
-	def find_hi(self, hi, l=None):
+	def find_hi(self, hi, lst=None):
 		"""
 		Return list of objects with given .hi
 		"""
-		if l is None:
-			l = []
+		if lst is None:
+			lst = []
 		if hi <= self.mid and self.less is not None:
-			self.less.find_hi(hi, l)
+			self.less.find_hi(hi, lst)
 		for i in self.cuts:
 			if hi == i.hi:
-				l.append(i)
+				lst.append(i)
 		if hi > self.mid and self.more is not None:
-			self.more.find_hi(hi, l)
-		return l
+			self.more.find_hi(hi, lst)
+		return lst
 
 	def __iter__(self):
 		"""
-		Iterate in order of .lo and break ties in favour of
-		the more narrow object.
+		Iterate in order of .lo and narrow before wider.
 		"""
-		# Python cannot yield in recursive functions so we have to
-		# keep our own recursion stack, and 'todo' list
-		stk = []
-		t = self
+		stk = [self]
 		lst = []
-		while True:
-			lst.extend(t.cuts)
-			if t.more is not None:
-				stk.append(t.more)
-			if t.less is not None:
-				t = t.less
-				continue
-			lst.sort(key=lambda x: (x.lo, x.lo - x.hi))
-			while lst and lst[0].lo < t.mid:
+		while stk:
+			cur = stk.pop()
+			while lst and lst[0].lo < cur.lo:
 				yield lst.pop(0)
-			if not stk:
-				break
-			t = stk.pop()
-			while lst and lst[0].lo < t.lo:
-				yield lst.pop(0)
+			lst.extend(cur.cuts)
+			if cur.more is not None:
+				stk.append(cur.more)
+			if cur.less is not None:
+				stk.append(cur.less)
+			else:
+				lst.sort(key=lambda x: (x.lo, x.lo - x.hi))
+				while lst and lst[0].lo < cur.mid:
+					yield lst.pop(0)
 		while lst:
 			yield lst.pop(0)
 
-if __name__ == "__main__":
+def test_tree():
 	# Minimal test cases
 
 	class Leaf():
@@ -218,23 +212,27 @@ if __name__ == "__main__":
 	print("  .__iter__() OK")
 
 	for i in slo:
-		l = it.find_lo(i)
-		for j in l:
+		lst = it.find_lo(i)
+		for j in lst:
 			assert j.lo == i
-		assert len(l) == dlo[i]
+		assert len(lst) == dlo[i]
 	print("  .find_lo() OK")
 
 	for i in shi:
-		l = it.find_hi(i)
-		for j in l:
+		lst = it.find_hi(i)
+		for j in lst:
 			assert j.hi == i
-		assert len(l) == dhi[i]
+		assert len(lst) == dhi[i]
 	print("  .find_hi() OK")
 
-	l = it.find_range(0x200, 0x300)
+	lst = it.find_range(0x200, 0x300)
 	for i in range(4):
-		for j in l[i]:
+		for j in lst[i]:
 			assert j.tag == i
 	print("  .find_range() OK")
 
 	print("Happy")
+
+if __name__ == "__main__":
+
+	test_tree()
