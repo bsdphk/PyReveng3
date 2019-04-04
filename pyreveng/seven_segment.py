@@ -76,59 +76,26 @@ known = {
 }
 
 known_rev = {}
-for i, j in known.items():
-	known_rev[j] = i
+for iii, jjj in known.items():
+	known_rev[jjj] = iii
 
 def lcmt(segs):
 	"""
 	segs = [A, B, C, D, E, F, G, RDP, LDP]
 	"""
-	r = ""
-	if segs[0]:
-		r += "  ###\n"
-	else:
-		r += "  ---\n"
-
-	if segs[5]:
-		s = " #"
-	else:
-		s = " |"
-	if segs[1]:
-		r += s + "   #\n"
-		r += s + "   #\n"
-	else:
-		r += s + "   |\n"
-		r += s + "   |\n"
-
-	if segs[6]:
-		r += "  ###\n"
-	else:
-		r += "  ---\n"
-
-	if segs[4]:
-		s = " #"
-	else:
-		s = " |"
-	if segs[2]:
-		r += s + "   #\n"
-		r += s + "   #\n"
-	else:
-		r += s + "   |\n"
-		r += s + "   |\n"
-
-	if segs[8]:
-		s = "."
-	else:
-		s = " "
-	if segs[3]:
-		s += " ### "
-	else:
-		s += " --- "
-	if segs[7]:
-		r += s + ".\n"
-	else:
-		r += s + "\n"
-	r += " "
+	r = "  AAA\n F   B\n F   B\n  GGG\n E   C\n E   C\nL DDD R\n"
+	for x, y, z in (
+		('A', 0, '-'),
+		('B', 1, '|'),
+		('C', 2, '|'),
+		('D', 3, '-'),
+		('E', 4, '|'),
+		('F', 5, '|'),
+		('G', 6, '-'),
+		('R', 7, ' '),
+		('L', 8, ' '),
+	):
+		r = r.replace(x, '#' if segs[y] else z)
 	return r
 
 def resolve(pj, adr, drive, inv):
@@ -136,20 +103,20 @@ def resolve(pj, adr, drive, inv):
 	x = pj.m.rd(adr)
 	if inv:
 		x ^= 255
-	l = list()
+	lst = list()
 	n = 0
 	for i in drive:
 		n >>= 1
 		if x & i:
-			l.append(True)
+			lst.append(True)
 			n |= 0x100
 		else:
-			l.append(False)
+			lst.append(False)
 	n &= 0x7f
 	k = known.get(n)
 	if k is None:
 		print("NB! Unknown 7seg (TBL idx: 0x%x)" % n)
-	return k, l
+	return k, lst
 
 class digit(job.Leaf):
 	def __init__(self, pj, adr, drive=None, inv=False, verbose=False):
@@ -160,7 +127,7 @@ class digit(job.Leaf):
 			drive = default_drive
 		assert len(drive) == 9
 		super().__init__(pj, adr, adr+1, "7seg")
-		k, l = resolve(pj, adr, drive, inv)
+		k, lst = resolve(pj, adr, drive, inv)
 		self.resolv = k
 		s = ".7SEG"
 		if k is not None:
@@ -168,17 +135,17 @@ class digit(job.Leaf):
 				s += ' "' + k + '"'
 			else:
 				s += " " + k
-			if l[7]:
+			if lst[7]:
 				s += " + RDP"
-			if l[8]:
+			if lst[8]:
 				s += " + LDP"
 		else:
 			print("NB! @0x%x: Unknown 7seg (0x%x)" %
-			    (adr, pj.m.rd(adr)), "\n" + lcmt(l))
+			    (adr, pj.m.rd(adr)), "\n" + lcmt(lst))
 			verbose = True
 			# s += " 0x%02x" % n
 		if verbose:
-			self.lcmt = lcmt(l)
+			self.lcmt = lcmt(lst)
 		self.rendered = s
 		pj.insert(self)
 
@@ -189,7 +156,7 @@ def table(pj, lo, hi, drive=None, inv=False, verbose=False):
 	if drive is None:
 		drive = default_drive
 	assert len(drive) == 9
-	c = pj.add(lo, hi, "7segtable")
+	pj.add(lo, hi, "7segtable")
 	t = []
 	for a in range(lo, hi):
 		t.append(digit(pj, a, drive, inv, verbose).resolv)
@@ -202,7 +169,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 	def bc(a):
 		return bin(a).count("1")
 	print('7-segment hunt (0x%x-0x%x) for "%s"' % (lo, hi, pattern))
-	l = list()
+	lst = list()
 	f = False
 	for i in pattern:
 		j = known_rev.get(i)
@@ -210,14 +177,14 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 			print("cannot hunt for '%s' -- no reference" % i)
 			f = True
 		else:
-			l.append(bc(j))
+			lst.append(bc(j))
 	if f:
 		return
-	for a in range(lo, hi - len(l)):
+	for a in range(lo, hi - len(lst)):
 		p = True
 		n = True
 		y = list()
-		for i, z in enumerate(l):
+		for i, z in enumerate(lst):
 			try:
 				x = pj.m.rd(a + i * distance)
 			except mem.MemError:
