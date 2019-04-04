@@ -39,8 +39,8 @@ HP 48 Calculator.
 
 from . import job, pil
 
-class Invalid(Exception):
-	pass
+from .exception import *
+from .leaf import Leaf
 
 #######################################################################
 
@@ -106,7 +106,7 @@ def lcmt_flows(pj):
 
 #######################################################################
 
-class Code(job.Leaf):
+class Code(Leaf):
 	"""
 	A single undivisible "instruction" in some language
 	"""

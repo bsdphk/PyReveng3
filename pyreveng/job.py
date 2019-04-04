@@ -33,31 +33,8 @@ useful to analyse multiple versions of a given image in parallel.
 """
 
 from . import mem, code
-
-class Leaf():
-	"""
-	These are the leaves we hang into the tree class.
-
-	Many datatypes will sub-type this class and add functionality
-	"""
-	def __init__(self, p, lo, hi, tag):
-		self.lo = lo
-		self.hi = hi
-		self.tag = tag
-		self.pil = None
-		self.lcmt = ""
-		self.rendered = None
-		self.compact = False
-
-	def __repr__(self):
-		s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
-		return s + ">"
-
-	def render(self, pj):
-		return self.rendered
-
-	def arg_render(self, pj):
-		return ""
+from .exception import *
+from .leaf import Leaf
 
 class Job():
 	"""
