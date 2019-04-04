@@ -128,7 +128,7 @@ def task(pj, cx):
 
 	led_drive = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
-	seven_segment.table(pj, 0xecb4, 0xecd4, drive=led_drive, verbose=False)
+	seven_segment.table(pj, 0xecb4, 0xecd4, drive=led_drive, verbose=True)
 	pj.set_label(0xecb4, "7SEG_TBL")
 
 	LED_lbl = {
