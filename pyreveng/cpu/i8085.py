@@ -115,9 +115,7 @@ XCHG	-		|1 1 1 0 1 0 1 1| {
 }
 ADD	r2		|1 0 0 0 0| sss | {
 	%0 = add i8 %A , RS
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , RS )
 	%F.ac = pyreveng.bcdcarry.add ( %A , RS )
 	%A = i8 %0
@@ -125,18 +123,14 @@ ADD	r2		|1 0 0 0 0| sss | {
 ADD	(HL)		|1 0 0 0 0|1 1 0| {
 	%1 = load i8 , i8* %HL
 	%0 = add i8 %A , %1
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , %1 )
 	%F.ac = pyreveng.bcdcarry.add ( %A , %1 )
 	%A = i8 %0
 }
 ADI	I		|1 1 0 0 0 1 1 0| imm		| {
 	%0 = add i8 %A , IMM
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , IMM )
 	%F.ac = pyreveng.bcdcarry.add ( %A , IMM )
 	%A = i8 %0
@@ -145,9 +139,7 @@ ADC	r2		|1 0 0 0 1| sss | {
 	%1 = zext i1 %F.cy to i8
 	%2 = add i8 %A , %1
 	%0 = add i8 %2 , RS
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , %1, RS )
 	%F.ac = pyreveng.bcdcarry.add ( %A , %1, RS )
 	%A = i8 %0
@@ -158,9 +150,7 @@ ADC	(HL)		|1 0 0 0 1|1 1 0| {
 	%1 = zext i1 %F.cy to i8
 	%2 = add i8 %A , %1
 	%0 = add i8 %2 , %3
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , %1, %3 )
 	%F.ac = pyreveng.bcdcarry.add ( %A , %1, %3 )
 	%A = i8 %0
@@ -169,18 +159,14 @@ ACI	I		|1 1 0 0 1 1 1 0| imm		| {
 	%1 = zext i1 %F.cy to i8
 	%2 = add i8 %A , %1
 	%0 = add i8 %2 , IMM
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.add ( %A , %1, IMM )
 	%F.ac = pyreveng.bcdcarry.add ( %A , %1, IMM )
 	%A = i8 %0
 }
 SUB	r2		|1 0 0 1 0| sss | {
 	%0 = sub i8 %A , RS
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.sub ( %A , RS )
 	%F.ac = pyreveng.bcdcarry.sub ( %A , RS )
 	%A = i8 %0
@@ -188,18 +174,14 @@ SUB	r2		|1 0 0 1 0| sss | {
 SUB	(HL)		|1 0 0 1 0 1 1 0| {
 	%1 = load i8 , i8* %HL
 	%0 = sub i8 %A , %1
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.sub ( %A , %1 )
 	%F.ac = pyreveng.bcdcarry.sub ( %A , %1 )
 	%A = i8 %0
 }
 SUI	I		|1 1 0 1 0 1 1 0| imm		| {
 	%0 = sub i8 %A , IMM
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.sub ( %A , IMM )
 	%F.ac = pyreveng.bcdcarry.sub ( %A , IMM )
 	%A = i8 %0
@@ -208,69 +190,265 @@ SBB	r2		|1 0 0 1 1| sss | {
 	%1 = zext i1 %F.cy to i8
 	%2 = sub i8 %A , %1
 	%0 = sub i8 %2 , RS
-	%F.z = icmp eq i8 %0 , 0
-	%F.s = icmp gt i8 %0 , 0x7f
-	%F.p = pyreveng.parity.odd,i1 %0
+	ZSP %0
 	%F.cy = pyreveng.carry.sub ( %A , %1, RS )
 	%F.ac = pyreveng.bcdcarry.sub ( %A , %1, RS )
 	%A = i8 %0
 }
 # pg7			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
-SBB	(HL)		|1 0 0 1 1 1 1 0|
-SBI	I		|1 1 0 1 1 1 1 0| imm		|
-INR	r1		|0 0| ddd |1 0 0|
-INR	(HL)		|0 0 1 1 0 1 0 0|
-DCR	r1		|0 0| ddd |1 0 1|
-DCR	(HL)		|0 0 1 1 0 1 0 1|
-#
-INX	rp		|0 0|rp |0 0 1 1|
-DCX	rp		|0 0|rp |1 0 1 1|
-DAD	rp		|0 0|rp |1 0 0 1|
-DAA	-		|0 0 1 0 0 1 1 1|
-ANA	r2		|1 0 1 0 0| sss	|
-#
-ANA	(HL)		|1 0 1 0 0 1 1 0|
-ANI	I		|1 1 1 0 0 1 1 0| imm		|
-XRA	r2		|1 0 1 0 1| sss |
-XRA	(HL)		|1 0 1 0 1|1 1 0|
-XRI	I		|1 1 1 0 1 1 1 0| imm		|
-ORA	r2		|1 0 1 1 0| sss |
-#
-ORA	(HL)		|1 0 1 1 0 1 1 0|
-ORI	I		|1 1 1 1 0 1 1 0| imm		|
-CMP	r2		|1 0 1 1 1| sss |
-CMP	(HL)		|1 0 1 1 1|1 1 0|
-CPI	I		|1 1 1 1 1 1 1 0| imm		|
-RLC	-		|0 0 0 0 0 1 1 1|
-#
-RRC	-		|0 0 0 0 1 1 1 1|
-RAL	-		|0 0 0 1 0 1 1 1|
-RAR	-		|0 0 0 1 1 1 1 1|
-CMA	-		|0 0 1 0 1 1 1 1|
-CMC	-		|0 0 1 1 1 1 1 1|
-STC	-		|0 0 1 1 0 1 1 1|
-#
-JMP	a,>J		|1 1 0 0 0 0 1 1| lo		| hi		|
-J	cc,a,>JC	|1 1| cc  |0 1 0| lo		| hi		|
-CALL	a,>C		|1 1 0 0 1 1 0 1| lo		| hi		|
-C	cc,a,>CC	|1 1| cc  |1 0 0| lo		| hi		|
-RET	>R		|1 1 0 0 1 0 0 1|
-R	cc,>RC		|1 1| cc  |0 0 0|
-RST	n,>J		|1 1| n	  |1 1 1|
-#
-POP	PSW		|1 1 1 1 0 0 0 1|
-XTHL	-		|1 1 1 0 0 0 1 1|
-SPHL	-		|1 1 1 1 1 0 0 1|
-IN	p		|1 1 0 1 1 0 1 1| p		|
-OUT	p		|1 1 0 1 0 0 1 1| p		|
-#
-EI	-		|1 1 1 1 1 0 1 1|
-DI	-		|1 1 1 1 0 0 1 1|
-HLT	-		|0 1 1 1 0 1 1 0|
-NOP	-		|0 0 0 0 0 0 0 0|
-RIM	-		|0 0 1 0 0 0 0 0|
-#
-SIM	-		|0 0 1 1 0 0 0 0|
+SBB	(HL)		|1 0 0 1 1 1 1 0| {
+	%3 = load i8 , i8* %HL
+	%1 = zext i1 %F.cy to i8
+	%2 = sub i8 %A , %1
+	%0 = sub i8 %2 , %3
+	ZSP %0
+	%F.cy = pyreveng.carry.sub ( %A , %1, %3 )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , %1, %3 )
+	%A = i8 %0
+}
+SBI	I		|1 1 0 1 1 1 1 0| imm		| {
+	%1 = zext i1 %F.cy to i8
+	%2 = sub i8 %A , %1
+	%0 = sub i8 %2 , IMM
+	ZSP %0
+	%F.cy = pyreveng.carry.sub ( %A , %1, IMM )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , %1, IMM )
+	%A = i8 %0
+}
+INR	r1		|0 0| ddd |1 0 0| {
+	%0 = add i8 RD , 1
+	ZSP %0
+	%F.ac = pyreveng.bcdcarry.add ( RD , 1 )
+	RD = i8 %0
+}
+INR	(HL)		|0 0 1 1 0 1 0 0| {
+	%3 = load i8 , i8* %HL
+	%0 = add i8 %3 , 1
+	ZSP %0
+	%F.ac = pyreveng.bcdcarry.add ( %3 , 1 )
+	store i8 %0 , i8* %HL
+}
+DCR	r1		|0 0| ddd |1 0 1| {
+	%0 = sub i8 RD , 1
+	ZSP %0
+	%F.ac = pyreveng.bcdcarry.sub ( RD , 1 )
+	RD = i8 %0
+}
+DCR	(HL)		|0 0 1 1 0 1 0 1| {
+	%3 = load i8 , i8* %HL
+	%0 = sub i8 %3 , 1
+	ZSP %0
+	%F.ac = pyreveng.bcdcarry.sub ( %3 , 1 )
+	store i8 %0 , i8* %HL
+}
+# pg8			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+INX	rp		|0 0|rp |0 0 1 1| {
+	RP = add i16 RP , 1
+}
+DCX	rp		|0 0|rp |1 0 1 1| {
+	RP = sub i16 RP , 1
+}
+DAD	rp		|0 0|rp |1 0 0 1| {
+	%0 = add i16 %HL , RP
+	%F.cy = pyreveng.carry.sub ( %HL , RP )
+	%HL = i16 %0
+}
+DAA	-		|0 0 1 0 0 1 1 1| {
+	%A = pyreveng.void ( )
+	%F = pyreveng.void ( )
+}
+ANA	r2		|1 0 1 0 0| sss	| {
+	%A = and i8 %A , RS
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 1
+}
+# pg9			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+ANA	(HL)		|1 0 1 0 0 1 1 0| {
+	%3 = load i8 , i8* %HL
+	%A = and i8 %A , %3
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 1
+}
+ANI	I		|1 1 1 0 0 1 1 0| imm		| {
+	%A = and i8 %A , IMM
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 1
+}
+XRA	r2		|1 0 1 0 1| sss | {
+	%A = and i8 %A , RS
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+XRA	(HL)		|1 0 1 0 1|1 1 0| {
+	%3 = load i8 , i8* %HL
+	%A = xor i8 %A , %3
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+XRI	I		|1 1 1 0 1 1 1 0| imm		| {
+	%A = xor i8 %A , IMM
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+ORA	r2		|1 0 1 1 0| sss | {
+	%A = or i8 %A , RS
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+# pg10			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+ORA	(HL)		|1 0 1 1 0 1 1 0| {
+	%3 = load i8 , i8* %HL
+	%A = or i8 %A , %3
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+ORI	I		|1 1 1 1 0 1 1 0| imm		| {
+	%A = or i8 %A , IMM
+	ZSP %A
+	%F.cy = i1 0
+	%F.ay = i1 0
+}
+CMP	r2		|1 0 1 1 1| sss | {
+	%0 = sub i8 %A , RS
+	ZSP %0
+	%F.cy = pyreveng.carry.sub ( %A , RS )
+	%F.ac = pyreveng.bcdcarry.sub ( %3 , RS )
+}
+CMP	(HL)		|1 0 1 1 1|1 1 0| {
+	%3 = load i8 , i8* %HL
+	%0 = sub i8 %A , %3
+	ZSP %0
+	%F.cy = pyreveng.carry.sub ( %A , %3 )
+	%F.ac = pyreveng.bcdcarry.sub ( %3 , %3 )
+}
+CPI	I		|1 1 1 1 1 1 1 0| imm		| {
+	%0 = sub i8 %A , IMM
+	ZSP %0
+	%F.cy = pyreveng.carry.sub ( %A , IMM )
+	%F.ac = pyreveng.bcdcarry.sub ( %3 , IMM )
+}
+RLC	-		|0 0 0 0 0 1 1 1| {
+	%0 = lshr i8 %A , 7
+	%F.cy = trunc i8 %0 to i1
+	%1 = shl %A , 1
+	%A = or i8 %1 , %0
+}
+# pg11			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+RRC	-		|0 0 0 0 1 1 1 1| {
+	%0 = and i8 %A , 1
+	%F.cy = trunc i8 %0 to i1
+	%1 = lshr i8 %A , 1
+	%2 = shl %0 , 7
+	%A = and i8 %1 , %2
+}
+RAL	-		|0 0 0 1 0 1 1 1| {
+	%0 = lshr i8 %A , 7
+	%1 = shl %A , 1
+	%2 = zext i1 %F.cy to i8
+	%A = or i8 %1 , %2
+	%F.cy = trunc i8 %0 to i1
+}
+RAR	-		|0 0 0 1 1 1 1 1| {
+	%0 = and i8 %A , 1
+	%1 = lshr i8 %A , 1
+	%2 = zext i1 %F.cy to i8
+	%3 = shl %2 , 7
+	%A = or i8 %1 , %3
+	%F.cy = trunc i8 %0 to i1
+}
+CMA	-		|0 0 1 0 1 1 1 1| {
+	%A = xor i8 %A , 0xff
+}
+CMC	-		|0 0 1 1 1 1 1 1| {
+	%F.cy = xor i1 %F.cy , 1
+}
+STC	-		|0 0 1 1 0 1 1 1| {
+	%F.cy = i1 1
+}
+# pg12			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+JMP	a,>J		|1 1 0 0 0 0 1 1| lo		| hi		| {
+	br label ADR
+}
+J	cc,a,>JC	|1 1| cc  |0 1 0| lo		| hi		| {
+	JCC ADR
+}
+CALL	a,>C		|1 1 0 0 1 1 0 1| lo		| hi		| {
+	%SP = sub i16 %SP , 2
+	store i16 HI , i16* %SP
+	br label ADR
+}
+# pg13			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+C	cc,a,>CC	|1 1| cc  |1 0 0| lo		| hi		| {
+	JNCC HI
+	%SP = sub i16 %SP , 2
+	store i16 HI , i16* %SP
+	br label ADR
+}
+RET	>R		|1 1 0 0 1 0 0 1| {
+	%0 = load i16 , i16* %SP
+	%SP = sub i16 %SP , 2
+	br label %0
+}
+R	cc,>RC		|1 1| cc  |0 0 0| {
+	JNCC HI
+	%0 = load i16 , i16* %SP
+	%SP = sub i16 %SP , 2
+	br label %0
+}
+RST	n,>J		|1 1| n	  |1 1 1| {
+	%SP = sub i16 %SP , 2
+	store i16 HI , i16* %SP
+	br label NADR
+}
+# pg14			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+POP	PSW		|1 1 1 1 0 0 0 1| {
+	%F = load i8 , i8* %SP
+	%SP = add i16 %SP , 1
+	%A = load i8 , i8* %SP
+	%SP = add i16 %SP , 1
+}
+XTHL	-		|1 1 1 0 0 0 1 1| {
+	%0 = load i16 , i16* %SP
+	store i16 %HL , i16* %SP
+	%HL = i16 %0
+}
+SPHL	-		|1 1 1 1 1 0 0 1| {
+	%SP = i16 %HL
+}
+IN	p		|1 1 0 1 1 0 1 1| p		| {
+	%A = i8085.in ( PORT )
+}
+OUT	p		|1 1 0 1 0 0 1 1| p		| {
+	i8085.out ( PORT , %A )
+}
+# pg15			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+EI	-		|1 1 1 1 1 0 1 1| {
+	i8085.ei ( )
+}
+DI	-		|1 1 1 1 0 0 1 1| {
+	i8085.di ( )
+}
+HLT	-		|0 1 1 1 0 1 1 0| {
+	i8085.hlt ( )
+}
+NOP	-		|0 0 0 0 0 0 0 0| {
+	%0 = i1 0
+}
+RIM	-		|0 0 1 0 0 0 0 0| {
+	%A = i8 i8085.rim ( )
+}
+# pg16			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+SIM	-		|0 0 1 1 0 0 0 0| {
+	i8085.sim ( %A )
+}
 
 """
 
@@ -359,11 +537,56 @@ class i8085_ins(assy.Instree_ins):
 	def pilmacro_ADR(self):
 		return "0x%02x%02x" % (self['hi'], self['lo'])
 
+	def pilmacro_PORT(self):
+		return "0x%02x" % self['p']
+
+	def pilmacro_NADR(self):
+		return "0x%02x" % (self['n'] << 3)
+
+	def pilmacro_RP(self):
+		return "%%%s" % ["BC", "DE", "HL", "SP"][self['rp']]
+
 	def pilmacro_RP1(self):
 		return "%%%s" % "BDH"[self['rp']]
 
 	def pilmacro_RP2(self):
 		return "%%%s" % "CEL"[self['rp']]
+
+	def pilmacro_HI(self):
+		return "0x%x" % self.hi
+
+	def pilfunc_ZSP(self, arg):
+		self.add_il([
+			[ "%F.z", "=", "icmp", "eq", "i8", arg[0], ",", "0" ],
+			[ "%F.s", "=", "icmp", "gt", "i8", arg[0], ",", "0x7f" ],
+			[ "%F.p", "=", "pyreveng.parity.odd.i1", "(", arg[0], ")" ],
+		])
+
+	def pilfunc_JCC(self, arg):
+		i = self['cc']
+		b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
+		if i & 1:
+			a1 = arg[0]
+			a2 = "0x%x" % self.hi
+		else:
+			a1 = "0x%x" % self.hi
+			a2 = arg[0]
+		self.add_il([
+			["br", "i1", b, "label", a1, ",", "label", a2 ],
+		])
+
+	def pilfunc_JNCC(self, arg):
+		i = self['cc']
+		b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
+		if i & 1:
+			a1 = arg[0]
+			a2 = "0x%x" % self.hi
+		else:
+			a1 = "0x%x" % self.hi
+			a2 = arg[0]
+		self.add_il([
+			["br", "i1", b, "label", a2, ",", "label", a1 ],
+		])
 
 
 class i8085(assy.Instree_disass):
