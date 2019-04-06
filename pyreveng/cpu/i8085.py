@@ -26,45 +26,196 @@
 
 """
 Disassembler for Intel i8085 microprocessor
+
+Page references to "8085 Instruction Set.pdf"
 """
 
 from pyreveng import instree, assy, data
 
 i8085_desc="""
-#			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
-MOV	r1,r2		|0 1| ddd | sss |
-MOV	(HL),r2		|0 1 1 1 0| sss |
-MOV	r1,(HL)		|0 1| ddd |1 1 0|
-MVI	r1,I		|0 0| ddd |1 1 0| imm		|
-MVI	(HL),I		|0 0|1 1 0|1 1 0| imm		|
-#
-LXI	rp,II		|0 0|rp |0 0 0 1| imml		| immh		|
-LXI	SP,II		|0 0|1 1|0 0 0 1| imml		| immh		|
-LDA	a		|0 0 1 1 1 0 1 0| lo		| hi		|
-STA	a		|0 0 1 1 0 0 1 0| lo		| hi		|
-LHLD	a		|0 0 1 0 1 0 1 0| lo		| hi		|
-SHLD	a		|0 0 1 0 0 0 1 0| lo		| hi		|
-LDAX	rp		|0 0|rp |1 0 1 0|
-#
-PCHL	>J		|1 1 1 0 1 0 0 1|
-PUSH	rp		|1 1|rp |0 1 0 1|
-PUSH	PSW		|1 1 1 1 0 1 0 1|
-POP	rp		|1 1|rp |0 0 0 1|
-#
-STAX	rp		|0 0|rp |0 0 1 0|
-XCHG	-		|1 1 1 0 1 0 1 1|
-ADD	r2		|1 0 0 0 0| sss |
-ADD	(HL)		|1 0 0 0 0|1 1 0|
-ADI	I		|1 1 0 0 0 1 1 0| imm		|
-ADC	r2		|1 0 0 0 1| sss |
-#
-ADC	(HL)		|1 0 0 0 1|1 1 0|
-ACI	I		|1 1 0 0 1 1 1 0| imm		|
-SUB	r2		|1 0 0 1 0| sss |
-SUB	(HL)		|1 0 0 1 0 1 1 0|
-SUI	I		|1 1 0 1 0 1 1 0| imm		|
-SBB	r2		|1 0 0 1 1| sss |
-#
+# pg2			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+MOV	r1,r2		|0 1| ddd | sss | {
+	RD = i8 RS
+}
+MOV	r1,(HL)		|0 1| ddd |1 1 0| {
+	RD = load i8 , i8* %HL
+}
+MOV	(HL),r2		|0 1 1 1 0| sss | {
+	store i8 RS , i8* %HL
+}
+MVI	r1,I		|0 0| ddd |1 1 0| imm		| {
+	RD = i8 IMM
+}
+MVI	(HL),I		|0 0|1 1 0|1 1 0| imm		| {
+	store i8 IMM , i8* %HL
+}
+# pg3			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+LXI	rp,II		|0 0|rp |0 0 0 1| imml		| immh		| {
+	RP1 = i8 IMMH
+	RP2 = i8 IMML
+}
+LXI	SP,II		|0 0|1 1|0 0 0 1| imml		| immh		| {
+	%SP = i16 IMM16
+}
+LDA	a		|0 0 1 1 1 0 1 0| lo		| hi		| {
+	%A = load i8 , i8* ADR
+}
+STA	a		|0 0 1 1 0 0 1 0| lo		| hi		| {
+	store i8 %A , i8* ADR
+}
+LHLD	a		|0 0 1 0 1 0 1 0| lo		| hi		| {
+	%HL = load i16 , i16* ADR
+}
+SHLD	a		|0 0 1 0 0 0 1 0| lo		| hi		| {
+	store i16 %HL , i16* ADR
+}
+LDAX	DE		|0 0|0 1|1 0 1 0| {
+	%A = load i8 , i8* %DE
+}
+# Original Intel datasheet has typo: 0x2a
+LDAX	BC		|0 0|0 0|1 0 1 0| {
+	%A = load i8 , i8* %BC
+}
+# pg4			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+PCHL	>J		|1 1 1 0 1 0 0 1| {
+	br label %HL
+}
+PUSH	rp		|1 1|rp |0 1 0 1| {
+	%SP = sub i16 %SP , 1
+	store i8 RP1 , i8* %SP
+	%SP = sub i16 %SP , 1
+	store i8 RP2 , i8* %SP
+}
+PUSH	PSW		|1 1 1 1 0 1 0 1| {
+	%SP = sub i16 %SP , 1
+	store i8 %A , i8* %SP
+	%SP = sub i16 %SP , 1
+	store i8 %PSW , i8* %SP
+}
+POP	rp		|1 1|rp |0 0 0 1| {
+	RP2 = load i8 , i8* %SP
+	%SP = add i16 %SP , 1
+	RP1 = load i8 , i8* %SP
+	%SP = add i16 %SP , 1
+}
+# pg5			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+STAX	BC		|0 0|0 0|0 0 1 0| {
+	store i8 %A , i8* %BC
+}
+STAX	DE		|0 0|0 1|0 0 1 0| {
+	store i8 %A , i8* %DE
+}
+XCHG	-		|1 1 1 0 1 0 1 1| {
+	%0 = i8 %H
+	%1 = i8 %H
+	%H = i8 %D
+	%L = i8 %E
+	%D = i8 %0
+	%E = i8 %1
+}
+ADD	r2		|1 0 0 0 0| sss | {
+	%0 = add i8 %A , RS
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , RS )
+	%F.ac = pyreveng.bcdcarry.add ( %A , RS )
+	%A = i8 %0
+}
+ADD	(HL)		|1 0 0 0 0|1 1 0| {
+	%1 = load i8 , i8* %HL
+	%0 = add i8 %A , %1
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , %1 )
+	%F.ac = pyreveng.bcdcarry.add ( %A , %1 )
+	%A = i8 %0
+}
+ADI	I		|1 1 0 0 0 1 1 0| imm		| {
+	%0 = add i8 %A , IMM
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , IMM )
+	%F.ac = pyreveng.bcdcarry.add ( %A , IMM )
+	%A = i8 %0
+}
+ADC	r2		|1 0 0 0 1| sss | {
+	%1 = zext i1 %F.cy to i8
+	%2 = add i8 %A , %1
+	%0 = add i8 %2 , RS
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , %1, RS )
+	%F.ac = pyreveng.bcdcarry.add ( %A , %1, RS )
+	%A = i8 %0
+}
+# pg6			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
+ADC	(HL)		|1 0 0 0 1|1 1 0| {
+	%3 = load i8 , i8* %HL
+	%1 = zext i1 %F.cy to i8
+	%2 = add i8 %A , %1
+	%0 = add i8 %2 , %3
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , %1, %3 )
+	%F.ac = pyreveng.bcdcarry.add ( %A , %1, %3 )
+	%A = i8 %0
+}
+ACI	I		|1 1 0 0 1 1 1 0| imm		| {
+	%1 = zext i1 %F.cy to i8
+	%2 = add i8 %A , %1
+	%0 = add i8 %2 , IMM
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.add ( %A , %1, IMM )
+	%F.ac = pyreveng.bcdcarry.add ( %A , %1, IMM )
+	%A = i8 %0
+}
+SUB	r2		|1 0 0 1 0| sss | {
+	%0 = sub i8 %A , RS
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.sub ( %A , RS )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , RS )
+	%A = i8 %0
+}
+SUB	(HL)		|1 0 0 1 0 1 1 0| {
+	%1 = load i8 , i8* %HL
+	%0 = sub i8 %A , %1
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.sub ( %A , %1 )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , %1 )
+	%A = i8 %0
+}
+SUI	I		|1 1 0 1 0 1 1 0| imm		| {
+	%0 = sub i8 %A , IMM
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.sub ( %A , IMM )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , IMM )
+	%A = i8 %0
+}
+SBB	r2		|1 0 0 1 1| sss | {
+	%1 = zext i1 %F.cy to i8
+	%2 = sub i8 %A , %1
+	%0 = sub i8 %2 , RS
+	%F.z = icmp eq i8 %0 , 0
+	%F.s = icmp gt i8 %0 , 0x7f
+	%F.p = pyreveng.parity.odd,i1 %0
+	%F.cy = pyreveng.carry.sub ( %A , %1, RS )
+	%F.ac = pyreveng.bcdcarry.sub ( %A , %1, RS )
+	%A = i8 %0
+}
+# pg7			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
 SBB	(HL)		|1 0 0 1 1 1 1 0|
 SBI	I		|1 1 0 1 1 1 1 0| imm		|
 INR	r1		|0 0| ddd |1 0 0|
@@ -187,12 +338,42 @@ class i8085_ins(assy.Instree_ins):
 		self.dstadr = self['hi'] << 8 | self['lo']
 		return assy.Arg_dst(pj, self.dstadr)
 
+	def pilmacro_RD(self):
+		return "%%%s" % "BCDEHL-A"[self['ddd']]
+
+	def pilmacro_RS(self):
+		return "%%%s" % "BCDEHL-A"[self['sss']]
+
+	def pilmacro_IMM(self):
+		return "#0x%02x" % self['imm']
+
+	def pilmacro_IMMH(self):
+		return "#0x%02x" % self['immh']
+
+	def pilmacro_IMML(self):
+		return "#0x%02x" % self['imml']
+
+	def pilmacro_IMM16(self):
+		return "#0x%02x%02x" % (self['immh'], self['imml'])
+
+	def pilmacro_ADR(self):
+		return "0x%02x%02x" % (self['hi'], self['lo'])
+
+	def pilmacro_RP1(self):
+		return "%%%s" % "BDH"[self['rp']]
+
+	def pilmacro_RP2(self):
+		return "%%%s" % "CEL"[self['rp']]
+
+
 class i8085(assy.Instree_disass):
 	def __init__(self):
 		super().__init__("i8085", 8)
 		self.add_ins(i8085_desc, i8085_ins)
 		self.verbatim |= set ((
 		    "(HL)",
+		    "BC",
+		    "DE",
 		    "SP",
 		    "PSW",
 		))
