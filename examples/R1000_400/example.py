@@ -153,7 +153,7 @@ def task(pj, cpu):
 			y = data.Txt(pj, a, label=False, align=align, splitnl=True)
 			a = y.hi
 
-	txts(0x800010cc, 0x80001122)
+	txts(0x800010cc, 0x80001122, align=1)
 	txts(0x80001bb0, 0x80001bc2)
 	txts(0x80002c14, 0x80002e04, align=1)
 	txts(0x80004ece, 0x80004fbf, align=1)
