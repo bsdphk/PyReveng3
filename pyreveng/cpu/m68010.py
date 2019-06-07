@@ -39,10 +39,10 @@ from pyreveng.cpu.m68000 import *
 m68010_desc = """
 # 476/6-22
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
-mOVEC           Rc,Dn           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|0|0| Dn  | Rc                    |
-mOVEC           Rc,An           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|0|1| An  | Rc                    |
-mOVEC           Dn,Rc           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|1|0| Dn  | Rc                    |
-mOVEC           An,Rc           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|1|1| An  | Rc                    |
+MOVEC           Rc,Dn           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|0|0| Dn  | Rc                    |
+MOVEC           Rc,An           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|0|1| An  | Rc                    |
+MOVEC           Dn,Rc           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|1|0| Dn  | Rc                    |
+MOVEC           An,Rc           0000    |0 1 0 0|1 1 1 0|0 1 1 1|1 0 1|1|1| An  | Rc                    |
 
 # 478/6.24
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -59,8 +59,22 @@ class m68010_ins(m68000_ins):
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
 
+	def assy_Rc(self, pj):
+		x = self.lang.cregs.get(self['Rc'])
+		if x is None:
+			return "RC_%03x" % self['Rc']
+		self.lcmt += x[1]
+		return x[0]
+
+
 
 class m68010(m68000):
 	def __init__(self, lang="m68010"):
 		super().__init__(lang)
 		self.add_ins(m68010_desc, m68010_ins)
+		self.cregs = {
+			0x000: ("SFC", "Source Function Code"),
+			0x001: ("DFC", "Destination Function Code"),
+			0x800: ("USP", "User Stack Pointer"),
+			0x801: ("VBR", "Vector Base Register"),
+		}

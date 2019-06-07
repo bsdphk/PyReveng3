@@ -94,6 +94,12 @@ class m68020(m68010):
 		self.it.load_string(m68020_desc, m68020_ins)
 		self.ea_fullext = True
 		self.ea_scale = True
+		self.cregs.update({
+			0x002: ("CACR", "Cache Control Register"),
+			0x802: ("CAAR", "Cache Address Register"),
+			0x803: ("MSP", "Master Stack Pointer"),
+			0x804: ("ISP", "Interrupt Stack Pointer"),
+		})
 
 if __name__ == '__main__':
 	m = m68020()
