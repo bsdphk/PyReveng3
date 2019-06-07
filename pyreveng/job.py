@@ -126,6 +126,6 @@ class Job():
 				err = e
 			if err is None:
 				continue
-			print("Todo fail: " + str(err) + "\n" +
+			print("Todo fail: " + self.name + " " + str(err) + "\n" +
 			    "    adr= " + self.afmt(adr) + " func=", func)
 		return rv
