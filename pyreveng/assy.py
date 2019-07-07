@@ -124,6 +124,11 @@ class Instree_ins(Assy):
 		if arg == "-":
 			return
 
+		if arg == "?":
+			for i in self.lim:
+				self.oper.append(Arg_verbatim(pj, str(i.flds)))
+			return
+
 		x = None
 		if arg[0] == ">":
 			try:
@@ -190,6 +195,8 @@ class Instree_disass(code.Decode):
 			self.getmore = self.getmore_word
 		elif ins_word == 16 and mem_word == 8 and endian == ">":
 			self.getmore = self.getmore_bu16
+		elif ins_word == 32 and mem_word == 8 and endian == "<":
+			self.getmore = self.getmore_lu32
 		else:
 			raise Exception("XXX: No getmore() [%d/%d/%s]" %
 					(ins_word, mem_word, endian))
@@ -207,6 +214,9 @@ class Instree_disass(code.Decode):
 
 	def getmore_bu16(self, pj, adr, v):
 		v.append(pj.m.bu16(adr + len(v) * 2))
+
+	def getmore_lu32(self, pj, adr, v):
+		v.append(pj.m.lu32(adr + len(v) * 4))
 
 	def decode(self, pj, adr, l=None):
 		if l is None:
