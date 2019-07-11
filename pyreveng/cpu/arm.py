@@ -57,6 +57,9 @@ misc_212	?		|cond	|1 0|op		|rn	|r|x1				|
 misc_213	?		|cond	|1 1|op		|rn	|x1	|cp	|x2   |o|x3	|
 misc_214	?		|1 1 1 1| xyz							|
 misc_215	?		|1 1 1 1 0|op1		|rn	|x1		|op2	|x2	|
+"""
+
+arm_desc = """
 
 ################################################################################################
 
@@ -69,6 +72,10 @@ ADC		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 1 0 1|s|rn	|rd	|rs	|0|typ|1|rm	|
 ADD		S,Rd,Rn,imm12	|cond	|0 0|1|0 1 0 0|s|rn	|rd	|imm12			|
 ADD		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 ADD		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|rs	|0|typ|1|rm	|
+
+# p320-321
+ADR		Rd,adr_plus	|cond	|0 0 1 0 1 0 0 0 1 1 1 1|rd	|imm12			|
+ADR		Rd,adr_minus	|cond	|0 0 1 0 0 1 0 0 1 1 1 1|rd	|imm12			|
 
 # p322-327
 AND		S,Rd,Rn,imm12	|cond	|0 0|1|0 0 0 0|s|rn	|rd	|imm12			|
@@ -151,9 +158,9 @@ LDR		?		|cond	|0 1 1|p|u|0|w|1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p417-424
 LDRB		?		|1 1 1 1 1|0 0|0|0|0 0|1|rn	|rt	|1|p|u|w|imm8		|
-LDRB		?		|cond	|0 1 0|p|u|1|w|1|rn	|rt	|imm12			|
-LDRB		?		|cond	|0 1 0|p|u|1|w|1|1 1 1 1|rt	|imm12			|
-LDRB		?		|cond	|0 1 1|p|u|1|w|1|rn	|rt	|imm5	  |typ|0|rm	|
+LDRB		WRt,irn		|cond	|0 1 0|p|u|1|w|1|rn	|rt	|imm12			|
+LDRB		Wrt,ipc		|cond	|0 1 0|p|u|1|w|1|1 1 1 1|rt	|imm12			|
+LDRB		WRt,Rn,Rm,sh	|cond	|0 1 1|p|u|1|w|1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p425-426
 LDRBT		?		|cond	|0 1 1|0|u|1 1 1|rn	|rt	|imm5	  |typ|0|rm	|
@@ -211,16 +218,37 @@ LSL		S,Rd,Rn,Rm 	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|rm	|0 0 0 1|rn	|
 LSR		S,Rd,Rm,imm5	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|imm5	  |0 1 0|rm	|
 LSR		S,Rd,Rn,Rm 	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|rm	|0 0 1 1|rn	|
 
+# p477-478
+MCR		?		|cond	|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
+MCR2		?		|1 1 1 1|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
+
+# p479-480
+MCRR		?		|cond	|1 1 0 0 0 1 0 0|rt2	|rt	|cop	|opc1	|crm	|
+MCRR2		?		|1 1 1 1|1 1 0 0 0 1 0 0|rt2	|rt	|cop	|opc1	|crm	|
+
 # p481-482
 MLA		?		|cond	|0 0 0 0 0 0 1|s|rd	|ra	|rm	|1 0 0 1|rn	|
 
 # p483-484
 MLS		?		|cond	|0 0 0 0 0 1 1 0|rd	|ra	|rm	|1 0 0 1|rn	|
 
-# A8-485...491
+# p485-491
 MOV		S,Rd,imm12	|cond	|0 0|1|1 1 0 1|s|0 0 0 0|rd	|imm12			|
+MOV		?		|cond	|0 0 1 1|0 0 0 0|imm4	|rd	|imm12			|
+MOV		S,Rd,Rm		|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|0 0 0 0 0 0 0 0|rm	|
 MOV		S,Rd,Rm,Rs 	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|rs	|0|typ|1|rm	|
 MOV		S,Rd,Rm,sh	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|imm5	  |typ|0|rm	|
+
+# p492
+MOVT		?		|cond	|0 0 1 1|0 1 0 0|imm4	|rd	|imm12			|
+
+# p493-494
+MMR		?		|cond	|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
+MMR2		?		|1 1 1 1|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
+
+# p495-496
+MMRC		?		|cond	|1 1 0 0|0 1 0|1|rt2	|rt	|cop	|opc1	|crm	|
+MMRC2		?		|1 1 1 1|1 1 1 0|0 1 0|1|crn	|rt	|cop	|opc1	|crm	|
 
 # p497-498
 MRS		?		|cond	|0 0 0 1 0|0|0 0|1 1 1 1|rd	|0 0 0 0 0 0 0 0 0 0 0 0|
@@ -237,6 +265,9 @@ MVN		?		|cond	|0 0|i|1 1 1 1|s|rn	|rd	|oper2			|
 MVN		S,Rd,imm12	|cond	|0 0|1|1 1 1 1|s|0 0 0 0|rd	|imm12			|
 MVN		S,Rd,Rm,sh	|cond	|0 0|0|1 1 1 1|s|0 0 0 0|rd	|imm5	  |typ|0|rm	|
 MVN		S,Rd,Rm,Rs 	|cond	|0 0|0|1 1 1 1|s|0 0 0 0|rd	|rs	|0|typ|1|rm	|
+
+# p511-512
+NOP		-		|cond	|0 0 1 1 0 0 1 0|0 0 0 0|1 1 1 1|0 0 0 0|0 0 0 0 0 0 0 0|
 
 # p519-522
 ORR		S,Rd,Rn,imm12	|cond	|0 0|1|1 1 0 0|s|rn	|rd	|imm12			|
@@ -401,6 +432,7 @@ SMC_1988	?		|cond	|0 0 0 1 0 1 1|0|0 0 0 0 0 0 0 0 0 0 0 0|0 1 1 1|imm4	|
 # p1994
 STM		?		|cond	|1 0|0|a|b|1|c|0|rn	|r|oper				|
 
+
 """
 
 CC = [ "EQ", "NE", "CS", "LO", "MI", "PL", "VS", "VC", "HI", "LS", "GE", "LT", "GT", "LE", "", "NV" ]
@@ -409,13 +441,32 @@ class Arm_ins(assy.Instree_ins):
 
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
+		if self.lo & 3:
+			raise assy.Invalid("Unaligned Instruction")
 		if 'cond' in self.lim[-1].flds:
 			cond = self['cond']
 			self.mne += CC[cond]
 			if self['cond'] != 14:
 				self.add_flow(pj, '>', '?', self.hi)
-		
 
+	def imm12_rotate(self):
+		v = self['imm12']
+		if not (v & 0xf00):
+			return v
+		r = v >> 8
+		b = v & 0xff
+		b |= b << 32
+		b = b >> (r * 2)
+		return b & 0xffffffff
+
+	def assy_adr_plus(self, pj):
+		v = self.imm12_rotate()
+		return assy.Arg_dst(pj, self.hi + 4 + v, "#")
+
+	def assy_adr_minus(self, pj):
+		v = self.imm12_rotate()
+		return assy.Arg_dst(pj, self.hi + 4 - v, "#")
+	
 	def assy_S(self, pj):
 		if self['s']:
 			self.mne += "S"
