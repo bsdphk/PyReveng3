@@ -149,13 +149,27 @@ class Instree_ins(Assy):
 			x = Arg_verbatim(pj, x)
 		if x is None:
 			return
-		if not isinstance(x, Arg):
+		if isinstance(x, list):
+			for i in x:
+				if isinstance(i, Arg):
+					self.oper.append(i)
+				elif isinstance(i, str):
+					self.oper.append(Arg_verbatim(pj, i))
+				else:
+					print(self)
+					print(self.lim)
+					print(self.lang)
+					raise Wrong("Not Arg, type '%s', str '%s'" %
+					    (str(type(i)), str(i)))
+
+		elif not isinstance(x, Arg):
 			print(self)
 			print(self.lim)
 			print(self.lang)
 			raise Wrong("Not Arg, type '%s', str '%s'" %
 			    (str(type(x)), str(x)))
-		self.oper.append(x)
+		else:
+			self.oper.append(x)
 
 	def parse(self, pj):
 		if self.mne[0] == "+":
