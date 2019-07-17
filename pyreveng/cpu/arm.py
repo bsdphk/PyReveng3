@@ -251,7 +251,7 @@ MMRC		?		|cond	|1 1 0 0|0 1 0|1|rt2	|rt	|cop	|opc1	|crm	|
 MMRC2		?		|1 1 1 1|1 1 1 0|0 1 0|1|crn	|rt	|cop	|opc1	|crm	|
 
 # p497-498
-MRS		?		|cond	|0 0 0 1 0|0|0 0|1 1 1 1|rd	|0 0 0 0 0 0 0 0 0 0 0 0|
+# MRS see below 1976
 
 # p499-502
 MSR		?		|cond	|0 0 1 1 0|0 1 0|msk|0 0|1 1 1 1|imm12			|
@@ -275,12 +275,12 @@ ORR		S,Rd,Rn,Rm,sh	|cond	|0 0|0|1 1 0 0|s|rn	|rd	|imm5     |typ|0|rm	|
 ORR		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|1 1 0 0|s|rn	|rd	|rs	|0|typ|1|rm	|
 
 # p535-538
-POP		wreglist	|cond	|1 0|0 0 1 0 1 1|1 1 0 1|reglist			|
-POP		?		|cond	|0 1 0|0|1|0|0|1|1 1 0 1|0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0|
+POP		wreglist	|cond	|1 0 0 0 1 0 1 1|1 1 0 1|reglist			|
+POP		Rt		|cond	|0 1 0 0 1 0 0 1|1 1 0 1|rt	|0 0 0 0 0 0 0 0 0 0 0 0|
 
 # p539-540
-PUSH		reglist		|cond	|1 0|0 1 0 0 1 0|1 1 0 1|reglist			|
-PUSH		?		|cond	|0 1 0|1|0|0|1|0|1 1 0 1|rt	|0 0 0 0 0 0 0 0 0 1 0 0|
+PUSH		reglist		|cond	|1 0 0 1 0 0 1 0|1 1 0 1|reglist			|
+PUSH		Rt		|cond	|0 1 0 1 0 0 1 0|1 1 0 1|rt	|0 0 0 0 0 0 0 0 0 1 0 0|
 
 # p541-542
 QADD		?		|cond	|0 0 0 1 0 0 0 0|rn	|rd	|0 0 0 0|0 1 0 1|rm	|
@@ -411,6 +411,12 @@ HVC_1970	?		|cond	|0 0 0 1 0 1 0 0|imm12			|0 1 1 1|imm4	|
 # p1974
 LDM		?		|cond	|1 0|0|a|b|1|c|1|rn	|0|oper				|
 
+# p497-498
+# p1976-1977
+MRS		Rd,SPSR		|cond	|0 0 0 1 0|1|0 0|1 1 1 1|rd	|0 0 0|0|0 0 0 0|0 0 0 0|
+MRS		Rd,CPSR		|cond	|0 0 0 1 0|0|0 0|1 1 1 1|rd	|0 0 0 0 0 0 0 0 0 0 0 0|
+MRS		UN		|cond	|0 0 0 1 0|r|0 0|1 1 1 1|1 1 1 1|0 0 0|0|0 0 0 0|0 0 0 0|
+
 # p1978
 MRS_1978	?		|cond	|0 0 0 1 0|r|0 0|m1	|rd	|0 0 1|m|0 0 0 0|0 0 0 0|
 
@@ -421,10 +427,9 @@ MSR_1980	?		|cond	|0 0 0 1 0|r|1 0|m1	|1 1 1 1 0 0|1|m|0 0 0 0|rn	|
 MSR_1982	?		|cond	|0 0 1 1 0|r|1 0|mask   |1 1 1 1|imm12			|
 
 # p1984
-MSR_1984	?		|cond	|0 0 0 1 0|r|1 0|msk	|1 1 1 1|0 0 0 0 0 0 0 0|rn	|
-
-# p1987
-MRS_1987	?		|cond	|0 0 0 1 0|r|0 0|1 1 1 1|rd	|0 0 0 0 0 0 0 0 0 0 0 0|
+MSR		cpsr,Rn		|cond	|0 0 0 1 0|r|1 0|msk	|1 1 1 1|0 0 0 0 0 0 0 0|rn	|
+MSR		UN		|cond	|0 0 0 1 0|r|1 0|msk	|1 1 1 1|0 0 0 0 0 0 0 0|1 1 1 1|
+MSR		UN		|cond	|0 0 0 1 0|r|1 0|0 0 0 0|1 1 1 1|0 0 0 0 0 0 0 0|rn	|
 
 # p1988
 SMC_1988	?		|cond	|0 0 0 1 0 1 1|0|0 0 0 0 0 0 0 0 0 0 0 0|0 1 1 1|imm4	|
@@ -448,6 +453,21 @@ class Arm_ins(assy.Instree_ins):
 			self.mne += CC[cond]
 			if self['cond'] != 14:
 				self.add_flow(pj, '>', '?', self.hi)
+
+	def assy_UN(self, pj):
+		raise assy.Invalid("UNPREDICTABLE")
+
+	def assy_cpsr(self, pj):
+		t = "CPSR_"
+		if self['msk'] & 8:
+			t += "f"
+		if self['msk'] & 4:
+			t += "s"
+		if self['msk'] & 2:
+			t += "x"
+		if self['msk'] & 1:
+			t += "c"
+		return assy.Arg_verbatim(pj, t)
 
 	def imm12_rotate(self):
 		v = self['imm12']
@@ -593,6 +613,8 @@ class Arm(assy.Instree_disass):
 	def __init__(self):
 		super().__init__("arm", 32, 8, "<")
 		self.add_ins(arm_desc, Arm_ins)
+		self.verbatim.add("CPSR")
+		self.verbatim.add("SPSR")
 
 	def codeptr(self, pj, adr):
 		t = pj.m.lu32(adr)
@@ -606,3 +628,63 @@ class Arm(assy.Instree_disass):
 	def vectors(self, pj, adr=0x0, xops=1):
 		return
 
+if __name__ == "__main__":
+	h = Arm()
+	dom = {}
+
+	def dl(l):
+		t = ""
+		for i in range(0, len(l), 2):
+			t += " %08x" % l[i]
+		t += "\n"
+		for i in range(0, len(l), 2):
+			t += " %08x" % l[i + 1]
+		t += "\n"
+		return t
+
+	for a, aa in h.it:
+		for b, bb in h.it:
+			if aa == bb:
+				continue
+			i = 0
+			while i < len(a) and i < len(b):
+				if b[0] & a[0] != b[0]:
+					i += 2
+					continue
+				if b[0] & a[1] != b[1]:
+					i += 2
+					continue
+				if aa not in dom:
+					dom[aa] = []
+				dom[aa].append(bb)
+				i += 2
+
+	for a, b in dom.items():
+		print("B", a)
+		for i in b:
+			print("  ", i)
+		i = 0
+		a.elide = set()
+		while i < len(b):
+			j = 0
+			while j < len(b):
+				if j != i and b[i] in dom and b[j] in dom[b[i]]:
+					print(a)
+					print(".",b[i])
+					print("..", b[j])
+					a.elide.add(b[j])
+				j += 1
+			i += 1
+		print("A", a)
+		print(a.elide)
+		for i in b:
+			print("  ", i)
+
+	fo = open("/tmp/_.dot", "w")
+	fo.write("digraph {\n")
+	for a, b in dom.items():
+		for i in b:
+			if i not in a.elide:
+				fo.write('"%s" -> "%s"\n' % ("_".join(i.assy), "_".join(a.assy)))
+	
+	fo.write("}\n")
