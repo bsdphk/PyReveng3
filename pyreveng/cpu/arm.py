@@ -219,8 +219,8 @@ LSR		S,Rd,Rm,imm5	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|imm5	  |0 1 0|rm	|
 LSR		S,Rd,Rn,Rm 	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|rm	|0 0 1 1|rn	|
 
 # p477-478
-MCR		?		|cond	|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
-MCR2		?		|1 1 1 1|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
+MCR		COP		|cond	|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
+MCR2		COP		|1 1 1 1|1 1 1 0|opc1 |0|crn	|rt	|cop	|opc2 |1|crm	|
 
 # p479-480
 MCRR		?		|cond	|1 1 0 0 0 1 0 0|rt2	|rt	|cop	|opc1	|crm	|
@@ -243,12 +243,12 @@ MOV		S,Rd,Rm,sh	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|imm5	  |typ|0|rm	|
 MOVT		?		|cond	|0 0 1 1|0 1 0 0|imm4	|rd	|imm12			|
 
 # p493-494
-MMR		?		|cond	|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
-MMR2		?		|1 1 1 1|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
+MRC		COP		|cond	|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
+MRC2		COP		|1 1 1 1|1 1 1 0|opc1 |1|crn	|rt	|cop	|opc2 |1|crm	|
 
 # p495-496
-MMRC		?		|cond	|1 1 0 0|0 1 0|1|rt2	|rt	|cop	|opc1	|crm	|
-MMRC2		?		|1 1 1 1|1 1 1 0|0 1 0|1|crn	|rt	|cop	|opc1	|crm	|
+MRRC		?		|cond	|1 1 0 0|0 1 0|1|rt2	|rt	|cop	|opc1	|crm	|
+MRRC2		?		|1 1 1 1|1 1 1 0|0 1 0|1|crn	|rt	|cop	|opc1	|crm	|
 
 # p497-498
 # MRS see below 1976
@@ -371,8 +371,11 @@ SUB		?		|cond	|0 0|1|0 0 1 0|s|1 1 0 1|rd	|imm12			|
 SUB		?		|cond	|0 0|0|0 0 1 0|s|1 1 0 1|rd	|imm5	  |typ|0|rm	|
 
 # p723-724
-SWP		?		|cond	|0 0 0 1 0|0|0 0|rn	|rt	|0 0 0 0|1 0 0 1|rt2	|
-SWPB		?		|cond	|0 0 0 1 0|1|0 0|rn	|rt	|0 0 0 0|1 0 0 1|rt2	|
+SWP		UN		|cond	|0 0 0 1 0|x|0 0|1 1 1 1|rt	|0 0 0 0|1 0 0 1|rt2	|
+SWP		UN		|cond	|0 0 0 1 0|x|0 0|rn	|1 1 1 1|0 0 0 0|1 0 0 1|rt2	|
+SWP		UN		|cond	|0 0 0 1 0|x|0 0|rn	|rt	|0 0 0 0|1 0 0 1|1 1 1 1|
+SWP		Rt,Rt2,vrn	|cond	|0 0 0 1 0|0|0 0|rn	|rt	|0 0 0 0|1 0 0 1|rt2	|
+SWPB		Rt,Rt2,vrn	|cond	|0 0 0 1 0|1|0 0|rn	|rt	|0 0 0 0|1 0 0 1|rt2	|
 
 # p725-726
 SXTAB		?		|cond	|0 1 1 0 1 0 1 0|rn	|rd	|rot|0 0|0 1 1 1|rm	|
@@ -457,6 +460,16 @@ class Arm_ins(assy.Instree_ins):
 	def assy_UN(self, pj):
 		raise assy.Invalid("UNPREDICTABLE")
 
+	def assy_COP(self, pj):
+		return ([
+			assy.Arg_verbatim(pj, "%d" % self['cop']),
+			assy.Arg_verbatim(pj, "%d" % self['opc1']),
+			self.assy_Rt(pj),
+			assy.Arg_verbatim(pj, "CR%d" % self['crn']),
+			assy.Arg_verbatim(pj, "CR%d" % self['crm']),
+			assy.Arg_verbatim(pj, "%d" % self['opc2']),
+		])
+
 	def assy_cpsr(self, pj):
 		t = "CPSR_"
 		if self['msk'] & 8:
@@ -537,6 +550,9 @@ class Arm_ins(assy.Instree_ins):
 		v &= 0xffffffff
 		return assy.Arg_verbatim(pj, "#0x%x" % v)
 
+	def assy_vrn(self, pj):
+		return assy.Arg_verbatim(pj, "[R%d]" % self['rn'])
+
 	def assy_irn(self, pj):
 		imm32 = self['imm12']
 		rn = "R%d" % self['rn']
@@ -585,6 +601,9 @@ class Arm_ins(assy.Instree_ins):
 
 	def assy_Rt(self, pj):
 		return assy.Arg_verbatim(pj, "R%d" % self['rt'])
+
+	def assy_Rt2(self, pj):
+		return assy.Arg_verbatim(pj, "R%d" % self['rt2'])
 
 	def assy_Rn(self, pj):
 		return assy.Arg_verbatim(pj, "R%d" % self['rn'])
