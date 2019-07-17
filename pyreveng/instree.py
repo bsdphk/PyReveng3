@@ -210,6 +210,16 @@ class InsBranch():
 		self.mask = 0
 		self.wildcard = None
 
+	def __iter__(self):
+		for i, x in self.t:
+			for j in sorted(x.keys()):
+				y = x[j]
+				if isinstance(y, InsLine):
+					yield [i, j], y
+				else:
+					for a, b in y:
+						yield [i, j] + a, b
+
 	def insert(self, last, x):
 		#print("?  ", self.lvl, "%02x" % self.mask, x)
 		if len(x.mask) == self.lvl:
@@ -331,6 +341,10 @@ class InsTree():
 	def __init__(self, wordsize=8):
 		self.wordsize = wordsize
 		self.root = InsBranch(0)
+
+	def __iter__(self):
+		for i in self.root:
+			yield i
 
 	def load_string(self, s, handler=None):
 		i = 0
