@@ -44,6 +44,36 @@ ARM_SWITCH = '''
 ADD	not	|1 1 1 0|0 0|0|0 1 0 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 '''
 
+
+def switchblock_8(pj, adr, nswitch, lang):
+	nswitch += 1
+	tl = (nswitch + 3) & ~3
+	a = adr
+	txt = ''
+	for i in range(nswitch):
+		o = pj.m[a] * 4
+		d = adr + 4 + o
+		pj.set_label(d, "switch_0x%x_%d" % (adr, i))
+		pj.todo(d, lang.disass)
+		txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
+		a += 1
+	y = data.Data(pj, adr, adr + tl, fmt=txt)
+
+def switchblock_16(pj, adr, nswitch, lang):
+	nswitch += 1
+	tl = (nswitch * 2 + 3) & ~3
+	a = adr
+	txt = ''
+	for i in range(nswitch):
+		o = pj.m.lu16(a) * 4
+		d = adr + 4 + o
+		pj.set_label(d, "switch_0x%x_%d" % (adr, i))
+		pj.todo(d, lang.disass)
+		txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
+		a += 2
+	y = data.Data(pj, adr, adr + tl, fmt=txt)
+
+
 class ArmSwitchIns(assy.Instree_ins):
 
 	def __init__(self, pj, lim, lang):
@@ -74,7 +104,7 @@ class ArmSwitchIns(assy.Instree_ins):
 				print("\t\t", j, i[j])
 
 		ri = self.lim[0]['rn']
-		nswitch = self.lim[0]['imm12'] + 1
+		nswitch = self.lim[0]['imm12']
 
 		# XXX: default dst from lim[1]
 
@@ -105,15 +135,7 @@ class ArmSwitchIns(assy.Instree_ins):
 			if self.lim[4].assy[0] != "+LDRH":
 				fail("NOT A switch construction (16b/!ldrh)")
 
-			tl = (nswitch * 2 + 3) & ~3
-			a = self.hi
-			for i in range(nswitch):
-				o = pj.m.lu16(a) * 4
-				d = self.hi + 4 + o
-				pj.set_label(d, "switch_0x%x_%d" % (self.hi, i))
-				pj.todo(d, self.lang.disass)
-				txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
-				a += 2
+			switchblock_16(pj, self.hi, nswitch, self.lang)
 
 		else:
 			# 8 bit
@@ -134,19 +156,7 @@ class ArmSwitchIns(assy.Instree_ins):
 			if self.lim[3]['rt'] != rd:
 				fail("NOT A switch construction (rd/3rt)")
 
-			tl = (nswitch + 3) & ~3
-			a = self.hi
-			for i in range(nswitch):
-				o = pj.m[a] * 4
-				d = self.hi + 4 + o
-				pj.set_label(d, "switch_0x%x_%d" % (self.hi, i))
-				pj.todo(d, self.lang.disass)
-				txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
-				a += 1
-
-		print("SWX GO")
-
-		y = data.Data(pj, self.hi, self.hi + tl, fmt=txt)
+			switchblock_8(pj, self.hi, nswitch, self.lang)
 
 		raise assy.Invalid("NOTYET")
 
