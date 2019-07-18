@@ -93,6 +93,9 @@ class Instree_ins(Assy):
 		self.verbatim = []
 		self.lang = lang
 
+	def args_done(self, pj):
+		return
+
 	def flow_R(self, pj):
 		self.add_flow(pj, "R", self.cc)
 
@@ -179,6 +182,8 @@ class Instree_ins(Assy):
 			i = self.im.assy
 			for j in i[1].split(","):
 				self.arg(pj, j)
+
+		self.args_done(pj)
 
 		if not self.flow_out:
 			self.add_flow(pj, True)

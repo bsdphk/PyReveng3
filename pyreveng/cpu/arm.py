@@ -74,8 +74,8 @@ ADD		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 ADD		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|rs	|0|typ|1|rm	|
 
 # p320-321
-ADR		Rd,adr_plus	|cond	|0 0 1 0 1 0 0 0 1 1 1 1|rd	|imm12			|
-ADR		Rd,adr_minus	|cond	|0 0 1 0 0 1 0 0 1 1 1 1|rd	|imm12			|
+#ADR		Rd,adr_plus	|cond	|0 0 1 0 1 0 0 0 1 1 1 1|rd	|imm12			|
+#ADR		Rd,adr_minus	|cond	|0 0 1 0 0 1 0 0 1 1 1 1|rd	|imm12			|
 
 # p322-327
 AND		S,Rd,Rn,imm12	|cond	|0 0|1|0 0 0 0|s|rn	|rd	|imm12			|
@@ -105,7 +105,8 @@ BKPT		?		|cond	|0 0 0 1 0 0 1 0|imm12			|0 1 1 1|imm4	|
 
 # p346-349
 BL		dst,>C		|cond	|1 0 1 1|off						|
-BLX		imm24,>C	|1 1 1 1|1 0 1|h|imm24						|
+BLX		dst,>C		|1 1 1 1|1 0 1|0|off						|
+BLX		imm24,>C	|1 1 1 1|1 0 1|1|off						|
 BLX		Rm,>C		|cond	|0 0 0 1 0 0 1 0|1 1 1 1|1 1 1 1|1 1 1 1|0 0 1 1|rm	|
 
 # p350-351
@@ -140,10 +141,10 @@ EOR		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 0 0 1|s|rn	|rd	|imm5	  |typ|0|rm	|
 EOR		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 0 0 1|s|rn	|rd	|rs	|0|typ|1|rm	|
 
 # p399-400
-LDM		Rn,w,wreglist	|cond	|1 0|0 0 1 0|w|1|rn	|reglist			|
+LDM		Rnw,wreglist	|cond	|1 0|0 0 1 0|w|1|rn	|reglist			|
 
 # p401-402
-LDMDA		?		|cond	|1 0|0 0 0 0|a|1|rn	|r|oper				|
+LDMDA		Rnw,wreglist	|cond	|1 0|0 0 0 0|w|1|rn	|reglist			|
 
 # p403-404
 LDMDB		Rn,w,wreglist	|cond	|1 0|0 1 0 0|w|1|rn	|reglist			|
@@ -152,23 +153,21 @@ LDMDB		Rn,w,wreglist	|cond	|1 0|0 1 0 0|w|1|rn	|reglist			|
 LDMIB		Rn,w,wreglist	|cond	|1 0|0 1 1 0|w|1|rn	|reglist			|
 
 # p407-417
-LDR		WRt,irn		|cond	|0 1 0|p|u|0|w|1|rn	|rt	|imm12			|
-LDR		WRt,ipc		|cond	|0 1 0|p|u|0|w|1|1 1 1 1|rt	|imm12			|
-LDR		?		|cond	|0 1 1|p|u|0|w|1|rn	|rt	|imm5	  |typ|0|rm	|
+LDR		WRt,a_rn	|cond	|0 1 0|p|u|0|w|1|rn	|rt	|imm12			|
+LDR		WRt,a_imm5	|cond	|0 1 1|p|u|0|w|1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p417-424
 LDRB		?		|1 1 1 1 1|0 0|0|0|0 0|1|rn	|rt	|1|p|u|w|imm8		|
-LDRB		WRt,irn		|cond	|0 1 0|p|u|1|w|1|rn	|rt	|imm12			|
-LDRB		Wrt,ipc		|cond	|0 1 0|p|u|1|w|1|1 1 1 1|rt	|imm12			|
-LDRB		WRt,Rn,Rm,sh	|cond	|0 1 1|p|u|1|w|1|rn	|rt	|imm5	  |typ|0|rm	|
+LDRB		WRt,a_rn	|cond	|0 1 0|p|u|1|w|1|rn	|rt	|imm12			|
+LDRB		WRt,a_imm5	|cond	|0 1 1|p|u|1|w|1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p425-426
 LDRBT		?		|cond	|0 1 1|0|u|1 1 1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p427-432
-LDRD		?		|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
-LDRD		?		|cond	|0 0 0|1|u|1|0|0|1 1 1 1|rt	|imm4h	|1 1 0 1|imm4l	|
+LDRD		Wrt,a_imm4	|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
 LDRD		?		|cond	|0 0 0|p|u|0|w|0|rn	|rt	|0 0 0 0|1 1 0 1|rm	|
+
 
 # p433-434
 LDREX		?		|cond	|0 0 0 1 1 0 0|1|rn	|rt	|1 1 1 1|1 0 0 1|1 1 1 1|
@@ -183,32 +182,29 @@ LDREXD		?		|cond	|0 0 0|1 1 0 1|1|rn	|rt	|1 1 1 1|1 0 0 1|1 1 1 1|
 LDREXH		?		|cond	|0 0 0|1 1 1 1|1|rn	|rt	|1 1 1 1|1 0 0 1|1 1 1 1|
 
 # p441-448
-LDRH		?		|1 1 1 1 1|0 0|0|0|0 1|1|rn	|rt	|1|p|u|w|imm8		|
-LDRH		?		|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 0 1 1|imm4l	|
-LDRH		?		|cond	|0 0 0|p|u|1|w|1|1 1 1 1|rt	|imm4h	|1 0 1 1|imm4l	|
-LDRH		?		|cond	|0 0 0|p|u|0|w|1|rn	|rt	|0 0 0 0|1 0 1 1|rm	|
+LDRH		WRt,a_imm4	|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 0 1 1|imm4l	|
+LDRH		WRt,a_rnrm	|cond	|0 0 0|p|u|0|w|1|rn	|rt	|0 0 0 0|1 0 1 1|rm	|
 
 # p449-450
 LDRHT		?		|cond	|0 0 0|0|u|0|1|1|rn	|rt	|0 0 0 0|1 0 1 1|rm	|
 
 # p451-456
-LDRSB		?		|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
-LDRSB		?		|cond	|0 0 0|p|u|1|w|1|1 1 1 1|rt	|imm4h	|1 1 0 1|imm4l	|
-LDRSB		?		|cond	|0 0 0|p|u|0|w|1|rn	|rt	|0 0 0 0|1 1 0 1|rm	|
+LDRSB		WRt,a_imm4	|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
+LDRSB		WRt,a_rnrm	|cond	|0 0 0|p|u|0|w|1|rn	|rt	|0 0 0 0|1 1 0 1|rm	|
 
 # p457-458
 LDRSBT		?		|cond	|0 0 0|0|u|0|1|1|rn	|rt	|0 0 0 0|1 1 0 1|rm	|
 
 # p459-464
-LDRSH		?		|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 1 1 1|imm4l	|
-LDRSH		?		|cond	|0 0 0|p|u|1|w|1|1 1 1 1|rt	|imm4h	|1 1 1 1|imm4l	|
+LDRSH		WRt,a_imm4	|cond	|0 0 0|p|u|1|w|1|rn	|rt	|imm4h	|1 1 1 1|imm4l	|
 LDRSH		?		|cond	|0 0 0|p|u|0|w|1|rn	|rt	|0 0 0 0|1 1 1 1|rm	|
 
 # p465-466
 LDRSHT		?		|cond	|0 0 0|0|u|0|1|1|rn	|rt	|0 0 0 0|1 1 1 1|rm	|
 
 # p467-468
-LDRT		?		|cond	|0 1|0 0|u|0|1 1|rn	|rt	|imm12			|
+LDRT		WRt,a_rn	|cond	|0 1|0 0|u|0|1 1|rn	|rt	|imm12			|
+LDRT		WRt,a_imm5	|cond	|0 1|1 0|u|0|1 1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p469-472
 LSL		S,Rd,Rm,imm5	|cond	|0 0|0|1 1 0 1|s|0 0 0 0|rd	|imm5	  |0 0 0|rm	|
@@ -258,13 +254,13 @@ MSR		?		|cond	|0 0 1 1 0|0 1 0|msk|0 0|1 1 1 1|imm12			|
 MSR		?		|cond	|0 0 0 1 0|0|1 0|msk|0 0|1 1 1 1|0 0 0 0 0 0 0 0|rn	|
 
 # p503-504
-MUL		?		|cond	|0 0 0 0 0 0 0|s|rd	|0 0 0 0|rm	|1 0 0 1|rn	|
+MUL		Rd,Rn,Rm	|cond	|0 0 0 0 0 0 0|s|rd	|0 0 0 0|rm	|1 0 0 1|rn	|
 
 # p505...510
-MVN		?		|cond	|0 0|i|1 1 1 1|s|rn	|rd	|oper2			|
+MVN		?		|cond	|0 0|1|1 1 1 1|s|rn	|rd	|oper2			|
 MVN		S,Rd,imm12	|cond	|0 0|1|1 1 1 1|s|0 0 0 0|rd	|imm12			|
-MVN		S,Rd,Rm,sh	|cond	|0 0|0|1 1 1 1|s|0 0 0 0|rd	|imm5	  |typ|0|rm	|
 MVN		S,Rd,Rm,Rs 	|cond	|0 0|0|1 1 1 1|s|0 0 0 0|rd	|rs	|0|typ|1|rm	|
+MVN		S,Rd,Rm,sh	|cond	|0 0|0|1 1 1 1|s|0 0 0 0|rd	|imm5	  |typ|0|rm	|
 
 # p511-512
 NOP		-		|cond	|0 0 1 1 0 0 1 0|0 0 0 0|1 1 1 1|0 0 0 0|0 0 0 0 0 0 0 0|
@@ -319,31 +315,30 @@ SMMUL		?		|cond	|0 1 1 1 0 1 0 1|rd	|1 1 1 1|rm	|0 0|r|1|rn	|
 SMULL		?		|cond	|0 0 0 0 1 1 0|s|rdhi	|rdlo	|rm	|1 0 0 1|rn	|
 
 # p665-666
-STM		Rn,w,reglist	|cond	|1 0|0 0 1 0|w|0|rn	|reglist			|
+STM		Rnw,reglist	|cond	|1 0|0 0 1 0|w|0|rn	|reglist			|
 
 # p667-668
-STMDA		?		|cond	|1 0|0 0 0 0|a|0|rn	|r|oper				|
+STMDA		Rnw,reglist	|cond	|1 0|0 0 0 0|w|0|rn	|reglist			|
 
 # p669-670
-STMDB		?		|cond	|1 0|0 1 0 0|w|0|rn	|r|oper				|
+STMDB		Rnw,reglist	|cond	|1 0|0 1 0 0|w|0|rn	|reglist			|
 
 # p671-672
 STMIB		Rn,w,reglist	|cond	|1 0|0 1 1 0|w|0|rn	|reglist			|
 
 # p673-678
-STR		Rt,irn		|cond	|0 1 0|p|u|0|w|0|rn	|rt	|imm12			|
-STR		?		|cond	|0 1 1|p|u|0|w|0|rn	|rt	|imm5	  |typ|0|rm	|
+STR		Rt,a_rn		|cond	|0 1 0|p|u|0|w|0|rn	|rt	|imm12			|
+STR		Rt,a_imm5	|cond	|0 1 1|p|u|0|w|0|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p679-684
-STRB		?		|1 1 1 1 1|0 0|0|0|0 0|0|rn	|rt	|1|p|u|w|imm8		|
-STRB		?		|cond	|0 1 0|p|u|1|w|0|rn	|rt	|imm12			|
-STRB		?		|cond	|0 1 1|p|u|1|w|0|rn	|rt	|imm5	  |typ|0|rm	|
+STRB		Rt,a_rn		|cond	|0 1 0|p|u|1|w|0|rn	|rt	|imm12			|
+STRB		Rt,a_imm5	|cond	|0 1 1|p|u|1|w|0|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p685-686
-STRBT		?		|cond	|0 1 1|0|u|1|1|0|rn	|rt	|imm5	  |typ|0|rm	|
+STRBT		Rt,a_imm5	|cond	|0 1 1|0|u|1|1|0|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p687-690
-STRD		?		|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 1 1|imm4l	|
+STRD		Rt,a_imm4	|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 1 1|imm4l	|
 STRD		?		|cond	|0 0 0|p|u|0|w|0|rn	|rt	|0 0 0 0|1 1 1 1|rm	|
 
 # p691-692
@@ -360,15 +355,15 @@ STREXH		?		|cond	|0 0 0|1 1 1 1|0|rn	|rd 	|1 1 1 1|1 0 0 1|rt	|
 
 # p699-704
 STRH		?		|1 1 1 1 1|0 0|0|0|0 1|0|rn	|rt	|1|p|u|w|imm8		|
-STRH		?		|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 0 1 1|imm4l	|
+STRH		Rt,a_imm4	|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 0 1 1|imm4l	|
 STRH		?		|cond	|0 0 0|p|u|0|w|0|rn	|rt	|0 0 0 0|1 0 1 1|rm	|
 
 # A8-709...720
 SUB		S,Rd,Rn,imm12	|cond	|0 0|1|0 0 1 0|s|rn	|rd	|imm12			|
 SUB		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 0 1 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 SUB		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 0 1 0|s|rn	|rd	|rs	|0|typ|1|rm	|
-SUB		?		|cond	|0 0|1|0 0 1 0|s|1 1 0 1|rd	|imm12			|
-SUB		?		|cond	|0 0|0|0 0 1 0|s|1 1 0 1|rd	|imm5	  |typ|0|rm	|
+#SUB		?		|cond	|0 0|1|0 0 1 0|s|1 1 0 1|rd	|imm12			|
+#SUB		?		|cond	|0 0|0|0 0 1 0|s|1 1 0 1|rd	|imm5	  |typ|0|rm	|
 
 # p723-724
 SWP		UN		|cond	|0 0 0 1 0|x|0 0|1 1 1 1|rt	|0 0 0 0|1 0 0 1|rt2	|
@@ -397,7 +392,7 @@ UADD16		?		|cond	|0 1 1 0 0 1 0 1|rn	|rd	|1 1 1 1|0 0 0 1|rm	|
 UADD8		>		|cond	|0 1 1 0 0 1 0 1|rn	|rd	|1 1 1 1|1 0 0 1|rm	|
 
 # p779
-UMULL		?		|cond	|0 0 0 0 1 0 0|s|rdhi	|rdlo	|rm	|1 0 0 1|rn	|
+UMULL		Rdlo,Rdhi,Rn,Rm	|cond	|0 0 0 0 1 0 0|s|rdhi	|rdlo	|rm	|1 0 0 1|rn	|
 
 # p1966-1967
 CPS		?		|1 1 1 1|0 0 0 1 0 0 0 0|imo|m|0|0 0 0 0|0 0 0 0|a|i|f|0|mode	|
@@ -406,13 +401,13 @@ CPS		?		|1 1 1 1|0 0 0 1 0 0 0 0|imo|m|0|0 0 0 0|0 0 0 0|a|i|f|0|mode	|
 ERET_1968	?		|cond	|0 0 0 1 0 1 1 0|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 0|
 
 # p1972
-LDM		?		|cond	|1 0|0|a|b|1|c|1|rn	|1|oper				|
+LDM	amode,Rnw,reglist3	|cond	|1 0|0|p|u|1|w|1|rn	|1|reglist			|
 
 # p1970
 HVC_1970	?		|cond	|0 0 0 1 0 1 0 0|imm12			|0 1 1 1|imm4	|
 
 # p1974
-LDM		?		|cond	|1 0|0|a|b|1|c|1|rn	|0|oper				|
+LDM	amode,Rnw,reglist2	|cond	|1 0|0|p|u|1|w|1|rn	|0|reglist			|
 
 # p497-498
 # p1976-1977
@@ -438,12 +433,31 @@ MSR		UN		|cond	|0 0 0 1 0|r|1 0|0 0 0 0|1 1 1 1|0 0 0 0 0 0 0 0|rn	|
 SMC_1988	?		|cond	|0 0 0 1 0 1 1|0|0 0 0 0 0 0 0 0 0 0 0 0|0 1 1 1|imm4	|
 
 # p1994
-STM		?		|cond	|1 0|0|a|b|1|c|0|rn	|r|oper				|
+STM	amode,Rnw,reglist2	|cond	|1 0|0|p|u|1|w|0|rn	|reglist			|
 
 
 """
 
-CC = [ "EQ", "NE", "CS", "LO", "MI", "PL", "VS", "VC", "HI", "LS", "GE", "LT", "GT", "LE", "", "NV" ]
+OBJDUMP_COMPAT = True
+
+if OBJDUMP_COMPAT:
+	CC = [
+		"eq", "ne", "cs", "cc", "mi", "pl", "vs", "vc",
+		"hi", "ls", "ge", "lt", "gt", "le", "", "nv"
+	]
+	REG = [
+		"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
+		"r8", "r9", "sl", "fp", "ip", "sp", "lr", "pc"
+	]
+else:
+	CC = [
+		"EQ", "NE", "CS", "CC", "MI", "PL", "VS", "VC",
+		"HI", "LS", "GE", "LT", "GT", "LE", "", "NV"
+	]
+	REG = [
+		"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
+		"R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"
+	]
 
 class Arm_ins(assy.Instree_ins):
 
@@ -451,6 +465,9 @@ class Arm_ins(assy.Instree_ins):
 		super().__init__(pj, lim, lang)
 		if self.lo & 3:
 			raise assy.Invalid("Unaligned Instruction")
+
+
+	def args_done(self, pj):
 		if 'cond' in self.lim[-1].flds:
 			cond = self['cond']
 			self.mne += CC[cond]
@@ -467,8 +484,17 @@ class Arm_ins(assy.Instree_ins):
 			self.assy_Rt(pj),
 			assy.Arg_verbatim(pj, "CR%d" % self['crn']),
 			assy.Arg_verbatim(pj, "CR%d" % self['crm']),
-			assy.Arg_verbatim(pj, "%d" % self['opc2']),
+			assy.Arg_verbatim(pj, "{%d}" % self['opc2']),
 		])
+
+	def assy_amode(self, pj):
+		self.mne += {
+			0: "DA",
+			1: "",		# IA
+			2: "DB",
+			3: "IB",
+		}[self['p'] * 2 + self['u']]
+		
 
 	def assy_cpsr(self, pj):
 		t = "CPSR_"
@@ -494,11 +520,11 @@ class Arm_ins(assy.Instree_ins):
 
 	def assy_adr_plus(self, pj):
 		v = self.imm12_rotate()
-		return assy.Arg_dst(pj, self.hi + 4 + v, "#")
+		return assy.Arg_dst(pj, self.hi + 4 + v, "")
 
 	def assy_adr_minus(self, pj):
 		v = self.imm12_rotate()
-		return assy.Arg_dst(pj, self.hi + 4 - v, "#")
+		return assy.Arg_dst(pj, self.hi + 4 - v, "")
 	
 	def assy_S(self, pj):
 		if self['s']:
@@ -517,7 +543,7 @@ class Arm_ins(assy.Instree_ins):
 			o |= 0xfc000000
 		self.dstadr = 4 + (self.hi + o) & 0xffffffff
 		pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
-		return assy.Arg_dst(pj, self.dstadr, "#")
+		return assy.Arg_dst(pj, self.dstadr, "")
 
 	def assy_sh(self, pj):
 		typ = self['typ']
@@ -525,18 +551,18 @@ class Arm_ins(assy.Instree_ins):
 		if typ == 0:
 			if not imm5:
 				return
-			return assy.Arg_verbatim(pj, "lsl#%d" % imm5)
+			return "lsl,#%d" % imm5
 		if typ == 1:
 			if not imm5:
 				imm5 = 32
-			return assy.Arg_verbatim(pj, "lsr#%d" % imm5)
+			return "lsr,#%d" % imm5
 		if typ == 2:
 			if not imm5:
 				imm5 = 32
-			return assy.Arg_verbatim(pj, "asr#%d" % imm5)
+			return "asr,#%d" % imm5
 		if not imm5:
-			return assy.Arg_verbatim(pj, "rrx#1")
-		return assy.Arg_verbatim(pj, "ror#%d" % imm5)
+			return "rrx,#1"
+		return "ror,#%d" % imm5
 
 	def assy_imm5(self, pj):
 		return assy.Arg_verbatim(pj, "#0x%x" % self['imm5'])
@@ -545,37 +571,129 @@ class Arm_ins(assy.Instree_ins):
 		v = self['imm12']
 		s = v >> 8
 		v = v & 0xff
+		# return "#0x%x,%d" % (v, s)
 		v = v << (32 - 2 * s)
 		v |= v >> 32
 		v &= 0xffffffff
-		return assy.Arg_verbatim(pj, "#0x%x" % v)
+		return "#0x%x" % v
 
 	def assy_vrn(self, pj):
-		return assy.Arg_verbatim(pj, "[R%d]" % self['rn'])
+		return assy.Arg_verbatim(pj, "[%s]" % REG[self['rn']])
 
-	def assy_irn(self, pj):
+	def assy_a_rnrm(self, pj):
+		rn = REG[self['rn']]
+		rm = REG[self['rm']]
+		if not self['u']:
+			rm = "-" + rm
+		p = self.lim[-1].flds.get('p')
+		w = self.lim[-1].flds.get('w')
+
+		if not p:
+			if not w:
+				return "[%s]," % rn + rm
+			raise assy.Invalid("a_imm4 mode wrong (!p,w)")
+
+		if w:
+			return "[%s," % rn + rm + "]!"
+
+		return "[%s," % rn + rm + "]"
+
+
+	def assy_a_imm4(self, pj):
+		imm32 = (self['imm4h'] << 4) | self['imm4l']
+		if self['u']:
+			imm = "#0x%x" % imm32
+		else:
+			imm = "#-0x%x" % imm32
+		p = self.lim[-1].flds.get('p')
+		w = self.lim[-1].flds.get('w')
+		rn = REG[self['rn']]
+
+		if not p:
+			if not w:
+				return "[%s]," % rn + imm
+			raise assy.Invalid("a_imm4 mode wrong (!p,w)")
+
+		if w:
+			return "[%s," % rn + imm + "]!"
+
+		if True or self['rn'] != 15 or OBJDUMP_COMPAT:
+			if imm32:
+				return "[%s," % rn + imm + "]"
+			return "[%s]" % rn
+
+		if self['u']:
+			t = self.hi + 4 + imm32
+		else:
+			t = self.hi + 4 - imm32
+		try:
+			v = pj.m.lu32(t)
+			data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
+			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
+			return "#0x%x" % v
+		except:
+			self.lcmt += "[%s,%s]\n" % (rn, imm)
+			return "[#0x%x]" % t
+
+	def assy_a_imm5(self, pj):
+		''' Addressing mode Rn/U/P/W/imm5 '''
+		shf = self.assy_sh(pj)
+		if shf is None:
+			shf = ""
+		else:
+			shf = "," + shf
+		rn = REG[self['rn']]
+		rm = REG[self['rm']]
+		if not self['u']:
+			rm = "-" + rm
+		p = self.lim[-1].flds.get('p')
+		w = self.lim[-1].flds.get('w')
+		if p:
+			if w:
+				return "[%s,%s%s]!" % (rn, rm, shf)
+			return "[%s,%s%s]" % (rn, rm, shf)
+		else:
+			if not w:
+				return "[%s],%s%s" % (rn, rm, shf)
+			raise assy.Invalid("a_imm5 mode wrong (!p,w)")
+
+	def assy_a_rn(self, pj):
+		''' Addressing mode Rn/U/P/W '''
 		imm32 = self['imm12']
-		rn = "R%d" % self['rn']
-		if self['w'] or not self['p']:
-			wb="XXX_WRITEBACK"
-		else:
-			wb=""
-		if not imm32 or not self['p']:
-			return assy.Arg_verbatim(pj, "[%s]" % rn + wb)
+		rn = REG[self['rn']]
 		if self['u']:
-			return assy.Arg_verbatim(pj, "[%s+#0x%x]" % (rn, imm32) + wb)
+			imm = "#0x%x" % imm32
 		else:
-			return assy.Arg_verbatim(pj, "[%s-#0x%x]" % (rn, imm32) + wb)
-		
-	def assy_ipc(self, pj):
-		v = self['imm12']
+			imm = "#-0x%x" % imm32
+
+		p = self.lim[-1].flds.get('p')
+		w = self.lim[-1].flds.get('w')
+
+		if not p:
+			if not w:
+				return "[%s]," % rn + imm
+			raise assy.Invalid("a_rn mode wrong (!p,w)")
+
+		if w:
+			return "[%s," % rn + imm + "]!"
+
+		if self['rn'] != 15 or OBJDUMP_COMPAT:
+			if imm32:
+				return "[%s," % rn + imm + "]"
+			return "[%s]" % rn
+
 		if self['u']:
-			t = self.hi + 4 + v
+			t = self.hi + 4 + imm32
 		else:
-			t = self.hi + 4 - v
-		data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
-		return assy.Arg_verbatim(pj, "[#0x%x]" % t)
-		
+			t = self.hi + 4 - imm32
+		try:
+			v = pj.m.lu32(t)
+			data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
+			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
+			return "#0x%x" % v
+		except:
+			self.lcmt += "[%s,%s]\n" % (rn, imm)
+			return "[#0x%x]" % t
 
 	def assy_w(self, pj):
 		if (self['w']):
@@ -584,32 +702,44 @@ class Arm_ins(assy.Instree_ins):
 	def assy_Rd(self, pj):
 		if self['rd'] == 15:
 			self.flow_R(pj)
-		return assy.Arg_verbatim(pj, "R%d" % self['rd'])
+		return REG[self['rd']]
 
 	def assy_WRt(self, pj):
 		if self['rt'] == 15:
 			self.flow_J(pj)
-		return assy.Arg_verbatim(pj, "R%d" % self['rt'])
+		return REG[self['rt']]
 
 	def assy_Rs(self, pj):
 		typ = self['typ']
 		rs = self['rs']
-		return assy.Arg_verbatim(pj, "%s R%d" % (
-			["lsl", "lsr", "asr", "ror"][typ], rs
+		return assy.Arg_verbatim(pj, "%s,%s" % (
+			["lsl", "lsr", "asr", "ror"][typ], REG[rs]
 		))
 		
 
 	def assy_Rt(self, pj):
-		return assy.Arg_verbatim(pj, "R%d" % self['rt'])
+		return REG[self['rt']]
 
 	def assy_Rt2(self, pj):
-		return assy.Arg_verbatim(pj, "R%d" % self['rt2'])
+		return REG[self['rt2']]
 
 	def assy_Rn(self, pj):
-		return assy.Arg_verbatim(pj, "R%d" % self['rn'])
+		return REG[self['rn']]
+
+	def assy_Rdhi(self, pj):
+		return REG[self['rdhi']]
+
+	def assy_Rdlo(self, pj):
+		return REG[self['rdlo']]
+
+	def assy_Rnw(self, pj):
+		if self['w']:
+			return REG[self['rn']] + "!"
+		return REG[self['rn']]
+		
 
 	def assy_Rm(self, pj):
-		return assy.Arg_verbatim(pj, "R%d" % self['rm'])
+		return REG[self['rm']]
 
 	def assy_reglist(self, pj):
 		r = self['reglist']
@@ -617,10 +747,16 @@ class Arm_ins(assy.Instree_ins):
 		i = 0
 		while r:
 			if r & 1:
-				l.append("R%d" % i)
+				l.append(REG[i])
 			r = r >> 1
 			i += 1
-		return assy.Arg_verbatim(pj, "(" + ",".join(l) + ")")
+		return "{" + ",".join(l) + "}"
+
+	def assy_reglist2(self, pj):
+		return self.assy_reglist(pj) + "^"
+
+	def assy_reglist3(self, pj):
+		return self.assy_reglist(pj)[:-1] + "," + REG[15] + "}^"
 
 	def assy_wreglist(self, pj):
 		r = self['reglist']
