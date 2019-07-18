@@ -74,8 +74,8 @@ ADD		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 ADD		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 1 0 0|s|rn	|rd	|rs	|0|typ|1|rm	|
 
 # p320-321
-#ADR		Rd,adr_plus	|cond	|0 0 1 0 1 0 0 0 1 1 1 1|rd	|imm12			|
-#ADR		Rd,adr_minus	|cond	|0 0 1 0 0 1 0 0 1 1 1 1|rd	|imm12			|
+ADR		Rd,adr_plus	|cond	|0 0 1 0 1 0 0 0 1 1 1 1|rd	|imm12			|
+ADR		Rd,adr_minus	|cond	|0 0 1 0 0 1 0 0 1 1 1 1|rd	|imm12			|
 
 # p322-327
 AND		S,Rd,Rn,imm12	|cond	|0 0|1|0 0 0 0|s|rn	|rd	|imm12			|
@@ -438,7 +438,7 @@ STM	amode,Rnw,reglist2	|cond	|1 0|0|p|u|1|w|0|rn	|reglist			|
 
 """
 
-OBJDUMP_COMPAT = True
+OBJDUMP_COMPAT = False
 
 if OBJDUMP_COMPAT:
 	CC = [
@@ -542,7 +542,8 @@ class Arm_ins(assy.Instree_ins):
 		if o & (1<<25):
 			o |= 0xfc000000
 		self.dstadr = 4 + (self.hi + o) & 0xffffffff
-		pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
+		if self.mne.find("L") != -1:
+			pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
 		return assy.Arg_dst(pj, self.dstadr, "")
 
 	def assy_sh(self, pj):

@@ -97,11 +97,12 @@ class ArmSwitchIns(assy.Instree_ins):
 			print("FAIL", why)
 			raise assy.Invalid(why)
 
-		print("SWX ?")
-		for i in self.lim:
-			print("\t", i, i.assy)
-			for j in i.flds:
-				print("\t\t", j, i[j])
+		if False:
+			print("SWX ?")
+			for i in self.lim:
+				print("\t", i, i.assy)
+				for j in i.flds:
+					print("\t\t", j, i[j])
 
 		ri = self.lim[0]['rn']
 		nswitch = self.lim[0]['imm12']
