@@ -165,7 +165,7 @@ LDRB		WRt,a_imm5	|cond	|0 1 1|p|u|1|w|1|rn	|rt	|imm5	  |typ|0|rm	|
 LDRBT		?		|cond	|0 1 1|0|u|1 1 1|rn	|rt	|imm5	  |typ|0|rm	|
 
 # p427-432
-LDRD		Wrt,a_imm4	|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
+LDRD		WRt,a_imm4	|cond	|0 0 0|p|u|1|w|0|rn	|rt	|imm4h	|1 1 0 1|imm4l	|
 LDRD		?		|cond	|0 0 0|p|u|0|w|0|rn	|rt	|0 0 0 0|1 1 0 1|rm	|
 
 
@@ -308,11 +308,82 @@ SBC		S,Rd,Rn,imm12	|cond	|0 0|1|0 1 1 0|s|rn	|rd	|imm12			|
 SBC		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 1 1 0|s|rn	|rd	|imm5	  |typ|0|rm	|
 SBC		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 1 1 0|s|rn	|rd	|rs	|0|typ|1|rm	|
 
+# p599-600
+SBFX		?		|cond	|0 1 1 1 1|0|1|w1	|rd	|lsb	  |1 0 1|rn	|
+
+# p601-602
+SDIV		Rd,Rn,Rm	|cond	|0 1 1 1 0 0 0 1|rd	|1 1 1 1|rm	|0 0 0|1|rn	|
+
+# p603-604
+SEL		Rd,Rn,Rm	|cond	|0 1 1 0 1 0 0 0|rn	|rd	|1 1 1 1|1 0 0 1|rm	|
+
+# p605-606
+SETEND		?		|1 1 1 1|0 0 0 1 0 0 0 0|0 0 0 1|0 0 0 0 0 0|e|0|0 0 0 0|0 0 0 0|
+
+# p607-608
+SEV		-		|cond	|0 0 1 1 0 0 1 0|0 0 0 0|1 1 1 1|0 0 0 0|0 0 0 0|0 1 0 0|
+
+# p609-610
+SHADD		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rn	|rd	|1 1 1 1|0 0 0 1|rm	|
+
+# p611-612
+SHADD8		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rn	|rd	|1 1 1 1|1 0 0 1|rm	|
+
+# p613-614
+SHASX		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rn	|rd	|1 1 1 1|0 0 1 1|rm	|
+
+# p615-616
+SHSAX		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rm	|rd	|1 1 1 1|0 1 0 1|rm	|
+
+# p617-618
+SHSUB16		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rn	|rd	|1 1 1 1|0 1 1 1|rm	|
+
+# p619-620
+SHSUB8		Rd,Rn,Rm	|cond	|0 1 1 0 0 0 1 1|rn	|rd	|1 1 1 1|1 1 1 1|rm	|
+
+# p621-622
+SMLA		Rd,Rn,Rm,Ra,?	|cond	|0 0 0 1 0 0 0 0|rd	|ra	|rm	|1|m|n|0|rn	|
+
+# p623-624
+SMLAD		Rd,Rn,Rm,Ra,?	|cond	|0 1 1 1 0 0 0 0|rd	|ra	|rm	|0|0|m|1|rn	|
+
+# p625-626
+SMLAL		Rdlo,Rdhi,Rn,Rm	|cond	|0 0 0 0 1 1 1|s|Rdhi	|rdlo	|rm	|1 0 0 1|rn	|
+
+# p627-628
+SMLAL		Rdlo,Rdhi,Rn,Rm,?	|cond	|0 0 0 1 0 1 0 0|rdhi	|rdlo	|rm	|1|m|n|0|rn	|
+
+# p629-630
+SMLALD		Rdlo,Rdhi,Rn,Rm,?	|cond	|0 1 1 1 0 1 0 0|rdhi	|rdlo	|rm	|0 0|m|1|rn	|
+
+# p631-632
+SMLAW		Rd,Rn,Rm,Ra,?	|cond	|0 0 0 1|0 0 1 0|rd	|ra	|rm	|1|m|0 0|rn	|
+
+# p633-p634
+SMLSD		Rd,Rn,Rm,Ra,?	|cond	|0 1 1 1|0 0 0 0|rd	|ra	|rm	|0 1|m|1|rn	|
+
+# p635-636
+SMLSLD		Rdlo,Rdhi,Rn,Rm,?	|cond	|0 1 1 1 0 1 0 0|rdhi	|rdlo	|rm	|0 1|m|1|rn	|
+
+# p637-638
+SMMLA		Rd,Rn,Rm,Ra,?	|cond	|0 1 1 1 0 1 0 1|rd	|ra	|rm	|0 0|r|1|rn	|
+
+
+# p639-640
+SMMLS		Rd,Rn,Rm,Ra,?	|cond	|0 1 1 1 0 1 0 1|rd	|ra	|rm	|1 1|r|1|rn	|
+
 # p641-642
-SMMUL		?		|cond	|0 1 1 1 0 1 0 1|rd	|1 1 1 1|rm	|0 0|r|1|rn	|
+SMMUL		Rd,Rn,Rm	|cond	|0 1 1 1 0 1 0 1|rd	|1 1 1 1|rm	|0 0|r|1|rn	|
+
+# p643-644
+SMUAD		Rd,Rn,Rm,?	|cond	|0 1 1 1 0 0 0 0|rd	|1 1 1 1|rm	|0 0|m|1|rn	|
+
+# p645-646
+SMUL		Rd,Rn,Rm,?	|cond	|0 0 0 1 0 1 1 0|rd	|0 0 0 0|rm	|1|m|n|0|rn	|
 
 # p647-648
-SMULL		?		|cond	|0 0 0 0 1 1 0|s|rdhi	|rdlo	|rm	|1 0 0 1|rn	|
+SMULL		Rdlo,Rdhi,Rn,Rm	|cond	|0 0 0 0 1 1 0|s|rdhi	|rdlo	|rm	|1 0 0 1|rn	|
+
 
 # p665-666
 STM		Rnw,reglist	|cond	|1 0|0 0 1 0|w|0|rn	|reglist			|
