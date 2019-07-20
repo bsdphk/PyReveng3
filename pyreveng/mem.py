@@ -104,6 +104,9 @@ class address_space():
 		self.block_comments.setdefault(adr, '')
 		self.block_comments[adr] += cmt + '\n'
 
+	def bytearray(self, lo, bcnt):
+		assert False
+
 	def gaps(self):
 		ll = self.lo
 		for i in self.t:
@@ -240,6 +243,10 @@ class byte_mem(word_mem):
 		super().__init__(lo, hi, 8, attr)
 		self.ncol = 4
 		self.ascii = True
+
+	def bytearray(self, lo, bcnt):
+		i = self._off(lo)
+		return bytearray(self.m[i:i+bcnt])
 
 	def u8(self, a):
 		"""Unsigned 8-bit byte"""

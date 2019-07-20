@@ -67,12 +67,9 @@ class Const(Data):
 class Pstruct(Data):
 	''' Uses python struct.* to untangle data '''
 	def __init__(self, pj, lo, spec, fmt=None, typ=".PSTRUCT"):
-		hi = lo + struct.calcsize(spec)
-		super().__init__(pj, lo, hi, "const")
-		v = []
-		for i in range(lo, hi):
-			v.append(pj.m.rd(i))
-		self.data = struct.unpack(spec, bytearray(v))
+		bcnt = struct.calcsize(spec)
+		super().__init__(pj, lo, lo + bcnt, "const")
+		self.data = struct.unpack(spec, pj.m.bytearray(lo, bcnt))
 		self.spec = spec
 		self.fmt = fmt
 		self.typ = typ
