@@ -33,6 +33,7 @@ from pyreveng import assy, data
 
 arm_desc = """
 
+# pages ref: DDI0406C_d_armv7ar_arm.pdf
 # XXX: Wildcards until comple
 misc_192	?		|cond	|op1  |x1				      |b|x2	|
 misc_194	?		|cond	|0 0|p|op1	|x0			|op2	|x1	|

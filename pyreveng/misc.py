@@ -109,7 +109,6 @@ def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64, all_val
 		if b - a >= minsize:
 			x = pj.add(a, b, "blank")
 			x.rendered = ".BLANK\t" + fmt % c + "[0x%x]" % ((b-a) // width)
-			print("... adding " + x.rendered)
 			x.compact = True
 		a = b
 
