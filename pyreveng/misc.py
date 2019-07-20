@@ -65,10 +65,11 @@ def fill_gaps(pj):
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
 	pj.run()
 
-def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64):
+def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64, all_vals=False):
 	'''
 		Find stretches `minsize` or more of `width` words
 		of all zeros or all ones and turn them into a .BLANK
+		If `all_vals` stretches of any word will be converted.
 	'''
 	while lo & (width - 1):
 		lo = lo + 1
@@ -82,13 +83,20 @@ def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64):
 	fmt = "0x%" + "0%dx" % ((width * aspace.bits + 3) // 4)
 
 	a = lo
+	co = None
 	while a < hi:
 		try:
 			c = func(a)
 		except mem.MemError:
 			a += width
 			continue
-		if c and ~c and a < hi:
+		if all_vals:
+			if co is None:
+				co = c
+			if c != co:
+				a += width
+				continue
+		elif c and ~c and a < hi:
 			a += width
 			continue
 		b = a

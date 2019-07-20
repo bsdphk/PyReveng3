@@ -113,12 +113,13 @@ class Listing():
 		print("Listing into", fn)
 		self.fo = open(fn, "w")
 		misc.fill_gaps(pj)
+		misc.fill_all_blanks(pj, all_vals=True, minsize=16)
 		a0 = pj.m.lo
 		for i in pj:
 			if i.lo > a0:
 				nxxx += 1
 				cxxx += i.lo - a0
-				self.render_xxx(a0, i.lo)
+				self.render_chunk(a0, i.lo)
 				a0 = i.lo
 
 			rx = i.render(pj)
@@ -135,7 +136,7 @@ class Listing():
 				a0 = i.hi
 
 		if a0 < pj.m.hi:
-			self.render_xxx(a0, pj.m.hi)
+			self.render_chunk(a0, pj.m.hi)
 			nxxx += 1
 			cxxx += pj.m.hi - a0
 
@@ -143,24 +144,6 @@ class Listing():
 			self.fo.close()
 
 		print("%d XXXs containing %d bytes" % (nxxx, cxxx))
-
-	def render_xxx(self, lo, hi):
-		if hi - lo <= 2:
-			self.render_chunk(lo, hi)
-			return
-		try:
-			x = self.pj.m.rd(lo)
-			for i in range(lo, hi):
-				if self.pj.m.rd(i) != x:
-					self.render_chunk(lo, hi)
-					return
-		except mem.MemError:
-			self.render_chunk(lo, hi,
-			    ".UNDEF\t[0x%x]" % (hi - lo), "", compact=True)
-			return
-
-		self.render_chunk(lo, hi,
-		    ".XXX\t0x%02x[0x%x]" % (x, hi - lo), "", compact=True)
 
 	def render_chunk(self, lo, hi, rx=".XXX", lcmt="", pil=None, compact=False):
 		rx = rx.strip().split("\n")
