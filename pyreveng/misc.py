@@ -36,12 +36,12 @@ def fill_gaps(pj):
 	def add_gap(pj, lo, hi):
 		print("... adding .GAP 0x%x-0x%x" % (lo, hi))
 		x = pj.add(lo, hi, "gap")
-		x.rendered = ".GAP 0x%x" % (hi - lo)
+		x.rendered = ".GAP\t0x%x" % (hi - lo)
 		x.compact = True
 
 	gaps = 0
 	ngaps = 0
-	for lo, hi, aspace in pj.gaps():
+	for lo, hi, unused_aspace in pj.gaps():
 		g0 = lo
 		g1 = False
 		for j in range(lo, hi):
@@ -64,3 +64,50 @@ def fill_gaps(pj):
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
 	pj.run()
+
+def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64):
+	'''
+		Find stretches `minsize` or more of `width` words
+		of all zeros or all ones and turn them into a .BLANK
+	'''
+	while lo & (width - 1):
+		lo = lo + 1
+	while hi & (width - 1):
+		hi = hi - 1
+	if aspace is None:
+		aspace = pj.m
+	if func is None:
+		func = aspace.__getitem__
+
+	fmt = "0x%" + "0%dx" % ((width * aspace.bits + 3) // 4)
+
+	a = lo
+	while a < hi:
+		try:
+			c = func(a)
+		except mem.MemError:
+			a += width
+			continue
+		if c and ~c and a < hi:
+			a += width
+			continue
+		b = a
+		try:
+			while b < aspace.hi and func(b) == c and b < hi:
+				b += width
+				continue
+		except mem.MemError:
+			pass
+		if b - a >= minsize:
+			x = pj.add(a, b, "blank")
+			x.rendered = ".BLANK\t" + fmt % c + "[0x%x]" % ((b-a) // width)
+			print("... adding " + x.rendered)
+			x.compact = True
+		a = b
+
+def fill_all_blanks(pj, **kwargs):
+	'''
+		Fill in all .BLANKS
+	'''
+	for lo, hi, aspace in pj.gaps():
+		fill_blanks(pj, lo, hi, aspace=aspace, **kwargs)
