@@ -83,29 +83,25 @@ def fill_blanks(pj, lo, hi, aspace=None, func=None, width=1, minsize=64, all_val
 	fmt = "0x%" + "0%dx" % ((width * aspace.bits + 3) // 4)
 
 	a = lo
-	co = None
+	b = a
 	while a < hi:
 		try:
 			c = func(a)
 		except mem.MemError:
 			a += width
 			continue
-		if all_vals:
-			if co is None:
-				co = c
-			if c != co:
-				a += width
-				continue
-		elif c and ~c and a < hi:
+		if not all_vals and c and ~c:
 			a += width
 			continue
-		b = a
-		try:
-			while b < aspace.hi and func(b) == c and b < hi:
-				b += width
-				continue
-		except mem.MemError:
-			pass
+		b = a + width
+		while b < hi:
+			try:
+				if func(b) == c:
+					b += width
+					continue
+			except mem.MemError:
+				pass
+			break
 		if b - a >= minsize:
 			x = pj.add(a, b, "blank")
 			x.rendered = ".BLANK\t" + fmt % c + "[0x%x]" % ((b-a) // width)
