@@ -224,7 +224,7 @@ MCRR		?		|cond	|1 1 0 0 0 1 0 0|rt2	|rt	|cop	|opc1	|crm	|
 MCRR2		?		|1 1 1 1|1 1 0 0 0 1 0 0|rt2	|rt	|cop	|opc1	|crm	|
 
 # p481-482
-MLA		?		|cond	|0 0 0 0 0 0 1|s|rd	|ra	|rm	|1 0 0 1|rn	|
+MLA		S,Rd,Rn,Rm,Ra	|cond	|0 0 0 0 0 0 1|s|rd	|ra	|rm	|1 0 0 1|rn	|
 
 # p483-484
 MLS		?		|cond	|0 0 0 0 0 1 1 0|rd	|ra	|rm	|1 0 0 1|rn	|
@@ -744,6 +744,7 @@ class Arm_ins(assy.Instree_ins):
 
 		if not p:
 			if not w:
+				#return [assy.Arg_verbatim(pj, "[%s]" % rn), assy.Arg_dst(pj, imm)]
 				return "[%s]," % rn + imm
 			raise assy.Invalid("a_rn mode wrong (!p,w)")
 
@@ -763,6 +764,7 @@ class Arm_ins(assy.Instree_ins):
 			v = pj.m.lu32(t)
 			data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
 			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
+			return assy.Arg_dst(pj, v, pfx="#")
 			return "#0x%x" % v
 		except:
 			self.lcmt += "[%s,%s]\n" % (rn, imm)
@@ -809,7 +811,9 @@ class Arm_ins(assy.Instree_ins):
 		if self['w']:
 			return REG[self['rn']] + "!"
 		return REG[self['rn']]
-		
+
+	def assy_Ra(self, pj):
+		return REG[self['ra']]
 
 	def assy_Rm(self, pj):
 		return REG[self['rm']]
