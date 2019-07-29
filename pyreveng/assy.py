@@ -212,6 +212,8 @@ class Instree_disass(code.Decode):
 
 		if ins_word == mem_word:
 			self.getmore = self.getmore_word
+		elif ins_word == 16 and mem_word == 8 and endian == "<":
+			self.getmore = self.getmore_lu16
 		elif ins_word == 16 and mem_word == 8 and endian == ">":
 			self.getmore = self.getmore_bu16
 		elif ins_word == 32 and mem_word == 8 and endian == "<":
@@ -230,6 +232,9 @@ class Instree_disass(code.Decode):
 
 	def getmore_word(self, pj, adr, v):
 		v.append(pj.m.rd(adr + len(v)))
+
+	def getmore_lu16(self, pj, adr, v):
+		v.append(pj.m.lu16(adr + len(v) * 2))
 
 	def getmore_bu16(self, pj, adr, v):
 		v.append(pj.m.bu16(adr + len(v) * 2))
