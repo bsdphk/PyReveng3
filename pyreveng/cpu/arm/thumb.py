@@ -30,6 +30,7 @@ Disassembler for ARM processors, Thumb1 instruction set
 """
 
 from pyreveng import assy, data
+from pyreveng.cpu.arm import arm_base
 
 thumb_desc = '''
 #		|       |       |       |       |       |       |       |       |
@@ -565,7 +566,7 @@ CMP	Rn,Const		|1 1 1 1 0|i|0 1 1 0 1 1|rn	|0|imm3	|1 1 1 1|imm8		|
 # 370
 CMP	Rn,Rm			|0 1 0 0 0 1 0 1|n|rm	  |rn	|
 # 385
-EOR	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 1 0 0|s|rn	|0|imm3|rd	|im2|typ|rm	|
+EOR	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 1 0 0|s|rn	|0|imm3 |rd	|im2|typ|rm	|
 # 393 XXX: COND ?
 LDC	Cop,Crd,Rn		|1 1 1 1 1 1 0|p|u|d|w|1|rn	|crd	|cop	|imm8		|
 # 395 XXX: COND ?
@@ -584,7 +585,7 @@ LDRB	Rt,Rn,Imm		|1 1 1 1 1 0 0 0 1 0 0 1|rn	|rt	|imm12			|
 
 '''
 
-class Arm_Thumb_ins(assy.Instree_ins):
+class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
