@@ -419,8 +419,167 @@ STRT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 0 0 1 0 0|rn	|rt	|1 1 1 0|imm8		|
 SUB	Rd,Rn,Imm3		|0 0 0 1 1 1 1|im3  |rn   |rd	|
 # 713
 SUB	Rb,Rn,Rm		|0 0 0 1 1 0 1|rm   |rn   |rd	|
+# 715
+SUB	SP,SP,Imm		|1 0 1 1 0 0 0 0 1|imm7		|
+# 719
+SUB	Rd,SP,Rm,Shift		|1 1 1 0 1 0 1 1 1 0 1|s|1 1 0 1|0|imm3	|rd	|im2|typ|rm	|
+# 721
+SVC	Imm8			|1 1 0 1 1 1 1 1|imm8		|
+# 725
+SXTAB	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 1 0 0|rn	|1 1 1 1|rd	|1|0|rot|rm	|
+# 727
+SXTAB16	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 1 0|rn	|1 1 1 1|rd	|1|0|rot|rm	|
+# 729
+SXTAH	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 0 0|rn	|1 1 1 1|rd	|1 0|rot|rm	|
+# 731
+SXTB	Rd,Rm			|1 0 1 1 0 0 1 0 0 1|rm   |rd	|
+# 733
+SXTB16	Rd,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 1 0 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# 735
+SXTH	Rd,Rm			|1 0 1 1 0 0 1 0 0 0|rm   |rd	|
+# 737
+TBB	Rn,Rm			|1 1 1 0 1 0 0 0 1 1 0 1|rn	|1 1 1 1 0 0 0 0 0 0 0|h|rm	|
+# 739
+TEQ	Rn,Const		|1 1 1 1 0|i|0 0 1 0 0 1|rn	|0|imm3 |1 1 1 1|imm8		|
+# 741
+TEQ	Rn,Rm,Shift		|1 1 1 0 1 0 1 0 1 0 0 1|rn	|0|imm3	|1 1 1 1|im2|typ|rm	|
+# 745
+TST	Rn,Const		|1 1 1 1 0|i|0 0 0 0 0 1|rn	|0|imm3 |1 1 1 1|imm8		|
+# 747
+TST	Rn,Rm			|0 1 0 0 0 0 1 0 0 0|rm   |rn	|
+# 751
+UADD16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 1|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 753
+UADD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 755
+UASX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 757
+UBFX	Rd,Rn,Lsb,Wid		|1 1 1 1 0 0 1 1 1 1 0 0|rn	|0|imm3	|rd	|im2|0|widthm1	|
+# 759
+UDF	Imm8			|1 1 0 1 1 1 1 0|imm8		|
+# 761
+UDIV	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 1 0 1 1|rn	|1 1 1 1|rd	|1 1 1 1|rm	|
+# 763
+UHADD16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 1|rn	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 765
+UHADD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 767
+UHASX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 769
+UHSAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 1 0|rm	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 771
+UHSUB16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 1|rn	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 773
+UHSUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 1 1 0|rm	|
+# 775
+UMAAL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 1 0|rn	|rdlo	|rdhi	|0 1 1 0|rm	|
+# 777
+UMLAL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 1 0|rn	|rdlo	|rdhi	|0 0 0 0|rm	|
+# 779
+UMULL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 0 1 0|rn	|rdlo	|rdhi	|0 0 0 0|rm	|
+# 781
+UQADD16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 1|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 783
+UQADD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 785
+UQASX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 787
+UQSAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 1 0|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 789
+UQSUB16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 1|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 791
+UQSUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 1 0 1|rm	|
+# 793
+USAD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 1 1 1|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 795
+USADA8	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 1 1 1|rn	|ra	|rd	|0 0 0 0|rm	|
+# 797
+USAT	Rd,Imm5,Rn,Shift	|1 1 1 1 0 0 1 1 1 0|s|0|rn	|0|imm3	|rd	|im2|0|sat_imm	|
+# 799
+USAT16	Rd,Imm4,Rn		|1 1 1 1 0 0 1 1 1 0 1 0|rn	|0 0 0 0|rd	|0 0 0 0|sat_imm|
+# 801
+USAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 1 0|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 803
+USUB16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 1|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 805
+USUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 1 0 0|rm	|
+# 807
+UXTAB	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 1 0 1|rn	|1 1 1 1|rd	|1 0|rot|rm	|
+# 809
+UXTAB16	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 1 1|rn	|1 1 1 1|rd	|1 0|rot|rm	|
+# 811
+UXTAH	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 0 1|rn	|1 1 1 1|rd	|1 0|rot|rm	|
+# 813
+UXTB	Rd,Rm			|1 0 1 1 0 0 1 0 1 1|rm   |rd	|
+# 815
+UXB16	Rd,Rm			|1 1 1 1 1 0 1 0 0 0 1 1 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# 817
+UXTH	Rd,Rm			|1 0 1 1 0 0 1 0 1 0|rm   |rd	|
+# <vector stuff>
+# 955
+VMRS	Rt,FPSCR		|cond	|1 1 1 0 1 1 1 1 0 0 0 1|rt	|1 0 1 0 0 0 0 1 0 0 0 0|
+# 957
+VMSR	FPSCR,Rt		|cond	|1 1 1 0 1 1 1 0 0 0 0 1|rt	|1 0 1 0 0 0 0 1 0 0 0 0|
+# <vector stuff>
+# 1105
+WFE	-			|1 0 1 1 1 1 1 1 0 0 1 0 0 0 0 0|
+# 1107
+WFI	-			|1 0 1 1 1 1 1 1 0 0 1 1 0 0 0 0|
+# 1109
+YIELD	-			|1 0 1 1 1 1 1 1 0 0 0 1 0 0 0 0|
+'''
 
-
+thumb_t2_desc = '''
+#				|       |       |       |       |       |       |       |       |
+#				|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+# 300
+ADC	Rd,Rn,Rm		|1 1 1 0 1 0 1 1 0 1 0|s|rn	|0|imm3	|rd	|im2|typ|rm	|
+# 304
+ADD	Rdn,Imm8		|0 0 1 1 0|rd	|imm8		|
+# 308
+ADD	Rdn,Rm			|0 1 0 0 0 1 0 0|d|rm     |rdn	|
+# 314
+ADD	SP,SP,Imm7		|1 0 1 1 0 0 0 0 0|imm7		|
+# 316
+ADD	SP,Rm			|0 1 0 0 0 1 0 0|d|rm     |1 0 1|
+# 320
+ADR	Rd,Dst			|1 1 1 1 0|i|1 0 1 0 1 0 1 1 1 1|0|imm3	|rd	|imm8		|
+# 324
+AND	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 0 0 0|s|rn	|0|imm3	|rd	|im2|typ|rm	|
+# 328
+ASR	Rd,Rm,Imm		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|imm3	|rd	|im2|1 0|rm	|
+# 330
+ASR	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 1 0|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 332
+B	Dst,>J			|1 1 1 0 0|imm11		|
+# 340
+BIC	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 0 0 1|s|rn	|0|imm3	|rd	|im2|typ|rm	|
+# 346
+BLX	Dst,>C			|1 1 1 1 0|s|imm10h		|1 1|j|0|k|imm10l		|
+# 356 XXX: COND ?
+CDP2	Cop,Op1,Rd,Rn,Rm,Op2	|1 1 1 1 1 1 1 0|opc	|crn	|crd	|cop	|opc2 |0|crm	|
+# 364
+CMN	Rn,Rn,Shift		|1 1 1 0 1 0 1 1 0 0 0 1|rn	|0|imm3	|1 1 1 1|im2|typ|rm	|
+# 368
+CMP	Rn,Const		|1 1 1 1 0|i|0 1 1 0 1 1|rn	|0|imm3	|1 1 1 1|imm8		|
+# 370
+CMP	Rn,Rm			|0 1 0 0 0 1 0 1|n|rm	  |rn	|
+# 385
+EOR	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 1 0 0|s|rn	|0|imm3|rd	|im2|typ|rm	|
+# 393 XXX: COND ?
+LDC	Cop,Crd,Rn		|1 1 1 1 1 1 0|p|u|d|w|1|rn	|crd	|cop	|imm8		|
+# 395 XXX: COND ?
+LDC	Cop,Crd,Dst		|1 1 1 1 1 1 0|p|u|d|w|1 1 1 1 1|crd	|cop	|imm8		|
+# 397
+LDM	Rn,Reglist		|1 1 1 0 1 0 0 0 1 0|w|1|rn	|p|m|0|reglist			|
+# 407
+LDR	Rt,Sp,Imm		|1 0 0 1 1|rt	|imm8		|
+# 411
+LDR	Rt,Dst			|1 1 1 1 1 0 0 0|u|1 0 1 1 1 1 1|rt	|imm12			|
+# 413
+LDR	Rt,Rn,Rm		|1 1 1 1 1 0 0 0 0 1 0 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 417
+LDRB	Rt,Rn,Imm		|1 1 1 1 1 0 0 0 1 0 0 1|rn	|rt	|imm12			|
 
 
 '''
@@ -437,6 +596,7 @@ class Arm_Thumb(assy.Instree_disass):
 		super().__init__("arm_thumb", 16, 8, "<")
 		self.add_ins(thumb_desc, Arm_Thumb_ins)
 		self.add_ins(thumb_t1_desc, Arm_Thumb_ins)
+		self.add_ins(thumb_t2_desc, Arm_Thumb_ins)
 
 	def codeptr(self, pj, adr):
 		t = pj.m.lu32(adr)
