@@ -305,6 +305,122 @@ RRX	Rd,Rm			|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0 0 0 0|rd	|0 0 1 1|rm	|
 RSB	Rd,Rn,Zero		|0 1 0 0 0 0 1 0 0 1|rn   |rd	|
 # 577
 RSB	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 1 1 1 0|s|rn	|0|imm3	|rd	|im2|typ|rm	|
+# 587
+SADD	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 1|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 589
+SADD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 591
+SASX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 593
+SBC	Rd,Rn,Const		|1 1 1 1 0|i|0 1 0 1 1|s|rn	|0|imm3	|rd	|imm8		|
+# 595
+SBC	Rdn,Rm			|0 1 0 0 0 0 0 1 1 0|rm   |rdn	|
+# 599
+SBFX	Rd,Rn,Lsb,Wid		|1 1 1 1 0 0 1 1 0 1 0 0|rn	|0|imm3	|rd	|im2|0|widthm1	|
+# 601
+SDIV	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 1 0 0 1|rn	|1 1 1 1|rd	|1 1 1 1|rm	|
+# 603
+SEL	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|1 0 0 0|rm	|
+# 605
+SETEND	Endian			|1 0 1 1 0 1 1 0 0 1 0 1|e|0 0 0|
+# 607
+SEV	-			|1 0 1 1 1 1 1 1 0 1 0 0 0 0 0 0|
+# 609
+SHADD16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 1|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 611
+SHADD8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 613
+SHAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 0 1 0|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 615
+SHSAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 1 0|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 617
+SHSUB16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 1|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 619
+SHSUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 0 1 0|rm	|
+# 621
+SMLABB	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 0 0 1|rn	|ra	|rd	|0 0|n|m|rm	|
+# 623
+SMLAD	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 0 1 0|rn	|ra	|rd	|0 0 0|m|rm	|
+# 625
+SMLAL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 0 0|rn	|rdlo	|rdhi	|0 0 0 0|rm	|
+# 627
+SMLAL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 0 0|rm	|rdlo	|rdhi	|1 0|n|m|rm	|
+# 629
+SMLALD	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 0 0|rm	|rdlo	|rdhi	|1 1 0|m|rm	|
+# 631
+SMLAWB	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 0 1 1|rn	|ra	|rd	|0 0 0|m|rm	|
+# 633
+SMLSD	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 1 0 0|rn	|ra	|rd	|0 0 0|m|rm	|
+# 635
+SMLSLD	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 1 0 1|rn	|rdlo	|rdhi	|1 1 0|m|rm	|
+# 637
+SMMLA	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 1 0 1|rn	|ra	|rd	|0 0 0|r|rm	|
+# 639
+SMMLS	Rd,Rn,Rm,Ra		|1 1 1 1 1 0 1 1 0 1 1 0|rn	|ra	|rd	|0 0 0|r|rm	|
+# 641
+SMMUL	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 1 0 1|rn	|1 1 1 1|rd	|0 0 0|r|rm	|
+# 643
+SMUAD	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 0 1 0|rn	|1 1 1 1|rd	|0 0 0|m|rm	|
+# 645
+SMUL	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 0 0 1|rn	|1 1 1 1|rd	|0 0|n|m|rm	|
+# 647
+SMULL	Rdlo,Rdhi,Rn,Rm		|1 1 1 1 1 0 1 1 1 0 0 0|rn	|rdlo	|rdhi	|0 0 0 0|rm	|
+# 649
+SMULWB	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 0 1 1|rn	|1 1 1 1|rd	|0 0 0|m|rm	|
+# 651
+SMUSD	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 1 0 0|rn	|1 1 1 1|rd	|0 0 0|m|rm	|
+# 653
+SSAT	Rd,Imm,Rn,Shift		|1 1 1 1 0 0 1 1 0 0|s|0|rn	|0|imm3	|rd	|im2|0|sat_imm	|
+# 655
+SSAT16	Rd,Imm,Rn		|1 1 1 1 0 0 1 1 0 0 1 0|rn	|0 0 0 0|rd	|0 0 0 0|sat_imm|
+# 657
+SSAX	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 1 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 659
+SSUB16	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 1|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 661
+SSUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 663
+STC	Cop,Crd,Rn,Imm		|cond	|1 1 0|p|u|d|w|0|rn	|crd	|cop	|imm8		|
+# 665
+STM	Rd,Reglist		|1 1 0 0 0|rn	|reglist	|
+# 669
+STMDB	Rn,Reglist		|1 1 1 0 1|0 0 1 0 0|w|0|rn	|0|m|0|reglist			|
+# 671
+STMIB	Rn,Reglist		|cond	|1 0 0 1 1 0|w|0|rn	|reglist			|
+# 673
+STR	Rt,Rn,Imm		|0 1 1 0 0|imm5	    |rn   |rt	|
+# 677
+STR	Rt,Rn,Rm		|0 1 0 1 0 0 0|rm   |rn   |rt	|
+# 679
+STRB	Rt,Rn,Imm5		|0 1 1 1 0|imm5	    |rn   |rt	|
+# 683
+STRB	Rt,Rn,Rm		|0 1 0 1 0 1 0|rm   |rn   |rt	|
+# 685
+STRBT	Rt,Rn,Imm8		|1 1 1 1 1|0 0 0 0 0 0 0|rn	|rt	|1 1 1 0|imm8		|
+# 687
+STRD	Rt,Rt2,Rn		|1 1 1 0 1 0 0|p|u|1|w|0|rn	|rt	|rt2	|imm8		|
+# 691
+STREX	Rd,Rt,Rn		|1 1 1 0 1 0 0 0 0 1 0 0|rn	|rt	|rtd	|imm8		|
+# 693
+STREXB	Rd,Rt,Rn		|1 1 1 0 1 0 0 0 1 1 0 0|rn	|rt	|1 1 1 1|0 1 0 0|rd	|
+# 695
+STREXD	Rd,Rt,Rt2,Rn		|1 1 1 0 1 0 0 0 1 1 0 0|rn	|rt	|rt2	|0 1 1 1|rd	|
+# 697
+STREXH	Rd,Rt,Rn		|1 1 1 0 1 0 0 0 1 1 0 0|rn	|rt	|1 1 1 1 0 1 0 1|rd	|
+# 699
+STRH	Rt,Rn,Imm		|1 0 0 0 0|imm5     |rn   |rt	|
+# 703
+STRH	Rt,Rn,Rm		|0 1 0 1 0 0 1|rm   |rn   |rt	|
+# 705
+STRHT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 0 0 0 1 0|rn	|rt	|1 1 1 0|imm8		|
+# 707
+STRT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 0 0 1 0 0|rn	|rt	|1 1 1 0|imm8		|
+# 709
+SUB	Rd,Rn,Imm3		|0 0 0 1 1 1 1|im3  |rn   |rd	|
+# 713
+SUB	Rb,Rn,Rm		|0 0 0 1 1 0 1|rm   |rn   |rd	|
+
+
 
 
 '''
