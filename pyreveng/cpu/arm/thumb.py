@@ -581,8 +581,36 @@ LDR	Rt,Dst			|1 1 1 1 1 0 0 0|u|1 0 1 1 1 1 1|rt	|imm12			|
 LDR	Rt,Rn,Rm		|1 1 1 1 1 0 0 0 0 1 0 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
 # 417
 LDRB	Rt,Rn,Imm		|1 1 1 1 1 0 0 0 1 0 0 1|rn	|rt	|imm12			|
-
-
+# 423
+LDRB	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 0 0 0 0 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 441
+LDRH	Rt,Rn,Imm12		|1 1 1 1 1 0 0 0 1 0 1 1|rn	|rt	|imm12			|
+# 447
+LDRH	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 0 0 0 1 1|rn	|rt	|0 0 0 0 0 0|rm2|rm	|
+# 451
+LDRSB	Rt,Rn,Imm		|1 1 1 1 1 0 0 1 0 0 0 1|rn	|rt	|1|p|u|w|imm8		|
+# 455
+LDRSB	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 1 0 0 0 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 459
+LDRSH	Rt,Rn,Imm		|1 1 1 1 1 0 0 1 0 0 1 1|rn	|rt	|1|p|u|w|imm8		|
+# 463
+LDRSH	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 1 0 0 1 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 469
+LSL	Rb,Rm,Imm5		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|im3	|rd	|im2|0 0|rm	|
+# 471
+LSL	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 0 0|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 473
+LSR	Rd,Rm,Imm		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|im3	|rd	|im2|0 1|rm	|
+# 475
+LSR	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 0 1|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 477 XXX: COND ?
+MCR2	Cop,Op1,Rt,Crn,Rm,Op2	|1 1 1 1 1 1 1 0|op1  |0|crn	|rt	|cop	|op2  |1|crm	|
+# 479 XXX: COND ?
+MCRR2	Cop,Op1,Rt,Rt2,Crm	|1 1 1 1 1 1 0 0 0 1 0 0|rt2	|rt	|cop	|op1	|crm	|
+# 485
+MOV	Rd,Const		|1 1 1 1 0|i|0 0 0 1 0|s|1 1 1 1|0|im3  |rd	|imm8		|
+# 487
+MOV	Rd,Rn			|0 0 0 0 0 0 0 0 0 0|rm   |rd	|
 '''
 
 class Arm_Thumb_ins(arm_base.Arm_Base_ins):
