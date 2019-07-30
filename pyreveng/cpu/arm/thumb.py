@@ -77,15 +77,15 @@ ADC	Rd,Rn,imm8		|1 1 1 1 0|i|0 1 0 1 0|s|rn	|0|imm3	|rd	|imm8		|
 # 300
 ADC	Rdn,Rm			|0 1 0 0 0 0|0 1 0 1|rm   |rdn	|
 # 304
-ADD	Rd,Rn,imm3		|0 0 0 1 1 1 0|imm3 |rn	  |rd	|
+ADD	Rd,Rn,Imm3		|0 0 0 1 1 1 0|imm3 |rn	  |rd	|
 # 308
 ADD	Rd,Rn,Rm		|0 0 0 1 1 0 0|rm   |rn   |rd	|
 # 314
-ADD	Rd,SP,imm8		|1 0 1 0 1|rd 	|imm8		|
+ADD	Rd,SP,Imm8		|1 0 1 0 1|rd 	|imm8		|
 # 316
 ADD	Rdm,SP,Rdm		|0 1 0 0 0 1 0 0|d|1 1 0 1|rdm	|
 # 320
-ADR	Rd,dst			|1 0 1 0 0|rd	|imm8		|
+ADR	Rd,DImm8		|1 0 1 0 0|rd	|imm8		|
 # 322
 AND	Rd,Rn,imm		|1 1 1 1 0|i|0 0 0 0 0|s|rn	|0|imm3	|rd	|imm8		|
 # 324
@@ -95,7 +95,7 @@ ASR	Rd,Rm,imm5		|0 0 0 1 0|imm5	    |rm   |rd	|
 # 330
 ASR	Rdn,Rm			|0 1 0 0 0 0 0 1 0 0|rm	  |rdn  |
 # 332
-B	dst,>J			|1 1 0 1|cc	|imm8		|
+B	Cc,Dst8,>JC		|1 1 0 1|cc	|imm8		|
 # 334
 BFC	Rd,Lsb,Wid		|1 1 1 1 0 0 1 1 0 1 1 0 1 1 1 1|0|imm3	|rd	|im2|0|msb	|
 # 336
@@ -107,7 +107,7 @@ BIC	Rdn,Rm			|0 1 0 0 0 0 1 1 1 0|rm   |rdn	|
 # 344
 BKPT	imm8,>C			|1 0 1 1 1 1 1 0|imm8		|
 #346
-BL	dst,>C			|1 1 1 1 0|s|imm10		|1 1|j|1|k|imm11		|
+BL	Dst1011,>C		|1 1 1 1 0|s|imm10		|1 1|j|1|k|imm11		|
 # 348
 BLX	Rm,>C			|0 1 0 0 0 1 1 1 1|rm     |0 0 0|
 # 350
@@ -115,7 +115,7 @@ BX	Rm,>J			|0 1 0 0 0 1 1 1 0|rm	  |0 0 0|
 # 352
 BXJ	Rm,>J			|1 1 1 1 0 0 1 1 1 1 0 0|rm	|1 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0|
 # 354
-CBnZ	Rn,dst			|1 0 1 1|o|0|i|1|imm5	  |rn	|
+CBnZ	Rn,Dst			|1 0 1 1|o|0|i|1|imm5	  |rn	|
 # 356
 CDP	Cop,Op1,Crd,Crn,Crm,Op2	|1 1 1 0|1 1 1 0|opc1	|crn	|crd	|cop	|opc2 |0|crm	|
 # 358
@@ -127,7 +127,7 @@ CMN	Rn,const		|1 1 1 1 0|i|0 1 0 0 0 1|rn	|0|imm3	|1 1 1 1|imm8		|
 # 364
 CMN	Rn,Rm			|0 1 0 0 0 0 1 0 1 1|rm	  |rn	|
 # 368
-CMP	Rn,imm8			|0 0 1 0 1|rm	|imm8		|
+CMP	Rn,Imm8			|0 0 1 0 1|rn	|imm8		|
 # 370
 CMP	Rn,Rm			|0 1 0 0 0 0|1 0 1 0|rm   |rn	|
 # 376
@@ -155,11 +155,11 @@ LDM	Rn,Reglist		|1 1 0 0 1|rn	|reglist	|
 # 403
 LDMD	Rn,Reglist		|1 1 1 0 1 0 0 1 0 0|w|rn	|p|m|0|reglist			|
 # 407
-LDR	Rt,Rn,Imm		|0 1 1 0 1|imm5	    |rn   |rt	|
+LDR	Rt,Rn5			|0 1 1 0 1|imm5	    |rn   |rt	|
 # 411
-LDR	Rt,Dst			|0 1 0 0 1|rt	|imm8		|
+LDR	Rt,Rel8			|0 1 0 0 1|rt	|imm8		|
 # 413
-LDR	Rt,Rn,Rm		|0 1 0 1 1 0 0|rm   |rn   |rt	|
+LDR	Rt,Rnm			|0 1 0 1 1 0 0|rm   |rn   |rt	|
 # 417
 LDRB	Rt,Rn,Imm		|0 1 1 1 1|imm5	    |rn	  |rt	|
 # 421
@@ -207,7 +207,7 @@ LDRSHT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 1 0 0 1 1|rn	|rt	|1 1 1 0|imm8		|
 # 467
 LDRT	Rt,Rn,Imm8		|1 1 1 1 1|0 0 0 0 1 0 1|rn	|rt	|1 1 1 0|imm8		|
 # 469
-LSL	Rd,Rm,Imm5		|0 0 0 0 0|imm5	    |rm   |rd	|
+LSL	Rd,Rm,Sh5		|0 0 0 0 0|imm5	    |rm   |rd	|
 # 471
 LSL	Rdn,Rm			|0 1 0 0 0 0 0 0 1 0|rm   |rdn	|
 # 473
@@ -265,9 +265,9 @@ PLI	Rn,Imm12		|1 1 1 1 1 0 0 1 1 0 0 1|rn	|1 1 1 1|imm12			|
 # 533
 PLI	Rn,Rm,Lsl,Imm2		|1 1 1 1 1 0 0 1 0 0 0 1|rn	|1 1 1 1|0 0 0 0 0 0|im2|rm	|
 # 535
-POP	Reglist			|1 0 1 1 1 1 0|p|reglist	|
+POP	ReglistP		|1 0 1 1 1 1 0|p|reglist	|
 # 539
-PUSH	Reglist			|1 0 1 1 0 1 0|m|reglist	|
+PUSH	ReglistM		|1 0 1 1 0 1 0|m|reglist	|
 # 541
 QADD	Rd,Rm,Rn		|1 1 1 1 1 0 1 0 1 0 0 0|rn	|1 1 1 1|rd	|1 0 0 0|rm	|
 # 543
@@ -383,11 +383,9 @@ SSUB8	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 1 1 0 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
 # 663
 STC	Cop,Crd,Rn,Imm		|cond	|1 1 0|p|u|d|w|0|rn	|crd	|cop	|imm8		|
 # 665
-STM	Rd,Reglist		|1 1 0 0 0|rn	|reglist	|
+STM	Rn,Reglist		|1 1 0 0 0|rn	|reglist	|
 # 669
 STMDB	Rn,Reglist		|1 1 1 0 1|0 0 1 0 0|w|0|rn	|0|m|0|reglist			|
-# 671
-STMIB	Rn,Reglist		|cond	|1 0 0 1 1 0|w|0|rn	|reglist			|
 # 673
 STR	Rt,Rn,Imm		|0 1 1 0 0|imm5	    |rn   |rt	|
 # 677
@@ -417,9 +415,9 @@ STRHT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 0 0 0 1 0|rn	|rt	|1 1 1 0|imm8		|
 # 707
 STRT	Rt,Rn,Imm8		|1 1 1 1 1 0 0 0 0 1 0 0|rn	|rt	|1 1 1 0|imm8		|
 # 709
-SUB	Rd,Rn,Imm3		|0 0 0 1 1 1 1|im3  |rn   |rd	|
+SUB	Rd,Rn,Imm3		|0 0 0 1 1 1 1|imm3 |rn   |rd	|
 # 713
-SUB	Rb,Rn,Rm		|0 0 0 1 1 0 1|rm   |rn   |rd	|
+SUB	Rd,Rn,Rm		|0 0 0 1 1 0 1|rm   |rn   |rd	|
 # 715
 SUB	SP,SP,Imm		|1 0 1 1 0 0 0 0 1|imm7		|
 # 719
@@ -536,7 +534,7 @@ thumb_t2_desc = '''
 # 300
 ADC	Rd,Rn,Rm		|1 1 1 0 1 0 1 1 0 1 0|s|rn	|0|imm3	|rd	|im2|typ|rm	|
 # 304
-ADD	Rdn,Imm8		|0 0 1 1 0|rd	|imm8		|
+ADD	Rdn,Imm8		|0 0 1 1 0|rdn	|imm8		|
 # 308
 ADD	Rdn,Rm			|0 1 0 0 0 1 0 0|d|rm     |rdn	|
 # 314
@@ -552,11 +550,11 @@ ASR	Rd,Rm,Imm		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|imm3	|rd	|im2|1 0|rm	|
 # 330
 ASR	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 1 0|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
 # 332
-B	Dst,>J			|1 1 1 0 0|imm11		|
+B	Dst11,>J		|1 1 1 0 0|imm11		|
 # 340
 BIC	Rd,Rn,Rm,Shift		|1 1 1 0 1 0 1 0 0 0 1|s|rn	|0|imm3	|rd	|im2|typ|rm	|
 # 346
-BLX	Dst,>C			|1 1 1 1 0|s|imm10h		|1 1|j|0|k|imm10l		|
+BLX	Dst10hl,>C		|1 1 1 1 0|s|imm10h		|1 1|j|0|k|imm10l		|
 # 356 XXX: COND ?
 CDP2	Cop,Op1,Rd,Rn,Rm,Op2	|1 1 1 1 1 1 1 0|opc	|crn	|crd	|cop	|opc2 |0|crm	|
 # 364
@@ -574,7 +572,7 @@ LDC	Cop,Crd,Dst		|1 1 1 1 1 1 0|p|u|d|w|1 1 1 1 1|crd	|cop	|imm8		|
 # 397
 LDM	Rn,Reglist		|1 1 1 0 1 0 0 0 1 0|w|1|rn	|p|m|0|reglist			|
 # 407
-LDR	Rt,Sp,Imm		|1 0 0 1 1|rt	|imm8		|
+LDR	Rt,Sp8			|1 0 0 1 1|rt	|imm8		|
 # 411
 LDR	Rt,Dst			|1 1 1 1 1 0 0 0|u|1 0 1 1 1 1 1|rt	|imm12			|
 # 413
@@ -596,7 +594,7 @@ LDRSH	Rt,Rn,Imm		|1 1 1 1 1 0 0 1 0 0 1 1|rn	|rt	|1|p|u|w|imm8		|
 # 463
 LDRSH	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 1 0 0 1 1|rn	|rt	|0 0 0 0 0 0|im2|rm	|
 # 469
-LSL	Rb,Rm,Imm5		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|im3	|rd	|im2|0 0|rm	|
+LSL	Rd,Rm,Imm5		|1 1 1 0 1 0 1 0 0 1 0|s|1 1 1 1|0|im3	|rd	|im2|0 0|rm	|
 # 471
 LSL	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 0 0|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
 # 473
@@ -610,7 +608,7 @@ MCRR2	Cop,Op1,Rt,Rt2,Crm	|1 1 1 1 1 1 0 0 0 1 0 0|rt2	|rt	|cop	|op1	|crm	|
 # 485
 MOV	Rd,Const		|1 1 1 1 0|i|0 0 0 1 0|s|1 1 1 1|0|im3  |rd	|imm8		|
 # 487
-MOV	Rd,Rn			|0 0 0 0 0 0 0 0 0 0|rm   |rd	|
+MOV	Rd,Rm			|0 0 0 0 0 0 0 0 0 0|rm   |rd	|
 # 493 XXX: COND ?
 MRC2	Cop,Op1,Rt,Crn,Crm,Op2	|1 1 1 1 1 1 1 0|op1  |1|crn	|rt	|cop	|op2  |1|crm	|
 # 495
@@ -630,7 +628,7 @@ PLI	Rn,Imm8			|1 1 1 1 1 0 0 1 0 0 0 1|rn	|1 1 1 1 1 1 0 0|imm8		|
 # 535
 POP	Reglist			|1 1 1 0 1 0 0 0 1 0 1 1 1 1 0 1|p|m|0|reglist			|
 # 539
-PUSH	Reglist			|1 1 1 0 1 0 0 1 0 0 1 0 1 1 0 1|0|m|0|reglist			|
+PUSH	ReglistM		|1 1 1 0 1 0 0 1 0 0 1 0 1 1 0 1|0|m|0|reglist			|
 # 563
 REV	Rd,Rm			|1 1 1 1 1 0 1 0 1 0 0 1|rm	|1 1 1 1|rd	|1 0 0 0|rm	|
 # 565
@@ -694,6 +692,77 @@ class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 		super().__init__(pj, lim, lang)
 		if self.lo & 1:
 			raise assy.Invalid("Unaligned Instruction")
+
+	def assy_Cc(self, pj):
+		self.mne += arm_base.CC[self['cc']]
+
+	def assy_Dst8(self, pj):
+		imm32 = self['imm8'] << 1
+		if imm32 & 0x100:
+			imm32 |= 0xfffffe00
+		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Dimm8(self, pj):
+		imm32 = self['imm11'] << 2
+		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Dst11(self, pj):
+		imm32 = self['imm11'] << 1
+		if imm32 & 0x1000:
+			imm32 |= 0xffffe000
+		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Dst1011(self, pj):
+		i1 = not (self['j'] ^ self['s'])
+		i2 = not (self['k'] ^ self['s'])
+
+		imm32 = self['s'] * 0xff
+		imm32 <<= 1
+		imm32 |= i1
+		imm32 <<= 1
+		imm32 |= i2
+		imm32 <<= 10
+		imm32 |= self['imm10']
+		imm32 <<= 11
+		imm32 |= self['imm11']
+		imm32 <<= 1
+		self.dstadr = (self.hi + imm32) & 0xffffffff
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Rel8(self, pj):
+		self.dstadr = (self.hi + 2 + (self['imm8'] << 2)) & 0xffffffff
+		return assy.Arg_dst(pj, self.dstadr)
+
+	def assy_Imm3(self, pj):
+		return "#0x%x" % self['imm3']
+
+	def assy_Imm8(self, pj):
+		return "#0x%x" % self['imm8']
+
+	def assy_ReglistP(self, pj):
+		return self.assy_wreglist(pj, r=(self['p'] << 15) | self['reglist'])
+
+	def assy_ReglistM(self, pj):
+		return self.assy_reglist(pj, r=(self['m'] << 14) | self['reglist'])
+
+	def assy_Sh5(self, pj):
+		return self.assy_sh(pj, typ=0)
+
+	def assy_Sp8(self, pj):
+		return "[R13+0x%x]" % (self['imm8'] << 2)
+
+	def assy_Rn5(self, pj):
+		return "[%s+0x%x]" % (arm_base.REG[self['rn']], self['imm5'] << 2)
+
+	def assy_Rnm(self, pj):
+		return "[%s+%s]" % (arm_base.REG[self['rn']], arm_base.REG[self['rm']])
+
+	def assy_Rdn(self, pj):
+		return arm_base.REG[self['rdn']]
+
 
 class Arm_Thumb(assy.Instree_disass):
 	def __init__(self):

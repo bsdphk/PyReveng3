@@ -602,25 +602,6 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
 		return assy.Arg_dst(pj, self.dstadr, "")
 
-	def assy_sh(self, pj):
-		typ = self['typ']
-		imm5 = self['imm5']
-		if typ == 0:
-			if not imm5:
-				return
-			return "lsl,#%d" % imm5
-		if typ == 1:
-			if not imm5:
-				imm5 = 32
-			return "lsr,#%d" % imm5
-		if typ == 2:
-			if not imm5:
-				imm5 = 32
-			return "asr,#%d" % imm5
-		if not imm5:
-			return "rrx,#1"
-		return "ror,#%d" % imm5
-
 	def assy_imm5(self, pj):
 		return assy.Arg_verbatim(pj, "#0x%x" % self['imm5'])
 

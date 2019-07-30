@@ -94,8 +94,9 @@ class Arm_Base_ins(assy.Instree_ins):
 	def assy_Rm(self, pj):
 		return REG[self['rm']]
 
-	def assy_reglist(self, pj):
-		r = self['reglist']
+	def assy_reglist(self, pj, r=None):
+		if r is None:
+			r = self['reglist']
 		l = []
 		i = 0
 		while r:
@@ -105,8 +106,31 @@ class Arm_Base_ins(assy.Instree_ins):
 			i += 1
 		return "{" + ",".join(l) + "}"
 
-	def assy_wreglist(self, pj):
-		r = self['reglist']
+	def assy_wreglist(self, pj, r=None):
+		if r is None:
+			r = self['reglist']
 		if r & 0x8000:
 			self.flow_R(pj)
-		return self.assy_reglist(pj)
+		return self.assy_reglist(pj, r=r)
+
+	def assy_sh(self, pj, typ=None, imm5=None):
+		if typ is None:
+			typ = self['typ']
+		if imm5 is None:
+			imm5 = self['imm5']
+		if typ == 0:
+			if not imm5:
+				return
+			return "lsl,#%d" % imm5
+		if typ == 1:
+			if not imm5:
+				imm5 = 32
+			return "lsr,#%d" % imm5
+		if typ == 2:
+			if not imm5:
+				imm5 = 32
+			return "asr,#%d" % imm5
+		if not imm5:
+			return "rrx,#1"
+		return "ror,#%d" % imm5
+

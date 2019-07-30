@@ -183,8 +183,9 @@ class Instree_ins(Assy):
 			for j in i[1].split(","):
 				try:
 					self.arg(pj, j)
-				except KeyError:
-					print("XXX Failure processing arg", j, "in", self)
+				except KeyError as e:
+					print("XXX Failure processing arg", j, "in", self.lim)
+					print("XXX", e)
 
 		self.args_done(pj)
 
