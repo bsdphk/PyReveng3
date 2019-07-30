@@ -611,6 +611,81 @@ MCRR2	Cop,Op1,Rt,Rt2,Crm	|1 1 1 1 1 1 0 0 0 1 0 0|rt2	|rt	|cop	|op1	|crm	|
 MOV	Rd,Const		|1 1 1 1 0|i|0 0 0 1 0|s|1 1 1 1|0|im3  |rd	|imm8		|
 # 487
 MOV	Rd,Rn			|0 0 0 0 0 0 0 0 0 0|rm   |rd	|
+# 493 XXX: COND ?
+MRC2	Cop,Op1,Rt,Crn,Crm,Op2	|1 1 1 1 1 1 1 0|op1  |1|crn	|rt	|cop	|op2  |1|crm	|
+# 495
+MRRC2	Cop,Op1,Rt,Rt2,Crm	|1 1 1 1 1 1 0 0 0 1 0 1|rt2	|rt	|cop	|op1	|crm	|
+# 503
+MUL	Rd,Rn,Rm		|1 1 1 1 1 0 1 1 0 0 0 0|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 507
+MVN	Rd,Rm			|1 1 1 0 1 0 1 0 0 1 1|s|1 1 1 1|0|imm3 |rd	|im2|typ|rm	|
+# 511
+NOP	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0|
+# 519
+ORR	Rd,Rn,Rm		|1 1 1 0 1 0 1 0 0 1 0|s|rn	|0|imm3 |rd	|im2|typ|rm	|
+# 525
+PLD	Rn,Imm8			|1 1 1 1 1 0 0 0 0 0|w|1|rn	|1 1 1 1 1 1 0 0|imm8		|
+# 531
+PLI	Rn,Imm8			|1 1 1 1 1 0 0 1 0 0 0 1|rn	|1 1 1 1 1 1 0 0|imm8		|
+# 535
+POP	Reglist			|1 1 1 0 1 0 0 0 1 0 1 1 1 1 0 1|p|m|0|reglist			|
+# 539
+PUSH	Reglist			|1 1 1 0 1 0 0 1 0 0 1 0 1 1 0 1|0|m|0|reglist			|
+# 563
+REV	Rd,Rm			|1 1 1 1 1 0 1 0 1 0 0 1|rm	|1 1 1 1|rd	|1 0 0 0|rm	|
+# 565
+REV16	Rd,Rm			|1 1 1 1 1 0 1 0 1 0 0 1|rm	|1 1 1 1|rd	|1 0 0 1|rm	|
+# 567
+REVSH	Rd,Rm			|1 1 1 1 1 0 1 0 1 0 0 1|rm	|1 1 1 1|rd	|1 0 1 1|rm	|
+# 571
+ROR	Rd,Rn,Rm		|1 1 1 1 1 0 1 0 0 1 1|s|rn	|1 1 1 1|rd	|0 0 0 0|rm	|
+# 575
+RSB	Rd,Rn			|1 1 1 1 0|i|0 1 1 1 0|s|rn	|0|imm3	|rd	|imm8		|
+# 595
+SBC	Rd,Rn,Rm		|1 1 1 0 1 0 1 1 0 0 1|s|rn	|0|imm3 |rd	|im2|typ|rm	|
+# 607
+SEV	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0|
+# 663 XXX: COND ?
+STC2	Cop,Crd,Rn		|1 1 1 1 1 1 0|p|u|d|w|0|rn	|crd	|cop	|imm8		|
+# 665
+STM	Rn,Reglist		|1 1 1 0 1 0 0 0 1 0|w|0|rn	|0|m|0|reglist			|
+# 673
+STR	Rt,SP,Imm		|1 0 0 1 0|rt   |imm8		|
+# 677
+STR	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 0 0 1 0 0|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 679
+STRB	Rt,Rn,Imm12		|1 1 1 1 1 0 0 0 1 0 0 0|rn	|rt	|imm12			|
+# 683
+STRB	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 0 0 0 0 0|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 699
+STRH	Rt,Rn,Imm12		|1 1 1 1 1 0 0 0 1 0 1 0|rn	|rt	|imm12			|
+# 703
+STRH	Rt,Rn,Rm,LSL		|1 1 1 1 1 0 0 0 0 0 1 0|rn	|rt	|0 0 0 0 0 0|im2|rm	|
+# 709
+SUB	Rdn,Imm8		|0 0 1 1 1|rdn  |imm8		|
+# 713
+SUB	Rd,Rn,Rm		|1 1 1 0 1 0 1 1 1 0 1|s|rn	|0|imm3 |rd	|im2|typ|rm	|
+# 717
+SUB	Rd,SP,Const		|1 1 1 1 0|i|0 1 1 0 1|s|1 1 0 1|0|imm3 |rd	|imm8		|
+# 731
+SXTB	Rd,Rm,Rot		|1 1 1 1 1 0 1 0 0 1 0 0 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# 735
+SXTH	Rd,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 0 0 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# 747
+TST	Rn,Rm			|1 1 1 0 1 0 1 0 0 0 0 1|rn	|0|imm3 |1 1 1 1|im2|typ|rm	|
+# 759
+UDF	Imm16,>			|1 1 1 1 0 1 1 1 1 1 1 1|imm4	|1 0 1 0|imm12			|
+# 813
+UXTB	Rd,Rm,Rot		|1 1 1 1 1 0 1 0 0 1 0 1 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# 817
+UXTH	Rd,Rm,Rot		|1 1 1 1 1 0 1 0 0 0 0 1 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
+# XXX: <vector ins>
+# 1105
+WFE	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0|
+# 1107
+WFI	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1|
+# 1109
+YIELD	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1|
 '''
 
 class Arm_Thumb_ins(arm_base.Arm_Base_ins):
