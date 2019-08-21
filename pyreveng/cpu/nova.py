@@ -34,8 +34,8 @@ from pyreveng import assy
 # From RCSL 42-i-1008 "RC3803 CPU Programmer's Reference Manual
 #
 nova_instructions = '''
-JMP	i,da,>J			|0 0 0|0 0|i|idx|displ		|
-JSR	i,da,>C			|0 0 0|0 1|i|idx|displ		|
+JMP	i,db,>J			|0 0 0|0 0|i|idx|displ		|
+JSR	i,db,>C			|0 0 0|0 1|i|idx|displ		|
 ISZ	i,da,sz,>JC		|0 0 0|1 0|i|idx|displ		|
 DSZ	i,da,sz,>JC		|0 0 0|1 1|i|idx|displ		|
 LDA	acd,i,da		|0|0 1|acd|i|idx|displ		|
@@ -87,6 +87,21 @@ TKVAL	-			|0 1 1|x x|1 1 1|0 1|0 0 0 0 1 0|
 COMP	-			|0 1 1|x x|1 1 1|1 0|0 0 0 0 1 0|
 '''
 
+DEVNAMES = {
+	0x08: "TTYI",
+	0x09: "TTYO",
+	0x0a: "PTR",
+	0x0b: "PTP",
+	0x0c: "RTC",
+	0x0f: "LPT",
+	0x18: "MT",
+	0x2a: "AMX",
+	0x31: "FD0",
+	0x34: "FD1",
+	0x3b: "DKP",
+	0x3f: "CPU",
+}
+
 class nova_ins(assy.Instree_ins):
 
 	def assy_sz(self, pj):
@@ -124,17 +139,7 @@ class nova_ins(assy.Instree_ins):
 		return "%d" % self["acd"]
 
 	def assy_dev(self, pj):
-		t = {
-		0x08: "TTYI",
-		0x09: "TTYO",
-		0x0a: "PTR",
-		0x0b: "PTP",
-		0x0c: "RTC",
-		0x2a: "AMX",
-		0x31: "FD0",
-		0x34: "FD1",
-		0x3b: "DKP",
-		}.get(self["dev"])
+		t = DEVNAMES.get(self["dev"])
 		if t is None:
 			return "0x%x" % self["dev"]
 		return t
@@ -165,7 +170,16 @@ class nova_ins(assy.Instree_ins):
 			self.dstadr = t
 		return assy.Arg_dst(pj, t)
 
-
+	def assy_db(self, pj):
+		r = self.assy_da(pj)
+		if not isinstance(r, assy.Arg_dst):
+			return r
+		if not self['i']:
+			return r
+		t = pj.m[r.dst]
+		if t:
+			pj.todo(t, self.lang.disass)
+		return r
 
 class nova(assy.Instree_disass):
 	def __init__(self):
