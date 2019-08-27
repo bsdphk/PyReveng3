@@ -666,6 +666,10 @@ SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  | {
 tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| ea	|
 # 292/4-188
 TRAP		vect,>J		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
+# 293/4-189
+TRAP		cc,W,word,>JC	0000	|0 1 0 1|cc	|1 1 1 1 1|0 1 0| word				|
+TRAP		cc,L,long,>JC	0000	|0 1 0 1|cc	|1 1 1 1 1|0 1 1| word1				| word2				|
+TRAP		cc,>J		0000	|0 1 0 1|cc	|1 1 1 1 1|1 0 0|
 # 295/4-191
 tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
@@ -776,7 +780,10 @@ class m68000_ins(assy.Instree_ins):
 		return "#0x%x" % (self['bn'] % (self.sz*8))
 
 	def assy_cc(self, pj):
-		self.mne += cond_code[self['cc']]
+		c = cond_code[self['cc']]
+		if c != 'T':
+			self.mne += c
+		# XXX: remove flow
 
 	def assy_const(self, pj):
 		o = self['const']
@@ -1077,7 +1084,7 @@ class m68000_ins(assy.Instree_ins):
 		return "#0x%x" % a
 
 	def assy_vect(self, pj):
-		if self['vect'] in self.lang.trap_returns:
+		if self.lang.trap_returns.get(self['vect']):
 			# XXX: use flow
 			pj.todo(self.hi, self.lang.disass)
 		return "#%d" % self['vect']
@@ -1087,6 +1094,9 @@ class m68000_ins(assy.Instree_ins):
 		self.isz = "i16"
 		self.imsk = 0xffff
 		self.mne += ".W"
+
+	def assy_long(self, pj):
+		return "#0x%08x" % ((self['word1'] << 16) | self['word2'])
 
 	def assy_word(self, pj):
 		return "#0x%04x" % self['word']

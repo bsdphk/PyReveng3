@@ -39,15 +39,30 @@ from pyreveng.cpu.m68010 import *
 m68020_desc = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 
+# 139/4.35
+BFCLR		L,ea,BF		365	|1 1 1 0 1 1 0 0 1 1| ea	|0 0 0 0|o| off	    |w| wid	|
+
 # 141/4.37
-BFEXTS		L,ea,Dn,XXX	f75	|1 1 1 0 1 0 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+BFEXTS		L,ea,BF,Dn	f75	|1 1 1 0 1 0 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
 
 # 144/4.40
-BFEXTU		L,ea,Dn,XXX	f75	|1 1 1 0 1 0 0 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+BFEXTU		L,ea,BF,Dn	f75	|1 1 1 0 1 0 0 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+
+# 147/4.43 (nb: Typo)
+BFFFO		ea,BF,Dn	f65	|1 1 1 0 1 1 0 1 1 1| ea	|0| Dn	|o| off     |w| wid	|
 
 # 150/4.46
-BFINS 		L,Dn,ea,XXX	375	|1 1 1 0 1 1 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
+BFINS 		L,Dn,ea,BF	375	|1 1 1 0 1 1 1 1 1 1| ea        |0| Dn  |o| off     |w| wid     |
 
+# 153/4.49
+BFSET		L,ea,BF		365	|1 1 1 0 1 1 1 0 1 1| ea	|0 0 0 0|o| off	    |w| wid	|
+
+# 155/4.51
+BFTST		L,ea,BF		f65	|1 1 1 0 1 0 0 0 1 1| ea	|0 0 0 0|o| off	    |w| wid	|
+
+# 186/4.82
+CMP2		Z,ea,Dn		f62	|0 0 0 0 0|sz |0 1 1| ea	|0| Dn  |0 0 0 0 0 0 0 0 0 0 0 0|
+CMP2		Z,ea,An		f62	|0 0 0 0 0|sz |0 1 1| ea	|1| An  |0 0 0 0 0 0 0 0 0 0 0 0|
 
 # 196/4.92
 DIVS		L,ea,Dx,Dy	1f7d    |0 1 0 0 1 1 0 0 0 1| ea        |0| Dy  |1|0|0 0 0 0 0 0 0| Dx  |
@@ -86,6 +101,19 @@ UNPK		W,decAx,decAy,data -	|1 0 0 0| Ay  |1 1 0 0 0|1| Ax  |
 class m68020_ins(m68010_ins):
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
+
+	def assy_BF(self, pj):
+		t = "{"
+		if self['o']:
+			t += "D%d" % self['off']
+		else:
+			t += "%d" % self['off']
+		t += ":"
+		if self['w']:
+			t += "D%d" % self['wid']
+		else:
+			t += "%d" % self['wid']
+		return t + "}"
 
 
 class m68020(m68010):
