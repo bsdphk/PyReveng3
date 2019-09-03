@@ -102,10 +102,11 @@ class Instree_ins(Assy):
 	def flow_J(self, pj):
 		self.add_flow(pj, ">", True, self.dstadr)
 
-
 	def flow_RC(self, pj):
-		self.add_flow(pj, "R", self.cc)
-		self.add_flow(pj, True, "!" + self.cc, self.hi)
+		if self.cc is not False:
+			self.add_flow(pj, "R", self.cc)
+		if self.cc is not True:
+			self.add_flow(pj, True, "!" + self.cc, self.hi)
 
 	def flow_JC(self, pj):
 		if self.cc is True:
