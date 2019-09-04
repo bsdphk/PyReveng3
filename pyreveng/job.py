@@ -44,7 +44,6 @@ class Job():
 	def __init__(self, m, name="xxx"):
 		self.name = name
 		self.m = m
-		self.t = m.t
 		self.apct = m.apct
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
@@ -78,11 +77,11 @@ class Job():
 		return x[0]
 
 	def __iter__(self):
-		for i in self.t:
+		for i in self.m.t:
 			yield i
 
 	def find(self, adr, tag=None):
-		x = self.t.find_lo(adr)
+		x = self.m.t.find_lo(adr)
 		if tag is None:
 			return x
 		for i in x:
@@ -91,11 +90,11 @@ class Job():
 		return None
 
 	def insert(self, leaf):
-		self.t.insert(leaf)
+		self.m.t.insert(leaf)
 
 	def add(self, lo, hi, tag):
 		l = Leaf(self, lo, hi, tag)
-		self.t.insert(l)
+		self.m.t.insert(l)
 		return l
 
 	def gaps(self):

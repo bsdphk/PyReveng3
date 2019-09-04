@@ -379,7 +379,7 @@ def task(pj, cpu):
 				tt5(x, f, ll, ex)
 			else:
 				# print("%04x" % a, ll, "%04x" % ex)
-				y = pj.t.find_lo(ex)
+				y = pj.m.t.find_lo(ex)
 				y[0].lcmt += " ".join(ll) + "\n"
 				# print(y)
 
@@ -595,7 +595,7 @@ def task(pj, cpu):
 			continue
 		if i.dstadr != 0x91d7:
 			continue
-		j = pj.t.find_hi(i.lo)
+		j = pj.m.t.find_hi(i.lo)
 		if len(j) != 1:
 			continue
 		j=j[0]

@@ -35,11 +35,12 @@ from pyreveng import job, mem, code, data, misc, listing, charset
 import pyreveng.cpu.z8000 as z8000
 
 def mem_setup():
-    m = mem.byte_mem(0x0, 0x8000)
-    fn = os.path.join(os.path.dirname(__file__), "EPROM_C_900_boot-")
-    m.load_binfile(0x1, 2, fn + "L_V_1.0.bin")
-    m.load_binfile(0x0, 2, fn + "H_V_1.0.bin")
-    return m
+    return mem.stackup(
+	files=(
+	    ("EPROM_C_900_boot-L_V_1.0.bin", "EPROM_C_900_boot-H_V_1.0.bin"),
+	),
+	prefix=os.path.dirname(__file__) + "/"
+    )
 
 def setup():
     pj = job.Job(mem_setup(), "CBM900_BOOT")
