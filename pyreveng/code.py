@@ -63,10 +63,6 @@ class Flow():
 			self.to = fm.hi
 
 	def propagate(self, pj):
-		if self.fm.lo in pj.pending_flows:
-			x = pj.pending_flows[self.fm.lo]
-			del pj.pending_flows[self.fm.lo]
-			x.propagate(pj)
 
 		if self.to is not None:
 			pj.todo(self.to, self.lang.disass)

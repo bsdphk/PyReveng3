@@ -162,13 +162,13 @@ class Listing():
 
 		hl = len(hex[0][1])
 
-		cmt = self.pj.block_comments.get(lo)
+		cmt = self.pj.m.block_comments.get(lo)
 		if cmt is not None:
-			w = 72 - len(self.pj.comment_prefix)
-			self.fo.write(self.pj.comment_prefix + "-" * w + "\n")
-			self.fo.write(self.pj.comment_prefix)
+			w = 72 - len(self.pj.m.comment_prefix)
+			self.fo.write(self.pj.m.comment_prefix + "-" * w + "\n")
+			self.fo.write(self.pj.m.comment_prefix)
 			self.fo.write(cmt.replace("\n",
-			    "\n" + self.pj.comment_prefix))
+			    "\n" + self.pj.m.comment_prefix))
 			self.fo.write("-" * w + "\n")
 
 		lbl = self.pj.get_labels(lo)
@@ -198,9 +198,9 @@ class Listing():
 			while len((r + " ").expandtabs()) < 32:
 				r += " "
 			if i < len(lcmt):
-				l = self.pj.comment_prefix + lcmt[i]
+				l = self.pj.m.comment_prefix + lcmt[i]
 			elif a in self.pj.m.lcmt:
-				l = self.pj.comment_prefix + self.pj.m.lcmt[a]
+				l = self.pj.m.comment_prefix + self.pj.m.lcmt[a]
 			else:
 				l = ""
 			s = "%s\t%s%s%s" % (h, lbl, r, l)

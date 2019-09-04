@@ -45,9 +45,6 @@ class Job():
 		self.name = name
 		self.m = m
 		self.dolist = list()
-		self.pending_flows = dict()	# flow.py
-		self.block_comments = m.block_comments
-		self.comment_prefix = m.comment_prefix
 
 		# Banks are valid but presently unavailable memory ranges
 		# such as overlay areas in bank-switching.
@@ -63,10 +60,6 @@ class Job():
 
 	def set_block_comment(self, *args, **kwargs):
 		self.m.set_block_comment(*args, **kwargs)
-
-	def set_comment_prefix(self, prefix):
-		self.m.comment_prefix = prefix
-		self.comment_prefix = m.comment_prefix
 
 	def afmt(self, a):
 		return self.m.apct % a
