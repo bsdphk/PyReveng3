@@ -90,6 +90,10 @@ class address_space():
 		b = self._off(adr)
 		raise MemError(adr, "Undefined")
 
+	def __iter__(self):
+		for i in self.t:
+			yield i
+
 	def _off(self, adr):
 		if adr < self.lo:
 			raise MemError(adr, "Address too low")
@@ -114,6 +118,15 @@ class address_space():
 
 	def bytearray(self, lo, bcnt):
 		assert False
+
+	def insert(self, leaf):
+		return self.t.insert(leaf)
+
+	def find_lo(self, adr):
+		return self.t.find_lo(adr)
+
+	def find_hi(self, adr):
+		return self.t.find_hi(adr)
 
 	def gaps(self):
 		ll = self.lo

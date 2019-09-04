@@ -189,7 +189,7 @@ def task(pj, cx):
 
 		# Find queue'd entry points
 		stop = True
-		for i in pj:
+		for i in pj.m:
 			if i.tag != cx.name:
 				continue
 			if pj.m.rd(i.lo) != 0xce:

@@ -450,7 +450,7 @@ if False:
 			self.ptr = ptr
 			self.uverbs = set()
 
-			for j in pj:
+			for j in pj.m:
 				if isinstance(j, assy.Assy):
 					self.check_ins(j)
 
@@ -657,7 +657,7 @@ if False:
 
 			# XXX: This is kind of silly
 
-			for j in pj:
+			for j in pj.m:
 				if not isinstance(j, assy.Assy):
 					continue
 				y = PIL_BB()

@@ -70,12 +70,8 @@ class Job():
 			return self.afmt(a)
 		return x[0]
 
-	def __iter__(self):
-		for i in self.m.t:
-			yield i
-
 	def find(self, adr, tag=None):
-		x = self.m.t.find_lo(adr)
+		x = self.m.find_lo(adr)
 		if tag is None:
 			return x
 		for i in x:
@@ -84,11 +80,11 @@ class Job():
 		return None
 
 	def insert(self, leaf):
-		self.m.t.insert(leaf)
+		self.m.insert(leaf)
 
 	def add(self, lo, hi, tag):
 		l = Leaf(self, lo, hi, tag)
-		self.m.t.insert(l)
+		self.m.insert(l)
 		return l
 
 	def gaps(self):

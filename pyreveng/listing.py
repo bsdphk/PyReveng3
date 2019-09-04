@@ -115,7 +115,7 @@ class Listing():
 		misc.fill_gaps(pj)
 		misc.fill_all_blanks(pj, all_vals=True, minsize=16)
 		a0 = pj.m.lo
-		for i in pj:
+		for i in pj.m:
 			if i.lo > a0:
 				nxxx += 1
 				cxxx += i.lo - a0

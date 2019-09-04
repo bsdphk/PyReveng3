@@ -73,7 +73,7 @@ class Discover():
 		self.trust = dict()
 		self.prob = dict()
 
-		for i in self.pj:
+		for i in self.pj.m:
 			if i.tag == self.cx.name:
 				self.code[i.lo] = i
 				self.trust[i.lo] = 10

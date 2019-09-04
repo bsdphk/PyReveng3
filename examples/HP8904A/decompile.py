@@ -332,7 +332,7 @@ def analyse(pj, cpu):
 	d = {}
 	while True:
 		again = False
-		for i in pj:
+		for i in pj.m:
 			if i.tag != "mc6809":
 				continue
 			if i.lo in pj.analysed:

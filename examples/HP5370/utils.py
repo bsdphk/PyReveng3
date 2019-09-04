@@ -476,7 +476,7 @@ def square_tbl(pj):
 
 def tramp(pj):
 	l = list()
-	for i in pj:
+	for i in pj.m:
 		if not isinstance(i, code.Code):
 			continue
 		if len(i.flow_out) != 1:

@@ -124,7 +124,7 @@ def task(pj, cx):
 		while pj.run():
 			pass
 		more = False
-		for i in pj:
+		for i in pj.m:
 			if i.tag != "i8086":
 				continue
 			if i.lo in t2dict:

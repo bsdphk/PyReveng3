@@ -95,7 +95,7 @@ def lcmt_flows(pj):
 	"""
 	Add line-comments for all flow records
 	"""
-	for i in pj:
+	for i in pj.m:
 		if isinstance(i, Code):
 			for j in i.flow_out:
 				j.lcmt(i)

@@ -627,7 +627,7 @@ def lexer(pj):
 				h = hpib.get(self.pfx)
 				if h == None:
 					h = "UNDOC!"
-				y=pj.m.t.find_lo(self.t)
+				y=pj.m.find_lo(self.t)
 				assert len(y) == 1
 				y[0].lcmt += "HPIB: " + h + "\n"
 
@@ -719,7 +719,7 @@ def Menu(pj, cpu, a, nm):
 
 def error_arg(pj, dst, arg, errors):
 	return
-	for i in pj:
+	for i in pj.m:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
 		if i.args[arg][0] != "#":
@@ -733,7 +733,7 @@ def error_arg(pj, dst, arg, errors):
 
 def num_arg(pj, dst, arg):
 	return
-	for i in pj:
+	for i in pj.m:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
 		if i.args[arg][:3] != "#0x":
@@ -741,7 +741,7 @@ def num_arg(pj, dst, arg):
 		n = int(i.args[arg][1:], 16)
 		if n < pj.m.lo or n >= pj.m.hi:
 			continue
-		j = pj.m.t.find_lo(n)
+		j = pj.m.find_lo(n)
 		print("NUM", "%04x" % n, i, i.args, j)
 		if len(j) == 0:
 			j.append(Num(pj, n))
@@ -754,7 +754,7 @@ arg_strings = set()
 
 def str_len_args(pj, dst, args, argl):
 	return
-	for i in pj:
+	for i in pj.m:
 		if type(i) != decompile.Call or i.dst != dst:
 			continue
 		if i.args[args][:3] != "#0x":
@@ -769,7 +769,7 @@ def str_len_args(pj, dst, args, argl):
 		else:
 			l = int(i.args[argl][1:],16)
 		print("SL", "%04x" % s, l, i, i.args)
-		j = pj.m.t.find_lo(s)
+		j = pj.m.find_lo(s)
 		if len(j) == 0:
 			y = data.Txt(pj, s, s + l)
 			y.compact = True
@@ -928,7 +928,7 @@ def hints(pj, cpu):
 			y = pj.m.bu16(a)
 			assert pj.m.rd(y) == 0xcc
 			x = pj.m.bu16(y + 1)
-			z = pj.m.t.find_lo(x)
+			z = pj.m.find_lo(x)
 			if len(z) > 0:
 				t = z[0].txt[:-4].strip().replace(" ","_")
 				pj.set_label(y, "test_key_" + t)
