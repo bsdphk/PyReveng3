@@ -77,8 +77,8 @@ def do_one(fn, alist):
 		for i in alist:
 			pj.todo(i, dx.disass)
 
-	pj.apct = "%04o"
-	pj.apct = "%03x"
+	pj.m.apct = "%04o"
+	pj.m.apct = "%03x"
 
 	while pj.run():
 		pass

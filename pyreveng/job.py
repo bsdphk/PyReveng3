@@ -44,7 +44,6 @@ class Job():
 	def __init__(self, m, name="xxx"):
 		self.name = name
 		self.m = m
-		self.apct = m.apct
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
 		self.block_comments = m.block_comments
