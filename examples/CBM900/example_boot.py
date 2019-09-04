@@ -31,7 +31,7 @@ See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
 import os
-from pyreveng import job, mem, code, data, misc, listing
+from pyreveng import job, mem, code, data, misc, listing, charset
 import pyreveng.cpu.z8000 as z8000
 
 def mem_setup():
@@ -46,12 +46,139 @@ def setup():
     cx = z8000.z8001()
     return pj, cx
 
+def chargen(pj, a):
+    pj.m.set_label(0x45fe, "CHARGEN")
+    s = charset.SVG_Charset(
+        "/tmp/_.svg",
+        cols=8,
+        char_w=14,
+        char_h=26,
+        imargin=1,
+        linewidth=2,
+    )
+    for i in range(128):
+        l = []
+        for j in range(26):
+            l.append(pj.m.bu16(a + 10 + i * 66 + j * 2))
+        s.set_char(i // 16, i % 16, l)
+        y = data.Pstruct(pj, a + 8 + i * 66, ">BB32H")
+        y.compact = True
+    s.render()
+
+def hd6845_tab(pj):
+    hd6845reg = (
+	"Horizontal Total",
+	"Horizontal Displayed",
+	"Horizontal Sync Position",
+	"Sync Width",
+	"Vertical Total",
+	"Vertical Total Adjust",
+	"Vertical Displayed",
+	"Vertical Sync Position",
+	"Interlace & Skew",
+	"Maximum Raster Address",
+	"Cursor Start Raster",
+	"Cursor End Raster",
+	"Start Address (H)",
+	"Start Address (L)",
+	"Cursor (H)",
+	"Cursor (L)",
+	"Light Pen (H)",
+	"Light Pen (L)",
+    )
+    a = 0x434a
+    pj.set_label(a, "HD6845_PARAMS[]")
+    while a < 0x436a:
+        x = data.Pstruct(pj, a, "BB")
+        y = pj.m.rd(a)
+        if y < len(hd6845reg):
+            x.lcmt += hd6845reg[y]
+        a += 2
+    data.Pstruct(pj, a, ">H")
+
+
 def task(pj, cx):
+    # const.w32(p, 0x01000614)
+    # pj.set_label(0x01000614, "screen_ptr")
+    #pj.set_label(0x01001800, "is_lores")
+    #pj.set_label(0x010017ff, "is_hires")
+    #pj.set_label(0x01001562, "input_buffer")
+    #pj.set_label(0x01001562, "input_buffer")
+
     pj.set_label(0x0090, "size_ram")
     pj.set_label(0x00ca, "ram_sized")
     pj.set_label(0x00f4, "copy_dataseg")
+    pj.set_label(0x020a, "INB(adr)")
+    pj.set_label(0x0214, "INW(adr)")
+    pj.set_label(0x021c, "OUTB(adr,data)")
+    pj.set_label(0x0228, "OUTW(adr,data)")
+    pj.set_label(0x0234, "JMP(adr)")
     pj.set_label(0x023a, "SetMMU(int seg, int base1, int base2)")
+    pj.set_label(0x0274, "LDIRB(src,dst,len)")
+    pj.set_label(0x0286, "bzero(void *, int)")
+    pj.set_label(0x0326, "ResetHandler")
+    pj.set_label(0x0582, "mainmenu()")
+    pj.set_label(0x06e4, "long hex2int(char *)")
+    pj.set_label(0x074c, "DiskParam(char *)")
+    pj.set_label(0x07d4, "ShowRam(void)")
+    pj.set_label(0x08b0, "int HexDigit(char)")
+    pj.set_label(0x0900, "puts(char *)")
+    pj.set_label(0x092c, "readline(char *)")
+    pj.set_label(0x0998, "ShowMenu(void)")
+    pj.set_label(0x09d8, "Floppy(char *)")
+    pj.set_label(0x0a1c, "floppy_format")
+    pj.set_label(0x0ac0, "ParkDisk(char *)")
+    pj.set_label(0x0b26, "puthex(long val,int ndig)")
+    pj.set_label(0x0ccc, "Detect_HiRes")
+    pj.set_label(0x0ce4, "Found_HiRes")
+    pj.set_label(0x0cf0, "Detect_LoRes")
+    pj.set_label(0x0d06, "Found_LoRes")
+    pj.set_label(0x0d1c, "MMU_Video_Setup")
+    pj.set_label(0x0d56, "Hello_HiRes")
+    pj.set_label(0x0d7a, "Hello_LoRes")
+    pj.set_label(0x0d96, "No_Video")
+    pj.set_label(0x0d9c, "Hello_Serial")
+    pj.set_label(0x0db8, "RAM_check")
+    pj.set_label(0x0e28, "ram_error")
+    pj.set_label(0x0e74, "hires_ram_error")
+    pj.set_label(0x0eb6, "hires_ram_error")
+    pj.set_label(0x0f0a, "serial_ram_error")
+    pj.set_label(0x0fc2, "putchar(char)")
+    pj.set_label(0x104a, "int getchar()")
+    pj.set_label(0x111e, "FD_cmd(void *)")
+    pj.set_label(0x11a6, "wdread([0..3])")
+    pj.set_label(0x134a, "InitDrives(?)")
+    pj.set_label(0x1420, "FD_Format([0..1])")
+    pj.set_label(0x1548, "HD_Park(?)")
+    pj.set_label(0x1768, "char *Boot(char *)")
+    pj.set_label(0x2040, "TrapHandler")
+    pj.set_label(0x20b8, "Debugger(void)")
+    pj.set_label(0x20cc, "HiResPutChar(char *)")
+    pj.set_label(0x20e4, "hires_putc(RL0,>R10)")
+    pj.set_label(0x20ee, "hires_clear")
+    pj.set_label(0x216a, "hires_stamp_char")
+    pj.set_label(0x21b6, "hires_NL")
+    pj.set_label(0x21fc, "hires_scroll")
+    pj.set_label(0x2244, "hires_CR")
+    pj.set_label(0x225e, "hires_FF")
+    pj.set_label(0x226c, "hires_BS")
+    pj.set_label(0x231e, "Debugger_Menu()")
+    pj.set_label(0x2bb6, "Debugger_MainLoop()")
+    pj.set_label(0x3b28, "OutStr(char*)")
+    pj.set_label(0x420c, "LoResPutChar(char *)")
+    pj.set_label(0x4224, "lores_putc(RL0,>R10)")
+    pj.set_label(0x422c, "lores_setup")
+    pj.set_label(0x4276, "lores_dochar")
+    pj.set_label(0x4296, "lores_stamp_char")
+    pj.set_label(0x42b6, "lores_NL")
+    pj.set_label(0x42c2, "lores_scroll")
+    pj.set_label(0x42ee, "lores_CR")
+    pj.set_label(0x4304, "lores_cursor")
+    pj.set_label(0x431e, "lores_FF")
+    pj.set_label(0x4326, "lores_BS")
+
     cx.vectors(pj)
+    hd6845_tab(pj)
     for v, a in (
 	("VEC0", 0x0008,),
 	("VEC1", 0x0010,),
@@ -82,22 +209,18 @@ def task(pj, cx):
     pj.todo(0x3ec6, cx.disass)
 
     for a in (
-        0x0c08,
-        0x01ba,
-        0x0c3e,
-        0x0e98,
-        0x0ea8,
-        0x0eda,
-        0x0eea,
+        0x01c0,
+        0x0c0a,
+        0x0c44,
+        0x0e9e,
+        0x0ee0,
     ):
         pj.m.set_block_comment(a, "CALL_RR10_%x" % a)
-        pj.todo(a + 2, cx.disass)
+        pj.todo(a, cx.disass)
 
     pj.m.set_block_comment(0x6800, "DATA SEGMENT, len=0x1016")
 
-    y = data.Data(pj, 0x45fe, 0x6706)
-    y.compact = True
-    pj.m.set_label(0x45fe, "CHARGEN")
+    chargen(pj, 0x45fe + 0)
 
     while pj.run():
         pass
@@ -112,4 +235,4 @@ if __name__ == '__main__':
     pj, cx = setup()
     task(pj, cx)
     code.lcmt_flows(pj)
-    listing.Listing(pj, ncol=4)
+    listing.Listing(pj, ncol=8)
