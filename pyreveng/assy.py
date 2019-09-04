@@ -309,7 +309,7 @@ class Arg_dst(Arg):
 		self.sfx = sfx
 
 	def __str__(self):
-		l = self.pj.labels.get(self.dst)
+		l = self.pj.get_labels(self.dst)
 		if l is not None:
 			return self.pfx + "%s" % l[0] + self.sfx
 		elif self.dst is None:

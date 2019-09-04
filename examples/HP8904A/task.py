@@ -621,13 +621,13 @@ def lexer(pj):
 			if self.f > 0 and self.pfx in hpib:
 				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
-			if self.f > 0 and self.t not in pj.labels:
+			if self.f > 0 and not pj.get_labels(self.t):
 				pj.set_label(self.t, "J_" + self.pfx)
 				cpu.disass(pj, self.t)
 				h = hpib.get(self.pfx)
 				if h == None:
 					h = "UNDOC!"
-				y=pj.t.find_lo(self.t)
+				y=pj.m.t.find_lo(self.t)
 				assert len(y) == 1
 				y[0].lcmt += "HPIB: " + h + "\n"
 
@@ -741,7 +741,7 @@ def num_arg(pj, dst, arg):
 		n = int(i.args[arg][1:], 16)
 		if n < pj.m.lo or n >= pj.m.hi:
 			continue
-		j = pj.t.find_lo(n)
+		j = pj.m.t.find_lo(n)
 		print("NUM", "%04x" % n, i, i.args, j)
 		if len(j) == 0:
 			j.append(Num(pj, n))
@@ -769,7 +769,7 @@ def str_len_args(pj, dst, args, argl):
 		else:
 			l = int(i.args[argl][1:],16)
 		print("SL", "%04x" % s, l, i, i.args)
-		j = pj.t.find_lo(s)
+		j = pj.m.t.find_lo(s)
 		if len(j) == 0:
 			y = data.Txt(pj, s, s + l)
 			y.compact = True
@@ -928,7 +928,7 @@ def hints(pj, cpu):
 			y = pj.m.bu16(a)
 			assert pj.m.rd(y) == 0xcc
 			x = pj.m.bu16(y + 1)
-			z = pj.t.find_lo(x)
+			z = pj.m.t.find_lo(x)
 			if len(z) > 0:
 				t = z[0].txt[:-4].strip().replace(" ","_")
 				pj.set_label(y, "test_key_" + t)

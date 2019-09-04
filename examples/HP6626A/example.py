@@ -117,7 +117,7 @@ def task(pj, cpu):
 		print(s)
 
 	def softlbl(a,n):
-		if a not in pj.labels:
+		if not pj.get_labels(a):
 			pj.set_label(a, n)
 
 	for a,n in (

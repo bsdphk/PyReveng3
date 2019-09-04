@@ -388,18 +388,18 @@ def key_dispatch(pj, cx, start, end):
 		for row in range(4, 0, -1):
 			n = "KEY_C%d_R%d" % (col,row)
 			c = cx.codeptr(pj, a)
-			if c.dst not in pj.labels:
+			if not pj.get_labels(c.dst):
 				if n in keys:
 					m = keys[n]
 				else:
 					print("Unknown Key %s" % n)
 					m = n
 				pj.set_label(c.dst, m)
-			l = pj.labels[c.dst]
+			l = pj.get_labels(c.dst)
 			if l[:4] == "CMD_" and l[4:] in cmd_desc:
 				c.lcmt = n + " = " + cmd_desc[l[4:]]
 			else:
-				c.lcmt = n + " = " + str(pj.labels[c.dst])
+				c.lcmt = n + " = " + str(pj.get_labels(c.dst))
 			a += 2
 	x = pj.add(start, a, "KEY_DISPATCH")
 	pj.set_label(start, "KEY_DISPATCH")
@@ -492,8 +492,8 @@ def tramp(pj):
 		did = 0
 		for i in l:
 			da = i.flow_out[0].to
-			lx = pj.labels.get(i.lo)
-			ly = pj.labels.get(da)
+			lx = pj.get_labels(i.lo)
+			ly = pj.get_labels(da)
 			if lx != None:
 				if ly != None:
 					print("LX", lx)

@@ -47,7 +47,6 @@ class Job():
 		self.apct = m.apct
 		self.dolist = list()
 		self.pending_flows = dict()	# flow.py
-		self.labels = m.labels
 		self.block_comments = m.block_comments
 		self.comment_prefix = m.comment_prefix
 
@@ -59,6 +58,9 @@ class Job():
 
 	def set_label(self, *args, **kwargs):
 		self.m.set_label(*args, **kwargs)
+
+	def get_labels(self, *args):
+		return self.m.get_labels(*args)
 
 	def set_block_comment(self, *args, **kwargs):
 		self.m.set_block_comment(*args, **kwargs)

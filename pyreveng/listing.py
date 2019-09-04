@@ -171,7 +171,7 @@ class Listing():
 			    "\n" + self.pj.comment_prefix))
 			self.fo.write("-" * w + "\n")
 
-		lbl = self.pj.labels.get(lo)
+		lbl = self.pj.get_labels(lo)
 		if lbl is None:
 			lbl = "\t"
 		else:

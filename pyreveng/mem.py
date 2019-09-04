@@ -101,6 +101,9 @@ class address_space():
 		assert isinstance(lbl, str)
 		self.labels.setdefault(adr, []).append(lbl)
 
+	def get_labels(self, adr):
+		return self.labels.get(adr)
+
 	def set_lcmt(self, adr, lcmt):
 		assert isinstance(lcmt, str)
 		self.lcmt[adr] = lcmt

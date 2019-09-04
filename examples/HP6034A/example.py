@@ -134,7 +134,7 @@ def task(pj, cx):
 				n = "SIGN"
 			elif n == "C":
 				n = "CP"
-			if c.dst not in pj.labels:
+			if not pj.get_labels(c.dst):
 				pj.set_label(c.dst, "CMD_" + n)
 
 	if True:

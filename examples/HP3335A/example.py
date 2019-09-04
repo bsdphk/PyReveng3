@@ -126,11 +126,7 @@ def task(pj, cpu):
 
 		def render(self, pj):
 			v = pj.m.bu16(self.lo)
-			l = pj.labels.get(v)
-			if l == None:
-				return ".PTR 0x%x" % v
-			else:
-				return ".PTR %s" % l
+			return ".PTR " + pj.render_adr(v)
 
 	def jmptbl(lo, hi, x = None):
 		c = pj.add(lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))
