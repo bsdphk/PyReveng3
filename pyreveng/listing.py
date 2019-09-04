@@ -160,6 +160,8 @@ class Listing():
 		if not compact:
 			m = max(len(hex), m)
 
+		hl = len(hex[0][1])
+
 		cmt = self.pj.block_comments.get(lo)
 		if cmt is not None:
 			w = 72 - len(self.pj.comment_prefix)
@@ -178,14 +180,15 @@ class Listing():
 				if x in s:
 					continue
 				s.add(x)
-				self.fo.write("%s\t%s:\n" % (" " * len(hex[0]), x))
+				self.fo.write("%s\t%s:\n" % (" " * hl, x))
 			lbl = "\t"
 
 		for i in range(m):
 			if i < len(hex):
-				h = hex[i][1]
+				a, h = hex[i]
 			else:
-				h = " " * len(hex[0][1])
+				a = None
+				h = " " * hl
 			if i < len(rx):
 				r = rx[i]
 			else:
@@ -196,8 +199,8 @@ class Listing():
 				r += " "
 			if i < len(lcmt):
 				l = self.pj.comment_prefix + lcmt[i]
-			elif hex[i][0] in self.pj.m.lcmt:
-				l = self.pj.comment_prefix + self.pj.m.lcmt[hex[i][0]]
+			elif a in self.pj.m.lcmt:
+				l = self.pj.comment_prefix + self.pj.m.lcmt[a]
 			else:
 				l = ""
 			s = "%s\t%s%s%s" % (h, lbl, r, l)
