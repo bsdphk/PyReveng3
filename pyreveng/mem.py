@@ -71,6 +71,7 @@ class address_space():
 		self.name = name
 		self.labels = dict()
 		self.block_comments = dict()
+		self.lcmt = dict()
 		l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
 		self.apct = "0x%%0%dx" % l
 		self.t = tree.Tree(self.lo, self.hi)
@@ -99,6 +100,10 @@ class address_space():
 	def set_label(self, adr, lbl):
 		assert isinstance(lbl, str)
 		self.labels.setdefault(adr, []).append(lbl)
+
+	def set_lcmt(self, adr, lcmt):
+		assert isinstance(lcmt, str)
+		self.lcmt[adr] = lcmt
 
 	def set_block_comment(self, adr, cmt):
 		self.block_comments.setdefault(adr, '')

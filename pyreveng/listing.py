@@ -92,7 +92,7 @@ class Render_mem():
 			s = ""
 			t = ""
 			s += self.render_word(pj, lo, hi)
-			l.append(s)
+			l.append((lo, s))
 			lo += self.ncol
 			nlin -= 1
 		return l
@@ -183,9 +183,9 @@ class Listing():
 
 		for i in range(m):
 			if i < len(hex):
-				h = hex[i]
+				h = hex[i][1]
 			else:
-				h = " " * len(hex[0])
+				h = " " * len(hex[0][1])
 			if i < len(rx):
 				r = rx[i]
 			else:
@@ -196,6 +196,8 @@ class Listing():
 				r += " "
 			if i < len(lcmt):
 				l = self.pj.comment_prefix + lcmt[i]
+			elif hex[i][0] in self.pj.m.lcmt:
+				l = self.pj.comment_prefix + self.pj.m.lcmt[hex[i][0]]
 			else:
 				l = ""
 			s = "%s\t%s%s%s" % (h, lbl, r, l)

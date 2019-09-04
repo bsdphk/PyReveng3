@@ -98,6 +98,7 @@ def hd6845_tab(pj):
 
 
 def task(pj, cx):
+
     # const.w32(p, 0x01000614)
     # pj.set_label(0x01000614, "screen_ptr")
     #pj.set_label(0x01001800, "is_lores")
