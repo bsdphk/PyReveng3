@@ -162,7 +162,7 @@ class Listing():
 
 		hl = len(hex[0][1])
 
-		cmt = self.pj.m.block_comments.get(lo)
+		cmt = self.pj.m.get_block_comments(lo)
 		if cmt is not None:
 			w = 72 - len(self.pj.m.comment_prefix)
 			self.fo.write(self.pj.m.comment_prefix + "-" * w + "\n")

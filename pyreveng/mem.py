@@ -116,6 +116,9 @@ class address_space():
 		self.block_comments.setdefault(adr, '')
 		self.block_comments[adr] += cmt + '\n'
 
+	def get_block_comments(self, adr):
+		return self.block_comments.get(adr)
+
 	def bytearray(self, lo, bcnt):
 		assert False
 
