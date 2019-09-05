@@ -199,8 +199,8 @@ class Listing():
 				r += " "
 			if i < len(lcmt):
 				l = self.pj.m.comment_prefix + lcmt[i]
-			elif a in self.pj.m.lcmt:
-				l = self.pj.m.comment_prefix + self.pj.m.lcmt[a]
+			elif self.pj.m.get_line_comment(a):
+				l = self.pj.m.comment_prefix + self.pj.m.get_line_comment(a)
 			else:
 				l = ""
 			s = "%s\t%s%s%s" % (h, lbl, r, l)

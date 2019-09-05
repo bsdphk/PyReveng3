@@ -65,7 +65,7 @@ class Job():
 		return self.m.apct % a
 
 	def render_adr(self, a):
-		x = self.m.labels.get(a)
+		x = self.m.get_labels(a)
 		if x is None:
 			return self.afmt(a)
 		return x[0]

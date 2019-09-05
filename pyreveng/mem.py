@@ -40,7 +40,7 @@ XXX: Need resolution of who controls rendering...
 
 """
 
-import ctypes
+import ctypes, types
 
 from . import tree
 
@@ -94,6 +94,9 @@ class address_space():
 		for i in self.t:
 			yield i
 
+	def segments(self):
+		yield self
+
 	def _off(self, adr):
 		if adr < self.lo:
 			raise MemError(adr, "Address too low")
@@ -108,9 +111,12 @@ class address_space():
 	def get_labels(self, adr):
 		return self.labels.get(adr)
 
-	def set_lcmt(self, adr, lcmt):
+	def set_line_comment(self, adr, lcmt):
 		assert isinstance(lcmt, str)
 		self.lcmt[adr] = lcmt
+
+	def get_line_comment(self, adr):
+		return self.lcmt.get(adr)
 
 	def set_block_comment(self, adr, cmt):
 		self.block_comments.setdefault(adr, '')
@@ -139,6 +145,118 @@ class address_space():
 			ll = i.hi
 		if self.hi > ll:
 			yield ll, self.hi
+
+class segmented_mem():
+
+	def __init__(self):
+		self.map = []
+		self.seglist = []
+		self.realmem = None
+		self.lo = 1<<64
+		self.hi = 0
+		self.bits = 0
+
+	def add(self, mem, low, high = None, offset = None):
+		if offset is None:
+			offset = 0
+		if high is None:
+			high = mem.hi
+		self.bits = mem.bits
+		self.comment_prefix = mem.comment_prefix
+		self.lo = min(self.lo, mem.lo)
+		self.hi = max(self.hi, mem.hi)
+		self.seglist.append(mem)
+		self.map.append((mem, low, high, offset))
+		self.realmem = mem
+
+	def xlat(self, adr):                                                                                                                                                                                                                    
+		for i, j in enumerate(self.map):                                                                                                                                                                                                
+			mem, low, high, offset = j                                                                                                                                                                                              
+			if low <= adr < high:                                                                                                                                                                                                   
+				self.map.pop(i)                                                                                                                                                                                                 
+				self.map.insert(0, j)                                                                                                                                                                                           
+				return mem, adr - offset                                                                                                                                                                                        
+		raise MemError(adr, "Unmapped memory")   
+
+	def __iter__(self):
+		for i in self.seglist:
+			for j in i:
+				yield j
+
+	def __getitem__(self, adr):
+		m,a = self.xlat(adr)
+		return m[a]
+
+	def segments(self):
+		for i in self.seglist:
+			yield i
+
+	def rd(self, adr):
+		m,a = self.xlat(adr)
+		return m[a]
+
+	def set_label(self, adr, lbl):
+		m,a = self.xlat(adr)
+		m.set_label(a, lbl)
+
+	def get_labels(self, adr):
+		m,a = self.xlat(adr)
+		return m.get_labels(a)
+
+	def set_block_comment(self, adr, lbl):
+		m,a = self.xlat(adr)
+		m.set_block_comment(a, lbl)
+
+	def get_block_comments(self, adr):
+		m,a = self.xlat(adr)
+		return m.get_block_comments(a)
+
+	def set_line_comment(self, adr, lbl):
+		m,a = self.xlat(adr)
+		m.set_line_comment(a, lbl)
+
+	def get_line_comment(self, adr):
+		m,a = self.xlat(adr)
+		return m.get_line_comment(a)
+
+	def find_lo(self, adr):
+		m,a = self.xlat(adr)
+		return m.find_lo(a)
+
+	def find_hi(self, adr):
+		m,a = self.xlat(adr)
+		return m.find_hi(a)
+
+	def bs16(self, adr):
+		m,a = self.xlat(adr)
+		return m.bs16(a)
+
+	def bu16(self, adr):
+		m,a = self.xlat(adr)
+		return m.bu16(a)
+
+	def bs32(self, adr):
+		m,a = self.xlat(adr)
+		return m.bs32(a)
+
+	def bu32(self, adr):
+		m,a = self.xlat(adr)
+		return m.bu32(a)
+
+	def bytearray(self, adr, l):
+		m,a = self.xlat(adr)
+		return m.bytearray(a, l)
+
+	def gaps(self):
+		for i in self.seglist:
+			for j in i:
+				yield j
+
+	def insert(self, leaf):
+		mem,adr = self.xlat(leaf.lo)
+		# XXX: are the $m.t in "absolute addresses" ?
+		mem.insert(leaf)
+
 
 class word_mem(address_space):
 

@@ -34,47 +34,16 @@ import os
 from pyreveng import job, mem, code, data, misc, listing, charset
 import pyreveng.cpu.z8000 as z8000
 
-import types
-
-class bogocall():
-
-    def __init__(self, realmem, attn, att):
-        self.attn = attn
-        self.att = att
-
-    def foo(self, *args, **kwargs):
-        # print(self.attn, *args)
-        return self.att(*args, **kwargs)
-
-class bogomem():
-
-    def __init__(self, realmem):
-        self.realmem = realmem
-        self.cachexxx = {}
-
-    def __iter__(self):
-        for i in self.realmem:
-            yield i
-
-    def __getattr__(self, att):
-        t = self.cachexxx.get(att)
-        if t is None:
-            ra = self.realmem.__getattribute__(att)
-            if isinstance(ra, types.MethodType):
-                t = bogocall(self.realmem, att, ra).foo
-            else:
-                t = ra
-            self.cachexxx[att] = t
-        return t
-
 def mem_setup():
-    m = mem.stackup(
+    m = mem.segmented_mem()
+    m0 = mem.stackup(
         files=(
             ("EPROM_C_900_boot-L_V_1.0.bin", "EPROM_C_900_boot-H_V_1.0.bin"),
         ),
         prefix=os.path.dirname(os.path.abspath(__file__)) + "/"
     )
-    return bogomem(m)
+    m.add(m0, 0)
+    return m
 
 def setup():
     pj = job.Job(mem_setup(), "CBM900_BOOT")

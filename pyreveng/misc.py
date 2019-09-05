@@ -41,25 +41,26 @@ def fill_gaps(pj):
 
 	gaps = 0
 	ngaps = 0
-	for lo, hi in pj.m.gaps():
-		g0 = lo
-		g1 = False
-		for j in range(lo, hi):
-			try:
-				pj.m.rd(j)
-				if g1:
-					add_gap(pj, g0, j)
-					ngaps += 1
-					gaps += j - g0
-				g1 = False
-			except mem.MemError:
-				if not g1:
-					g1 = True
-					g0 = j
-		if g1:
-			add_gap(pj, g0, hi)
-			ngaps += 1
-			gaps += hi - g0
+	for m in pj.m.segments():
+		for lo, hi in m.gaps():
+			g0 = lo
+			g1 = False
+			for j in range(lo, hi):
+				try:
+					pj.m.rd(j)
+					if g1:
+						add_gap(pj, g0, j)
+						ngaps += 1
+						gaps += j - g0
+					g1 = False
+				except mem.MemError:
+					if not g1:
+						g1 = True
+						g0 = j
+			if g1:
+				add_gap(pj, g0, hi)
+				ngaps += 1
+				gaps += hi - g0
 
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
@@ -110,5 +111,6 @@ def fill_all_blanks(pj, **kwargs):
 	'''
 		Fill in all .BLANKS
 	'''
-	for lo, hi in pj.m.gaps():
-		fill_blanks(pj, lo, hi, **kwargs)
+	for m in pj.m.segments():
+		for lo, hi in m.gaps():
+			fill_blanks(pj, lo, hi, **kwargs)
