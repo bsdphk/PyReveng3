@@ -43,7 +43,7 @@ class bogocall():
         self.att = att
 
     def foo(self, *args, **kwargs):
-        print(self.attn, *args)
+        # print(self.attn, *args)
         return self.att(*args, **kwargs)
 
 class bogomem():

@@ -132,10 +132,10 @@ class address_space():
 		ll = self.lo
 		for i in self.t:
 			if i.lo > ll:
-				yield ll, i.lo, self
+				yield ll, i.lo
 			ll = i.hi
 		if self.hi > ll:
-			yield ll, self.hi, self
+			yield ll, self.hi
 
 class word_mem(address_space):
 

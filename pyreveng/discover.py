@@ -81,7 +81,7 @@ class Discover():
 		print("Known instructions:", len(self.code))
 
 		n = 0
-		for lx, hx, aspace in self.pj.gaps():
+		for lx, hx in self.pj.m.gaps():
 			for adr in range(lx, hx):
 				try:
 					x = self.cx.decode(self.pj, adr)

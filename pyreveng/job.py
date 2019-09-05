@@ -87,9 +87,6 @@ class Job():
 		self.m.insert(l)
 		return l
 
-	def gaps(self):
-		return self.m.gaps()
-
 	def todo(self, adr, func):
 		assert isinstance(adr, int)
 		if adr >= self.m.lo and adr < self.m.hi:
