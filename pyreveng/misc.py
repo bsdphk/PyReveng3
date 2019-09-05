@@ -41,8 +41,9 @@ def fill_gaps(pj):
 
 	gaps = 0
 	ngaps = 0
-	for m in pj.m.segments():
-		for lo, hi in m.gaps():
+	#for m in pj.m.segments():
+	if True:
+		for lo, hi in pj.m.gaps():
 			g0 = lo
 			g1 = False
 			for j in range(lo, hi):
@@ -111,6 +112,7 @@ def fill_all_blanks(pj, **kwargs):
 	'''
 		Fill in all .BLANKS
 	'''
-	for m in pj.m.segments():
-		for lo, hi in m.gaps():
-			fill_blanks(pj, lo, hi, **kwargs)
+	for m, slo, shi in pj.m.segments():
+		for glo, ghi in pj.m.gaps():
+			if glo >= slo and ghi <= shi:
+				fill_blanks(pj, glo, ghi, **kwargs)

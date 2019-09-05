@@ -40,7 +40,7 @@ XXX: Need resolution of who controls rendering...
 
 """
 
-import ctypes, types
+import ctypes, types, copy
 
 from . import tree
 
@@ -94,8 +94,23 @@ class address_space():
 		for i in self.t:
 			yield i
 
+	def set_apct(self, pct=None):
+		if pct is None:
+			l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+			pct = "0x%%0%dx" % l
+		self.apct = pct
+
+	def gaps(self):
+		ll = self.lo
+		for i in self.t:
+			if i.lo > ll:
+				yield ll, i.lo
+			ll = i.hi
+		if self.hi > ll:
+			yield ll, self.hi
+
 	def segments(self):
-		yield self
+		yield self, self.lo, self.hi
 
 	def _off(self, adr):
 		if adr < self.lo:
@@ -137,48 +152,47 @@ class address_space():
 	def find_hi(self, adr):
 		return self.t.find_hi(adr)
 
-	def gaps(self):
-		ll = self.lo
-		for i in self.t:
-			if i.lo > ll:
-				yield ll, i.lo
-			ll = i.hi
-		if self.hi > ll:
-			yield ll, self.hi
-
 class segmented_mem():
 
 	def __init__(self):
 		self.map = []
 		self.seglist = []
-		self.realmem = None
 		self.lo = 1<<64
 		self.hi = 0
 		self.bits = 0
+		self.naked = address_space(0, 1)
 
 	def add(self, mem, low, high = None, offset = None):
 		if offset is None:
 			offset = 0
 		if high is None:
-			high = mem.hi
+			high = low + mem.hi - mem.lo
 		self.bits = mem.bits
 		self.comment_prefix = mem.comment_prefix
-		self.lo = min(self.lo, mem.lo)
-		self.hi = max(self.hi, mem.hi)
-		self.seglist.append(mem)
+		self.lo = min(self.lo, low)
+		self.hi = max(self.hi, high)
+		self.naked.lo = self.lo
+		self.naked.hi = self.hi
+		self.naked.set_apct()
+		self.apct = self.naked.apct
+		self.seglist.append((mem, low, high, offset))
 		self.map.append((mem, low, high, offset))
-		self.realmem = mem
 
-	def xlat(self, adr):                                                                                                                                                                                                                    
-		for i, j in enumerate(self.map):                                                                                                                                                                                                
-			mem, low, high, offset = j                                                                                                                                                                                              
-			if low <= adr < high:                                                                                                                                                                                                   
-				self.map.pop(i)                                                                                                                                                                                                 
-				self.map.insert(0, j)                                                                                                                                                                                           
-				return mem, adr - offset                                                                                                                                                                                        
-		raise MemError(adr, "Unmapped memory")   
+	def xlat(self, adr, fail=True):
+		for i, j in enumerate(self.map):
+			mem, low, high, offset = j
+			if low <= adr < high:
+				self.map.pop(i)
+				self.map.insert(0, j)
+				return mem, (adr - low) + offset
+		if fail:
+			raise MemError(adr, "Unmapped memory")   
+		return self.naked, 0
 
 	def __iter__(self):
+		for i in self.naked:
+			yield i
+		return
 		for i in self.seglist:
 			for j in i:
 				yield j
@@ -188,19 +202,19 @@ class segmented_mem():
 		return m[a]
 
 	def segments(self):
-		for i in self.seglist:
-			yield i
+		for mem, low, high, offset in self.seglist:
+			yield mem, low, high
 
 	def rd(self, adr):
 		m,a = self.xlat(adr)
 		return m[a]
 
 	def set_label(self, adr, lbl):
-		m,a = self.xlat(adr)
+		m,a = self.xlat(adr, False)
 		m.set_label(a, lbl)
 
 	def get_labels(self, adr):
-		m,a = self.xlat(adr)
+		m,a = self.xlat(adr, False)
 		return m.get_labels(a)
 
 	def set_block_comment(self, adr, lbl):
@@ -208,7 +222,7 @@ class segmented_mem():
 		m.set_block_comment(a, lbl)
 
 	def get_block_comments(self, adr):
-		m,a = self.xlat(adr)
+		m,a = self.xlat(adr, False)
 		return m.get_block_comments(a)
 
 	def set_line_comment(self, adr, lbl):
@@ -216,7 +230,7 @@ class segmented_mem():
 		m.set_line_comment(a, lbl)
 
 	def get_line_comment(self, adr):
-		m,a = self.xlat(adr)
+		m,a = self.xlat(adr, False)
 		return m.get_line_comment(a)
 
 	def find_lo(self, adr):
@@ -248,14 +262,20 @@ class segmented_mem():
 		return m.bytearray(a, l)
 
 	def gaps(self):
-		for i in self.seglist:
-			for j in i:
-				yield j
+		for glo,ghi in self.naked.gaps():
+			for mem, slo, shi, offset in self.map:
+				if ghi <= slo or glo >= shi:
+					continue
+				glo = max(glo, slo)
+				ghi = min(ghi, shi)
+				yield glo, ghi
 
 	def insert(self, leaf):
-		mem,adr = self.xlat(leaf.lo)
+		self.naked.insert(leaf)
+		ll = copy.copy(leaf)
+		mem,adr = self.xlat(ll.lo, False)
 		# XXX: are the $m.t in "absolute addresses" ?
-		mem.insert(leaf)
+		mem.insert(ll)
 
 
 class word_mem(address_space):

@@ -97,8 +97,8 @@ class Render_mem():
 			nlin -= 1
 		return l
 
-class Listing():
-	def __init__(self, pj, fn=None, ascii=True, pil=True, ncol=None, fmt="x"):
+class Seg_Listing():
+	def __init__(self, pj, fo, mem, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
 		self.pj = pj
 		self.fmt = fmt
 		self.ascii = ascii
@@ -108,14 +108,15 @@ class Listing():
 
 		nxxx = 0
 		cxxx = 0
-		if fn is None:
-			fn = "/tmp/_." + pj.name + ".txt"
-		print("Listing into", fn)
-		self.fo = open(fn, "w")
+		self.fo = fo
 		misc.fill_gaps(pj)
-		misc.fill_all_blanks(pj, all_vals=True, minsize=16)
-		a0 = pj.m.lo
+		misc.fill_all_blanks(pj, all_vals=True, minsize=ncol * 2)
+		a0 = low
 		for i in pj.m:
+			if i.hi < low:
+				continue
+			if i.lo >= high:
+				break
 			if i.lo > a0:
 				nxxx += 1
 				cxxx += i.lo - a0
@@ -135,13 +136,10 @@ class Listing():
 				    i.lo, i.hi, rx, i.lcmt, i.pil, i.compact)
 				a0 = i.hi
 
-		if a0 < pj.m.hi:
-			self.render_chunk(a0, pj.m.hi)
+		if a0 < high:
+			self.render_chunk(a0, high)
 			nxxx += 1
-			cxxx += pj.m.hi - a0
-
-		if fn is not None:
-			self.fo.close()
+			cxxx += high - a0
 
 		print("%d XXXs containing %d bytes" % (nxxx, cxxx))
 
@@ -206,3 +204,12 @@ class Listing():
 			s = "%s\t%s%s%s" % (h, lbl, r, l)
 			self.fo.write(s.rstrip() + "\n")
 			lbl = "\t"
+
+def Listing(pj, fn=None, **kwargs):
+	if fn is None:
+		fn = "/tmp/_." + pj.name + ".txt"
+	print("Listing into", fn)
+	fo = open(fn, "w")
+	for mem, low, high in pj.m.segments():
+		Seg_Listing(pj, fo, mem, low, high, **kwargs)
+
