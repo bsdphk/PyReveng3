@@ -50,7 +50,7 @@ def setup():
 
 def task(pj, cx):
     s = charset.SVG_Charset(
-        "/tmp/_.svg",
+        "/tmp/cbm900_lowres.svg",
         cols=16,
         char_w=7,
         char_h=13,

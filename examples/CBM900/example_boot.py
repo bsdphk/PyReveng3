@@ -72,7 +72,7 @@ def setup():
 def chargen(pj, a):
     pj.m.set_label(0x45fe, "CHARGEN")
     s = charset.SVG_Charset(
-        "/tmp/_.svg",
+        "/tmp/cbm900_hires.svg",
         cols=8,
         char_w=14,
         char_h=26,
