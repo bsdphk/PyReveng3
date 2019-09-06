@@ -54,7 +54,7 @@ class Render_mem():
 		s += self.apct % lo + " "
 		for i in range(min(self.ncol, hi - lo)):
 			try:
-				v = pj.m.rd(lo + i)
+				v = pj.m[lo + i]
 			except mem.MemError:
 				v = None
 

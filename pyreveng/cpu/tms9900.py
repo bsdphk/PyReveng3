@@ -537,7 +537,7 @@ class Tms9900_ins(assy.Instree_ins):
 			if self.mne[-1] == "b":
 				c = data.Const(pj, v, v + 1)
 				c.typ = ".BYTE"
-				c.fmt = "0x%02x" % pj.m.rd(v)
+				c.fmt = "0x%02x" % pj.m[v]
 			else:
 				c = data.Const(pj, v, v + 2)
 				c.typ = ".WORD"

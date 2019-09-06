@@ -56,7 +56,7 @@ def task(pj, cx):
 
 	def cbyte(pj, a):
 		c = data.Const(pj, a, a + 1)
-		c.val = pj.m.rd(a)
+		c.val = pj.m[a]
 		c.typ = ".BYTE"
 		c.fmt = "0x%02x" % c.val
 		return c
@@ -72,17 +72,17 @@ def task(pj, cx):
 		def __init__(self, pj, a):
 			super(d_chain, self).__init__(pj, a, a + 4)
 			self.num = '%c%c%c' % (
-				pj.m.rd(self.lo),
-				pj.m.rd(self.lo + 1),
-				pj.m.rd(self.lo + 2),
+				pj.m[self.lo],
+				pj.m[self.lo + 1],
+				pj.m[self.lo + 2],
 			)
 
 		def render(self, pj):
 			return ".STRUCT chain { '%c%c%c', %d }" % (
-				pj.m.rd(self.lo),
-				pj.m.rd(self.lo + 1),
-				pj.m.rd(self.lo + 2),
-				pj.m.rd(self.lo + 3),
+				pj.m[self.lo],
+				pj.m[self.lo + 1],
+				pj.m[self.lo + 2],
+				pj.m[self.lo + 3],
 			)
 
 	class d_asf(data.Data):

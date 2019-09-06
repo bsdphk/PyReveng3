@@ -89,7 +89,7 @@ def task(pj, cpu):
 		pj.add(lo, hi, "ROM")
 		s = 0
 		for a in range(lo, hi):
-			s += pj.m.rd(a)
+			s += pj.m[a]
 		s &= 0xff
 		if s == 0:
 			print("ROM %04x-%04x sum good (%02x)" % (lo, hi, s))
@@ -152,11 +152,11 @@ def task(pj, cpu):
 		c = pj.add(a, a + 16, "tblx")
 		s = ""
 		for i in range(10):
-			v = pj.m.rd(a + i)
+			v = pj.m[a + i]
 			s += " %02x" % v
 		s += "  "
 		for i in range(10,16):
-			v = pj.m.rd(a + i)
+			v = pj.m[a + i]
 			s += " %02x" % v
 		c.rendered = "TBLX " + s
 		c.compact = True

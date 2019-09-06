@@ -116,7 +116,7 @@ def hd6845_tab(pj):
     pj.set_label(a, "HD6845_PARAMS[]")
     while a < 0x436a:
         x = data.Pstruct(pj, a, "BB")
-        y = pj.m.rd(a)
+        y = pj.m[a]
         if y < len(hd6845reg):
             x.lcmt += hd6845reg[y]
         a += 2

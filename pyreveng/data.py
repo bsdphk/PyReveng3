@@ -50,7 +50,7 @@ class Const(Data):
 	def __init__(self, pj, lo, hi, fmt=None, func=None, size=1):
 		super().__init__(pj, lo, hi, "const")
 		if func is None:
-			func = pj.m.rd
+			func = pj.m.__getitem__
 		if fmt is None:
 			fmt = "0x%x"
 		v = []
@@ -104,7 +104,7 @@ def stringify(pj, lo, length=None, term=None):
 	s = ""
 	v = ""
 	while True:
-		x = pj.m.rd(lo)
+		x = pj.m[lo]
 		lo += 1
 		if length is None and x in term:
 			return lo, s, v
@@ -133,7 +133,7 @@ class Txt(Data):
 		self.splitnl = splitnl
 		self.pre = ""
 		if pfx == 1:
-			x = pj.m.rd(lo)
+			x = pj.m[lo]
 			self.pre = '%d,' % x
 			hi, s, v = stringify(pj, lo + 1, length=x)
 		elif pfx is not None:

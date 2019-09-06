@@ -236,7 +236,7 @@ class Instree_disass(code.Decode):
 		self.it.load_string(desc, ins)
 
 	def getmore_word(self, pj, adr, v):
-		v.append(pj.m.rd(adr + len(v)))
+		v.append(pj.m[adr + len(v)])
 
 	def getmore_lu16(self, pj, adr, v):
 		v.append(pj.m.lu16(adr + len(v) * 2))

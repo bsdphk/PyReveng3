@@ -59,13 +59,13 @@ def setup(pg):
 def collect_errors():
 	pj,m = setup(3)
 	a = 0x7348
-	n = m.rd(a)
+	n = m[a]
 	a += 1
 	e = {}
 	for i in range(n):
-		x = m.rd(a)
+		x = m[a]
 		a += 1
-		l = m.rd(a)
+		l = m[a]
 		a += 1
 		p = m.bu16(a)
 		a += 2
@@ -84,7 +84,7 @@ def collect_keys():
 	n = 0
 	for a in range(0x4a3f, 0x4aad, 2):
 		y = pj.m.bu16(a)
-		assert pj.m.rd(y) == 0xcc
+		assert pj.m[y] == 0xcc
 		x = pj.m.bu16(y + 1)
 		y = data.Txt(pj, x, x + 9)
 		t = y.txt[:-4].strip().replace(" ","_")
@@ -580,7 +580,7 @@ def romsum(pj):
 	b = 0
 	c = 0
 	for x in range(pj.m.lo, pj.m.hi):
-		b += pj.m.rd(x) + c
+		b += pj.m[x] + c
 		c = b >> 8
 		c = 1
 		b &= 0xff
@@ -597,7 +597,7 @@ def romsum(pj):
 		pj.set_label(y.lo, "EPROM_SUM_%d" % pj.pg)
 
 		y = data.Const(pj, 0x4000, 0x4001, "'%c'")
-		assert pj.m.rd(y.lo) == 0x30 + pj.pg
+		assert pj.m[y.lo] == 0x30 + pj.pg
 		pj.set_label(y.lo, "EPROM_PAGE_%d" % pj.pg)
 
 	else:
@@ -612,9 +612,9 @@ def lexer(pj):
 	class lex(data.Data):
 		def __init__(self, pj, lo, pfx):
 			hi = lo + 4
-			self.f = pj.m.rd(lo + 1)
+			self.f = pj.m[lo + 1]
 			self.t = pj.m.bu16(lo + 2)
-			self.pfx = pfx + "%c" % pj.m.rd(lo)
+			self.pfx = pfx + "%c" % pj.m[lo]
 			if self.f > 0:
 				hi += 1
 			super(lex, self).__init__(pj, lo, hi, "lex")
@@ -633,20 +633,20 @@ def lexer(pj):
 
 		def render(self, pj):
 			s = ".LEX\t\"%s\", " % self.pfx
-			s += "%d, " % pj.m.rd(self.lo + 1)
+			s += "%d, " % pj.m[self.lo + 1]
 			s += pj.render_adr(pj.m.bu16(self.lo + 2))
 			if self.f:
-				s += ", 0x%02x" % pj.m.rd(self.lo + 4)
+				s += ", 0x%02x" % pj.m[self.lo + 4]
 			return s
 
 	def tx(a, pfx):
 		t0 = a
-		while pj.m.rd(a) != 0:
+		while pj.m[a] != 0:
 			y = lex(pj, a, pfx)
 			a = y.hi
 			if y.f == 0:
 				b = pj.m.bu16(y.lo + 2)
-				p = pfx + "%c" % pj.m.rd(y.lo)
+				p = pfx + "%c" % pj.m[y.lo]
 				pj.set_label(b, "LEX_" + p)
 				tx(b, p)
 		data.Const(pj, a, a + 1)
@@ -671,9 +671,9 @@ def lexer(pj):
 class Num(data.Data):
 	def __init__(self, pj, lo):
 		super(Num, self).__init__(pj, lo, lo + 3, "Num")
-		a = pj.m.rd(lo) << 16
-		a += pj.m.rd(lo + 1) << 8
-		a += pj.m.rd(lo + 2)
+		a = pj.m[lo] << 16
+		a += pj.m[lo + 1] << 8
+		a += pj.m[lo + 2]
 		self.val = a
 		self.fmt = ".NUM\t%d" % a
 		pj.set_label(lo, "N%d" % a)
@@ -710,7 +710,7 @@ class MenuPage(data.Data):
 def Menu(pj, cpu, a, nm):
 	pj.set_label(a, nm)
 	data.Const(pj, a - 1, a)
-	n = pj.m.rd(a - 1)
+	n = pj.m[a - 1]
 	for i in range(0, n + 1):
 		MenuPage(pj, cpu, a + i * 10)
 
@@ -886,9 +886,9 @@ def hints(pj, cpu):
 			a = 0x7349 + 4 * i
 			y = data.Const(pj, a, a + 2)
 			y.typ = ".BYTE"
-			y.fmt = "%d, %d" % (pj.m.rd(a), pj.m.rd(a + 1))
+			y.fmt = "%d, %d" % (pj.m[a], pj.m.[a + 1])
 			u = pj.m.bu16(a + 2)
-			l = pj.m.rd(a + 1)
+			l = pj.m[a + 1]
 			data.Dataptr(pj, a + 2, a + 4, pj.m.bu16(a + 2))
 			y = data.Txt(pj, u, u + l, label=False)
 			y.compact = True
@@ -926,7 +926,7 @@ def hints(pj, cpu):
 
 		for a in range(0x4a3f, 0x4aad, 2):
 			y = pj.m.bu16(a)
-			assert pj.m.rd(y) == 0xcc
+			assert pj.m[y] == 0xcc
 			x = pj.m.bu16(y + 1)
 			z = pj.m.find_lo(x)
 			if len(z) > 0:
@@ -942,13 +942,13 @@ def hints(pj, cpu):
 			u = pj.m.bu16(a)
 			y = data.Dataptr(pj, a, a + 2, u)
 			y = data.Const(pj, u, u + 1)
-			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
+			y = data.Txt(pj, u + 1, u + 1 + pj.m[u], label=False)
 			y.compact = True
 		for a in range(0xeeee, 0x0ef0e, 2):
 			u = pj.m.bu16(a)
 			y = data.Dataptr(pj, a, a + 2, u)
 			y = data.Const(pj, u, u + 1)
-			y = data.Txt(pj, u + 1, u + 1 + pj.m.rd(u), label=False)
+			y = data.Txt(pj, u + 1, u + 1 + pj.m[u], label=False)
 			y.compact = True
 		for a in range(0xef94, 0xf014, 8):
 			y = data.Const(pj, a, a + 8, fmt="0x%02x")
@@ -974,7 +974,7 @@ def hints(pj, cpu):
 		def char_def(pj, a):
 			for i in range(8):
 				y = data.Data(pj, a + i, a + i + 1)
-				x = pj.m.rd(a + i)
+				x = pj.m[a + i]
 				y.fmt = ".BITS\t"
 				for j in range(8):
 					if x & 0x80:
@@ -1016,8 +1016,8 @@ def hints(pj, cpu):
 
 		for a in range(0xef4a, 0xef94, 2):
 			y = data.Const(pj, a, a + 2, fmt="0x%02x")
-			i = keys.get(pj.m.rd(a))
-			j = keys.get(pj.m.rd(a + 1))
+			i = keys.get(pj.m[a])
+			j = keys.get(pj.m[a + 1])
 			y.lcmt += "%8s | %-8s\n" % (i, j)
 
 #######################################################################

@@ -97,9 +97,9 @@ def task(pj, cx):
 			pj.todo(a, cx.disass)
 
 	def tbl2(a):
-		assert pj.m.rd(a + 0) == 0x2e
-		assert pj.m.rd(a + 1) == 0xff
-		assert pj.m.rd(a + 2) == 0xa7
+		assert pj.m[a + 0] == 0x2e
+		assert pj.m[a + 1] == 0xff
+		assert pj.m[a + 2] == 0xa7
 		o = pj.m.lu16(a + 3)
 		s = (a + 5 - o)
 		#print("T2", "seg", "%05x" % s, "off", "%04x" % o)
@@ -129,11 +129,11 @@ def task(pj, cx):
 				continue
 			if i.lo in t2dict:
 				continue
-			if pj.m.rd(i.lo + 0) != 0x2e:
+			if pj.m[i.lo + 0] != 0x2e:
 				continue
-			if pj.m.rd(i.lo + 1) != 0xff:
+			if pj.m[i.lo + 1] != 0xff:
 				continue
-			if pj.m.rd(i.lo + 2) != 0xa7:
+			if pj.m[i.lo + 2] != 0xa7:
 				continue
 			t2dict[i.lo] = True
 			tbl2(i.lo)
@@ -149,11 +149,11 @@ def task(pj, cx):
 		for lo, hi in pj.m.gaps():
 			if lo + 1 == hi:
 				continue
-			if pj.m.rd(lo) == 0x55:
+			if pj.m[lo] == 0x55:
 				print("%04x, %04x" % (lo, hi))
 				pj.todo(lo, cx.disass)
 				more = True
-			elif pj.m.rd(lo) == 0x00 and pj.m.rd(lo + 1) == 0x55:
+			elif pj.m[lo] == 0x00 and pj.m[lo + 1] == 0x55:
 				print("%04x, %04x" % (lo, hi))
 				pj.todo(lo + 1, cx.disass)
 				more = True

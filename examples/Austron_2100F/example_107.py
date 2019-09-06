@@ -45,7 +45,7 @@ class w8(data.Const):
 	def __init__(self, pj, a):
 		super(w8, self).__init__(pj, a, a + 1)
 		self.typ = ".BYTE"
-		self.val = pj.m.rd(a)
+		self.val = pj.m[a]
 		self.fmt = "0x%02x" % self.val
 
 class w16(data.Const):
@@ -101,9 +101,9 @@ def task(pj, cx):
 	# Check checksum
 	s = 0
 	for a in range(0xd001, pj.m.bu16(0xd001)):
-		s ^= pj.m.rd(a)
-	print("SUM", s, pj.m.rd(0xd000))
-	assert s == pj.m.rd(0xd000)
+		s ^= pj.m[a]
+	print("SUM", s, pj.m[0xd000])
+	assert s == pj.m[0xd000]
 
 	w16t(pj, 0xd8fb, 0xd903)
 	w32t(pj, 0xd903, 0xd90b)
@@ -192,14 +192,14 @@ def task(pj, cx):
 		for i in pj.m:
 			if i.tag != cx.name:
 				continue
-			if pj.m.rd(i.lo) != 0xce:
+			if pj.m[i.lo] != 0xce:
 				continue
-			j = pj.m.rd(i.lo + 3)
+			j = pj.m[i.lo + 3]
 			if j != 0xbd and j != 0x7e:
 				continue
-			if pj.m.rd(i.lo + 4) != 0xf1:
+			if pj.m[i.lo + 4] != 0xf1:
 				continue
-			if pj.m.rd(i.lo + 5) != 0x01:
+			if pj.m[i.lo + 5] != 0x01:
 				continue
 			a = pj.m.bu16(i.lo + 1)
 			if len(pj.find(a)) == 0:

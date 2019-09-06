@@ -98,10 +98,10 @@ def setup():
 	# See 00e9e/ROMSUM
 	s = [0xff, 0xff, 0xff, 0xff]
 	for a in range(32768):
-		s[0] += m.rd(a * 2)
-		s[1] += m.rd(a * 2 + 1)
-		s[2] += m.rd(a * 2 + 65536)
-		s[3] += m.rd(a * 2 + 65536 + 1)
+		s[0] += m[a * 2]
+		s[1] += m[a * 2 + 1]
+		s[2] += m[a * 2 + 65536]
+		s[3] += m[a * 2 + 65536 + 1]
 	for i in s:
 		assert i & 0xff == 0
 
@@ -423,10 +423,10 @@ def task(pj, cpu):
 			self.b = 0x195c4
 			self.i = i
 			self.j = j
-			self.fi = pj.m.rd(self.b + i)
+			self.fi = pj.m[self.b + i]
 			self.args = []
 			for a in range(j):
-				self.args.append(pj.m.rd(self.b + i + 1 + a))
+				self.args.append(pj.m[self.b + i + 1 + a])
 			super(params, self).__init__(pj, self.b + i, self.b + i + 1 + j)
 
 			self.fp = 0x196b6 + self.fi * 4
@@ -522,8 +522,8 @@ def task(pj, cpu):
 			super(oldcmd, self).__init__(pj, lo, lo + 2)
 			x,self.name,y = data.stringify(pj, self.lo, 2)
 
-			self.key = pj.m.rd(0x194b2 + n)
-			self.imm = (pj.m.rd(0x1951e + (n >> 3)) >> (n & 7)) & 1
+			self.key = pj.m[0x194b2 + n]
+			self.imm = (pj.m[0x1951e + (n >> 3)] >> (n & 7)) & 1
 			if not self.imm:
 				self.svf1 = pj.m.bu16(0x1952c + self.key * 4)
 				self.svf2 = pj.m.bu16(0x1952c + self.key * 4 + 2)
@@ -805,8 +805,8 @@ def task(pj, cpu):
 			if len(y) != 1:
 				continue
 			y = y[0]
-			if pj.m.rd(y.lo) == 0x70:
-				k = pj.m.rd(y.lo + 1)
+			if pj.m[y.lo] == 0x70:
+				k = pj.m[y.lo + 1]
 			elif pj.m.bu16(y.lo) == 0x103c:
 				k = pj.m.bu16(y.lo + 2)
 			else:
@@ -1320,7 +1320,7 @@ def task(pj, cpu):
 					continue
 				if pj.m.bu16(b) in (0x4eb8, 0x4e56):
 					l.append(b)
-				elif pj.m.rd(b) in (0x61,):
+				elif pj.m[b] in (0x61,):
 					l.append(b)
 			# print(l)
 			for i in l:

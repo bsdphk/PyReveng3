@@ -40,7 +40,7 @@ def task(pj, cpu):
 
 	def cbyte(pj, a):
 		c = data.Const(pj, a, a + 1)
-		c.val = pj.m.rd(a)
+		c.val = pj.m[a]
 		c.typ = ".BYTE"
 		c.fmt = "0x%02x" % c.val
 

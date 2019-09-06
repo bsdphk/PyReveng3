@@ -261,7 +261,7 @@ class z80_ins(assy.Instree_ins):
 	def assy_iHL(self, pj):
 		if self.idx == "HL":
 			return "(HL)"
-		d = pj.m.rd(self.hi)
+		d = pj.m[self.hi]
 		self.hi += 1
 		if d & 0x80:
 			d = 256 - d

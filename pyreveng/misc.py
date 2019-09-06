@@ -48,7 +48,7 @@ def fill_gaps(pj):
 			g1 = False
 			for j in range(lo, hi):
 				try:
-					pj.m.rd(j)
+					pj.m[j]
 					if g1:
 						add_gap(pj, g0, j)
 						ngaps += 1

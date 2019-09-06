@@ -1040,7 +1040,7 @@ class m68000_ins(assy.Instree_ins):
 		if eax == 0x0800:
 			return self.assy_eaxt(pj, id, "PC")
 		if eax == 0x1000 and self.sz == 1:
-			v = pj.m.rd(self.hi+1)
+			v = pj.m[self.hi+1]
 			self.hi += 2
 			il += ["0x%x" % v]
 			return "#0x%02x" % v

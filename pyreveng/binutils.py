@@ -36,7 +36,7 @@ def ask_objdump(p, adr, m, M):
 	j = bytearray()
 	for i in range(15):
 		try:
-			j.append(p.m.rd(adr + i))
+			j.append(p.m[adr + i])
 		except:
 			break
 	nm = tempfile.mktemp()

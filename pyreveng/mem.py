@@ -205,7 +205,7 @@ class segmented_mem():
 		for mem, low, high, offset in self.seglist:
 			yield mem, low, high
 
-	def rd(self, adr):
+	def xrd(self, adr):
 		m,a = self.xlat(adr)
 		return m[a]
 

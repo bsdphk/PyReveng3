@@ -136,19 +136,19 @@ def task(pj, dx):
 	#######################################################################
 	if True:
 		for a0 in range(4,0x20,4):
-			assert pj.m.rd(a0) == 0xc8
-			pg = (pj.m.rd(a0 + 1) & 0x07) << 11
+			assert pj.m[a0] == 0xc8
+			pg = (pj.m[a0 + 1] & 0x07) << 11
 			assert pg == a0 << 9
-			dpf = pj.m.rd(a0 + 2) << 8
-			dpf |= pj.m.rd(a0 + 3)
+			dpf = pj.m[a0 + 2] << 8
+			dpf |= pj.m[a0 + 3]
 			dpf &= 0x7ff
 			dpf |= pg
 			pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			pj.todo(a0, dx.disass)
 			pj.todo(dpf, dx.disass)
 			for a1 in range(pg, dpf, 2):
-				da = pj.m.rd(a1) << 8
-				da |= pj.m.rd(a1 + 1)
+				da = pj.m[a1] << 8
+				da |= pj.m[a1 + 1]
 				da &= 0x7ff
 				da |= pg
 				v = a0 << 3

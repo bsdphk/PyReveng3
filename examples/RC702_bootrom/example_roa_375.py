@@ -34,7 +34,7 @@ def mem_setup():
 	m.load_binfile(0x0000, 1, os.path.join(dn, "EPROM_ROA_375.bin"))
 
 	for a in range(0x797):
-		m.wr(0x7000 + a, m.rd(0x0069 + a))
+		m.wr(0x7000 + a, m[0x0069 + a])
 	return m
 
 def setup():

@@ -165,7 +165,7 @@ def task(pj, cpu):
 	data.Txt(pj, 0x8000223d, align=1, splitnl=True)
 	l = []
 	for a in range(0x8000228f, 0x800024a8):
-		x = pj.m.rd(a)
+		x = pj.m[a]
 		if not x:
 			l.append(a)
 			break

@@ -193,7 +193,7 @@ class Scrtxt(data.Data):
 		n = 0
 		gpu = hp1345a.hp1345a()
 		while w > 0:
-			c = pj.m.rd(hi)
+			c = pj.m[hi]
 			if c > 0x10:
 				t += "%c" % c
 				hi += 1
@@ -283,7 +283,7 @@ def task(pj, cpu):
 
 	if True:
 		for a in (0x129d, 0x17e3, 0x181e, 0xe0e3, 0xee7e):
-			w = pj.m.rd(a + 1) + 1
+			w = pj.m[a + 1] + 1
 			t = pj.m.bu16(a + 4)
 			for i in range(w):
 				d = pj.m.bu16(t)
@@ -300,7 +300,7 @@ def task(pj, cpu):
 
 	if True:
 		a = 0xf56e
-		while pj.m.rd(a):
+		while pj.m[a]:
 			y = data.Txt(pj, a, a + 6, label=False, align=1)
 			a = y.hi
 
@@ -341,11 +341,11 @@ def task(pj, cpu):
 		while b < c:
 			p = pj.m.bu16(a)
 			y = data.Dataptr(pj, a, a + 2, p)
-			pj.set_label(p, "CHR_TBL_%02x" % pj.m.rd(b))
+			pj.set_label(p, "CHR_TBL_%02x" % pj.m[b])
 			while True:
 				z = data.Const(pj, p, p + 2,
 				    func=pj.m.bu16, fmt="0x%x", size=2)
-				if pj.m.rd(p + 1) & 0x80:
+				if pj.m[p + 1] & 0x80:
 					break
 				p += 2
 			b += 1

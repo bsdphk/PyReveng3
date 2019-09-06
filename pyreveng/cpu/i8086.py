@@ -521,7 +521,7 @@ class i8086(assy.Instree_disass):
 		y = pj.find(adr, self.name)
 		if y != None:
 			return False
-		if (pj.m.rd(adr) & 0xf8) == 0xd8 or (pj.m.rd(adr + 1) & 0xf8) == 0xd8:
+		if (pj.m[adr] & 0xf8) == 0xd8 or (pj.m[adr + 1] & 0xf8) == 0xd8:
 			#x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
 			#ll = len(x[10:30].split())
 			x = ""

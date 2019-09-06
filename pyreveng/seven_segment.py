@@ -100,7 +100,7 @@ def lcmt(segs):
 
 def resolve(pj, adr, drive, inv):
 	assert len(drive) == 9
-	x = pj.m.rd(adr)
+	x = pj.m[adr]
 	if inv:
 		x ^= 255
 	lst = list()
@@ -141,7 +141,7 @@ class digit(job.Leaf):
 				s += " + LDP"
 		else:
 			print("NB! @0x%x: Unknown 7seg (0x%x)" %
-			    (adr, pj.m.rd(adr)), "\n" + lcmt(lst))
+			    (adr, pj.m[adr]), "\n" + lcmt(lst))
 			verbose = True
 			# s += " 0x%02x" % n
 		if verbose:
@@ -186,7 +186,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		y = list()
 		for i, z in enumerate(lst):
 			try:
-				x = pj.m.rd(a + i * distance)
+				x = pj.m[a + i * distance]
 			except mem.MemError:
 				p = False
 				n = False

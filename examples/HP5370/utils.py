@@ -282,7 +282,7 @@ def one_eprom(pj, disass, start, eprom_size):
 	# Calculate checksum
 	j = 0 ^ pj.m.bu16(start)
 	for jj in range(2, eprom_size):
-		j += pj.m.rd(start + jj)
+		j += pj.m[start + jj]
 	j &= 0xffff
 	if j == 0xffff:
 		j = "OK"
@@ -297,12 +297,12 @@ def one_eprom(pj, disass, start, eprom_size):
 	c.lcmt = "EPROM checksum (%s)" % j
 
 	c = pj.add(start + 2, start + 3, "byte")
-	c.rendered = ".BYTE 0x%02x" % pj.m.rd(start + 2)
+	c.rendered = ".BYTE 0x%02x" % pj.m[start + 2]
 	c.lcmt = "EPROM ID"
 
 	# Jump table at front of EPROM
 	for ax in range(start + 3, start + eprom_size, 3):
-		if pj.m.rd(ax) != 0x7e:
+		if pj.m[ax] != 0x7e:
 			break
 		pj.todo(ax, disass)
 
@@ -333,7 +333,7 @@ def cmd_tbl(pj, start, end):
 	for a in range(start, end, 2):
 		s = ""
 		for i in range(2):
-			j = pj.m.rd(a + i)
+			j = pj.m[a + i]
 			if i == 1 and j == 0:
 				pass
 			elif j <= 32 or j > 126:
@@ -353,8 +353,8 @@ def arg_range(pj, cmds, start, end):
 	for a in range(start, end, 2):
 		c = cmds[n]
 		n += 1
-		lo = pj.m.rd(a)
-		hi = pj.m.rd(a + 1)
+		lo = pj.m[a]
+		hi = pj.m[a + 1]
 		x = pj.add(a, a + 2, "byte")
 		x.rendered = ".BYTE\t0x%02x, 0x%02x" % (lo, hi)
 		x.lcmt = c + "[%d" % lo + "-%d]" % hi
@@ -418,9 +418,9 @@ def dsp_dispatch(pj, cx, start, end):
 class data24(data.Const):
 	def __init__(self, pj, lo):
 		super(data24, self).__init__(pj, lo, lo + 3)
-		v = pj.m.rd(self.lo) << 16
-		v |= pj.m.rd(self.lo + 1) << 8
-		v |= pj.m.rd(self.lo + 2)
+		v = pj.m[self.lo] << 16
+		v |= pj.m[self.lo + 1] << 8
+		v |= pj.m[self.lo + 2]
 		self.val = v
 		self.fmt = "%d" % v
 		self.typ = ".24bit"
@@ -429,7 +429,7 @@ class data24(data.Const):
 class float70(data.Const):
 	def __init__(self, pj, lo):
 		super(float70, self).__init__(pj, lo, lo + 7)
-		x = pj.m.rd(self.lo)
+		x = pj.m[self.lo]
 		if x & 0x80:
 			s = -1
 			x ^= 0x80
@@ -440,7 +440,7 @@ class float70(data.Const):
 		for i in range(6):
 			m +=  math.ldexp(x, o)
 			o -= 8
-			x = pj.m.rd(self.lo + 1 + i)
+			x = pj.m[self.lo + 1 + i]
 		e =  pj.m.s8(self.lo + 6)
 		self.lcmt = "m %g e %g" % (m, e)
 		v = s * math.ldexp(m, e)
@@ -457,10 +457,10 @@ class float70(data.Const):
 
 def square_tbl(pj):
 	for i in range(256):
-		x = pj.m.rd(0x6e00 + i)
+		x = pj.m[0x6e00 + i]
 		y = (i * i) & 0xff
 		assert x == y
-		x = pj.m.rd(0x6f00 + i)
+		x = pj.m[0x6f00 + i]
 		y = (i * i) >> 8
 		assert x == y
 

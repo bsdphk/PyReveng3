@@ -256,8 +256,8 @@ class switch(object):
 			s = ",".join(s)
 			return False
 		if w == 2:
-			lo = self.pj.m.rd(l[0].lo + 1)
-			hi = self.pj.m.rd(l[2].lo + 1)
+			lo = self.pj.m[l[0].lo + 1]
+			hi = self.pj.m.[l[2].lo + 1]
 			d = l[-1].dstadr
 		elif w == 3:
 			lo = self.pj.m.bu16(l[0].lo + 1)
@@ -353,14 +353,14 @@ def analyse(pj, cpu):
 			j = pj.t.find_hi(i.lo)
 			if len(j) != 1:
 				continue
-			if pj.m.rd(j[0].lo) != 0x34:
+			if pj.m[j[0].lo] != 0x34:
 				continue
 			k = pj.t.find_lo(i.hi)
 			if len(k) != 1:
 				continue
-			if pj.m.rd(k[0].lo) != 0x32:
+			if pj.m[k[0].lo] != 0x32:
 				continue
-			if not assemble_call(pj, i.lo, k[0].hi, pj.m.rd(k[0].lo + 1) & 0xf):
+			if not assemble_call(pj, i.lo, k[0].hi, pj.m[k[0].lo + 1] & 0xf):
 				continue
 		while pj.run():
 			pass

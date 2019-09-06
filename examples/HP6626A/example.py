@@ -104,8 +104,8 @@ def task(pj, cpu):
 
 	for i in range(1,33):
 		s = "%02x" % i
-		a = pj.m.rd(0x87f0+i-1)
-		b = pj.m.rd(0x87d0+i-1)
+		a = pj.m[0x87f0+i-1]
+		b = pj.m[0x87d0+i-1]
 		s += "   "
 		s += " %x" % a
 		s += " %04x" % pj.m.bu16(0x87b2 + a * 2)
@@ -287,7 +287,7 @@ def task(pj, cpu):
 	a = 0xa225
 	nn = 7
 	while a < 0xa370:
-		b = pj.m.rd(a)
+		b = pj.m[a]
 		if b == 0:
 			break
 		y = data.Txt(pj, a, pfx=1, align=1, label=False)
@@ -304,7 +304,7 @@ def task(pj, cpu):
 		pj.set_label(a, l)
 		while True:
 			data.Const(pj, a, a + 1)
-			if pj.m.rd(a) == 0:
+			if pj.m[a] == 0:
 				return;
 			a += 1
 			y = data.Txt(pj, a, align=1, label=False)
@@ -343,12 +343,12 @@ def task(pj, cpu):
 
 		def render(self, pj):
 			s = ".TT5\t"
-			t = pj.m.rd(self.lo)
+			t = pj.m[self.lo]
 			if t in token:
 				s += (token[t] + ", ").ljust(8)
 			else:
 				s += "T%02x, " % t
-			s += "0x%02x, " % pj.m.rd(self.lo + 1)
+			s += "0x%02x, " % pj.m[self.lo + 1]
 			w = pj.m.bu16(self.lo + 2)
 			s += pj.render_adr(w)
 			return s
@@ -359,15 +359,15 @@ def task(pj, cpu):
 		pj.set_label(a, "tt5_%04x" % a)
 		while True:
 			ll = list(l)
-			if pj.m.rd(a) == 0:
+			if pj.m[a] == 0:
 				data.Const(pj, a, a + 1)
 				break
-			t = pj.m.rd(a)
+			t = pj.m[a]
 			if t in token:
 				ll.append(token[t])
 			else:
 				ll.append("T%02x" % t)
-			e = pj.m.rd(a + 1)
+			e = pj.m[a + 1]
 			if e != 0:
 				ex = f + e * 2
 				z = pj.m.bu16(ex)
@@ -447,7 +447,7 @@ def task(pj, cpu):
 		i = 0
 		a = hi - 2
 		while a >= lo:
-			m |= pj.m.rd(a) << i
+			m |= pj.m[a] << i
 			i += 8
 			a -= 1
 		m *= 10 ** e
@@ -463,7 +463,7 @@ def task(pj, cpu):
 
 	class tt_2(data.Data):
 		def __init__(self, pj, lo):
-			hi = lo + 5 + pj.m.rd(lo + 4) * 4
+			hi = lo + 5 + pj.m[lo + 4] * 4
 			super(tt_2, self).__init__(pj, lo, hi, "tt_2")
 
 		def render(self, pj):
@@ -471,7 +471,7 @@ def task(pj, cpu):
 			w = pj.m.bu16(self.lo + 0)
 			s += "\t.next = " + pj.render_adr(w) + "\n"
 			s += "\t.model = %4d\n" % pj.m.bu16(self.lo + 2)
-			n = pj.m.rd(self.lo + 4)
+			n = pj.m[self.lo + 4]
 			s += "\t.outputs = %d\n" % n
 			a = self.lo + 5
 			for i in range(n):
@@ -538,7 +538,7 @@ def task(pj, cpu):
 		return
 		softlbl(a, "tt3_2_%04x" % a)
 		while True:
-			if pj.m.rd(a + 2) > 2:
+			if pj.m[a + 2] > 2:
 				break
 			data.Const(pj, a, a+2, fmt="0x%02x")
 			fp(pj, a + 2, a + 6)
@@ -557,7 +557,7 @@ def task(pj, cpu):
 		continue
 		data.Const(pj, a + 2, a + 4, fmt="%d")
 		data.Const(pj, a + 4, a + 5)
-		y = pj.m.rd(a + 4)
+		y = pj.m[a + 4]
 		a += 5
 		for i in range(y * 2):
 			z = pj.m.bu16(a)
@@ -599,10 +599,10 @@ def task(pj, cpu):
 		if len(j) != 1:
 			continue
 		j=j[0]
-		x = pj.m.rd(j.lo)
+		x = pj.m[j.lo]
 		if x != 0x86:
 			continue
-		y = pj.m.rd(j.lo + 1)
+		y = pj.m[j.lo + 1]
 		j.lcmt += "Error: " + err[y] + "\n"
 
 	#############
