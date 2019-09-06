@@ -59,8 +59,8 @@ class SVG_Charset():
     def calc_geom(self):
         self.cell_w = self.char_w + 2 * self.imargin + self.linewidth
         self.cell_h = self.char_h + 2 * self.imargin + self.linewidth
-        self.width = self.margin * 2 * self.cell_w * self.cols
-        self.height = self.margin * 2 * self.cell_h * self.rows
+        self.width = self.margin * 2 + self.cell_w * self.cols
+        self.height = self.margin * 2 + self.cell_h * self.rows
 
     def draw_grid(self):
         self.ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
@@ -101,10 +101,10 @@ class SVG_Charset():
                 if j & m:
                     self.ctx.move_to(gx + .5, y0)
                     self.ctx.line_to(gx + .5, y0 + 1)
-                    self.ctx.stroke()
                 m >>= 1
                 gx += gi
             y0 += 1
+        self.ctx.stroke()
 
     def render(self):
         self.calc_geom()
