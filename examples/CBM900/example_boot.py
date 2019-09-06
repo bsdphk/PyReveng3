@@ -34,6 +34,21 @@ import os
 from pyreveng import job, mem, code, data, misc, listing, charset
 import pyreveng.cpu.z8000 as z8000
 
+def fc_outstr(pj, ins):
+    ''' Spot string arguments to OutStr() and puts() '''
+    for f in ins.flow_out:
+        if f.to not in (0x3b28, 0x0900):
+            continue
+        print("0", ins, f)
+        if pj.m.bu16(ins.lo - 2) != 0x91e0:
+            continue
+        print("1", ins, f)
+        if pj.m.bu16(ins.lo - 8) != 0x1400:
+            continue
+        print("2", ins, f)
+        y = data.Txt(pj, pj.m.bu32(ins.lo - 6), align=1, label=False)
+        pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
+
 def mem_setup():
     m = mem.segmented_mem()
     m0 = mem.stackup(
@@ -54,6 +69,7 @@ def mem_setup():
 def setup():
     pj = job.Job(mem_setup(), "CBM900_BOOT")
     cx = z8000.z8001()
+    cx.flow_check.append(fc_outstr)
     return pj, cx
 
 def chargen(pj, a):
@@ -228,11 +244,13 @@ def task(pj, cx):
         pj.todo(0x20bc, cx.disass)
         pj.todo(0x3ec6, cx.disass)
 
+        pj.todo(0x06da, cx.disass)
         pj.todo(0x0214, cx.disass)
         pj.todo(0x10ec, cx.disass)
         pj.todo(0x11a6, cx.disass)
         pj.todo(0x2028, cx.disass)
         pj.todo(0x2034, cx.disass)
+        pj.todo(0x3bd2, cx.disass)
 
         for a in (
             0x01c0,
@@ -240,8 +258,10 @@ def task(pj, cx):
             0x0c44,
             0x0e9e,
             0x0ee0,
+            0x0eae,
+            0x0ef0,
         ):
-            pj.m.set_block_comment(a, "CALL_RR10_%x" % a)
+            pj.m.set_line_comment(a, "CALL_RR10_%x" % a)
             pj.todo(a, cx.disass)
 
         for a in range(0x3e90, 0x3ea0, 4):
@@ -278,6 +298,8 @@ def task(pj, cx):
 
         data.Txt(pj, 0x0c75, align=1, label=False)
         data.Txt(pj, 0x0cb1, align=1, label=False)
+        for a in range(0xc4a, 0xc74, 2):
+            data.Pstruct(pj, a, "BB")
 
         hd6845_tab(pj)
 
