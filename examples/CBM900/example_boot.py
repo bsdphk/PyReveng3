@@ -39,13 +39,10 @@ def fc_outstr(pj, ins):
     for f in ins.flow_out:
         if f.to not in (0x3b28, 0x0900):
             continue
-        print("0", ins, f)
         if pj.m.bu16(ins.lo - 2) != 0x91e0:
             continue
-        print("1", ins, f)
         if pj.m.bu16(ins.lo - 8) != 0x1400:
             continue
-        print("2", ins, f)
         y = data.Txt(pj, pj.m.bu32(ins.lo - 6), align=1, label=False)
         pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
 
