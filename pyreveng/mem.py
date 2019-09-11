@@ -100,6 +100,13 @@ class address_space():
 			pct = "0x%%0%dx" % l
 		self.apct = pct
 
+	def adr(self, dst):
+		''' Render an address '''
+		l = self.labels.get(dst)
+		if l:
+			return l[0]
+		return "0x%x" % dst
+
 	def gaps(self):
 		ll = self.lo
 		for i in self.t:
@@ -152,7 +159,7 @@ class address_space():
 	def find_hi(self, adr):
 		return self.t.find_hi(adr)
 
-class segmented_mem():
+class mem_mapper():
 
 	def __init__(self):
 		self.map = []
@@ -198,67 +205,72 @@ class segmented_mem():
 				yield j
 
 	def __getitem__(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m[a]
+
+	def adr(self, dst):
+		''' Render an address '''
+		m, a = self.xlat(dst)
+		return m.adr(a)
 
 	def segments(self):
 		for mem, low, high, offset in self.seglist:
 			yield mem, low, high
 
 	def xrd(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m[a]
 
 	def set_label(self, adr, lbl):
-		m,a = self.xlat(adr, False)
+		m, a = self.xlat(adr, False)
 		m.set_label(a, lbl)
 
 	def get_labels(self, adr):
-		m,a = self.xlat(adr, False)
+		m, a = self.xlat(adr, False)
 		return m.get_labels(a)
 
 	def set_block_comment(self, adr, lbl):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		m.set_block_comment(a, lbl)
 
 	def get_block_comments(self, adr):
-		m,a = self.xlat(adr, False)
+		m, a = self.xlat(adr, False)
 		return m.get_block_comments(a)
 
 	def set_line_comment(self, adr, lbl):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		m.set_line_comment(a, lbl)
 
 	def get_line_comment(self, adr):
-		m,a = self.xlat(adr, False)
+		m, a = self.xlat(adr, False)
 		return m.get_line_comment(a)
 
 	def find_lo(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.find_lo(a)
 
 	def find_hi(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.find_hi(a)
 
 	def bs16(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.bs16(a)
 
 	def bu16(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.bu16(a)
 
 	def bs32(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.bs32(a)
 
 	def bu32(self, adr):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.bu32(a)
 
 	def bytearray(self, adr, l):
-		m,a = self.xlat(adr)
+		m, a = self.xlat(adr)
 		return m.bytearray(a, l)
 
 	def gaps(self):
@@ -273,7 +285,7 @@ class segmented_mem():
 	def insert(self, leaf):
 		self.naked.insert(leaf)
 		ll = copy.copy(leaf)
-		mem,adr = self.xlat(ll.lo, False)
+		mem, adr = self.xlat(ll.lo, False)
 		# XXX: are the $m.t in "absolute addresses" ?
 		mem.insert(ll)
 

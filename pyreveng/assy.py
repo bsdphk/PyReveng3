@@ -302,20 +302,22 @@ class Arg_verbatim(Arg):
 		return self.txt
 
 class Arg_dst(Arg):
-	def __init__(self, pj, dst, pfx="", sfx=""):
+	def __init__(self, pj, dst, pfx="", sfx="", aspace=None):
 		super().__init__(pj)
+		if aspace is None:
+			aspace = pj.m
 		self.dst = dst
+		self.aspace = aspace
 		self.pfx = pfx
 		self.sfx = sfx
 
 	def __str__(self):
-		l = self.pj.get_labels(self.dst)
-		if l is not None:
-			return self.pfx + "%s" % l[0] + self.sfx
-		elif self.dst is None:
+		if self.dst is None:
 			return self.pfx + "0x?" + self.sfx
-		else:
-			return self.pfx + "0x%x" % self.dst + self.sfx
+		l = self.aspace.get_labels(self.dst)
+		if l:
+			return self.pfx + "%s" % l[0] + self.sfx
+		return self.pfx + self.aspace.adr(self.dst) + self.sfx
 
 class Arg_ref(Arg):
 	def __init__(self, pj, obj):

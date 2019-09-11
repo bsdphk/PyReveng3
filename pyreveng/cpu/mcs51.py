@@ -28,7 +28,7 @@
 Disassembler for Intel mcs-51 microprocessor family
 """
 
-from pyreveng import assy
+from pyreveng import mem, assy
 
 mcs51_desc = """
 
@@ -222,17 +222,11 @@ class mcs51_ins(assy.Instree_ins):
 
 	def assy_adir(self, pj):
 		self.dstadr = self['adir']
-		s = self.lang.sfr.get(self.dstadr)
-		if s != None:
-			return s[0]
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_d)
 
 	def assy_adir2(self, pj):
 		self.dstadr = self['adir2']
-		s = self.lang.sfr.get(self.dstadr)
-		if s != None:
-			return s[0]
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_d)
 
 	def assy_a11(self, pj):
 		a = (self['ahi'] << 8) | self['alo']
@@ -266,16 +260,7 @@ class mcs51_ins(assy.Instree_ins):
 
 	def assy_abit(self, pj):
 		b = self['abit']
-		if b < 0x80:
-			return "0x%02x.%d" % (0x20 + (b >> 3), b & 7)
-		r = self.lang.sfr.get(b & 0xf8)
-		if r != None:
-			b &= 7
-			if len(r) > (b + 1):
-				return "%s.%s" % (r[0], r[b + 1])
-			else:
-				return "%s.%d" % (r[0], b)
-		return "b#%0x2x" % b
+		return assy.Arg_dst(pj, b, aspace=self.lang.as_b)
 
 	def assy_nabit(self, pj):
 		return "/" + self.assy_abit(pj)
@@ -307,56 +292,80 @@ class mcs51_ins(assy.Instree_ins):
 	def pilmacro_RN(self):
 		return "%%R%d" % self['rn']
 
+class bitspace(mem.address_space):
+
+	def adr(self, dst):
+		l = self.labels.get(dst)
+		if l:
+			return l[0]
+		a = dst & ~7
+		b = dst & 7
+		if a < 0x80:
+			a = 0x20 + (a >> 3)
+		l = self.dspace.get_labels(a)
+		if l:
+			return l[0] + ".%d" % b
+		return "0x%02x.%d" % (a, b)
+			
+
 class mcs51(assy.Instree_disass):
 	def __init__(self, lang="mcs51"):
 		super().__init__(lang, 8)
+		self.as_d = mem.address_space(0x00, 0x100, "RAM/IO")
+		self.as_b = bitspace(0x00, 0x100, "BITSPACE")
+		self.as_b.dspace = self.as_d
+
 		self.it.load_string(mcs51_desc, mcs51_ins)
 		self.amask = 0xffff
 		self.verbatim |= set((
 		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
 		)
-		self.sfr = {
-			0x80:	["P0",
-			    "AD0", "AD1", "AD2", "AD3",
-			    "AD4", "AD5", "AD6", "AD7"],
-			0x81:	["SP"],
-			0x82:	["DPL"],
-			0x83:	["DPH"],
-			0x87:	["PCON"
-			    "IDL", "PD", "GF0", "GF1",
-			    "4", "5", "6", "SMOD"],
-			0x88:	["TCON",
-			    "IT0", "IE0", "IT1", "IE1",
-			    "TR0", "TF0", "TR1", "TF1"],
-			0x89:	["TMOD",
-			    "M00", "M10", "CT0", "GATE0",
-			    "M01", "M11", "CT1", "GATE1"],
-			0x8a:	["TL0"],
-			0x8b:	["TL1"],
-			0x8c:	["TH0"],
-			0x8d:	["TH1"],
-			0x90:	["P1", "T2", "T2EX"],
-			0x98:	["SCON",
-			    "RI", "TI", "RB8", "TB8",
-			    "REN", "SM2", "SM1", "SM0"],
-			0x99:	["SBUF"],
-			0xa0:	["P2",
-			    "A8", "A9", "A10", "A11",
-			    "A12", "A13", "A14", "A15"],
-			0xa8:	["IE",
-			    "EX0", "ET0", "EX1", "ET1",
-			    "ES", "5", "6", "EA"],
-			0xb0:	["P3",
-			    "Rxd", "Txd", "_INT0", "_INT1",
-			    "T0", "T1", "_WR", "_RD"],
-			0xb8:	["IP",
-			    "PX0", "PT0", "PX1", "PT1", "PS"],
-			0xd0:	["PSW",
-			    "P", "1", "OV", "RS0",
-			    "RS1", "F0", "AC", "CY"],
-			0xe0:	["ACC"],
-			0xf0:	["B"],
-		}
+		self.define_bits(0x80, "P0", [
+		    "AD0", "AD1", "AD2", "AD3", "AD4", "AD5", "AD6", "AD7"
+		])
+		self.define_bits(0x81, "SP")
+		self.define_bits(0x82, "DPL")
+		self.define_bits(0x83, "DPH")
+		self.define_bits(0x87, "PCON")
+		self.define_bits(0x88, "TCON", [
+		    "IT0", "IE0", "IT1", "IE1", "TR0", "TF0", "TR1", "TF1"
+		])
+		self.define_bits(0x89, "TMOD")
+		self.define_bits(0x8a, "TL0")
+		self.define_bits(0x8b, "TL1")
+		self.define_bits(0x8c, "TH0")
+		self.define_bits(0x8d, "TH1")
+		self.define_bits(0x90, "P1")
+		self.define_bits(0x98, "SCON", [
+		    "RI", "TI", "RB8", "TB8",
+		    "REN", "SM2", "SM1", "SM0"
+		])
+		self.define_bits(0x99, "SBUF")
+		self.define_bits(0xa0, "P2", [
+		    "A8", "A9", "A10", "A11", "A12", "A13", "A14", "A15"
+		])
+		self.define_bits(0xa8, "IE", [
+		    "EX0", "ET0", "EX1", "ET1", "ES", "5", "6", "EA"
+		])
+		self.define_bits(0xb0, "P3", [
+		    "Rxd", "Txd", "_INT0", "_INT1", "T0", "T1", "_WR", "_RD",
+		])
+		self.define_bits(0xb8, "IP", [
+		    "PX0", "PT0", "PX1", "PT1", "PS",
+		])
+		self.define_bits(0xd0, "PSW", [
+		    "P", "1", "OV", "RS0", "RS1", "F0", "AC", "CY",
+		])
+		self.define_bits(0xe0, "ACC")
+		self.define_bits(0xf0, "B")
+
+	def define_bits(self, a, n, b = None):
+		self.as_d.set_label(a, n)
+		if b and not a & 7:
+			for i in b:
+				self.as_b.set_label(a, n + "." + i)
+				a += 1
+
 
 	def set_adr_mask(self, a):
 		self.amask = a
@@ -378,12 +387,16 @@ class mcs51(assy.Instree_disass):
 class i8032(mcs51):
 	def __init__(self):
 		super(i8032, self).__init__("i8032")
-		self.sfr[0xc8] = ["T2CON",
+
+		self.define_bits(0xc8, "T2CON", [
 		    "CP_RL2", "C_T2", "TR2", "EXEN2",
-		    "TCLK", "RCLK", "EXF2", "TF2" ]
-		self.sfr[0xc9] = ["T2MOD"]
-		self.sfr[0xca] = ["RCAP2L"]
-		self.sfr[0xcb] = ["RCAP2H"]
-		self.sfr[0xcc] = ["TL2"]
-		self.sfr[0xcd] = ["TH2"]
-		self.sfr[0xd8] = ["WDTCON"]
+		    "TCLK", "RCLK", "EXF2", "TF2"
+		])
+		self.define_bits(0xc9, "T2MOD")
+		self.define_bits(0xca, "RCAP2L")
+		self.define_bits(0xcb, "RCAP2H")
+		self.define_bits(0xcc, "TL2")
+		self.define_bits(0xcd, "TH2")
+		self.define_bits(0xd8, "WDTCON")
+
+		

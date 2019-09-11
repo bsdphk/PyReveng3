@@ -47,7 +47,7 @@ def fc_outstr(pj, ins):
         pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
 
 def mem_setup():
-    m = mem.segmented_mem()
+    m = mem.mem_mapper()
     m0 = mem.stackup(
         files=(
             ("EPROM_C_900_boot-L_V_1.0.bin", "EPROM_C_900_boot-H_V_1.0.bin"),
