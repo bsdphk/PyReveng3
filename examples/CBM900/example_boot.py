@@ -67,6 +67,8 @@ def setup():
     pj = job.Job(mem_setup(), "CBM900_BOOT")
     cx = z8000.z8001()
     cx.flow_check.append(fc_outstr)
+    cx.z8010_mmu(0xf8)
+    cx.z8010_mmu(0xfc)
     return pj, cx
 
 def chargen(pj, a):

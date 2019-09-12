@@ -32,7 +32,7 @@ This is prepared for Z8002 as well, but I lack a sample image.
 
 """
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 z8000_desc = '''
 # Z8000 instruction list
@@ -88,7 +88,7 @@ BIT	W,Xrd,Bit		|0 1 1 0 0 1 1|w| rd	| bit	|
 
 # p63
 BIT	Rd,Rs			|0 0 1 0 0 1 1|w|0 0 0 0| rs	|0 0 0 0| rd	|0 0 0 0 0 0 0 0|
-	
+
 # p64
 CALL	Ird,>C			|0 0 0 1 1 1 1 1| rd	|0 0 0 0|
 
@@ -648,22 +648,22 @@ class z8000_ins(assy.Instree_ins):
 
     def assy_Cc(self, pj):
         cc = {
-            0:    False,
-            8:    True,
-            1:    "LT",
-            9:    "GE",
-            2:    "LE",
-            10:    "GT",
-            3:    "UGT",
-            11:    "ULE",
-            4:    "OV",
-            12:    "NOV",
-            5:    "MI",
-            13:    "PL",
-            6:    "Z",
-            14:    "NZ",
-            7:    "C",
-            15:    "NC",
+            0: False,
+            8: True,
+            1: "LT",
+            9: "GE",
+            2: "LE",
+            10: "GT",
+            3: "UGT",
+            11: "ULE",
+            4: "OV",
+            12: "NOV",
+            5: "MI",
+            13: "PL",
+            6: "Z",
+            14: "NZ",
+            7: "C",
+            15: "NC",
         }.get(self['cc'])
         if isinstance(cc, str):
             return cc
@@ -677,17 +677,15 @@ class z8000_ins(assy.Instree_ins):
                 if self.flow_out[i].to == self.hi:
                     self.flow_out.pop(i)
                     break
-        
-        
 
     def assy_Ctl(self, pj):
         n = {
-            0x2:    "FCW",
-            0x3:    "REFRESH",
-            0x4:    "PSAPSEG",
-            0x5:    "PSAPOFF",
-            0x6:    "NSPSEG",
-            0x7:    "NSPOFF",
+            0x2: "FCW",
+            0x3: "REFRESH",
+            0x4: "PSAPSEG",
+            0x5: "PSAPOFF",
+            0x6: "NSPSEG",
+            0x7: "NSPOFF",
         }.get(self['ctl'])
         if n:
             return n
@@ -742,7 +740,9 @@ class z8000_ins(assy.Instree_ins):
             return "NVI"
 
     def assy_Port(self, pj):
-        return "#0x%x" % (self['port'])
+        if self['s']:
+            return assy.Arg_dst(pj, self['port'], aspace=self.lang.as_sio)
+        return assy.Arg_dst(pj, self['port'], aspace=self.lang.as_io)
 
     def reg(self, r):
         if self.word == 2:
@@ -775,7 +775,7 @@ class z8000_ins(assy.Instree_ins):
         return assy.Arg_dst(pj, self.dstadr)
 
     def assy_Rel8(self, pj):
-        d = self['disp'] 
+        d = self['disp']
         if d & 0x80:
             d -= 0x100
         self.dstadr = self.hi + d * 2
@@ -846,6 +846,9 @@ class z8001(assy.Instree_disass):
 
     def __init__(self):
         super().__init__("z8001", 16, 8, ">")
+        self.as_mem = mem.mem_mapper()
+        self.as_io = mem.address_space(0, 1<<16, "I/O")
+        self.as_sio = mem.address_space(0, 1<<16, "Special I/O")
         self.add_ins(z8000_desc, z8001_ins)
 
     def codeptr(self, pj, adr):
@@ -867,3 +870,29 @@ class z8001(assy.Instree_disass):
 
     def vectors(self, pj, adr=0,psap=0):
         self.vector(pj, adr, "RESET")
+
+    def z8010_mmu(self, adrlo):
+        ''' Add Z8010 MMU symbols for SIO instructions '''
+        p = "Z8010_%02X_" % adrlo
+        self.as_sio.set_label(0x0000 + adrlo, p + "MODE_REG")
+        self.as_sio.set_label(0x0100 + adrlo, p + "SEG_ADR")
+        self.as_sio.set_label(0x0200 + adrlo, p + "VIOLATION_TYPE")
+        self.as_sio.set_label(0x0300 + adrlo, p + "VIOLATION_SEG")
+        self.as_sio.set_label(0x0400 + adrlo, p + "VIOLATION_OFF")
+        self.as_sio.set_label(0x0500 + adrlo, p + "BUS_STATUS")
+        self.as_sio.set_label(0x0600 + adrlo, p + "INS_SEG")
+        self.as_sio.set_label(0x0700 + adrlo, p + "INS_OFF_HI")
+        self.as_sio.set_label(0x0800 + adrlo, p + "BASE")
+        self.as_sio.set_label(0x0900 + adrlo, p + "LIMIT")
+        self.as_sio.set_label(0x0a00 + adrlo, p + "ATTR")
+        self.as_sio.set_label(0x0b00 + adrlo, p + "DESC")
+        self.as_sio.set_label(0x0c00 + adrlo, p + "BASE++")
+        self.as_sio.set_label(0x0d00 + adrlo, p + "LIMIT++")
+        self.as_sio.set_label(0x0e00 + adrlo, p + "ATTR++")
+        self.as_sio.set_label(0x0f00 + adrlo, p + "DESCRIPTOR++")
+        self.as_sio.set_label(0x1100 + adrlo, p + "RESET_VIOLATION_TYPE")
+        self.as_sio.set_label(0x1300 + adrlo, p + "RESET_SWW_IN_VTR")
+        self.as_sio.set_label(0x1400 + adrlo, p + "RESET_FATL_IN_VTR")
+        self.as_sio.set_label(0x1500 + adrlo, p + "SET_ALL_CPU_INHIBIT")
+        self.as_sio.set_label(0x1600 + adrlo, p + "SET_ALL_DMA_INHIBIT")
+        self.as_sio.set_label(0x2000 + adrlo, p + "DESC_SEL_CTR")
