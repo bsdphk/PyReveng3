@@ -24,9 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for Intel mcs-48 microprocessor family
-"""
+'''Intel MCS-48 - 8035/39/40/48/49/50
+'''
 
 from pyreveng import assy
 

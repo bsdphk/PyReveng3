@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''Ray Jefferson PL99 Handheld Loran-C receiver
+'''
+
 import os
 from pyreveng import job, mem, data, seven_segment, code, listing
 import pyreveng.cpu.mc6800 as mc6800

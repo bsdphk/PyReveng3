@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''Micrologic ML200 Loran-C Receiver
+'''
+
 import os
 from pyreveng import job, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4

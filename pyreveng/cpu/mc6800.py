@@ -24,13 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for MC6800 familiy CPUs.
-
-Presently supported variants:
-        6800
-        MC68HC11 (incomplete)
-"""
+'''Motorola MC6800/MC68HC11
+'''
 
 from pyreveng import assy, data
 

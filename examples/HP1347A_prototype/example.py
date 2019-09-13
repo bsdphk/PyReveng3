@@ -23,20 +23,22 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
-# This is a prototype HP1347A used to make the special effects of the
-# NORAD control center in the Hollywood summer blockbuster movie "Wargames".
-#
-# This firmware does not match the 5957-7606 manual titled:
-#	1346A / 1347A IB Displays Operating and Programming Manual
-#
-# See also:
-#
-#	http://www.hp9845.net/9845/software/screenart/wargames/
-#
-#	http://phk.freebsd.dk/hacks/Wargames/index.html
 
-#
+'''HP1347 - Prototype
+
+This is a prototype HP1347A used to make the special effects of the
+NORAD control center in the Hollywood summer blockbuster movie "Wargames".
+
+This firmware does not match the 5957-7606 manual titled:
+    1346A / 1347A IB Displays Operating and Programming Manual
+
+See also:
+
+    http://www.hp9845.net/9845/software/screenart/wargames/
+
+    http://phk.freebsd.dk/hacks/Wargames/index.html
+'''
+
 # Notes:
 #
 #	0x0000-1fff	EPROM.low

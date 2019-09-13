@@ -24,8 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''
-This is the EPROM from the Commodore 900 hard disk controller.
+'''Commodore CBM900 - Hard Disk Controller
 
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''

@@ -25,6 +25,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP3455 Digital Voltmeter
+'''
+
 import os
 from pyreveng import job, mem, code, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc

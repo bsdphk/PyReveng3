@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP6034A System DC Power Supply
+'''
+
 import os
 from pyreveng import job, mem, listing, data, code
 import pyreveng.cpu.tms9900 as tms9900

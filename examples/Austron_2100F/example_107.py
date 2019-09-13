@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''Austron 2100F Loran-C Frequency Receiver
+'''
+
 import os
 from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.mc6800 as mc6800

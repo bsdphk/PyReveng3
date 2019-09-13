@@ -24,8 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''
-This is the EPROM from the Commodore 900 floppy disk controller.
+'''Commodore CBM900 - Floppy controller
 
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''

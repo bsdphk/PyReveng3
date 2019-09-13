@@ -24,9 +24,10 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for Intel MCS4 ("Worlds first") microprocessor
-"""
+'''Intel 4004/MCS-4
+
+"Worlds First Micro Processor"
+'''
 
 from pyreveng import assy
 

@@ -23,14 +23,11 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
 
-"""
-MC68881/68882 floating point instructions
+'''Motorola MC68881/882 Floating Point Coprocessor
 
 Page numbers with '*' reference MC68881/68882 USER's MANUAL (MC68881UM/AD Rev2)
-
-"""
+'''
 
 from pyreveng import assy, data, mem
 from pyreveng.cpu.m68000 import *

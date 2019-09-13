@@ -28,9 +28,8 @@
 # XXX: But how does "A *R2+, R2" behave  ?
 # XXX: and what about "A *R2+, *R2+" ?
 
-"""
-Disassembler for TI TMS9900 microprocessor
-"""
+'''Texas Instruments TMS9990
+'''
 
 from pyreveng import assy, data
 

@@ -23,10 +23,11 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
+#
+# INDEX CPU HP1345 Graphical Display Processor
 
-"""
-Disassembler for HP1345A graphical primitives
-"""
+'''HP1345A Vector Graphics Processor
+'''
 
 from pyreveng import assy
 

@@ -25,12 +25,8 @@
 # SUCH DAMAGE.
 
 
-"""
-Disassembler for Z8001
-
-This is prepared for Z8002 as well, but I lack a sample image.
-
-"""
+'''Zilog Z8000
+'''
 
 from pyreveng import assy, data, mem
 
@@ -692,7 +688,7 @@ class z8000_ins(assy.Instree_ins):
         raise assy.Invalid("CTL REG 0x%x" % self['ctl'])
 
     def assy_Data(self, pj):
-        d = pj.m.bu16(self.hi)
+        d = self.lang.as_mem.bu16(self.hi)
         self.hi += 2
         if not self.word:
             #if (d >> 8) != (d & 0xff):
@@ -700,7 +696,7 @@ class z8000_ins(assy.Instree_ins):
             return "#0x%x" % (d & 0xff)
         if self.word == 2:
             d <<= 16
-            d |= pj.m.bu16(self.hi)
+            d |= self.lang.as_mem.bu16(self.hi)
             self.hi += 2
         return "#0x%x" % d
 
@@ -772,14 +768,14 @@ class z8000_ins(assy.Instree_ins):
     def assy_Rel7(self, pj):
         d = self['disp'] << 1
         self.dstadr = self.hi - d
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
 
     def assy_Rel8(self, pj):
         d = self['disp']
         if d & 0x80:
             d -= 0x100
         self.dstadr = self.hi + d * 2
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
 
     def assy_Rs(self, pj):
         return self.reg(self['rs'])
@@ -824,11 +820,11 @@ class z8001_ins(z8000_ins):
         return "RR%d" % rn
 
     def seg(self, pj):
-        a1 = pj.m.bu16(self.hi)
+        a1 = self.lang.as_mem.bu16(self.hi)
         self.hi += 2
         if a1 < 0x8000:
             return (a1 >> 8, a1 & 0xff)
-        a2 = pj.m.bu16(self.hi)
+        a2 = self.lang.as_mem.bu16(self.hi)
         self.hi += 2
         return ((a1 >> 8) & 0x7f, a2)
 
@@ -839,7 +835,7 @@ class z8001_ins(z8000_ins):
     def assy_Dst(self, pj):
         a1, a2 = self.seg(pj)
         self.dstadr = a2    # XXX
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
 
 
 class z8001(assy.Instree_disass):
@@ -852,16 +848,16 @@ class z8001(assy.Instree_disass):
         self.add_ins(z8000_desc, z8001_ins)
 
     def codeptr(self, pj, adr):
-        y = data.Codeptr(pj, adr, adr + 4, pj.m.bu32(adr) & 0x7f00ffff)
+        y = data.Codeptr(pj, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
         pj.todo(y.dst, self.disass)
         return y
 
     def vector(self, pj, a, n):
         pj.set_label(a, n + "_RSV")
-        data.Const(pj, a, a + 2, func=pj.m.bu16, size=2, fmt="0x%04x")
+        data.Const(pj, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         pj.set_label(a, n + "_PSW")
-        data.Const(pj, a, a + 2, func=pj.m.bu16, size=2, fmt="0x%04x")
+        data.Const(pj, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         y = self.codeptr(pj, a)
         pj.todo(y.dst, self.disass)

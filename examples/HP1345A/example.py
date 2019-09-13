@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP1345 - Built-in Diagnostic processor
+'''
+
 import os
 from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.mcs48 as mcs48

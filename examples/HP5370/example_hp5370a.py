@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP5370A Time Interval Counter
+'''
+
 from pyreveng import listing, code, seven_segment
 from . import utils
 

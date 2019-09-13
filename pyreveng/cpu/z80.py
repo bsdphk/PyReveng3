@@ -25,9 +25,8 @@
 # SUCH DAMAGE.
 
 
-"""
-Partial disassembler for Z80
-"""
+'''Zilog Z80
+'''
 
 from pyreveng import assy, data
 

@@ -24,12 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for MC6809 familiy CPUs.
-
-Presently supported variants:
-	6809
-"""
+'''Motorola MC6809
+'''
 
 from pyreveng import assy, data
 

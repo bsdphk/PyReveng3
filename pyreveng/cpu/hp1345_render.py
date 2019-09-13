@@ -7,8 +7,6 @@
 # this stuff is worth it, you can buy me a beer in return.   Poul-Henning Kamp
 # ----------------------------------------------------------------------------
 #
-# HP1345A display emulation
-#
 
 import math
 

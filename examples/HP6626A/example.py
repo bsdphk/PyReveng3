@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP6626A Multiple Output Linear System DC Power Supply
+'''
+
 import os
 from pyreveng import job, mem, listing, data, code, assy, discover
 import pyreveng.cpu.mc6809 as mc6809

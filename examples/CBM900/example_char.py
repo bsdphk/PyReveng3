@@ -24,15 +24,13 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''
-This is the Low-Res character set EPROM(s) from the Commodore 900.
+'''Commodore CBM900 - Low-Res Character Set
 
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
 import os
 from pyreveng import job, mem, code, data, misc, listing, charset
-import pyreveng.cpu.z8000 as z8000
 
 def mem_setup():
     m = mem.stackup(
@@ -45,7 +43,7 @@ def mem_setup():
 
 def setup():
     pj = job.Job(mem_setup(), "CBM900_CHAR")
-    cx = z8000.z8001()
+    cx = None
     return pj, cx
 
 def task(pj, cx):

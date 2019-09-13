@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''II Morrow Apollo 618C Loran - Display Controller
+'''
+
 # P1.0 + P1.1 = outher switch
 # P1.2 + P1.3 = inner switch
 # P1.4 3 right buttons

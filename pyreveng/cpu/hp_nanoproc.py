@@ -24,18 +24,12 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for HP 1820-1692 "nanoprocessor"
-
-No manuals have been found for this processor
-What we know has been gleaned from schematics
-and the "09411" files in bitsaver.org's HP1000
-software section.
+'''Hewlett Packard Nanoprocessor (1820-1692)
 
 NB:
 This disassembler is prepared for bank-switching, in that it
 assumes that the upper (0xf800) address bits are preserved.
-"""
+'''
 
 from pyreveng import assy
 

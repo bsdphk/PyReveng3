@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''II Morrow Apollo 618C Loran - Navigation Processor
+'''
+
 import os
 from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.i8086 as i8086

@@ -23,15 +23,9 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
-# Ideas:  "DEFAULT_VECTOR" to target having most vectors pointed at it
 
-"""
-Disassembler for M68010 familiy CPUs.
-
-Presently supported variants:
-	68010
-"""
+'''Motorola M68010
+'''
 
 from pyreveng import assy
 from pyreveng.cpu.m68000 import *

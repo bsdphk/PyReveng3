@@ -24,8 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''
-This is the boot EPROM(s) from the Commodore 900.
+'''Commodore CBM900 - Boot EPROM
 
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
@@ -46,29 +45,26 @@ def fc_outstr(pj, ins):
         y = data.Txt(pj, pj.m.bu32(ins.lo - 6), align=1, label=False)
         pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
 
-def mem_setup():
-    m = mem.mem_mapper()
+def setup():
     m0 = mem.stackup(
         files=(
             ("EPROM_C_900_boot-L_V_1.0.bin", "EPROM_C_900_boot-H_V_1.0.bin"),
         ),
         prefix=os.path.dirname(os.path.abspath(__file__)) + "/"
     )
-    m.add(m0, 0x00000000)
-    m.add(m0, 0x01000000, 0x01001016, 0x6800)
-    y = job.Leaf(None, 0x6800, 0x6800 + 0x1016, tag = "MAP SEG1")
-    y.compact = True
-    y.rendered = str(y)
-    m.insert(y)
-    print("[%x..%x]" % (m.lo, m.hi))
-    return m
 
-def setup():
-    pj = job.Job(mem_setup(), "CBM900_BOOT")
     cx = z8000.z8001()
+    cx.as_mem.add(m0, 0x00000000)
+    cx.as_mem.add(m0, 0x01000000, 0x01001016, 0x00006800)
     cx.flow_check.append(fc_outstr)
     cx.z8010_mmu(0xf8)
     cx.z8010_mmu(0xfc)
+
+    pj = job.Job(cx.as_mem, "CBM900_BOOT")
+    y = job.Leaf(None, 0x6800, 0x6800 + 0x1016, tag = "MAP SEG1")
+    y.compact = True
+    y.rendered = str(y)
+    pj.m.insert(y)
     return pj, cx
 
 def chargen(pj, a):

@@ -24,9 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Disassembler for Intel i8086 microprocessor
-"""
+'''Intel i8088/i8086
+'''
 
 from pyreveng import instree, assy, binutils
 

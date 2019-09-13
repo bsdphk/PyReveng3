@@ -44,9 +44,9 @@ class cpu():
         self.examples.append(example)
 
     def render(self, fo):
-        fo.write("* " + self.doc.split('\n')[0].strip() + '\n')
+        fo.write("* " + self.doc.split('\n')[0].strip() + '\n\n')
         if not self.examples:
-            fo.write("  (No in-project examples)\n")
+            fo.write("(No in-project examples)\n")
         for i in sorted(self.examples):
             i.render(fo)
         fo.write('\n')
@@ -66,7 +66,7 @@ class example():
         self.cpus.append(cpu)
 
     def render(self, fo):
-        fo.write("  * `" + self.name + "`\n")
+        fo.write("  * ```" + self.name + "```\n")
         if not self.doc:
             # print("Missing docstring in " + self.name)
             return

@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''HP3325 Synthesizer/Function Generator
+'''
+
 import os
 from pyreveng import job, mem, listing, code
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc

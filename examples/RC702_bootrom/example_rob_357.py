@@ -24,6 +24,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+'''Regnecentralen Piccolo - RC702 boot EPROM
+'''
+
 import os
 from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80

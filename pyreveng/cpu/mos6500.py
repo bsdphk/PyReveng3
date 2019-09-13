@@ -24,9 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''
-Disassembler for MOS6500 familiy CPUs.
-
+'''MOS Technology 6500 Family
 '''
 
 from pyreveng import assy, data
