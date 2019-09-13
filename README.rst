@@ -12,9 +12,8 @@ to handle any weird computer architecture I have ever encountered.
 Another important idea has been to make it easy to add a new
 disassembler, without having to deal with a lot of binary arithmetic,
 by taking in the instruction descriptions as they are typically
-found in manuals:
+found in manuals::
 
-```
     PUSH    r2      |0 1 0 1 0| reg |
     PUSH    sr      |0 0 0|sr |1 1 0|
     POP     W,ea    |1 0 0 0 1 1 1 1|mod|0 0 0| rm  |
@@ -23,7 +22,6 @@ found in manuals:
     XCHG    r,ea    |1 0 0 0 0 1 1|w|mod| reg | rm  |
     XCHG    W,a,r2  |1 0 0 1 0| reg |
     NOP     -       |1 0 0 1 0 0 0 0|
-```
 
 Disassemblers are not just for CPUs, they can also be used to
 analyze interpreted code instructions, graphical primitives
