@@ -47,7 +47,7 @@ class cpu():
         fo.write("* " + self.doc.split('\n')[0].strip() + '\n')
         fo.write("\n")
         if not self.examples:
-            fo.write("(No in-project examples)\n\n")
+            fo.write("  (No in-project examples)\n\n")
         for i in sorted(self.examples):
             i.render(fo)
 

@@ -44,7 +44,7 @@ Disassemblers and examples
 
 * Intel i8085
 
-(No in-project examples)
+  (No in-project examples)
 
 * Intel i8088/i8086
 
@@ -58,13 +58,9 @@ Disassemblers and examples
 
     HP8568A Spectrum Analyzer
 
-* Recognize Switch/case constructs
-
-(No in-project examples)
-
 * Motorola M68010
 
-(No in-project examples)
+  (No in-project examples)
 
 * Motorola M68020
 
@@ -72,15 +68,9 @@ Disassemblers and examples
 
     Rational R1000/400 - IOC EEPROM
 
-  * `R1000_400/example_FS_0.py`
-
-  * `R1000_400/example_IOC.py`
-
-  * `R1000_400/example_RECOVERY.py`
-
 * Motorola MC68881/882 Floating Point Coprocessor
 
-(No in-project examples)
+  (No in-project examples)
 
 * Motorola MC6800/MC68HC11
 
@@ -136,7 +126,7 @@ Disassemblers and examples
 
 * Data General Nova CPU
 
-(No in-project examples)
+  (No in-project examples)
 
 * Texas Instruments TMS9990
 
