@@ -48,555 +48,555 @@ DEFINED = (1 << 7)
 
 class MemError(Exception):
 
-	def __init__(self, adr, reason):
-		super().__init__()
-		self.adr = adr
-		self.reason = reason
-		self.value = ("0x%x:" % adr + str(self.reason),)
+    def __init__(self, adr, reason):
+        super().__init__()
+        self.adr = adr
+        self.reason = reason
+        self.value = ("0x%x:" % adr + str(self.reason),)
 
-	def __str__(self):
-		return repr(self.value)
+    def __str__(self):
+        return repr(self.value)
 
 class address_space():
 
-	"""
-	A vacuous address-space and base-class for actual address-spaces
-	and memory types
-	"""
+    '''
+    A vacuous address-space, memory-mapper and base-class for actual
+    address-spaces and memory types.
+    '''
 
-	def __init__(self, lo, hi, name=""):
-		assert lo <= hi
-		self.lo = lo
-		self.hi = hi
-		self.name = name
-		self.labels = dict()
-		self.block_comments = dict()
-		self.lcmt = dict()
-		l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-		self.apct = "0x%%0%dx" % l
-		self.t = tree.Tree(self.lo, self.hi)
-		self.comment_prefix = "; "
+    def __init__(self, lo, hi, name=""):
+        assert lo <= hi
+        self.lo = lo
+        self.hi = hi
+        self.name = name
+        self.labels = dict()
+        self.block_comments = dict()
+        self.line_comments = dict()
+        l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+        self.apct = "0x%%0%dx" % l
+        self.t = tree.Tree(self.lo, self.hi)
+        self.comment_prefix = "; "
 
-	def __repr__(self):
-		return "<address_space %s 0x%x-0x%x>" % (
-		    self.name, self.lo, self.hi
-		)
+    def __repr__(self):
+        return "<address_space %s 0x%x-0x%x>" % (
+            self.name, self.lo, self.hi
+        )
 
-	def __getitem__(self, adr):
-		b = self._off(adr)
-		raise MemError(adr, "Undefined")
+    def __getitem__(self, adr):
+        b = self._off(adr)
+        raise MemError(adr, "Undefined")
 
-	def __setitem__(self, adr, data):
-		b = self._off(adr)
-		raise MemError(adr, "Undefined")
+    def __setitem__(self, adr, data):
+        b = self._off(adr)
+        raise MemError(adr, "Undefined")
 
-	def __iter__(self):
-		for i in self.t:
-			yield i
+    def __iter__(self):
+        for i in self.t:
+            yield i
 
-	def set_apct(self, pct=None):
-		if pct is None:
-			l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-			pct = "0x%%0%dx" % l
-		self.apct = pct
+    def set_apct(self, pct=None):
+        if pct is None:
+            l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+            pct = "0x%%0%dx" % l
+        self.apct = pct
 
-	def adr(self, dst):
-		''' Render an address '''
-		l = self.labels.get(dst)
-		if l:
-			return l[0]
-		return "0x%x" % dst
+    def adr(self, dst):
+        ''' Render an address '''
+        l = self.labels.get(dst)
+        if l:
+            return l[0]
+        return "0x%x" % dst
 
-	def gaps(self):
-		ll = self.lo
-		for i in self.t:
-			if i.lo > ll:
-				yield ll, i.lo
-			ll = i.hi
-		if self.hi > ll:
-			yield ll, self.hi
+    def gaps(self):
+        ll = self.lo
+        for i in self.t:
+            if i.lo > ll:
+                yield ll, i.lo
+            ll = i.hi
+        if self.hi > ll:
+            yield ll, self.hi
 
-	def segments(self):
-		yield self, self.lo, self.hi
+    def segments(self):
+        yield self, self.lo, self.hi
 
-	def _off(self, adr):
-		if adr < self.lo:
-			raise MemError(adr, "Address too low")
-		if adr >= self.hi:
-			raise MemError(adr, "Address too high")
-		return adr - self.lo
+    def _off(self, adr):
+        if adr < self.lo:
+            raise MemError(adr, "Address too low")
+        if adr >= self.hi:
+            raise MemError(adr, "Address too high")
+        return adr - self.lo
 
-	def set_label(self, adr, lbl):
-		assert isinstance(lbl, str)
-		self.labels.setdefault(adr, []).append(lbl)
+    def set_label(self, adr, lbl):
+        assert isinstance(lbl, str)
+        self.labels.setdefault(adr, []).append(lbl)
 
-	def get_labels(self, adr):
-		return self.labels.get(adr)
+    def get_labels(self, adr):
+        return self.labels.get(adr)
 
-	def set_line_comment(self, adr, lcmt):
-		assert isinstance(lcmt, str)
-		self.lcmt[adr] = lcmt
+    def set_line_comment(self, adr, lcmt):
+        assert isinstance(lcmt, str)
+        self.line_comments[adr] = lcmt
 
-	def get_line_comment(self, adr):
-		return self.lcmt.get(adr)
+    def get_line_comment(self, adr):
+        return self.line_comments.get(adr)
 
-	def set_block_comment(self, adr, cmt):
-		self.block_comments.setdefault(adr, '')
-		self.block_comments[adr] += cmt + '\n'
+    def set_block_comment(self, adr, cmt):
+        self.block_comments.setdefault(adr, '')
+        self.block_comments[adr] += cmt + '\n'
 
-	def get_block_comments(self, adr):
-		return self.block_comments.get(adr)
+    def get_block_comments(self, adr):
+        return self.block_comments.get(adr)
 
-	def bytearray(self, lo, bcnt):
-		assert False
+    def bytearray(self, lo, bcnt):
+        assert False
 
-	def insert(self, leaf):
-		return self.t.insert(leaf)
+    def insert(self, leaf):
+        return self.t.insert(leaf)
 
-	def find_lo(self, adr):
-		return self.t.find_lo(adr)
+    def find_lo(self, adr):
+        return self.t.find_lo(adr)
 
-	def find_hi(self, adr):
-		return self.t.find_hi(adr)
+    def find_hi(self, adr):
+        return self.t.find_hi(adr)
 
 class mem_mapper():
 
-	def __init__(self):
-		self.map = []
-		self.seglist = []
-		self.lo = 1<<64
-		self.hi = 0
-		self.bits = 0
-		self.naked = address_space(0, 1)
+    def __init__(self):
+        self.map = []
+        self.seglist = []
+        self.lo = 1<<64
+        self.hi = 0
+        self.bits = 0
+        self.naked = address_space(0, 1)
 
-	def add(self, mem, low, high = None, offset = None):
-		if offset is None:
-			offset = 0
-		if high is None:
-			high = low + mem.hi - mem.lo
-		self.bits = mem.bits
-		self.comment_prefix = mem.comment_prefix
-		self.lo = min(self.lo, low)
-		self.hi = max(self.hi, high)
-		self.naked.lo = self.lo
-		self.naked.hi = self.hi
-		self.naked.set_apct()
-		self.apct = self.naked.apct
-		self.seglist.append((mem, low, high, offset))
-		self.map.append((mem, low, high, offset))
+    def add(self, mem, low, high = None, offset = None):
+        if offset is None:
+            offset = 0
+        if high is None:
+            high = low + mem.hi - mem.lo
+        self.bits = mem.bits
+        self.comment_prefix = mem.comment_prefix
+        self.lo = min(self.lo, low)
+        self.hi = max(self.hi, high)
+        self.naked.lo = self.lo
+        self.naked.hi = self.hi
+        self.naked.set_apct()
+        self.apct = self.naked.apct
+        self.seglist.append((mem, low, high, offset))
+        self.map.append((mem, low, high, offset))
 
-	def xlat(self, adr, fail=True):
-		for i, j in enumerate(self.map):
-			mem, low, high, offset = j
-			if low <= adr < high:
-				self.map.pop(i)
-				self.map.insert(0, j)
-				return mem, (adr - low) + offset
-		if fail:
-			raise MemError(adr, "Unmapped memory")   
-		return self.naked, 0
+    def xlat(self, adr, fail=True):
+        for i, j in enumerate(self.map):
+            mem, low, high, offset = j
+            if low <= adr < high:
+                self.map.pop(i)
+                self.map.insert(0, j)
+                return mem, (adr - low) + offset
+        if fail:
+            raise MemError(adr, "Unmapped memory")   
+        return self.naked, 0
 
-	def __iter__(self):
-		for i in self.naked:
-			yield i
-		return
-		for i in self.seglist:
-			for j in i:
-				yield j
+    def __iter__(self):
+        for i in self.naked:
+            yield i
+        return
+        for i in self.seglist:
+            for j in i:
+                yield j
 
-	def __getitem__(self, adr):
-		m, a = self.xlat(adr)
-		return m[a]
+    def __getitem__(self, adr):
+        m, a = self.xlat(adr)
+        return m[a]
 
-	def adr(self, dst):
-		''' Render an address '''
-		m, a = self.xlat(dst)
-		return m.adr(a)
+    def adr(self, dst):
+        ''' Render an address '''
+        m, a = self.xlat(dst)
+        return m.adr(a)
 
-	def segments(self):
-		for mem, low, high, offset in self.seglist:
-			yield mem, low, high
+    def segments(self):
+        for mem, low, high, offset in self.seglist:
+            yield mem, low, high
 
-	def xrd(self, adr):
-		m, a = self.xlat(adr)
-		return m[a]
+    def xrd(self, adr):
+        m, a = self.xlat(adr)
+        return m[a]
 
-	def set_label(self, adr, lbl):
-		m, a = self.xlat(adr, False)
-		m.set_label(a, lbl)
+    def set_label(self, adr, lbl):
+        m, a = self.xlat(adr, False)
+        m.set_label(a, lbl)
 
-	def get_labels(self, adr):
-		m, a = self.xlat(adr, False)
-		return m.get_labels(a)
+    def get_labels(self, adr):
+        m, a = self.xlat(adr, False)
+        return m.get_labels(a)
 
-	def set_block_comment(self, adr, lbl):
-		m, a = self.xlat(adr)
-		m.set_block_comment(a, lbl)
+    def set_block_comment(self, adr, lbl):
+        m, a = self.xlat(adr)
+        m.set_block_comment(a, lbl)
 
-	def get_block_comments(self, adr):
-		m, a = self.xlat(adr, False)
-		return m.get_block_comments(a)
+    def get_block_comments(self, adr):
+        m, a = self.xlat(adr, False)
+        return m.get_block_comments(a)
 
-	def set_line_comment(self, adr, lbl):
-		m, a = self.xlat(adr)
-		m.set_line_comment(a, lbl)
+    def set_line_comment(self, adr, lbl):
+        m, a = self.xlat(adr)
+        m.set_line_comment(a, lbl)
 
-	def get_line_comment(self, adr):
-		m, a = self.xlat(adr, False)
-		return m.get_line_comment(a)
+    def get_line_comment(self, adr):
+        m, a = self.xlat(adr, False)
+        return m.get_line_comment(a)
 
-	def find_lo(self, adr):
-		m, a = self.xlat(adr)
-		return m.find_lo(a)
+    def find_lo(self, adr):
+        m, a = self.xlat(adr)
+        return m.find_lo(a)
 
-	def find_hi(self, adr):
-		m, a = self.xlat(adr)
-		return m.find_hi(a)
+    def find_hi(self, adr):
+        m, a = self.xlat(adr)
+        return m.find_hi(a)
 
-	def bs16(self, adr):
-		m, a = self.xlat(adr)
-		return m.bs16(a)
+    def bs16(self, adr):
+        m, a = self.xlat(adr)
+        return m.bs16(a)
 
-	def bu16(self, adr):
-		m, a = self.xlat(adr)
-		return m.bu16(a)
+    def bu16(self, adr):
+        m, a = self.xlat(adr)
+        return m.bu16(a)
 
-	def bs32(self, adr):
-		m, a = self.xlat(adr)
-		return m.bs32(a)
+    def bs32(self, adr):
+        m, a = self.xlat(adr)
+        return m.bs32(a)
 
-	def bu32(self, adr):
-		m, a = self.xlat(adr)
-		return m.bu32(a)
+    def bu32(self, adr):
+        m, a = self.xlat(adr)
+        return m.bu32(a)
 
-	def bytearray(self, adr, l):
-		m, a = self.xlat(adr)
-		return m.bytearray(a, l)
+    def bytearray(self, adr, l):
+        m, a = self.xlat(adr)
+        return m.bytearray(a, l)
 
-	def gaps(self):
-		for glo,ghi in self.naked.gaps():
-			for mem, slo, shi, offset in self.map:
-				if ghi <= slo or glo >= shi:
-					continue
-				glo = max(glo, slo)
-				ghi = min(ghi, shi)
-				yield glo, ghi
+    def gaps(self):
+        for glo,ghi in self.naked.gaps():
+            for mem, slo, shi, offset in self.map:
+                if ghi <= slo or glo >= shi:
+                    continue
+                glo = max(glo, slo)
+                ghi = min(ghi, shi)
+                yield glo, ghi
 
-	def insert(self, leaf):
-		self.naked.insert(leaf)
-		ll = copy.copy(leaf)
-		mem, adr = self.xlat(ll.lo, False)
-		# XXX: are the $m.t in "absolute addresses" ?
-		mem.insert(ll)
+    def insert(self, leaf):
+        self.naked.insert(leaf)
+        ll = copy.copy(leaf)
+        mem, adr = self.xlat(ll.lo, False)
+        # XXX: are the $m.t in "absolute addresses" ?
+        mem.insert(ll)
 
 
 class word_mem(address_space):
 
-	"""
-	Word memory is characteristic for a lot of the earliest computers,
-	they could access exactly one word at a time, or possibly fractions
-	of a word, but the instruction set did not support any "super-size"
-	data types or access spanning multiple words.
+    """
+    Word memory is characteristic for a lot of the earliest computers,
+    they could access exactly one word at a time, or possibly fractions
+    of a word, but the instruction set did not support any "super-size"
+    data types or access spanning multiple words.
 
-	Typical examples:  Pretty much any decendant of Von Neumans early
-	computers down to most of the minicomputers from DEC and DG etc.
+    Typical examples:  Pretty much any decendant of Von Neumans early
+    computers down to most of the minicomputers from DEC and DG etc.
 
-	Largest supported word-width is 64 bits and 8 attributes.
-	"""
+    Largest supported word-width is 64 bits and 8 attributes.
+    """
 
-	def __init__(self, lo, hi, bits=8, attr=0):
-		assert lo < hi
-		assert bits > 0
-		assert bits <= 64
-		assert attr >= 0
-		assert attr <= 7
+    def __init__(self, lo, hi, bits=8, attr=0):
+        assert lo < hi
+        assert bits > 0
+        assert bits <= 64
+        assert attr >= 0
+        assert attr <= 7
 
-		super().__init__(lo, hi)
+        super().__init__(lo, hi)
 
-		self.bits = bits
-		self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
-		self.undef = "-" * ((bits + 3) // 4)
-		self.ascii = (bits & 7) == 0
-		self.lo = lo
-		self.hi = hi
-		self.attr = attr
-		l = hi - lo
+        self.bits = bits
+        self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
+        self.undef = "-" * ((bits + 3) // 4)
+        self.ascii = (bits & 7) == 0
+        self.lo = lo
+        self.hi = hi
+        self.attr = attr
+        l = hi - lo
 
-		self.msk = (1 << bits) - 1
-		self.amsk = (1 << attr) - 1
+        self.msk = (1 << bits) - 1
+        self.amsk = (1 << attr) - 1
 
-		if bits <= 8:
-			self.mt = ctypes.c_uint8
-		elif bits <= 16:
-			self.mt = ctypes.c_uint16
-		elif bits <= 32:
-			self.mt = ctypes.c_uint32
-		else:
-			self.mt = ctypes.c_uint64
+        if bits <= 8:
+            self.mt = ctypes.c_uint8
+        elif bits <= 16:
+            self.mt = ctypes.c_uint16
+        elif bits <= 32:
+            self.mt = ctypes.c_uint32
+        else:
+            self.mt = ctypes.c_uint64
 
-		self.m = (self.mt * l)()
+        self.m = (self.mt * l)()
 
-		self.at = ctypes.c_uint8
-		self.a = (self.at * l)()
+        self.at = ctypes.c_uint8
+        self.a = (self.at * l)()
 
-	def __repr__(self):
-		return "<word_mem 0x%x-0x%x, @%d bits, %d attr>" % (
-		    self.lo, self.hi, self.bits, self.attr)
+    def __repr__(self):
+        return "<word_mem 0x%x-0x%x, @%d bits, %d attr>" % (
+            self.lo, self.hi, self.bits, self.attr)
 
-	def __getitem__(self, adr):
-		"""Read location"""
-		b = self._off(adr)
-		if not self.a[b] & DEFINED:
-			raise MemError(adr, "Undefined")
-		return self.m[b]
+    def __getitem__(self, adr):
+        """Read location"""
+        b = self._off(adr)
+        if not self.a[b] & DEFINED:
+            raise MemError(adr, "Undefined")
+        return self.m[b]
 
-	def rd(self, adr):
-		return self[adr]
+    def rd(self, adr):
+        return self[adr]
 
-	def __setitem__(self, adr, dat):
-		"""Write location"""
-		if dat & ~self.msk:
-			raise MemError(adr, "Data too wide (0x%x)" % dat)
-		b = self._off(adr)
-		self.m[b] = self.mt(dat)
-		self.a[b] |= DEFINED
+    def __setitem__(self, adr, dat):
+        """Write location"""
+        if dat & ~self.msk:
+            raise MemError(adr, "Data too wide (0x%x)" % dat)
+        b = self._off(adr)
+        self.m[b] = self.mt(dat)
+        self.a[b] |= DEFINED
 
-	def wr(self, adr, dat):
-		self[adr] = dat
+    def wr(self, adr, dat):
+        self[adr] = dat
 
-	def get_attr(self, adr):
-		"""Get attributes"""
-		b = self._off(adr)
-		return self.a[b] & self.amsk
+    def get_attr(self, adr):
+        """Get attributes"""
+        b = self._off(adr)
+        return self.a[b] & self.amsk
 
-	def set_attr(self, adr, x):
-		"""Set attributes"""
-		if x & ~self.amsk:
-			raise MemError(adr, "Attribute too wide (0x%x)" % x)
-		b = self._off(adr)
-		self.a[b] |= x
+    def set_attr(self, adr, x):
+        """Set attributes"""
+        if x & ~self.amsk:
+            raise MemError(adr, "Attribute too wide (0x%x)" % x)
+        b = self._off(adr)
+        self.a[b] |= x
 
-	def clr_attr(self, adr, x):
-		"""Clear attributes"""
-		if x & ~self.amsk:
-			raise MemError(adr, "Attribute too big (0x%x)" % x)
-		b = self._off(adr)
-		self.a[b] &= ~x
+    def clr_attr(self, adr, x):
+        """Clear attributes"""
+        if x & ~self.amsk:
+            raise MemError(adr, "Attribute too big (0x%x)" % x)
+        b = self._off(adr)
+        self.a[b] &= ~x
 
-	def do_ascii(self, w):
-		"""Return an ASCII representation of a value"""
-		s = " |"
-		b = self.bits - 8
-		while b >= 0:
-			if w is None:
-				s += " "
-			else:
-				x = (w >> b) & 0xff
-				if x > 32 and x < 127:
-					s += "%c" % x
-				else:
-					s += " "
-			b -= 8
-		return s + "|"
+    def do_ascii(self, w):
+        """Return an ASCII representation of a value"""
+        s = " |"
+        b = self.bits - 8
+        while b >= 0:
+            if w is None:
+                s += " "
+            else:
+                x = (w >> b) & 0xff
+                if x > 32 and x < 127:
+                    s += "%c" % x
+                else:
+                    s += " "
+            b -= 8
+        return s + "|"
 
 class byte_mem(word_mem):
 
-	"""
-	Byte memory is characteristic for microcomputers, which
-	typically had very narrow busses, 4 or 8 bits, but instructions
-	for operating on wider types than the width of the bus.
+    """
+    Byte memory is characteristic for microcomputers, which
+    typically had very narrow busses, 4 or 8 bits, but instructions
+    for operating on wider types than the width of the bus.
 
-	This introduces the issue of "endianess" but this is not
-	really attribute of the memory, it is an attribute of the
-	CPU, instruction set or interpreted code, so we provide
-	both "sexes" and leave it up to everybody else to use the
-	right one.
-	"""
+    This introduces the issue of "endianess" but this is not
+    really attribute of the memory, it is an attribute of the
+    CPU, instruction set or interpreted code, so we provide
+    both "sexes" and leave it up to everybody else to use the
+    right one.
+    """
 
-	def __init__(self, lo, hi, attr=0):
-		super().__init__(lo, hi, 8, attr)
-		self.ncol = 4
-		self.ascii = True
+    def __init__(self, lo, hi, attr=0):
+        super().__init__(lo, hi, 8, attr)
+        self.ncol = 4
+        self.ascii = True
 
-	def bytearray(self, lo, bcnt):
-		i = self._off(lo)
-		return bytearray(self.m[i:i+bcnt])
+    def bytearray(self, lo, bcnt):
+        i = self._off(lo)
+        return bytearray(self.m[i:i+bcnt])
 
-	def u8(self, a):
-		"""Unsigned 8-bit byte"""
-		return self[a]
+    def u8(self, a):
+        """Unsigned 8-bit byte"""
+        return self[a]
 
-	def bu16(self, a):
-		"""Big Endian Unsigned 16-bit half-word"""
-		b = self[a] << 8
-		b |= self[a + 1]
-		return b
+    def bu16(self, a):
+        """Big Endian Unsigned 16-bit half-word"""
+        b = self[a] << 8
+        b |= self[a + 1]
+        return b
 
-	def bu32(self, a):
-		"""Big Endian Unsigned 32-bit word"""
-		b = self[a] << 24
-		b |= self[a + 1] << 16
-		b |= self[a + 2] << 8
-		b |= self[a + 3]
-		return b
+    def bu32(self, a):
+        """Big Endian Unsigned 32-bit word"""
+        b = self[a] << 24
+        b |= self[a + 1] << 16
+        b |= self[a + 2] << 8
+        b |= self[a + 3]
+        return b
 
-	def bu64(self, a):
-		"""Big Endian Unsigned 64-bit double-word"""
-		b = self[a] << 56
-		b |= self[a + 1] << 48
-		b |= self[a + 2] << 40
-		b |= self[a + 3] << 32
-		b |= self[a + 4] << 24
-		b |= self[a + 5] << 16
-		b |= self[a + 6] << 8
-		b |= self[a + 7]
-		return b
+    def bu64(self, a):
+        """Big Endian Unsigned 64-bit double-word"""
+        b = self[a] << 56
+        b |= self[a + 1] << 48
+        b |= self[a + 2] << 40
+        b |= self[a + 3] << 32
+        b |= self[a + 4] << 24
+        b |= self[a + 5] << 16
+        b |= self[a + 6] << 8
+        b |= self[a + 7]
+        return b
 
-	def lu16(self, a):
-		"""Little Endian Unsigned 16-bit half-word"""
-		b = self[a]
-		b |= self[a + 1] << 8
-		return b
+    def lu16(self, a):
+        """Little Endian Unsigned 16-bit half-word"""
+        b = self[a]
+        b |= self[a + 1] << 8
+        return b
 
-	def lu32(self, a):
-		"""Little Endian Unsigned 32-bit word"""
-		b = self[a]
-		b |= self[a + 1] << 8
-		b |= self[a + 2] << 16
-		b |= self[a + 3] << 24
-		return b
+    def lu32(self, a):
+        """Little Endian Unsigned 32-bit word"""
+        b = self[a]
+        b |= self[a + 1] << 8
+        b |= self[a + 2] << 16
+        b |= self[a + 3] << 24
+        return b
 
-	def lu64(self, a):
-		"""Little Endian Unsigned 64-bit double-word"""
-		b = self[a]
-		b |= self[a + 1] << 8
-		b |= self[a + 2] << 16
-		b |= self[a + 3] << 24
-		b |= self[a + 4] << 32
-		b |= self[a + 5] << 40
-		b |= self[a + 6] << 48
-		b |= self[a + 7] << 56
-		return b
+    def lu64(self, a):
+        """Little Endian Unsigned 64-bit double-word"""
+        b = self[a]
+        b |= self[a + 1] << 8
+        b |= self[a + 2] << 16
+        b |= self[a + 3] << 24
+        b |= self[a + 4] << 32
+        b |= self[a + 5] << 40
+        b |= self[a + 6] << 48
+        b |= self[a + 7] << 56
+        return b
 
-	def s8(self, a):
-		"""Signed 8-bit byte"""
-		b = self[a]
-		if b & 0x80:
-			b -= 256
-		return b
+    def s8(self, a):
+        """Signed 8-bit byte"""
+        b = self[a]
+        if b & 0x80:
+            b -= 256
+        return b
 
-	def bs16(self, a):
-		"""Big Endian Signed 16-bit half-word"""
-		b = self.bu16(a)
-		if b & 0x8000:
-			b -= 0x10000
-		return b
+    def bs16(self, a):
+        """Big Endian Signed 16-bit half-word"""
+        b = self.bu16(a)
+        if b & 0x8000:
+            b -= 0x10000
+        return b
 
-	def ls16(self, a):
-		"""Little Endian Signed 16-bit half-word"""
-		b = self.lu16(a)
-		if b & 0x8000:
-			b -= 0x10000
-		return b
+    def ls16(self, a):
+        """Little Endian Signed 16-bit half-word"""
+        b = self.lu16(a)
+        if b & 0x8000:
+            b -= 0x10000
+        return b
 
-	def bs32(self, a):
-		"""Big Endian Signed 32-bit word"""
-		b = self.bu32(a)
-		if b & 0x80000000:
-			b -= 0x100000000
-		return b
+    def bs32(self, a):
+        """Big Endian Signed 32-bit word"""
+        b = self.bu32(a)
+        if b & 0x80000000:
+            b -= 0x100000000
+        return b
 
-	def ls32(self, a):
-		"""Little Endian Signed 32-bit word"""
-		b = self.lu32(a)
-		if b & 0x80000000:
-			b -= 0x100000000
-		return b
+    def ls32(self, a):
+        """Little Endian Signed 32-bit word"""
+        b = self.lu32(a)
+        if b & 0x80000000:
+            b -= 0x100000000
+        return b
 
-	def bs64(self, a):
-		"""Big Endian Signed 64-bit double-word"""
-		b = self.bu64(a)
-		if b & 0x8000000000000000:
-			b -= 0x10000000000000000
-		return b
+    def bs64(self, a):
+        """Big Endian Signed 64-bit double-word"""
+        b = self.bu64(a)
+        if b & 0x8000000000000000:
+            b -= 0x10000000000000000
+        return b
 
-	def ls64(self, a):
-		"""Little Endian Signed 64-bit double-word"""
-		b = self.lu64(a)
-		if b & 0x8000000000000000:
-			b -= 0x10000000000000000
-		return b
+    def ls64(self, a):
+        """Little Endian Signed 64-bit double-word"""
+        b = self.lu64(a)
+        if b & 0x8000000000000000:
+            b -= 0x10000000000000000
+        return b
 
-	def load_data(self, first, step, data):
-		for i in data:
-			self[first] = i
-			first += step
+    def load_data(self, first, step, data):
+        for i in data:
+            self[first] = i
+            first += step
 
-	def load_binfile(self, first, step, filename, lo=0, hi=None):
-		fi = open(filename, "rb")
-		d = bytearray(fi.read())
-		fi.close()
-		if hi:
-			self.load_data(first, step, d[lo:hi])
-		else:
-			self.load_data(first, step, d[lo:])
+    def load_binfile(self, first, step, filename, lo=0, hi=None):
+        fi = open(filename, "rb")
+        d = bytearray(fi.read())
+        fi.close()
+        if hi:
+            self.load_data(first, step, d[lo:hi])
+        else:
+            self.load_data(first, step, d[lo:])
 
 def stackup(files, lo=0, prefix=""):
-	"""
-	Convenience function to stack a set of eproms into byte_mem.
-	'files' indicate the layout desired, and each element can be
-	just a filename or an iterable of filenames:
+    """
+    Convenience function to stack a set of eproms into byte_mem.
+    'files' indicate the layout desired, and each element can be
+    just a filename or an iterable of filenames:
 
-		files = (
-			"singlelane",
-			("highbyte", "lowbyte"),
-			("topbyte", "midhibyte", "midlobyte", "lobyte"),
-		)
+        files = (
+            "singlelane",
+            ("highbyte", "lowbyte"),
+            ("topbyte", "midhibyte", "midlobyte", "lobyte"),
+        )
 
-	'prefix' is used for all filenames.
+    'prefix' is used for all filenames.
 
-	See also:
-		examples/HP3335A
-		examples/HP8568A
+    See also:
+        examples/HP3335A
+        examples/HP8568A
 
-	"""
-	l = []
-	hi = lo
-	for r in files:
-		l.append([])
-		if isinstance(r, str):
-			b = open(prefix + r, "rb").read()
-			hi += len(b)
-			l[-1].append(b)
-		else:
-			for i in r:
-				b = open(prefix + i, "rb").read()
-				hi += len(b)
-				l[-1].append(b)
-	m = byte_mem(lo, hi)
-	p = lo
-	for r in l:
-		stride = len(r)
-		ll = len(r[0])
-		o = stride
-		for i in r:
-			o -= 1
-			pp = p + o
-			for j in i:
-				m[pp] = j
-				pp += stride
-		p += stride * ll
-	print(m)
-	return m
+    """
+    l = []
+    hi = lo
+    for r in files:
+        l.append([])
+        if isinstance(r, str):
+            b = open(prefix + r, "rb").read()
+            hi += len(b)
+            l[-1].append(b)
+        else:
+            for i in r:
+                b = open(prefix + i, "rb").read()
+                hi += len(b)
+                l[-1].append(b)
+    m = byte_mem(lo, hi)
+    p = lo
+    for r in l:
+        stride = len(r)
+        ll = len(r[0])
+        o = stride
+        for i in r:
+            o -= 1
+            pp = p + o
+            for j in i:
+                m[pp] = j
+                pp += stride
+        p += stride * ll
+    print(m)
+    return m
 
 
 if __name__ == "__main__":
-	m = word_mem(0x0000, 0x1000, bits=64, attr=3)
-	print(m)
-	print(type(m.m), ctypes.sizeof(m.m))
-	m.wr(0x100, 0x123456789)
-	print("%x" % m[0x100])
-	print(m.get_attr(0x100))
-	print(m.get_attr(0x101))
-	print(m.set_attr(0x101, 4))
-	print(m.get_attr(0x101))
+    m = word_mem(0x0000, 0x1000, bits=64, attr=3)
+    print(m)
+    print(type(m.m), ctypes.sizeof(m.m))
+    m.wr(0x100, 0x123456789)
+    print("%x" % m[0x100])
+    print(m.get_attr(0x100))
+    print(m.get_attr(0x101))
+    print(m.set_attr(0x101, 4))
+    print(m.get_attr(0x101))
