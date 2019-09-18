@@ -241,6 +241,5 @@ class Discover():
 				c = self.code[i]
 				c.lcmt += "<discover>\n"
 				c.commit(self.pj)
-				self.pj.insert(c)
 				n += 1
 		print("Committed", n)
