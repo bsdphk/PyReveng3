@@ -107,7 +107,7 @@ class Code(Leaf):
     A single undivisible "instruction" in some language
     '''
     def __init__(self, pj, lo, hi, lang):
-        assert isinstance(lang, Decode)
+        assert isinstance(lang, Decoder)
         self.lang = lang
         super().__init__(pj, lo, hi, lang.name)
         self.flow_in = []
@@ -133,7 +133,7 @@ class Code(Leaf):
 
 #######################################################################
 
-class Decode():
+class Decoder():
     '''
     Base class for decoding code.
     '''
