@@ -140,11 +140,11 @@ class Txt(Data):
 			raise Exception("unknown pfx")
 		elif hi is None:
 			hi, s, v = stringify(pj, lo, term=term)
+			while hi % align:
+				hi += 1
 		else:
 			hi, s, v = stringify(pj, lo, hi - lo, term=term)
 
-		while hi % align:
-			hi += 1
 		super().__init__(pj, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"
