@@ -487,16 +487,12 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 class vector(data.Data):
 	def __init__(self, pj, adr, cx):
 		super().__init__(pj, adr, adr + 4)
-		self.ws = data.Dataptr(pj, adr + 0x00, adr + 0x02,
-		    pj.m.bu16(adr))
-		self.ip = cx.codeptr(pj, adr + 0x02)
-		self.dstadr = self.ip.dst
+		self.ws = pj.m.bu16(adr)
+		self.dstadr = pj.m.bu16(adr + 2)
+		pj.todo(self.dstadr, cx.disass)
 
 	def render(self, pj):
-		return self.ws.render(pj) + "; " + self.ip.render(pj)
-
-	def arg_render(self, pj):
-		return self.ip.arg_render(pj)
+		return "WP=0x%04x,IP=%s" % (self.ws, pj.m.adr(self.dstadr))
 
 
 class Tms9900_ins(assy.Instree_ins):
@@ -532,7 +528,6 @@ class Tms9900_ins(assy.Instree_ins):
 			except:
 				return assy.Arg_dst(pj, v, "@")
 
-			# print("XXX", "%04x" % v, "%04x" % w, self.mne)
 			if self.mne[-1] == "b":
 				c = data.Const(pj, v, v + 1)
 				c.typ = ".BYTE"
@@ -556,7 +551,8 @@ class Tms9900_ins(assy.Instree_ins):
 	def assy_blwp1(self, pj):
 		a = self['ptr']
 		self.cache['blwp1'] = pj.m.bu16(a)
-		data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+		if not pj.m.find_lo(a):
+			data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
 		return "WP=0x%04x" % pj.m.bu16(a)
 
 	def assy_blwp2(self, pj):
