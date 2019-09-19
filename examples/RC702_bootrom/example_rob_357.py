@@ -48,7 +48,6 @@ def setup():
 def task(pj, cx):
 	data.Txt(pj, 0xa533, label=False)
 	data.Txt(pj, 0xa546, label=False)
-	data.Txt(pj, 0xa571, label=False)
 	data.Txt(pj, 0xa574, label=False)
 	data.Txt(pj, 0xa593, 0xa593 + 0x7, label=False)
 

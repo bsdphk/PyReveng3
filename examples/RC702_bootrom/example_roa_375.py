@@ -46,6 +46,16 @@ def setup():
 	return pj, cx
 
 def task(pj, cx):
+
+	data.Txt(pj, 0x7071, 0x7071 + 0x6, label=False)
+	data.Txt(pj, 0x7077, 0x7077 + 0x6, label=False)
+	data.Txt(pj, 0x707d, 0x707d + 0x15, label=False)
+	data.Txt(pj, 0x7092, 0x7092 + 0x1e, label=False)
+	data.Txt(pj, 0x70b0, 0x70b0 + 0x10, label=False)
+	data.Txt(pj, 0x70c3, 0x70c3 + 0x5, label=False)
+	data.Txt(pj, 0x70c8, 0x70c8 + 0x5, label=False)
+	data.Txt(pj, 0x73f0, 0x73f0 + 0x12, label=False)
+
 	pj.todo(0x0000, cx.disass)
 
 	# 0x70e5
@@ -65,13 +75,6 @@ def task(pj, cx):
 	# Interrupt vector table
 	for a in range(16):
 		cx.codeptr(pj, 0x7300 + a * 2)
-
-	data.Txt(pj, 0x707d, 0x707d + 0x14, label=False)
-	data.Txt(pj, 0x70b0, 0x70b0 + 0xf, label=False)
-	data.Txt(pj, 0x7092, 0x7092 + 0x1d, label=False)
-	data.Txt(pj, 0x73f0, 0x73f0 + 0x12, label=False)
-	data.Txt(pj, 0x7071, 0x7071 + 0x6, label=False)
-	data.Txt(pj, 0x7077, 0x7077 + 0x6, label=False)
 
 	discover.Discover(pj, cx)
 
