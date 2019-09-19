@@ -158,8 +158,6 @@ def task(pj, cx):
 			cx.codeptr(pj, 0x23c + i)
 
 	if True:
-		cx.vector(pj, 0x364)
-		cx.vector(pj, 0x368)
 		pj.todo(0x037c, cx.disass)
 		pj.todo(0x038e, cx.disass)
 		pj.todo(0x03aa, cx.disass)

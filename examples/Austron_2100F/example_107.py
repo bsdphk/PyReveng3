@@ -75,7 +75,7 @@ def w16t(pj, lo, hi):
 		w16(pj, a)
 
 def w32t(pj, lo, hi):
-	for a in range(lo, hi, 2):
+	for a in range(lo, hi, 4):
 		w32(pj, a)
 
 def codet(pj, cx, lo, hi):
