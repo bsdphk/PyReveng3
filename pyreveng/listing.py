@@ -194,7 +194,7 @@ class Seg_Listing():
             while len((r + "\t").expandtabs()) < 32:
                 r += "\t"
             while len((r + " ").expandtabs()) < 32:
-               r += " "
+                r += " "
             if i < len(lcmt):
                 l = self.pj.m.comment_prefix + lcmt[i]
             elif self.pj.m.get_line_comment(a):

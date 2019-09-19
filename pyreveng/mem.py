@@ -161,13 +161,18 @@ class address_space():
 
 class mem_mapper():
 
-    def __init__(self):
+    def __init__(self, lo = None, hi = None):
         self.map = []
         self.seglist = []
-        self.lo = 1<<64
-        self.hi = 0
+        if lo is None:
+            lo = 1<<64
+        if hi is None:
+            hi = 0
+        self.lo = lo
+        self.hi = hi
         self.bits = 0
         self.naked = address_space(0, 1)
+        self.xlat = self.xlat1
 
     def add(self, mem, low, high = None, offset = None):
         if offset is None:
@@ -184,8 +189,14 @@ class mem_mapper():
         self.apct = self.naked.apct
         self.seglist.append((mem, low, high, offset))
         self.map.append((mem, low, high, offset))
+        if len(self.map) > 1:
+            self.xlat = self.xlatN
 
-    def xlat(self, adr, fail=True):
+    def xlat1(self, adr, fail=True):
+        mem, low, high, offset = self.map[0]
+        return mem, (adr - low) + offset
+
+    def xlatN(self, adr, fail=True):
         for i, j in enumerate(self.map):
             mem, low, high, offset = j
             if low <= adr < high:
@@ -257,6 +268,10 @@ class mem_mapper():
         m, a = self.xlat(adr)
         return m.bs16(a)
 
+    def lu16(self, adr):
+        m, a = self.xlat(adr)
+        return m.lu16(a)
+
     def bu16(self, adr):
         m, a = self.xlat(adr)
         return m.bu16(a)
@@ -268,6 +283,22 @@ class mem_mapper():
     def bu32(self, adr):
         m, a = self.xlat(adr)
         return m.bu32(a)
+
+    def lu64(self, adr):
+        m, a = self.xlat(adr)
+        return m.lu64(a)
+
+    def ls64(self, adr):
+        m, a = self.xlat(adr)
+        return m.ls64(a)
+
+    def bs64(self, adr):
+        m, a = self.xlat(adr)
+        return m.bs64(a)
+
+    def bu64(self, adr):
+        m, a = self.xlat(adr)
+        return m.bu64(a)
 
     def bytearray(self, adr, l):
         m, a = self.xlat(adr)

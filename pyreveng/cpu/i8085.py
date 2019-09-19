@@ -30,7 +30,7 @@
 Page references to "8085 Instruction Set.pdf"
 '''
 
-from pyreveng import instree, assy, data
+from pyreveng import instree, assy, data, mem
 
 i8085_desc="""
 # pg2			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
@@ -453,174 +453,175 @@ SIM	-		|0 0 1 1 0 0 0 0| {
 """
 
 if __name__ == "__main__":
-	print(i8085_instructions)
-	it = instree.Instree(8)
-	it.load_string(i8085_instructions)
-	it.print()
+    print(i8085_instructions)
+    it = instree.Instree(8)
+    it.load_string(i8085_instructions)
+    it.print()
 
 class i8085_ins(assy.Instree_ins):
-	def __init__(self, pj, lim, lang):
-		super(i8085_ins, self).__init__(pj, lim, lang)
-		self.seg = ""
+    def __init__(self, pj, lim, lang):
+        super(i8085_ins, self).__init__(pj, lim, lang)
+        self.seg = ""
 
-	def assy_cmdx(self, pj):
-		c = self['cmd']
-		l = c & 0x0f
-		if c & 0xd0 == 0x00:
-			s = "REG=0x%x" % l
-			r = I7220_REGS.get(l)
-			if c & 0x20:
-				s += " M"
-			if r is not None:
-				s += " - " + r
-			return s
-		if c & 0xf0 == 0x10:
-			return "CMD=0x%x - " % l + I7220_CMDS[l]
-		return "0x%02x" % c
+    def assy_cmdx(self, pj):
+        c = self['cmd']
+        l = c & 0x0f
+        if c & 0xd0 == 0x00:
+            s = "REG=0x%x" % l
+            r = I7220_REGS.get(l)
+            if c & 0x20:
+                s += " M"
+            if r is not None:
+                s += " - " + r
+            return s
+        if c & 0xf0 == 0x10:
+            return "CMD=0x%x - " % l + I7220_CMDS[l]
+        return "0x%02x" % c
 
-	def assy_r2(self, pj):
-		r = self['sss']
-		if r == 6:
-			raise assy.Invalid('0x%x rs=6' % self.lo)
-		return "BCDEHL-A"[r]
+    def assy_r2(self, pj):
+        r = self['sss']
+        if r == 6:
+            raise assy.Invalid('0x%x rs=6' % self.lo)
+        return "BCDEHL-A"[r]
 
-	def assy_r1(self, pj):
-		r = self['ddd']
-		if r == 6:
-			raise assy.Invalid('0x%x rd=6' % self.lo)
-		return "BCDEHL-A"[r]
+    def assy_r1(self, pj):
+        r = self['ddd']
+        if r == 6:
+            raise assy.Invalid('0x%x rd=6' % self.lo)
+        return "BCDEHL-A"[r]
 
-	def assy_cc(self, pj):
-		self.cc = (
-		    'nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm')[self['cc']]
-		self.mne += self.cc
+    def assy_cc(self, pj):
+        self.cc = (
+            'nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm')[self['cc']]
+        self.mne += self.cc
 
-	def assy_rp(self, pj):
-		rp = self['rp']
-		if rp == 3:
-			raise assy.Invalid('0x%x RP=3' % self.lo)
-		return ('BC', 'DE', 'HL')[rp]
+    def assy_rp(self, pj):
+        rp = self['rp']
+        if rp == 3:
+            raise assy.Invalid('0x%x RP=3' % self.lo)
+        return ('BC', 'DE', 'HL')[rp]
 
-	def assy_II(self, pj):
-		return "#0x%02x%02x" % (self['immh'], self['imml'])
+    def assy_II(self, pj):
+        return "#0x%02x%02x" % (self['immh'], self['imml'])
 
-	def assy_n(self, pj):
-		self.dstadr = 8 * self['n']
-		return "#%d" % self['n']
-		# return assy.Arg_dst(pj, self.dstadr)
+    def assy_n(self, pj):
+        self.dstadr = 8 * self['n']
+        return "#%d" % self['n']
+        # return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_I(self, pj):
-		return "#0x%02x" % self['imm']
+    def assy_I(self, pj):
+        return "#0x%02x" % self['imm']
 
-	def assy_a(self, pj):
-		self.dstadr = self['hi'] << 8 | self['lo']
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_a(self, pj):
+        self.dstadr = self['hi'] << 8 | self['lo']
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def pilmacro_RD(self):
-		return "%%%s" % "BCDEHL-A"[self['ddd']]
+    def pilmacro_RD(self):
+        return "%%%s" % "BCDEHL-A"[self['ddd']]
 
-	def pilmacro_RS(self):
-		return "%%%s" % "BCDEHL-A"[self['sss']]
+    def pilmacro_RS(self):
+        return "%%%s" % "BCDEHL-A"[self['sss']]
 
-	def pilmacro_IMM(self):
-		return "#0x%02x" % self['imm']
+    def pilmacro_IMM(self):
+        return "#0x%02x" % self['imm']
 
-	def pilmacro_IMMH(self):
-		return "#0x%02x" % self['immh']
+    def pilmacro_IMMH(self):
+        return "#0x%02x" % self['immh']
 
-	def pilmacro_IMML(self):
-		return "#0x%02x" % self['imml']
+    def pilmacro_IMML(self):
+        return "#0x%02x" % self['imml']
 
-	def pilmacro_IMM16(self):
-		return "#0x%02x%02x" % (self['immh'], self['imml'])
+    def pilmacro_IMM16(self):
+        return "#0x%02x%02x" % (self['immh'], self['imml'])
 
-	def pilmacro_ADR(self):
-		return "0x%02x%02x" % (self['hi'], self['lo'])
+    def pilmacro_ADR(self):
+        return "0x%02x%02x" % (self['hi'], self['lo'])
 
-	def pilmacro_PORT(self):
-		return "0x%02x" % self['p']
+    def pilmacro_PORT(self):
+        return "0x%02x" % self['p']
 
-	def pilmacro_NADR(self):
-		return "0x%02x" % (self['n'] << 3)
+    def pilmacro_NADR(self):
+        return "0x%02x" % (self['n'] << 3)
 
-	def pilmacro_RP(self):
-		return "%%%s" % ["BC", "DE", "HL", "SP"][self['rp']]
+    def pilmacro_RP(self):
+        return "%%%s" % ["BC", "DE", "HL", "SP"][self['rp']]
 
-	def pilmacro_RP1(self):
-		return "%%%s" % "BDH"[self['rp']]
+    def pilmacro_RP1(self):
+        return "%%%s" % "BDH"[self['rp']]
 
-	def pilmacro_RP2(self):
-		return "%%%s" % "CEL"[self['rp']]
+    def pilmacro_RP2(self):
+        return "%%%s" % "CEL"[self['rp']]
 
-	def pilmacro_HI(self):
-		return "0x%x" % self.hi
+    def pilmacro_HI(self):
+        return "0x%x" % self.hi
 
-	def pilfunc_ZSP(self, arg):
-		self.add_il([
-			[ "%F.z", "=", "icmp", "eq", "i8", arg[0], ",", "0" ],
-			[ "%F.s", "=", "icmp", "gt", "i8", arg[0], ",", "0x7f" ],
-			[ "%F.p", "=", "pyreveng.parity.odd.i1", "(", arg[0], ")" ],
-		])
+    def pilfunc_ZSP(self, arg):
+        self.add_il([
+            [ "%F.z", "=", "icmp", "eq", "i8", arg[0], ",", "0" ],
+            [ "%F.s", "=", "icmp", "gt", "i8", arg[0], ",", "0x7f" ],
+            [ "%F.p", "=", "pyreveng.parity.odd.i1", "(", arg[0], ")" ],
+        ])
 
-	def pilfunc_JCC(self, arg):
-		i = self['cc']
-		b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
-		if i & 1:
-			a1 = arg[0]
-			a2 = "0x%x" % self.hi
-		else:
-			a1 = "0x%x" % self.hi
-			a2 = arg[0]
-		self.add_il([
-			["br", "i1", b, "label", a1, ",", "label", a2 ],
-		])
+    def pilfunc_JCC(self, arg):
+        i = self['cc']
+        b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
+        if i & 1:
+            a1 = arg[0]
+            a2 = "0x%x" % self.hi
+        else:
+            a1 = "0x%x" % self.hi
+            a2 = arg[0]
+        self.add_il([
+            ["br", "i1", b, "label", a1, ",", "label", a2 ],
+        ])
 
-	def pilfunc_JNCC(self, arg):
-		i = self['cc']
-		b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
-		if i & 1:
-			a1 = arg[0]
-			a2 = "0x%x" % self.hi
-		else:
-			a1 = "0x%x" % self.hi
-			a2 = arg[0]
-		self.add_il([
-			["br", "i1", b, "label", a2, ",", "label", a1 ],
-		])
+    def pilfunc_JNCC(self, arg):
+        i = self['cc']
+        b = ["%F.z", "%F.cy", "%F.p", "%F.s"][i >> 1]
+        if i & 1:
+            a1 = arg[0]
+            a2 = "0x%x" % self.hi
+        else:
+            a1 = "0x%x" % self.hi
+            a2 = arg[0]
+        self.add_il([
+            ["br", "i1", b, "label", a2, ",", "label", a1 ],
+        ])
 
 
 class i8085(assy.Instree_disass):
-	def __init__(self):
-		super().__init__("i8085", 8)
-		self.add_ins(i8085_desc, i8085_ins)
-		self.verbatim |= set ((
-		    "(HL)",
-		    "BC",
-		    "DE",
-		    "SP",
-		    "PSW",
-		))
+    def __init__(self):
+        super().__init__("i8085", 8)
+        self.m = mem.mem_mapper(0x0000, 0x10000)
+        self.add_ins(i8085_desc, i8085_ins)
+        self.verbatim |= set ((
+            "(HL)",
+            "BC",
+            "DE",
+            "SP",
+            "PSW",
+        ))
 
-	def vectors(self, pj):
-		for l,a in (
-			("RESET", 	0x0000),
-			("TRAP", 	0x0024),
-			("RST1",	0x0008),
-			("RST2",	0x0010),
-			("RST3",	0x0018),
-			("RST4",	0x0020),
-			("RST5",	0x0028),
-			("RST5.5",	0x002c),
-			("RST6",	0x0030),
-			("RST6.5",	0x0034),
-			("RST7",	0x0038),
-			("RST7.5",	0x003c),
-		):
-			pj.todo(a, self.disass)
-			pj.set_label(a, l)
+    def vectors(self, pj):
+        for l,a in (
+            ("RESET",     0x0000),
+            ("TRAP",     0x0024),
+            ("RST1",    0x0008),
+            ("RST2",    0x0010),
+            ("RST3",    0x0018),
+            ("RST4",    0x0020),
+            ("RST5",    0x0028),
+            ("RST5.5",    0x002c),
+            ("RST6",    0x0030),
+            ("RST6.5",    0x0034),
+            ("RST7",    0x0038),
+            ("RST7.5",    0x003c),
+        ):
+            pj.todo(a, self.disass)
+            pj.set_label(a, l)
 
-	def codeptr(self, pj, adr):
-		t = pj.m.lu16(adr)
-		c = data.Codeptr(pj, adr, adr + 2, t)
-		pj.todo(t, self.disass)
-		return c
+    def codeptr(self, pj, adr):
+        t = self.m.lu16(adr)
+        c = data.Codeptr(pj, adr, adr + 2, t)
+        pj.todo(t, self.disass)
+        return c
