@@ -118,23 +118,33 @@ def setup():
 
 #######################################################################
 
+DATA = {}
+
 def data_double(pj, a):
-	return data.Pstruct(pj, a, ">d", "%g", ".DOUBLE")
+	y = DATA.get(a)
+	if not y:
+		y = data.Pstruct(pj, a, ">d", "%g", ".DOUBLE")
+		y.val = y.data[0]
+		DATA[a] = y
+	return y
 
 def data_float(pj, a):
-	y = data.Data(pj, a, a + 4)
-	x = pj.m.bu32(a)
-	e = x & 0xff
-	if e & 0x80:
-		e -= 0x100
-	m = x >> 8
-	s = m >> 23
-	m &= 0x7fffff
-	y.val = m * (2.0 ** (e - 22.0))
-	if s:
-		y.val *= -1
-	y.fmt = ".FLOAT\t%g" % y.val
-	y.lcmt = "s=%d m=0x%06x e=%d" % (s,m,e)
+	y = DATA.get(a)
+	if not y:
+		y = data.Data(pj, a, a + 4)
+		x = pj.m.bu32(a)
+		e = x & 0xff
+		if e & 0x80:
+			e -= 0x100
+		m = x >> 8
+		s = m >> 23
+		m &= 0x7fffff
+		y.val = m * (2.0 ** (e - 22.0))
+		if s:
+			y.val *= -1
+		y.fmt = ".FLOAT\t%g" % y.val
+		y.lcmt = "s=%d m=0x%06x e=%d" % (s,m,e)
+		DATA[a] = y
 	return y
 
 def data_bcd(pj, a):
@@ -254,8 +264,9 @@ def task(pj, cpu):
 				r = ins.hi + pj.m.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
-				y = data.Pstruct(pj, r, ">L", "%d", ".LONG")
-				l.append("%d" % y.data[0])
+				if not pj.m.find_lo(r):
+					data.Pstruct(pj, r, ">L", "%d", ".LONG")
+				l.append("%d" % pj.m.bu32(r))
 			elif i == "frel":
 				r = ins.hi + pj.m.bs16(ins.hi)
 				ins.hi += 2
@@ -264,7 +275,7 @@ def task(pj, cpu):
 				l.append("%g" % y.val)
 			elif i == "bcd":
 				r = pj.m.bu16(ins.hi)
-				y = data.Pstruct(pj, ins.hi, ">H", "%x", ".BCD")
+				# y = data.Pstruct(pj, ins.hi, ">H", "%x", ".BCD")
 				l.append("%04x" % r)
 				ins.hi += 2
 			else:

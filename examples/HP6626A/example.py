@@ -356,6 +356,8 @@ def task(pj, cpu):
 			s += pj.render_adr(w)
 			return s
 
+	tt5s = {}
+
 	def tt5(a, f, l = None, ex = 0):
 		if l == None:
 			l = []
@@ -363,7 +365,8 @@ def task(pj, cpu):
 		while True:
 			ll = list(l)
 			if pj.m[a] == 0:
-				data.Const(pj, a, a + 1)
+				if not pj.m.find_lo(a):
+					data.Const(pj, a, a + 1)
 				break
 			t = pj.m[a]
 			if t in token:
@@ -376,15 +379,16 @@ def task(pj, cpu):
 				z = pj.m.bu16(ex)
 				# print("%04x" % a, "%04x" % z, "A %02x" % e, ll)
 				pj.set_label(z, "cmd_" + "_".join(ll))
-			tt_5(pj, a)
+			if a not in tt5s:
+				tt5s[a] = tt_5(pj, a)
 			x = pj.m.bu16(a + 2)
 			if x != 0:
 				tt5(x, f, ll, ex)
 			else:
-				# print("%04x" % a, ll, "%04x" % ex)
+				#print("%04x" % a, ll, "%04x" % ex)
 				y = pj.m.find_lo(ex)
 				y[0].lcmt += " ".join(ll) + "\n"
-				# print(y)
+				#print(y)
 
 			a += 4
 

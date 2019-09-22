@@ -130,6 +130,7 @@ class Seg_Listing():
                 self.fo.write(
                     "%s-%s [%s]\n" % (alo, ahi, i.tag))
             elif i.lo < a0:
+                print("OVERLAP i.lo %x a0 %x" % (i.lo, a0), i)
                 continue
             else:
                 self.render_chunk(
@@ -170,16 +171,12 @@ class Seg_Listing():
             self.fo.write("-" * w + "\n")
 
         lbl = self.pj.get_labels(lo)
-        if lbl is None:
-            lbl = "\t"
-        else:
+        if lbl:
             s = set()
             for x in lbl:
-                if x in s:
-                    continue
-                s.add(x)
-                self.fo.write("%s\t%s:\n" % (" " * hl, x))
-            lbl = "\t"
+                if x not in s:
+                    s.add(x)
+                    self.fo.write("%s\t%s:\n" % (" " * hl, x))
 
         for i in range(m):
             if i < len(hex):
@@ -201,7 +198,7 @@ class Seg_Listing():
                 l = self.pj.m.comment_prefix + self.pj.m.get_line_comment(a)
             else:
                 l = ""
-            s = "%s\t%s%s%s" % (h, lbl, r, l)
+            s = "%s\t\t%s%s" % (h, r, l)
             self.fo.write(s.rstrip() + "\n")
             lbl = "\t"
 

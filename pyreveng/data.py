@@ -136,6 +136,8 @@ class Txt(Data):
 			x = pj.m[lo]
 			self.pre = '%d,' % x
 			hi, s, v = stringify(pj, lo + 1, length=x)
+			while hi % align:
+				hi += 1
 		elif pfx is not None:
 			raise Exception("unknown pfx")
 		elif hi is None:

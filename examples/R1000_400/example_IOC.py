@@ -37,7 +37,7 @@ def flow_check(pj, ins):
 	for i in ins.flow_out:
 		h = {
 		0x80002028: fc_puts_inline,
-		0x10284: fc_puts_inline,
+		# 0x10284: fc_puts_inline,
 		}.get(i.to)
 		if h:
 			h(pj, ins, i)
@@ -123,7 +123,13 @@ def task(pj, cpu):
 		pj.todo(obj.entry_point(), cpu.disass)
 
 	pj.todo(0x08ad2, cpu.disass)
+
+	if True:
+		data.Txt(pj, 0x294cc, 0x294da)
 		
+	if True:
+		for a in (0x08ad6, 0x08ada):
+			data.Const(pj, a, a + 4)
 
 	if True:
 		for a in range(0x09080, 0x09098, 4):
@@ -160,7 +166,7 @@ def task(pj, cpu):
 		for lo,hi in (
 			(0x04dbc, 0x04dd0),
 			(0x06596, 0x065ae),
-			(0x0663e, 0x0665a),
+			(0x06642, 0x0665a),
 			(0x09378, 0x09398),
 		):
 			for a in range(lo, hi, 4):
@@ -277,8 +283,6 @@ def task(pj, cpu):
 			0x088cc,
 			0x08914,
 			0x0895c,
-			0x089a4,
-			0x08a46,
 			0x08a70,
 			0x08b44,
 			0x08b4c,

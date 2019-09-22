@@ -948,7 +948,7 @@ class mc6809_ins(assy.Instree_ins):
 
 
 class mc6809(assy.Instree_disass):
-	def __init__(self, mask=0xffff, macros=True):
+	def __init__(self, mask=0xffff, macros=False):
 		super(mc6809, self).__init__("mc6809", 8)
 		self.add_ins(mc6809_desc, mc6809_ins)
 		if macros:
