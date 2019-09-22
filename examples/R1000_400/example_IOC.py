@@ -30,7 +30,7 @@ from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020
 
 def fc_puts_inline(pj, ins, flow):
-	y = data.Txt(pj, ins.hi, label=False)
+	y = data.Txt(pj, ins.hi, label=False, align=2)
 	flow.to = y.hi
 
 def flow_check(pj, ins):

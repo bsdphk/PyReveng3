@@ -62,7 +62,7 @@ INLTXT		inltxt		0	|0 1 0 0 1 1 1 0 1 0 0 1 0 1 1 0| a1            | a2          
 class my68k20_ins(m68020.m68020_ins):
 
 	def assy_inltxt(self, pj):
-		y = data.Txt(pj, self.lo + 2, label=False, splitnl=True)
+		y = data.Txt(pj, self.lo + 2, label=False, splitnl=True, align=2)
 		pj.todo(y.hi, self.lang.disass)
 		raise assy.Invalid("Inline text hack")
 
@@ -84,7 +84,7 @@ def inline_text(pj, ins):
 		0x80002028,
 	):
 		return
-	y = data.Txt(pj, ins.hi, label=False, splitnl=True)
+	y = data.Txt(pj, ins.hi, label=False, splitnl=True, align=2)
 	pj.todo(y.hi, ins.lang.disass)
 
 def setup():
@@ -149,7 +149,7 @@ def task(pj, cpu):
 		0x80004b68,
 		0x80007e0b,
 	):
-		data.Txt(pj, a, label=False)
+		data.Txt(pj, a, label=False, align=2)
 
 	def txts(a, b, align=2):
 		while a < b:

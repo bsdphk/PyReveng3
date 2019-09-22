@@ -129,7 +129,7 @@ def stringify(pj, lo, length=None, term=None):
 
 class Txt(Data):
 	def __init__(self, pj, lo, hi=None,
-	    label=True, term=None, pfx=None, align=2, splitnl=False):
+	    label=True, term=None, pfx=None, align=1, splitnl=False):
 		self.splitnl = splitnl
 		self.pre = ""
 		if pfx == 1:

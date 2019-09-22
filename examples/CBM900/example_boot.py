@@ -286,7 +286,7 @@ def task(pj, cx):
                 a += c
 
         for a in range(0x0100065a, 0x01000708, 6):
-            data.Txt(pj, a, label=False)
+            data.Txt(pj, a, label=False, align=2)
 
         for a in range(0x01000c26, 0x01000e19, 6):
             y1 = data.Pstruct(pj, a, ">HHH")
