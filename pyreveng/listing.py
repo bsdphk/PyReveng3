@@ -117,6 +117,13 @@ class Seg_Listing():
                 continue
             if i.lo >= high:
                 break
+            if i.lo > a0 and a0 % ncol:
+                if a0 % ncol:
+                    a1 = min(i.lo, a0 + ncol - a0 % ncol)
+                    nxxx += 1
+                    cxxx += a1 - a0
+                    self.render_chunk(a0, a1)
+                    a0 = a1
             if i.lo > a0:
                 nxxx += 1
                 cxxx += i.lo - a0
