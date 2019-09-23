@@ -92,10 +92,16 @@ class Discover():
 				except assy.Missing:
 					continue
 				assert x is not None
-				self.code[adr] = x
-				self.trust[adr] = 1
-				self.prob[adr] = .25
-				n += 1
+				for a in range(x.lo + 1, x.hi):
+					if a in self.pj.m.labels:
+						break
+					if a in self.pj.m.block_comments:
+						break
+				else:
+					self.code[adr] = x
+					self.trust[adr] = 1
+					self.prob[adr] = .25
+					n += 1
 		print("Possible instructions:", n)
 
 	def map_flows(self):
