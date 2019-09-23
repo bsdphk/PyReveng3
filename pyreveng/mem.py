@@ -75,7 +75,8 @@ class address_space():
         l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
         self.apct = "0x%%0%dx" % l
         self.t = tree.Tree(self.lo, self.hi)
-        self.comment_prefix = "; "
+        self.line_comment_prefix = "; "
+        self.line_comment_col = 88
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (
@@ -180,7 +181,8 @@ class mem_mapper():
         if high is None:
             high = low + mem.hi - mem.lo
         self.bits = mem.bits
-        self.comment_prefix = mem.comment_prefix
+        self.line_comment_prefix = mem.line_comment_prefix
+        self.line_comment_col = mem.line_comment_col
         self.lo = min(self.lo, low)
         self.hi = max(self.hi, high)
         self.naked.lo = self.lo

@@ -88,7 +88,7 @@ class Render_mem():
         Render 'ncol' words per line
         """
         l = list()
-        while lo < hi and nlin >= 0:
+        while lo < hi and nlin > 0:
             s = ""
             t = ""
             s += self.render_word(pj, lo, hi)
@@ -100,15 +100,24 @@ class Render_mem():
 class Seg_Listing():
     def __init__(self, pj, fo, mem, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
         self.pj = pj
+        self.mem = mem
         self.fmt = fmt
+        self.ncol = ncol
         self.ascii = ascii
         self.pil = pil
+        self.pil_col = 132
 
+        self.labels = sorted([adr for adr in mem.labels if low <= adr < high])
+        self.lcmt = sorted([adr for adr in mem.line_comments if low <= adr < high])
+        self.bcmt = sorted([adr for adr in mem.block_comments if low <= adr < high])
         self.render_mem = Render_mem(pj, fmt, ascii, ncol).render
+        self.line_comment_col = mem.line_comment_col
+        self.line_comment_prefix = mem.line_comment_prefix
 
-        nxxx = 0
-        cxxx = 0
+        self.nxxx = 0
+        self.cxxx = 0
         self.fo = fo
+
         misc.fill_gaps(pj)
         misc.fill_all_blanks(pj, all_vals=True, minsize=ncol * 2)
         a0 = low
@@ -117,17 +126,8 @@ class Seg_Listing():
                 continue
             if i.lo >= high:
                 break
-            if i.lo > a0 and a0 % ncol:
-                if a0 % ncol:
-                    a1 = min(i.lo, a0 + ncol - a0 % ncol)
-                    nxxx += 1
-                    cxxx += a1 - a0
-                    self.render_chunk(a0, a1)
-                    a0 = a1
             if i.lo > a0:
-                nxxx += 1
-                cxxx += i.lo - a0
-                self.render_chunk(a0, i.lo)
+                self.fill_xxx(a0, i.lo)
                 a0 = i.lo
 
             rx = i.render(pj)
@@ -141,41 +141,87 @@ class Seg_Listing():
                 continue
             else:
                 self.render_chunk(
-                    i.lo, i.hi, rx, i.lcmt, i.pil, i.compact)
+                    i.lo, i.hi, rx=rx, lcmt=i.lcmt, pil=i.pil, compact=i.compact)
                 a0 = i.hi
 
         if a0 < high:
-            self.render_chunk(a0, high)
-            nxxx += 1
-            cxxx += high - a0
+            self.fill_xxx(a0, high)
 
-        print("%d XXXs containing %d bytes" % (nxxx, cxxx))
+        print("%d XXXs containing %d bytes" % (self.nxxx, self.cxxx))
 
-    def render_chunk(self, lo, hi, rx=".XXX", lcmt="", pil=None, compact=False):
+    def fill_xxx(self, lo, hi):
+        ''' Add a .XXX entry, respecting bcmt, lcmt and labels '''
+        while lo < hi:
+            a1 = hi
+            a2 = a1
+            if self.bcmt:
+                a2 = min(a2, self.bcmt[0])
+            if self.labels:
+                a2 = min(a2, self.labels[0])
+            if self.lcmt:
+                a2 = min(a2, self.lcmt[0])
+            if lo % self.ncol:
+                a1 = min(a1, lo + self.ncol - lo % self.ncol)
+            if a2 == lo:
+                a1 = min(a1, lo + self.ncol)
+            else:
+                a1 = min(a1, a2)
+            self.nxxx += 1
+            self.cxxx += a1 - lo
+            self.render_chunk(lo, a1, rx = ".XXX")
+            lo = a1
+
+    def render_chunk(
+        self,
+        lo,
+        hi,
+        rx=".XXX",
+        lcmt="",
+        pil=None,
+        compact=False
+    ):
         rx = rx.strip().split("\n")
         lx = lcmt.split("\n")
+        px = []
         if self.pil and pil is not None:
-            lx += pil.render().split("\n")
-        lcmt = []
-        for i in lx:
-            j = i.rstrip()
-            if j != "":
-                lcmt.append(j)
-        m = max(len(rx), len(lcmt))
-        hex = self.render_mem(self.pj, lo, hi, m if compact else 9e9)
-        if not compact:
-            m = max(len(hex), m)
+            px = pil.render().split("\n")
 
-        hl = len(hex[0][1])
+        sc = set()
+        while self.bcmt and self.bcmt[0] < hi:
+            sc.add(self.bcmt.pop(0))
+        while self.labels and self.labels[0] < hi:
+            sc.add(self.labels.pop(0))
+        while self.lcmt and self.lcmt[0] < hi:
+            sc.add(self.lcmt.pop(0))
+        if compact is not None:
+            for a in sorted(sc):
+                if a != lo:
+                    self.render_subchunk(lo, a, False, compact, rx, px, lx)
+                lo = a
+        self.render_subchunk(lo, hi, True, compact, rx, px, lx)
 
+    def render_subchunk(self, lo, hi, last, compact, rx, px, lx):
         cmt = self.pj.m.get_block_comments(lo)
         if cmt is not None:
-            w = 72 - len(self.pj.m.comment_prefix)
-            self.fo.write(self.pj.m.comment_prefix + "-" * w + "\n")
-            self.fo.write(self.pj.m.comment_prefix)
+            w = self.line_comment_col - len(self.line_comment_prefix)
+            self.fo.write(self.line_comment_prefix + "-" * w + "\n")
+            self.fo.write(self.line_comment_prefix)
             self.fo.write(cmt.replace("\n",
-                "\n" + self.pj.m.comment_prefix))
+                "\n" + self.line_comment_prefix))
             self.fo.write("-" * w + "\n")
+
+        alx = self.pj.m.get_line_comment(lo)
+        if alx:
+            lx =  alx.split("\n") + lx
+
+        if last and (compact or compact is None):
+            m = max(len(rx), len(px), len(lx), 1)
+        else:
+            m = 9e9
+
+        hx = self.render_mem(self.pj, lo, hi, m)
+        hl = len(hx[0][1] + "\t")
+        shx = "\t" * (hl // 8)
 
         lbl = self.pj.get_labels(lo)
         if lbl:
@@ -183,31 +229,43 @@ class Seg_Listing():
             for x in lbl:
                 if x not in s:
                     s.add(x)
-                    self.fo.write("%s\t%s:\n" % (" " * hl, x))
+                    self.fo.write("%s\t%s:\n" % (shx, x))
+        while True:
+            hy = hx.pop(0)[1] if hx else ""
+            if not last and not hy:
+                break
+            ry = rx.pop(0).rstrip() if rx else ""
+            py = px.pop(0).rstrip() if px else ""
+            ly = lx.pop(0).rstrip() if lx else ""
+            if not hy and not ry and not py and not ly:
+                break
+            if compact and not ry and not py and not ly:
+                break
+            if hy:
+                t = hy + "\t\t"
+            else:
+                t = shx + "\t\t"
 
-        for i in range(m):
-            if i < len(hex):
-                a, h = hex[i]
-            else:
-                a = None
-                h = " " * hl
-            if i < len(rx):
-                r = rx[i]
-            else:
-                r = ""
-            while len((r + "\t").expandtabs()) < 32:
-                r += "\t"
-            while len((r + " ").expandtabs()) < 32:
-                r += " "
-            if i < len(lcmt):
-                l = self.pj.m.comment_prefix + lcmt[i]
-            elif self.pj.m.get_line_comment(a):
-                l = self.pj.m.comment_prefix + self.pj.m.get_line_comment(a)
-            else:
-                l = ""
-            s = "%s\t\t%s%s" % (h, r, l)
-            self.fo.write(s.rstrip() + "\n")
-            lbl = "\t"
+            t += ry + "\t"
+            l = len(t.expandtabs())
+            if l < 32:
+                t += "\t" * ((32 - l) // 8)
+
+            if ly:
+                t += "\t"
+                l = len(t.expandtabs()) 
+                if l < self.pj.m.line_comment_col:
+                    t += "\t" * ((self.pj.m.line_comment_col - l) // 8)
+                t += self.line_comment_prefix + ly
+
+            if self.pil and py:
+                t += "\t"
+                l = len(t.expandtabs()) 
+                if l < self.pil_col:
+                    t += "\t" * ((self.pil_col - l) // 8)
+                t += "| " + py + "\t"
+
+            self.fo.write(t + "\n")
 
 def Listing(pj, fn=None, **kwargs):
     if fn is None:

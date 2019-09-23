@@ -62,7 +62,7 @@ def setup():
 
     pj = job.Job(cx.as_mem, "CBM900_BOOT")
     y = job.Leaf(None, 0x6800, 0x6800 + 0x1016, tag = "MAP SEG1")
-    y.compact = True
+    y.compact = None
     y.rendered = str(y)
     pj.m.insert(y)
     return pj, cx
