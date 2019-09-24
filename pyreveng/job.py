@@ -99,10 +99,14 @@ class Job():
 		    self.afmt(adr), func)
 
 	def run(self):
+		s = {}
 		rv = False
 		while self.dolist:
 			rv = True
 			adr, func = self.dolist.pop()
+			if s.get(adr) == func:
+				continue
+			s[adr] = func
 			try:
 				func(self, adr)
 				err = None

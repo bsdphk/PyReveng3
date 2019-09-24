@@ -207,7 +207,7 @@ class mem_mapper():
                 return mem, (adr - low) + offset
         if fail:
             raise MemError(adr, "Unmapped memory")   
-        return self.naked, 0
+        return self.naked, adr
 
     def __iter__(self):
         for i in self.naked:
@@ -223,7 +223,7 @@ class mem_mapper():
 
     def adr(self, dst):
         ''' Render an address '''
-        m, a = self.xlat(dst)
+        m, a = self.xlat(dst, False)
         return m.adr(a)
 
     def segments(self):
@@ -265,6 +265,10 @@ class mem_mapper():
     def find_hi(self, adr):
         m, a = self.xlat(adr)
         return m.find_hi(a)
+
+    def s8(self, adr):
+        m, a = self.xlat(adr)
+        return m.s8(a)
 
     def bs16(self, adr):
         m, a = self.xlat(adr)

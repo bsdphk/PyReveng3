@@ -603,7 +603,7 @@ class mc6809_ins(assy.Instree_ins):
 			"?c?", "?d?", "?e?", "?f?"
 		]
 		if r[sr][0] == "?" or r[dr][0] == "?":
-			raise assy.Wrong("Wrong arg to TFR (0x%02x)" % val)
+			raise assy.Invalid("Wrong arg to TFR (0x%02x)" % val)
 		return r[sr] + "," + r[dr]
 
 	###############################################################
@@ -961,13 +961,14 @@ class mc6809(assy.Instree_disass):
 		pj.todo(t, self.disass)
 		return c
 
-	def vectors(self, pj, adr=0xfff0):
+	def vectors(self, pj, adr=0xfff0, which=None):
 		for v in (
 			"V??", "SWI3", "SWI2", "FIRQ",
 			"IRQ", "SWI", "NMI", "RST"
 		):
-			c = self.codeptr(pj, adr)
-			pj.set_label(c.dst, "VEC" + v)
+			if which and (adr in which or v in which):
+				c = self.codeptr(pj, adr)
+				pj.set_label(c.dst, "VEC" + v)
 			adr += 2
 
 if __name__ == '__main__':

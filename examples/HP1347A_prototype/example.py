@@ -154,12 +154,12 @@ CMDS = {
 }
 
 def mem_setup():
-	m = mem.byte_mem(0x0000, 0x10000)
-	dn = os.path.dirname(__file__)
-	m.load_binfile(0x0000, 1,
-	    os.path.join(dn, "hp1347a_proto.low.rom"))
-	m.load_binfile(0xe000, 1,
-	    os.path.join(dn, "hp1347a_proto.high.rom"))
+	dn = os.path.dirname(__file__) + "/"
+	m = mem.mem_mapper(0x0000, 0x10000)
+	mlo = mem.stackup(prefix=dn, files=("hp1347a_proto.low.rom",))
+	m.add(mlo, 0x0000)
+	mhi = mem.stackup(lo = 0xe000, prefix=dn, files=("hp1347a_proto.high.rom",))
+	m.add(mhi, 0xe000, offset=0xe000)
 
 	s = 0
 	for a in range(0x0000, 0x2000, 2):
@@ -173,10 +173,22 @@ def mem_setup():
 
 	return m
 
+# Interrupts do not return
+our_desc = '''
+CWAI	x	| 3C		| FF		|
+'''
+
+class our_ins(mc6809.mc6809_ins):
+
+	def assy_x(self, pj):
+		self.flow_J(pj)
+		return "#0xff"
+
 def setup():
 	pj = job.Job(mem_setup(), "HP1347A_proto")
 
 	cpu = mc6809.mc6809()
+	cpu.add_ins(our_desc, our_ins)
 	return pj, cpu
 
 def ttab(pj, a, b):
@@ -227,7 +239,7 @@ class Scrtxt(data.Data):
 def task(pj, cpu):
 	gpu = hp1345a.hp1345a()
 
-	cpu.vectors(pj)
+	cpu.vectors(pj, which = ("RST", "NMI", "SWI", "IRQ", "FIRQ", "SWI2"))
 
 	if True:
 		# screen texts
@@ -362,6 +374,7 @@ def task(pj, cpu):
 
 	pj.set_label(0xe5ed, "TEST_IMGRAM")
 
+	pj.todo(0x1acf, cpu.disass)
 	pj.todo(0xebf0, cpu.disass)
 
 	while pj.run():
