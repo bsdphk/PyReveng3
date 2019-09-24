@@ -32,12 +32,11 @@ from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80
 
 def mem_setup():
-	m = mem.byte_mem(0x0000, 0x7800)
 	dn = os.path.dirname(__file__)
-	m.load_binfile(0x0000, 1, os.path.join(dn, "EPROM_ROA_375.bin"))
-
-	for a in range(0x797):
-		m.wr(0x7000 + a, m[0x0069 + a])
+	m = mem.mem_mapper(0x0000, 0x10000)
+	mraw = mem.stackup(files=(os.path.join(dn, "EPROM_ROA_375.bin"),))
+	m.add(mraw, 0, 0x68)
+	m.add(mraw, 0x7000, offset = 0x69)
 	return m
 
 def setup():
@@ -62,10 +61,6 @@ def task(pj, cx):
 	pj.todo(0x0027, cx.disass)
 
 	pj.todo(0x0066, cx.disass)
-
-	x = data.Const(pj, 0x0068, 0x0800)
-	x.typ = ".BYTE"
-	x.fmt = "{Payload moved to 0x7000}"
 
 	pj.todo(0x70d0, cx.disass)
 

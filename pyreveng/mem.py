@@ -162,37 +162,42 @@ class address_space():
 
 class mem_mapper():
 
-    def __init__(self, lo = None, hi = None):
+    def __init__(self, lo, hi):
         self.map = []
         self.seglist = []
-        if lo is None:
-            lo = 1<<64
-        if hi is None:
-            hi = 0
         self.lo = lo
         self.hi = hi
         self.bits = 0
-        self.naked = address_space(0, 1)
+        self.naked = address_space(lo, hi)
+        self.apct = self.naked.apct
         self.xlat = self.xlat1
+
+    def __repr__(self):
+        return "<mem_mapper 0x%x-0x%x>" % (
+            self.lo, self.hi
+        )
 
     def add(self, mem, low, high = None, offset = None):
         if offset is None:
             offset = 0
         if high is None:
-            high = low + mem.hi - mem.lo
+            high = low + mem.hi - (mem.lo + offset)
         self.bits = mem.bits
         self.line_comment_prefix = mem.line_comment_prefix
         self.line_comment_col = mem.line_comment_col
-        self.lo = min(self.lo, low)
-        self.hi = max(self.hi, high)
-        self.naked.lo = self.lo
-        self.naked.hi = self.hi
-        self.naked.set_apct()
-        self.apct = self.naked.apct
+        #self.lo = min(self.lo, low)
+        #self.hi = max(self.hi, high)
+        #self.naked.lo = self.lo
+        #self.naked.hi = self.hi
+        #self.naked.set_apct()
+        #self.apct = self.naked.apct
         self.seglist.append((mem, low, high, offset))
         self.map.append((mem, low, high, offset))
         if len(self.map) > 1:
             self.xlat = self.xlatN
+
+    def xlat0(self, adr, fail=True):
+        return self.naked, adr
 
     def xlat1(self, adr, fail=True):
         mem, low, high, offset = self.map[0]
@@ -223,7 +228,7 @@ class mem_mapper():
 
     def adr(self, dst):
         ''' Render an address '''
-        m, a = self.xlat(dst, False)
+        m, a = self.xlat0(dst, False)
         return m.adr(a)
 
     def segments(self):
@@ -235,35 +240,35 @@ class mem_mapper():
         return m[a]
 
     def set_label(self, adr, lbl):
-        m, a = self.xlat(adr, False)
+        m, a = self.xlat0(adr, False)
         m.set_label(a, lbl)
 
     def get_labels(self, adr):
-        m, a = self.xlat(adr, False)
+        m, a = self.xlat0(adr, False)
         return m.get_labels(a)
 
     def set_block_comment(self, adr, lbl):
-        m, a = self.xlat(adr)
+        m, a = self.xlat0(adr)
         m.set_block_comment(a, lbl)
 
     def get_block_comments(self, adr):
-        m, a = self.xlat(adr, False)
+        m, a = self.xlat0(adr, False)
         return m.get_block_comments(a)
 
     def set_line_comment(self, adr, lbl):
-        m, a = self.xlat(adr)
+        m, a = self.xlat0(adr)
         m.set_line_comment(a, lbl)
 
     def get_line_comment(self, adr):
-        m, a = self.xlat(adr, False)
+        m, a = self.xlat0(adr, False)
         return m.get_line_comment(a)
 
     def find_lo(self, adr):
-        m, a = self.xlat(adr)
+        m, a = self.xlat0(adr, False)
         return m.find_lo(a)
 
     def find_hi(self, adr):
-        m, a = self.xlat(adr)
+        m, a = self.xlat0(adr, False)
         return m.find_hi(a)
 
     def s8(self, adr):

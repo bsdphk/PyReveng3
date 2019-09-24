@@ -32,13 +32,13 @@ from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80
 
 def mem_setup():
-	m = mem.byte_mem(0x0000, 0x10000)
 	dn = os.path.dirname(__file__)
-	m.load_binfile(0x0000, 1, os.path.join(dn, "EPROM_ROB_357.bin"))
-
-	for a in range(0x7ee):
-		m.wr(0xa000 + a, m[0x0012 + a])
+	m = mem.mem_mapper(0x0000, 0x10000)
+	mraw = mem.stackup(files=(os.path.join(dn, "EPROM_ROB_357.bin"),))
+	m.add(mraw, 0, 0x12)
+	m.add(mraw, 0xa000, offset = 0x12)
 	return m
+
 
 def setup():
 	pj = job.Job(mem_setup(), "RC702_bootrom_rob_357")
@@ -50,47 +50,20 @@ def task(pj, cx):
 	data.Txt(pj, 0xa546, label=False)
 	data.Txt(pj, 0xa571, label=False)
 	data.Txt(pj, 0xa574, label=False)
+	data.Txt(pj, 0xa588, 0xa58c, label=False)
+	data.Txt(pj, 0xa58c, 0xa590, label=False)
 	data.Txt(pj, 0xa593, 0xa593 + 0x7, label=False)
 
 	pj.todo(0x0000, cx.disass)
-	x = data.Const(pj, 0x0012, 0x0800)
-	x.typ = ".BYTE"
-	x.fmt = "{Payload moved to 0xa000}"
 
 	# Interrupt vector table
 	for a in range(12):
 		cx.codeptr(pj, 0xa000 + a * 2)
 
-
 	#discover.Discover(pj, cx)
 
-	return
-
-	# 0x70e5
-	pj.todo(0x0027, cx.disass)
-
-	pj.todo(0x0066, cx.disass)
-
-
-	pj.todo(0x70d0, cx.disass)
-
-	pj.todo(0x7322, cx.disass)
-	pj.todo(0x7615, cx.disass)
-
-	# Interrupt vector table
-	for a in range(16):
-		cx.codeptr(pj, 0x7300 + a * 2)
-
-	data.Txt(pj, 0x707d, 0x707d + 0x14, label=False)
-	data.Txt(pj, 0x70b0, 0x70b0 + 0xf, label=False)
-	data.Txt(pj, 0x7092, 0x7092 + 0x1d, label=False)
-	data.Txt(pj, 0x73f0, 0x73f0 + 0x12, label=False)
-	data.Txt(pj, 0x7071, 0x7071 + 0x6, label=False)
-	data.Txt(pj, 0x7077, 0x7077 + 0x6, label=False)
-
-	discover.Discover(pj, cx)
-
-	pj.set_label(0x7068, "memcpy(BC, DE,  L)")
+	while pj.run():
+		continue
 
 
 if __name__ == '__main__':

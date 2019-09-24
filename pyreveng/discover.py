@@ -93,9 +93,9 @@ class Discover():
 					continue
 				assert x is not None
 				for a in range(x.lo + 1, x.hi):
-					if a in self.pj.m.labels:
+					if self.pj.m.get_labels(a):
 						break
-					if a in self.pj.m.block_comments:
+					if self.pj.m.get_block_comments(a):
 						break
 				else:
 					self.code[adr] = x
