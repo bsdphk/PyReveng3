@@ -49,7 +49,7 @@ def setup():
 
 def task(pj, cpu):
 
-	cpu.vectors(pj)
+	cpu.vectors(pj, which=("RST", "NMI", "SWI", "IRQ", "FIRQ"))
 
 	token = {
 		1:	'?',
