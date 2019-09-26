@@ -35,8 +35,8 @@ def mem_setup():
 	dn = os.path.dirname(__file__)
 	m = mem.mem_mapper(0x0000, 0x10000)
 	mraw = mem.stackup(files=(os.path.join(dn, "EPROM_ROB_357.bin"),))
-	m.add(mraw, 0, 0x12)
-	m.add(mraw, 0xa000, offset = 0x12)
+	m.map(mraw, 0, 0x12)
+	m.map(mraw, 0xa000, offset = 0x12)
 	return m
 
 

@@ -272,5 +272,8 @@ def Listing(pj, fn=None, **kwargs):
         fn = "/tmp/_." + pj.name + ".txt"
     print("Listing into", fn)
     fo = open(fn, "w")
+    sep = ""
     for mem, low, high in pj.m.segments():
+        fo.write(sep)
         Seg_Listing(pj, fo, mem, low, high, **kwargs)
+        sep = "\n" + "-" * 80 + "\n\n"

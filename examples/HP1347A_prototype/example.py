@@ -157,9 +157,9 @@ def mem_setup():
 	dn = os.path.dirname(__file__) + "/"
 	m = mem.mem_mapper(0x0000, 0x10000)
 	mlo = mem.stackup(prefix=dn, files=("hp1347a_proto.low.rom",))
-	m.add(mlo, 0x0000)
+	m.map(mlo, 0x0000)
 	mhi = mem.stackup(prefix=dn, files=("hp1347a_proto.high.rom",))
-	m.add(mhi, 0xe000)
+	m.map(mhi, 0xe000)
 
 	s = 0
 	for a in range(0x0000, 0x2000, 2):

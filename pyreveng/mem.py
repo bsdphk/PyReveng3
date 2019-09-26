@@ -40,9 +40,10 @@ XXX: Need resolution of who controls rendering...
 
 """
 
-import ctypes, types, copy
+import ctypes
 
 from . import tree
+from . import job
 
 DEFINED = (1 << 7)
 
@@ -148,7 +149,7 @@ class address_space():
     def get_block_comments(self, adr):
         return self.block_comments.get(adr)
 
-    def bytearray(self, lo, bcnt):
+    def bytearray(self, _lo, _bcnt):
         assert False
 
     def insert(self, leaf):
@@ -160,124 +161,65 @@ class address_space():
     def find_hi(self, adr):
         return self.t.find_hi(adr)
 
-class mem_mapper():
+class Map_Leaf(job.Leaf):
 
-    def __init__(self, lo, hi):
-        self.map = []
+    def __init__(self, lo, hi, ref):
+        super().__init__(None, lo, hi, "MAPLEAF")
+        self.ref = ref
+
+    def render(self, pj):
+        return self.ref.render(pj)
+
+class mem_mapper(address_space):
+
+    def __init__(self, lo, hi, **kwargs):
+        super().__init__(lo, hi, **kwargs)
+        self.mapping = []
         self.seglist = []
-        self.lo = lo
-        self.hi = hi
         self.bits = 0
-        self.naked = address_space(lo, hi)
-        self.apct = self.naked.apct
         self.xlat = self.xlat1
 
     def __repr__(self):
-        return "<mem_mapper 0x%x-0x%x>" % (
-            self.lo, self.hi
-        )
+        return "<mem_mapper 0x%x-0x%x>" % (self.lo, self.hi)
 
-    def add(self, mem, low, high = None, offset = None):
+    def map(self, mem, low, high=None, offset=None):
         if offset is None:
             offset = 0
         if high is None:
             high = low + mem.hi - (mem.lo + offset)
-        self.bits = mem.bits
-        self.line_comment_prefix = mem.line_comment_prefix
-        self.line_comment_col = mem.line_comment_col
-        #self.lo = min(self.lo, low)
-        #self.hi = max(self.hi, high)
-        #self.naked.lo = self.lo
-        #self.naked.hi = self.hi
-        #self.naked.set_apct()
-        #self.apct = self.naked.apct
-        self.seglist.append((mem, low, high, offset))
-        self.map.append((mem, low, high, offset))
-        if len(self.map) > 1:
+        self.seglist.append((low, high, offset, mem))
+        self.mapping.append((low, high, offset, mem))
+        if len(self.mapping) > 1:
             self.xlat = self.xlatN
+        else:
+            self.bits = mem.bits
 
-    def xlat0(self, adr, fail=True):
-        return self.naked, adr
-
-    def xlat1(self, adr, fail=True):
-        mem, low, high, offset = self.map[0]
+    def xlat1(self, adr, _fail=True):
+        low, high, offset, mem = self.mapping[0]
         return mem, (adr - low) + offset
 
     def xlatN(self, adr, fail=True):
-        for i, j in enumerate(self.map):
-            mem, low, high, offset = j
+        for i, j in enumerate(self.mapping):
+            low, high, offset, mem = j
             if low <= adr < high:
-                self.map.pop(i)
-                self.map.insert(0, j)
+                self.mapping.pop(i)
+                self.mapping.insert(0, j)
                 return mem, (adr - low) + offset
         if fail:
-            raise MemError(adr, "Unmapped memory")   
-        return self.naked, adr
-
-    def __iter__(self):
-        for i in self.naked:
-            yield i
-        return
-        for i in self.seglist:
-            for j in i:
-                yield j
+            raise MemError(adr, "Unmapped memory")
+        return self, adr
 
     def __getitem__(self, adr):
         m, a = self.xlat(adr)
         return m[a]
 
-    def adr(self, dst):
-        ''' Render an address '''
-        m, a = self.xlat0(dst, False)
-        return m.adr(a)
-
     def segments(self):
-        for mem, low, high, offset in self.seglist:
+        for low, high, _offset, mem in sorted(self.seglist):
             yield mem, low, high
 
-    def xrd(self, adr):
+    def u8(self, adr):
         m, a = self.xlat(adr)
-        return m[a]
-
-    def set_label(self, adr, lbl):
-        m, a = self.xlat0(adr, False)
-        m.set_label(a, lbl)
-
-    def get_labels(self, adr):
-        m, a = self.xlat0(adr, False)
-        return m.get_labels(a)
-
-    def set_block_comment(self, adr, lbl):
-        m, a = self.xlat0(adr)
-        m.set_block_comment(a, lbl)
-
-    def get_block_comments(self, adr):
-        m, a = self.xlat0(adr, False)
-        return m.get_block_comments(a)
-
-    def set_line_comment(self, adr, lbl):
-        m, a = self.xlat0(adr)
-        m.set_line_comment(a, lbl)
-
-    def get_line_comment(self, adr):
-        m, a = self.xlat0(adr, False)
-        return m.get_line_comment(a)
-
-    def find_lo(self, adr):
-        m, a = self.xlat0(adr, False)
-        return m.find_lo(a)
-
-    def find_hi(self, adr):
-        m, a = self.xlat0(adr, False)
-        return m.find_hi(a)
-
-    def s8(self, adr):
-        m, a = self.xlat(adr)
-        return m.s8(a)
-
-    def bs16(self, adr):
-        m, a = self.xlat(adr)
-        return m.bs16(a)
+        return m.u8(a)
 
     def lu16(self, adr):
         m, a = self.xlat(adr)
@@ -287,9 +229,9 @@ class mem_mapper():
         m, a = self.xlat(adr)
         return m.bu16(a)
 
-    def bs32(self, adr):
+    def lu32(self, adr):
         m, a = self.xlat(adr)
-        return m.bs32(a)
+        return m.lu32(a)
 
     def bu32(self, adr):
         m, a = self.xlat(adr)
@@ -299,6 +241,30 @@ class mem_mapper():
         m, a = self.xlat(adr)
         return m.lu64(a)
 
+    def bu64(self, adr):
+        m, a = self.xlat(adr)
+        return m.bu64(a)
+
+    def s8(self, adr):
+        m, a = self.xlat(adr)
+        return m.s8(a)
+
+    def ls16(self, adr):
+        m, a = self.xlat(adr)
+        return m.ls16(a)
+
+    def bs16(self, adr):
+        m, a = self.xlat(adr)
+        return m.bs16(a)
+
+    def ls32(self, adr):
+        m, a = self.xlat(adr)
+        return m.ls32(a)
+
+    def bs32(self, adr):
+        m, a = self.xlat(adr)
+        return m.bs32(a)
+
     def ls64(self, adr):
         m, a = self.xlat(adr)
         return m.ls64(a)
@@ -307,17 +273,13 @@ class mem_mapper():
         m, a = self.xlat(adr)
         return m.bs64(a)
 
-    def bu64(self, adr):
-        m, a = self.xlat(adr)
-        return m.bu64(a)
-
     def bytearray(self, adr, l):
         m, a = self.xlat(adr)
         return m.bytearray(a, l)
 
     def gaps(self):
-        for glo,ghi in self.naked.gaps():
-            for mem, slo, shi, offset in self.map:
+        for glo, ghi in super().gaps():
+            for slo, shi, _offset, _mem in self.mapping:
                 if ghi <= slo or glo >= shi:
                     continue
                 glo = max(glo, slo)
@@ -325,12 +287,10 @@ class mem_mapper():
                 yield glo, ghi
 
     def insert(self, leaf):
-        self.naked.insert(leaf)
-        ll = copy.copy(leaf)
-        mem, adr = self.xlat(ll.lo, False)
-        # XXX: are the $m.t in "absolute addresses" ?
+        super().insert(leaf)
+        mem, adr = self.xlat(leaf.lo, False)
+        ll = Map_Leaf(adr, leaf.hi - (leaf.lo - adr), leaf)
         mem.insert(ll)
-
 
 class word_mem(address_space):
 
@@ -346,14 +306,14 @@ class word_mem(address_space):
     Largest supported word-width is 64 bits and 8 attributes.
     """
 
-    def __init__(self, lo, hi, bits=8, attr=0):
+    def __init__(self, lo, hi, bits=8, attr=0, **kwargs):
         assert lo < hi
         assert bits > 0
         assert bits <= 64
         assert attr >= 0
         assert attr <= 7
 
-        super().__init__(lo, hi)
+        super().__init__(lo, hi, **kwargs)
 
         self.bits = bits
         self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
@@ -391,9 +351,6 @@ class word_mem(address_space):
         if not self.a[b] & DEFINED:
             raise MemError(adr, "Undefined")
         return self.m[b]
-
-    def rd(self, adr):
-        return self[adr]
 
     def __setitem__(self, adr, dat):
         """Write location"""
@@ -434,7 +391,7 @@ class word_mem(address_space):
                 s += " "
             else:
                 x = (w >> b) & 0xff
-                if x > 32 and x < 127:
+                if 32 < x < 127:
                     s += "%c" % x
                 else:
                     s += " "
@@ -455,10 +412,10 @@ class byte_mem(word_mem):
     right one.
     """
 
-    def __init__(self, lo, hi, attr=0):
-        super().__init__(lo, hi, 8, attr)
-        self.ncol = 4
-        self.ascii = True
+    def __init__(self, lo, hi, ncol=4, charcol=True, **kwargs):
+        super().__init__(lo, hi, bits=8, **kwargs)
+        self.ncol = ncol
+        self.ascii = charcol
 
     def bytearray(self, lo, bcnt):
         i = self._off(lo)
