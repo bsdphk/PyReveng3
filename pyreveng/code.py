@@ -113,7 +113,7 @@ class Code(Leaf):
         self.flow_in = []
         self.flow_out = []
 
-    def render(self, pj):
+    def render(self):
         return "<Code %x-%x %s>" % (self.lo, self.hi, self.lang.name)
 
     def add_flow(self, unused_pj, typ, cond=True, to=None, lang=None):

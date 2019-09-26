@@ -42,13 +42,14 @@ class Leaf():
 		self.lcmt = ""
 		self.rendered = None
 		self.compact = False
+		self.aspace = None
 
 	def __repr__(self):
 		s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
 		return s + ">"
 
-	def render(self, pj):
+	def render(self):
 		return self.rendered
 
-	def arg_render(self, pj):
+	def arg_render(self):
 		return ""

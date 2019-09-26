@@ -120,9 +120,9 @@ def task(pj, cpu):
 			super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
 			pj.insert(self)
 
-		def render(self, pj):
-			v = pj.m.bu16(self.lo)
-			return ".PTR " + pj.render_adr(v)
+		def render(self):
+			v = self.aspace.bu16(self.lo)
+			return ".PTR " + self.aspace.adr(v)
 
 	def jmptbl(lo, hi, x = None):
 		c = pj.add(lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))

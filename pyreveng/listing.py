@@ -98,10 +98,8 @@ class Render_mem():
         return l
 
 class Seg_Listing():
-    def __init__(self, pj, fo, aspace, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
-        self.pj = pj
-        self.mem = aspace
-        self.aspace = pj.m
+    def __init__(self, aspace, fo, seg, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
+        self.aspace = aspace
         self.fmt = fmt
         self.ncol = ncol
         self.ascii = ascii
@@ -111,7 +109,7 @@ class Seg_Listing():
         self.labels = sorted([adr for adr in aspace.labels if low <= adr < high])
         self.lcmt = sorted([adr for adr in aspace.line_comments if low <= adr < high])
         self.bcmt = sorted([adr for adr in aspace.block_comments if low <= adr < high])
-        self.render_mem = Render_mem(aspace, fmt, ascii, ncol).render
+        self.render_mem = Render_mem(seg, fmt, ascii, ncol).render
         self.line_comment_col = aspace.line_comment_col
         self.line_comment_prefix = aspace.line_comment_prefix
 
@@ -131,7 +129,7 @@ class Seg_Listing():
                 self.fill_xxx(a0, i.lo)
                 a0 = i.lo
 
-            rx = i.render(pj)
+            rx = i.render()
             if rx is None:
                 alo = aspace.apct % i.lo
                 ahi = aspace.apct % i.hi
@@ -223,7 +221,7 @@ class Seg_Listing():
         hl = len(hx[0][1] + "\t")
         shx = "\t" * (hl // 8)
 
-        lbl = self.pj.get_labels(lo)
+        lbl = self.aspace.get_labels(lo)
         if lbl:
             s = set()
             for x in lbl:
@@ -267,14 +265,12 @@ class Seg_Listing():
 
             self.fo.write(t + "\n")
 
-def Listing(pj, fn=None, **kwargs):
-    if fn is None:
-        fn = "/tmp/_." + pj.name + ".txt"
+def Listing(aspace, fn, **kwargs):
     print("Listing into", fn)
     fo = open(fn, "w")
     sep = ""
-    for mem, low, high in pj.m.segments():
+    for seg, low, high in aspace.segments():
         print("SEG %x-%x" % (low, high), mem)
         fo.write(sep)
-        Seg_Listing(pj, fo, mem, low, high, **kwargs)
+        Seg_Listing(aspace, fo, seg, low, high, **kwargs)
         sep = "\n" + "-" * 80 + "\n\n"

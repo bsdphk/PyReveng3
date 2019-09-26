@@ -60,7 +60,7 @@ class Assy(code.Code):
     def pildefault(self):
         return
 
-    def render(self, pj):
+    def render(self):
         s = self.mne + "\t"
         l = []
         for i in self.oper:
@@ -74,7 +74,7 @@ class Assy(code.Code):
                 print(self.oper)
                 raise Wrong("Not Arg, type '%s', str '%s'" %
                     (str(type(i)), str(i)))
-            l.append(i.render(pj))
+            l.append(i.render())
         return s + ",".join(l)
 
 #######################################################################
@@ -317,7 +317,7 @@ class Arg():
     def __init__(self, pj):
         self.pj = pj
 
-    def render(self, unused_pj):
+    def render(self):
         return str(self)
 
 class Arg_verbatim(Arg):
@@ -353,7 +353,7 @@ class Arg_ref(Arg):
 
     def __str__(self):
         s = "(" + self.pj.render_adr(self.obj.lo) + ")"
-        a = self.obj.arg_render(self.pj)
+        a = self.obj.arg_render()
         if a != "":
             s += "=" + a
         return s

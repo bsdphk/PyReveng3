@@ -153,6 +153,7 @@ class AddressSpace():
         assert False
 
     def insert(self, leaf):
+        leaf.aspace = self
         return self.t.insert(leaf)
 
     def find_lo(self, adr):

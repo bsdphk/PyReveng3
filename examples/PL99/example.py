@@ -74,23 +74,23 @@ def task(pj, cx):
 				pj.m[self.lo + 2],
 			)
 
-		def render(self, pj):
+		def render(self):
 			return ".STRUCT chain { '%c%c%c', %d }" % (
-				pj.m[self.lo],
-				pj.m[self.lo + 1],
-				pj.m[self.lo + 2],
-				pj.m[self.lo + 3],
+				self.aspace[self.lo],
+				self.aspace[self.lo + 1],
+				self.aspace[self.lo + 2],
+				self.aspace[self.lo + 3],
 			)
 
 	class d_asf(data.Data):
 		def __init__(self, pj, a):
 			super(d_asf, self).__init__(pj, a, a + 16)
 
-		def render(self, pj):
+		def render(self):
 			s = ".STRUCT asf {"
 			t = " "
 			for i in range(0, 16, 2):
-				s += t + "%6d" % pj.m.bu16(self.lo + i)
+				s += t + "%6d" % self.aspace.bu16(self.lo + i)
 				t = ", "
 			s += "}"
 			return s
@@ -113,7 +113,7 @@ def task(pj, cx):
 			if lbl:
 				pj.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
 
-		def render(self, pj):
+		def render(self):
 			if self.dec != 0.0:
 				b = 1.0/self.dec
 			else:

@@ -491,8 +491,8 @@ class vector(data.Data):
         self.dstadr = pj.m.bu16(adr + 2)
         pj.todo(self.dstadr, cx.disass)
 
-    def render(self, pj):
-        return "WP=0x%04x,IP=%s" % (self.ws, pj.m.adr(self.dstadr))
+    def render(self):
+        return "WP=0x%04x,IP=%s" % (self.ws, self.aspace.adr(self.dstadr))
 
 
 class Tms9900_ins(assy.Instree_ins):

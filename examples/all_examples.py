@@ -57,9 +57,9 @@ def one_example(dir, example):
 	pj, cx = y.setup()
 	# return
 	y.task(pj, cx)
-	listing.Listing(pj, ncol = 8, 
+	listing.Listing(pj.m, ncol = 8, 
 			fn = "_output/" + pj.name + ".asm", pil=False)
-	listing.Listing(pj, ncol = 8,
+	listing.Listing(pj.m, ncol = 8,
 			fn = "_output/" + pj.name + ".pil", pil=True)
 	sys.stdout.flush()
 

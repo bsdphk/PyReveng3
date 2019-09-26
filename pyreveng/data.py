@@ -41,7 +41,7 @@ class Data(job.Leaf):
 		pj.insert(self)
 		self.fmt = fmt
 
-	def render(self, pj):
+	def render(self):
 		if self.fmt is None:
 			return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 		return self.fmt
@@ -61,7 +61,7 @@ class Const(Data):
 		self.val = None
 		self.compact = True
 
-	def render(self, pj):
+	def render(self):
 		return self.typ + "\t" + self.fmt
 
 class Pstruct(Data):
@@ -74,7 +74,7 @@ class Pstruct(Data):
 		self.fmt = fmt
 		self.typ = typ
 
-	def render(self, pj):
+	def render(self):
 		if self.fmt is not None:
 			return self.typ + "\t" + self.fmt % self.data
 		return self.typ + "\t" + self.spec + " = " + str(self.data)
@@ -84,19 +84,19 @@ class Codeptr(Data):
 		super().__init__(pj, lo, hi, "codeptr")
 		self.dst = dst
 
-	def render(self, pj):
-		return ".CODE\t" + pj.render_adr(self.dst)
+	def render(self):
+		return ".CODE\t" + self.aspace.adr(self.dst)
 
-	def arg_render(self, pj):
-		return pj.render_adr(self.dst)
+	def arg_render(self):
+		return self.aspace.adr(self.dst)
 
 class Dataptr(Data):
 	def __init__(self, pj, lo, hi, dst):
 		super().__init__(pj, lo, hi, "dataptr")
 		self.dst = dst
 
-	def render(self, pj):
-		return ".PTR\t" + pj.render_adr(self.dst)
+	def render(self):
+		return ".PTR\t" + self.aspace.adr(self.dst)
 
 def stringify(pj, lo, length=None, term=None):
 	if term is None:
@@ -154,7 +154,7 @@ class Txt(Data):
 			pj.set_label(lo, "t_" + v.strip())
 		self.compact = True
 
-	def render(self, pj):
+	def render(self):
 		if not self.splitnl:
 			return ".TXT\t" + self.pre + "'" + self.txt + "'"
 
@@ -172,5 +172,5 @@ class Txt(Data):
 			txt += '.TXT\t' + p + "'" + l[-1] + "'"
 		return txt
 
-	def arg_render(self, pj):
+	def arg_render(self):
 		return "'" + self.txt + "'"

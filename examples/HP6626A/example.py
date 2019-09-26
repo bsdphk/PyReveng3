@@ -344,16 +344,16 @@ def task(pj, cpu):
 			hi = lo + 4
 			super(tt_5, self).__init__(pj, lo, hi, "tt_5")
 
-		def render(self, pj):
+		def render(self):
 			s = ".TT5\t"
-			t = pj.m[self.lo]
+			t = self.aspace[self.lo]
 			if t in token:
 				s += (token[t] + ", ").ljust(8)
 			else:
 				s += "T%02x, " % t
-			s += "0x%02x, " % pj.m[self.lo + 1]
-			w = pj.m.bu16(self.lo + 2)
-			s += pj.render_adr(w)
+			s += "0x%02x, " % self.aspace[self.lo + 1]
+			w = self.aspace.bu16(self.lo + 2)
+			s += self.aspace.adr(w)
 			return s
 
 	tt5s = {}
@@ -465,7 +465,7 @@ def task(pj, cpu):
 			super(fp, self).__init__(pj, lo, hi, "fp")
 			self.val = fp_val(pj, lo, hi)
 
-		def render(self, pj):
+		def render(self):
 			return ".FP\t%g" % self.val
 
 	class tt_2(data.Data):
@@ -473,20 +473,20 @@ def task(pj, cpu):
 			hi = lo + 5 + pj.m[lo + 4] * 4
 			super(tt_2, self).__init__(pj, lo, hi, "tt_2")
 
-		def render(self, pj):
+		def render(self):
 			s = ".TT2\t{\n"
-			w = pj.m.bu16(self.lo + 0)
-			s += "\t.next = " + pj.render_adr(w) + "\n"
-			s += "\t.model = %4d\n" % pj.m.bu16(self.lo + 2)
-			n = pj.m[self.lo + 4]
+			w = self.aspace.bu16(self.lo + 0)
+			s += "\t.next = " + self.aspace.adr(w) + "\n"
+			s += "\t.model = %4d\n" % self.aspace.bu16(self.lo + 2)
+			n = self.aspace[self.lo + 4]
 			s += "\t.outputs = %d\n" % n
 			a = self.lo + 5
 			for i in range(n):
-				w = pj.m.bu16(a)
-				s += "\t.out1[%d] = " % i + pj.render_adr(w) + "\n"
+				w = self.aspace.bu16(a)
+				s += "\t.out1[%d] = " % i + self.aspace.adr(w) + "\n"
 				a += 2
-				w = pj.m.bu16(a)
-				s += "\t.out2[%d] = " % i + pj.render_adr(w) + "\n"
+				w = self.aspace.bu16(a)
+				s += "\t.out2[%d] = " % i + self.aspace.adr(w) + "\n"
 				a += 2
 			return s + "\t}"
 
@@ -496,12 +496,12 @@ def task(pj, cpu):
 			super(tt_output1, self).__init__(pj, lo, hi, "tt_output1")
 			self.compact = True
 
-		def render(self, pj):
+		def render(self):
 			s = ".OUTPUT1\t"
 			a = self.lo
 			f = [ "%4.1f", "%4.1f", "%6.3f", "%6.3f", "%4.1f"]
 			for i in range(5):
-				s += "0x%04x, " % pj.m.bu16(a)
+				s += "0x%04x, " % self.aspace.bu16(a)
 				a += 2
 				s += (f[i] + ", ") % fp_val(pj, a, a + 4)
 				a += 4
@@ -516,17 +516,17 @@ def task(pj, cpu):
 			super(tt_output2, self).__init__(pj, lo, hi, "tt_output2")
 			self.compact = True
 
-		def render(self, pj):
+		def render(self):
 			s = ".OUTPUT2\t"
 			a = self.lo
 			f = [ "%4.1f", "%4.1f", "%6.3f", "%6.3f", "%4.1f",
 			    "%5.3f", "%4.1f"]
 			for i in range(7):
-				s += "0x%04x, " % pj.m.bu16(a)
+				s += "0x%04x, " % self.aspace.bu16(a)
 				a += 2
 				s += (f[i] + ", ") % fp_val(pj, a, a + 4)
 				a += 4
-			s += "0x%04x" % pj.m.bu16(a)
+			s += "0x%04x" % self.aspace.bu16(a)
 			return s
 
 	tt = {}

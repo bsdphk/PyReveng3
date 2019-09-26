@@ -451,7 +451,7 @@ def task(pj, cpu):
 			data.Codeptr(pj, self.fp, self.fp + 4, self.fa)
 			pj.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
 
-		def render(self, pj):
+		def render(self):
 			t = ".PARAM\t"
 			t += "func=%d" % self.fi
 			t += " call=%s" % self.nm
@@ -513,7 +513,7 @@ def task(pj, cpu):
 					keynos[self.b] = "CMD_" + self.string
 
 
-		def render(self, pj):
+		def render(self):
 			t = ".MNEM\t"
 			t += "0x%04x" % self.a
 			t += ", 0x%04x" % self.b
@@ -546,7 +546,7 @@ def task(pj, cpu):
 				if not self.svf2 in keynos:
 					keynos[self.svf2] = "CMD_" + self.name
 
-		def render(self, pj):
+		def render(self):
 			t = ".OLDCMD\t"
 			t += "'" + self.name + "'"
 			t += " imm=%x" % self.imm
