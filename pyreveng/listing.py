@@ -56,7 +56,6 @@ class Render_mem():
             try:
                 v = aspace[lo + i]
             except mem.MemError:
-                print("RW", aspace, "%x" % lo, "%x" % hi)
                 v = None
 
             if v is None:
@@ -120,10 +119,10 @@ class Seg_Listing():
         self.cxxx = 0
         self.fo = fo
 
-        misc.fill_gaps(pj)
-        misc.fill_all_blanks(pj, all_vals=True, minsize=ncol * 2)
+        misc.fill_gaps(self.aspace)
+        misc.fill_all_blanks(self.aspace, all_vals=True, minsize=ncol * 2)
         a0 = low
-        for i in pj.m:
+        for i in self.aspace:
             if i.hi < low:
                 continue
             if i.lo >= high:
@@ -134,10 +133,9 @@ class Seg_Listing():
 
             rx = i.render(pj)
             if rx is None:
-                alo = pj.afmt(i.lo)
-                ahi = pj.afmt(i.hi)
-                self.fo.write(
-                    "%s-%s [%s]\n" % (alo, ahi, i.tag))
+                alo = aspace.apct % i.lo
+                ahi = aspace.apct % i.hi
+                self.fo.write("%s-%s [%s]\n" % (alo, ahi, i.tag))
             elif i.lo < a0:
                 print("OVERLAP i.lo %x a0 %x" % (i.lo, a0), i)
                 continue

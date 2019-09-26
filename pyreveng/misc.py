@@ -28,29 +28,29 @@
 Misc generally usable functions which don't reallly belong anywhere else
 """
 
-from pyreveng import mem
+from pyreveng import mem, leaf
 
-def fill_gaps(pj):
+def fill_gaps(aspace):
 	# First GAPs, where mem cannot be read
 
-	def add_gap(pj, lo, hi):
+	def add_gap(aspace, lo, hi):
 		print("... adding .GAP 0x%x-0x%x" % (lo, hi))
-		x = pj.add(lo, hi, "gap")
+		x = leaf.Leaf(None, lo, hi, "gap")
 		x.rendered = ".GAP\t0x%x" % (hi - lo)
 		x.compact = True
+		aspace.insert(x)
 
 	gaps = 0
 	ngaps = 0
-	#for m in pj.m.segments():
 	if True:
-		for lo, hi in pj.m.gaps():
+		for lo, hi in aspace.gaps():
 			g0 = lo
 			g1 = False
 			for j in range(lo, hi):
 				try:
-					pj.m[j]
+					aspace[j]
 					if g1:
-						add_gap(pj, g0, j)
+						add_gap(aspace, g0, j)
 						ngaps += 1
 						gaps += j - g0
 					g1 = False
@@ -59,15 +59,14 @@ def fill_gaps(pj):
 						g1 = True
 						g0 = j
 			if g1:
-				add_gap(pj, g0, hi)
+				add_gap(aspace, g0, hi)
 				ngaps += 1
 				gaps += hi - g0
 
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
-	pj.run()
 
-def fill_blanks(pj, lo, hi, func=None, width=1, minsize=64, all_vals=False):
+def fill_blanks(aspace, lo, hi, func=None, width=1, minsize=64, all_vals=False):
 	'''
 		Find stretches `minsize` or more of `width` words
 		of all zeros or all ones and turn them into a .BLANK
@@ -78,9 +77,9 @@ def fill_blanks(pj, lo, hi, func=None, width=1, minsize=64, all_vals=False):
 	while hi & (width - 1):
 		hi = hi - 1
 	if func is None:
-		func = pj.m.__getitem__
+		func = aspace.__getitem__
 
-	fmt = "0x%" + "0%dx" % ((width * pj.m.bits + 3) // 4)
+	fmt = "0x%" + "0%dx" % ((width * aspace.bits + 3) // 4)
 
 	a = lo
 	b = a
@@ -103,16 +102,17 @@ def fill_blanks(pj, lo, hi, func=None, width=1, minsize=64, all_vals=False):
 				pass
 			break
 		if b - a >= minsize:
-			x = pj.add(a, b, "blank")
+			x = leaf.Leaf(None, a, b, "blank")
 			x.rendered = ".BLANK\t" + fmt % c + "[0x%x]" % ((b-a) // width)
 			x.compact = True
+			x = aspace.insert(x)
 		a = b
 
-def fill_all_blanks(pj, **kwargs):
+def fill_all_blanks(aspace, **kwargs):
 	'''
 		Fill in all .BLANKS
 	'''
-	for m, slo, shi in pj.m.segments():
-		for glo, ghi in pj.m.gaps():
+	for m, slo, shi in aspace.segments():
+		for glo, ghi in aspace.gaps():
 			if glo >= slo and ghi <= shi:
-				fill_blanks(pj, glo, ghi, **kwargs)
+				fill_blanks(aspace, glo, ghi, **kwargs)

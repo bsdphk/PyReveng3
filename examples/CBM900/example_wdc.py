@@ -67,8 +67,6 @@ def task(pj, cx):
     while pj.run():
         pass
 
-    misc.fill_all_blanks(pj, minsize=2)
-
 if __name__ == '__main__':
     pj, cx = setup()
     task(pj, cx)
