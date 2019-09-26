@@ -210,9 +210,11 @@ class mcs48_ins(assy.Instree_ins):
 
 class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
-		super().__init__(lang, 8)
-		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
-		print(self.m)
+		super().__init__(
+                    lang,
+                    ins_word=8,
+                    abits=16,
+                )
 		self.it.load_string(mcs48_desc, mcs48_ins)
 
 		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",

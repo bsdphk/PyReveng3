@@ -511,9 +511,12 @@ class i8086_ins(assy.Instree_ins):
 
 class i8086(assy.Instree_disass):
     def __init__(self):
-        super().__init__("i8086", 8)
-        self.add_as("mem", mem.MemMapper(0, 1<<20, "Memory"))
-        self.add_as("io", mem.MemMapper(0, 1<<16, "IO"))
+        super().__init__(
+            "i8086",
+            ins_word=8,
+            abits=20,
+        )
+        self.add_as("io", "I/O", bits=16)
         self.add_ins(i8086_desc, i8086_ins)
 
     def has_8087(self):

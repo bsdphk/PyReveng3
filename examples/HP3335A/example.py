@@ -42,8 +42,10 @@ def mem_setup():
 	)
 
 def setup():
-	cpu = mc6800.mc6800(mask = 0x7fff)
-	cpu.m.map(mem_setup(), 0x6800)
+	cpu = mc6800.mc6800()
+	m = mem_setup()
+	cpu.m.map(m, 0x6800)
+	cpu.m.map(m, 0xfff8, 0x10000, offset=0x17f8)
 	pj = job.Job(cpu.m, "HP3335A")
 
 	return pj, cpu
@@ -109,16 +111,7 @@ def task(pj, cpu):
 
 	#######################################################################
 
-	def vec(a, n):
-		c = pj.add(a, a + 2, "vector")
-		c.rendered = "vector(%s)" % n
-		v = pj.m.bu16(a)
-		pj.todo(v, cpu.disass)
-
-	vec(0x7ff8, "IRQ")
-	vec(0x7ffa, "SWI")
-	vec(0x7ffc, "NMI")
-	vec(0x7ffe, "RST")
+	cpu.vectors(pj)
 
 	#######################################################################
 

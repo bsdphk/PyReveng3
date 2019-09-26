@@ -33,7 +33,7 @@ Prefix instructions are marked with mnemonic "+" and their
 arguments are processed before the instruction.
 """
 
-from . import instree, code, pil
+from . import instree, code, pil, mem
 
 #######################################################################
 
@@ -204,7 +204,14 @@ class Instree_ins(Assy):
 #######################################################################
 
 class Instree_disass(code.Decoder):
-    def __init__(self, name, ins_word=8, mem_word=None, endian=None):
+    def __init__(
+        self,
+        name,
+        ins_word=8,
+        mem_word=None,
+        endian=None,
+        abits=None
+    ):
         super().__init__(name)
         if mem_word is None:
             mem_word = ins_word
@@ -232,9 +239,17 @@ class Instree_disass(code.Decoder):
         self.verbatim = set()
         self.it = instree.InsTree(ins_word)
         self.m = None
-        self.aspace = {}
 
-    def add_as(self, name, aspace):
+        self.aspace = {}
+        if abits is not None:
+            self.add_as("mem", "Memory", bits = abits)
+
+    def add_as(self, name, desc=None, bits=None, lo=None, hi=None, aspace=None):
+        if bits is not None:
+            lo = 0
+            hi = 1 << bits
+        if aspace is None:
+            aspace = mem.MemMapper(lo, hi, desc)
         self.aspace[name] = aspace
         if name == "mem":
             self.m = aspace

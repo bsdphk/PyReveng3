@@ -485,476 +485,481 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 """
 
 class vector(data.Data):
-	def __init__(self, pj, adr, cx):
-		super().__init__(pj, adr, adr + 4)
-		self.ws = pj.m.bu16(adr)
-		self.dstadr = pj.m.bu16(adr + 2)
-		pj.todo(self.dstadr, cx.disass)
+    def __init__(self, pj, adr, cx):
+        super().__init__(pj, adr, adr + 4)
+        self.ws = pj.m.bu16(adr)
+        self.dstadr = pj.m.bu16(adr + 2)
+        pj.todo(self.dstadr, cx.disass)
 
-	def render(self, pj):
-		return "WP=0x%04x,IP=%s" % (self.ws, pj.m.adr(self.dstadr))
+    def render(self, pj):
+        return "WP=0x%04x,IP=%s" % (self.ws, pj.m.adr(self.dstadr))
 
 
 class Tms9900_ins(assy.Instree_ins):
-	pass
+    pass
 
-	def sz(self):
-		if self.mne[-1] == 'b':
-			return 8
-		return 16
+    def sz(self):
+        if self.mne[-1] == 'b':
+            return 8
+        return 16
 
-	def arg_o(self, pj, sd):
-		to = self['t' + sd]
-		o = self[sd]
-		nm = 'G' + sd
-		if to == 0:
-			return "R%d" % o
-		if to == 1:
-			return "*R%d" % o
+    def arg_o(self, pj, sd):
+        to = self['t' + sd]
+        o = self[sd]
+        nm = 'G' + sd
+        if to == 0:
+            return "R%d" % o
+        if to == 1:
+            return "*R%d" % o
 
-		if to == 2:
-			v = pj.m.bu16(self.hi)
-			self.hi += 2
-			self[nm] = v
-			if o != 0:
-				return "R%d+#0x%04x" % (o, v)
+        if to == 2:
+            v = pj.m.bu16(self.hi)
+            self.hi += 2
+            self[nm] = v
+            if o != 0:
+                return "R%d+#0x%04x" % (o, v)
 
-			x = pj.find(v)
-			if len(x) > 0:
-				return assy.Arg_ref(pj, x[0])
+            x = pj.find(v)
+            if len(x) > 0:
+                return assy.Arg_ref(pj, x[0])
 
-			try:
-				w = pj.m.bu16(v)
-			except:
-				return assy.Arg_dst(pj, v, "@")
+            try:
+                w = pj.m.bu16(v)
+            except:
+                return assy.Arg_dst(pj, v, "@")
 
-			if self.mne[-1] == "b":
-				c = data.Const(pj, v, v + 1)
-				c.typ = ".BYTE"
-				c.fmt = "0x%02x" % pj.m[v]
-			else:
-				c = data.Const(pj, v, v + 2)
-				c.typ = ".WORD"
-				c.fmt = "0x%04x" % w
-			return assy.Arg_ref(pj, c)
+            if self.mne[-1] == "b":
+                c = data.Const(pj, v, v + 1)
+                c.typ = ".BYTE"
+                c.fmt = "0x%02x" % pj.m[v]
+            else:
+                c = data.Const(pj, v, v + 2)
+                c.typ = ".WORD"
+                c.fmt = "0x%04x" % w
+            return assy.Arg_ref(pj, c)
 
-		if to == 3:
-			return "*R%d+" % o
+        if to == 3:
+            return "*R%d+" % o
 
-	#-----------------------------------
-	# Methods related to assembly output
-	#-----------------------------------
+    #-----------------------------------
+    # Methods related to assembly output
+    #-----------------------------------
 
-	def assy_b(self, pj):
-		if self['b']:
-			ins.mne += "B"
-	def assy_blwp1(self, pj):
-		a = self['ptr']
-		self.cache['blwp1'] = pj.m.bu16(a)
-		if not pj.m.find_lo(a):
-			data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
-		return "WP=0x%04x" % pj.m.bu16(a)
+    def assy_b(self, pj):
+        if self['b']:
+            ins.mne += "B"
+    def assy_blwp1(self, pj):
+        a = self['ptr']
+        self.cache['blwp1'] = pj.m.bu16(a)
+        if not pj.m.find_lo(a):
+            data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+        return "WP=0x%04x" % pj.m.bu16(a)
 
-	def assy_blwp2(self, pj):
-		a = self['ptr']
-		self.cache['blwp2'] = pj.m.bu16(a + 2)
-		self.dstadr = pj.m.bu16(a+2)
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_blwp2(self, pj):
+        a = self['ptr']
+        self.cache['blwp2'] = pj.m.bu16(a + 2)
+        self.dstadr = pj.m.bu16(a+2)
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_c(self, pj):
-		x = self['c']
-		if x == 0:
-			x = 16
-		if x <= 8:
-			self.mne += "b"
-		return assy.Arg_imm(pj, x)
+    def assy_c(self, pj):
+        x = self['c']
+        if x == 0:
+            x = 16
+        if x <= 8:
+            self.mne += "b"
+        return assy.Arg_imm(pj, x)
 
-	def assy_cru(self, pj):
-		i = self['cru']
-		if i & 0x80:
-			i -= 0x100
-		# XXX: This doubling may be model-dependent
-		# XXX: Based on 9980/9981
-		i *= 2
-		return "R12%#+x" % i
+    def assy_cru(self, pj):
+        i = self['cru']
+        if i & 0x80:
+            i -= 0x100
+        # XXX: This doubling may be model-dependent
+        # XXX: Based on 9980/9981
+        i *= 2
+        return "R12%#+x" % i
 
-	def assy_da(self, pj):
-		self.dstadr = self['da']
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_da(self, pj):
+        self.dstadr = self['da']
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_do(self, pj):
-		return self.arg_o(pj, 'd')
+    def assy_do(self, pj):
+        return self.arg_o(pj, 'd')
 
-	def assy_i(self, pj):
-		return assy.Arg_imm(pj, self['iop'], 16)
+    def assy_i(self, pj):
+        return assy.Arg_imm(pj, self['iop'], 16)
 
-	def assy_so(self, pj):
-		return self.arg_o(pj, 's')
+    def assy_so(self, pj):
+        return self.arg_o(pj, 's')
 
-	def assy_r(self, pj):
-		i = self['disp']
-		if i & 0x80:
-			i -= 256
-		self.dstadr = self.hi + i * 2
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_r(self, pj):
+        i = self['disp']
+        if i & 0x80:
+            i -= 256
+        self.dstadr = self.hi + i * 2
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_sc(self, pj):
-		if self['c'] == 0:
-			return "R0"
-		else:
-			return "#%d" % self['c']
+    def assy_sc(self, pj):
+        if self['c'] == 0:
+            return "R0"
+        else:
+            return "#%d" % self['c']
 
-	def assy_w(self, pj):
-		return "R%d" % self['w']
+    def assy_w(self, pj):
+        return "R%d" % self['w']
 
-	#-----------------------------
-	# Methods related to IL output
-	#-----------------------------
+    #-----------------------------
+    # Methods related to IL output
+    #-----------------------------
 
-	def pilmacro_R(self):
-		return "%%R%d" % self['w']
+    def pilmacro_R(self):
+        return "%%R%d" % self['w']
 
-	def pilmacro_RN(self):
-		assert self['w'] != 15
-		return "%%R%d" % (self['w'] + 1)
+    def pilmacro_RN(self):
+        assert self['w'] != 15
+        return "%%R%d" % (self['w'] + 1)
 
-	def pilmacro_IMM(self):
-		return "0x%04x" % self['iop']
+    def pilmacro_IMM(self):
+        return "0x%04x" % self['iop']
 
-	def ilarg_ao(self, sd):
-		t = self['t' + sd]
-		s = self[sd]
-		nm = 'G' + sd
-		sz = self.sz()
-		tsz = "i%d" % sz
-		r = "%%R%d" % s
-		assert t != 0
+    def ilarg_ao(self, sd):
+        t = self['t' + sd]
+        s = self[sd]
+        nm = 'G' + sd
+        sz = self.sz()
+        tsz = "i%d" % sz
+        r = "%%R%d" % s
+        assert t != 0
 
-		if t == 1:
-			return self.add_il([
-				[ "%0", '=', 'inttoptr', 'i16', r,
-				    'to', tsz + "*"],
-			], "%0")
+        if t == 1:
+            return self.add_il([
+                [ "%0", '=', 'inttoptr', 'i16', r,
+                    'to', tsz + "*"],
+            ], "%0")
 
-		if t == 2 and s == 0:
-			return "0x%04x" % self[nm]
+        if t == 2 and s == 0:
+            return "0x%04x" % self[nm]
 
-		if t == 2:
-			return self.add_il([
-				[ "%0", '=', 'add', 'i16', r, ',',
-				    "0x%04x" % self[nm]],
-				[ "%1", '=', 'inttoptr', "i16", "%0",
-				    'to', tsz + "*"],
-			], "%1")
+        if t == 2:
+            return self.add_il([
+                [ "%0", '=', 'add', 'i16', r, ',',
+                    "0x%04x" % self[nm]],
+                [ "%1", '=', 'inttoptr', "i16", "%0",
+                    'to', tsz + "*"],
+            ], "%1")
 
-		assert t == 3
-		z = self.cache.get(sd)
-		if z is not None:
-			return z
-		z = self.add_il([
-			[ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
-			[ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz // 8)],
-		], "%0")
-		self.cache[sd] = z
-		return z
+        assert t == 3
+        z = self.cache.get(sd)
+        if z is not None:
+            return z
+        z = self.add_il([
+            [ "%0", '=', 'inttoptr', "i16", r, 'to', tsz + "*"],
+            [ r, '=', 'add', 'i16', r, ',', '0x%04x' % (sz // 8)],
+        ], "%0")
+        self.cache[sd] = z
+        return z
 
-	def ilarg_ro(self, sd):
-		t = self['t' + sd]
-		s = self[sd]
-		nm = 'G' + sd
-		sz = self.sz()
-		tsz = "i%d" % sz
-		r = "%%R%d" % s
-		if t == 0 and sz == 16:
-			return r
+    def ilarg_ro(self, sd):
+        t = self['t' + sd]
+        s = self[sd]
+        nm = 'G' + sd
+        sz = self.sz()
+        tsz = "i%d" % sz
+        r = "%%R%d" % s
+        if t == 0 and sz == 16:
+            return r
 
-		if t == 0 and sz == 8:
-			return self.add_il([
-				[ "%0", '=', 'shr', "i16", r, ',', '8' ],
-				[ "%1", '=', 'trunc', "i16", "%0", 'to', 'i8' ],
-			], "%1")
+        if t == 0 and sz == 8:
+            return self.add_il([
+                [ "%0", '=', 'shr', "i16", r, ',', '8' ],
+                [ "%1", '=', 'trunc', "i16", "%0", 'to', 'i8' ],
+            ], "%1")
 
-		a = self.ilarg_ao(sd)
-		return self.add_il([
-			[ "%0", '=', 'load', tsz, ',', tsz + "*", a],
-		], "%0")
+        a = self.ilarg_ao(sd)
+        return self.add_il([
+            [ "%0", '=', 'load', tsz, ',', tsz + "*", a],
+        ], "%0")
 
-	def ilarg_lo(self, sd, args):
-		t = self['t' + sd]
-		s = self[sd]
-		nm = 'G' + sd
-		sz = self.sz()
-		tsz = "i%d" % sz
-		r = "%%R%d" % s
-		if t == 0 and sz == 16:
-			self.add_il([ [ r, "=", tsz, args[0]], ])
-			return
-		if t == 0 and sz == 8:
-			self.add_il([
-				[ "%0", "=", "zext", tsz, args[0],
-				    "to", "i16" ],
-				[ "%1", "=", "shl", "i16", "%0", ",", "8" ],
-				[ r, "=", "and", "i16", r, ",", "0x00ff" ],
-				[ r, "=", "or", "i16", r, ",", "%1" ],
-			])
-			return
+    def ilarg_lo(self, sd, args):
+        t = self['t' + sd]
+        s = self[sd]
+        nm = 'G' + sd
+        sz = self.sz()
+        tsz = "i%d" % sz
+        r = "%%R%d" % s
+        if t == 0 and sz == 16:
+            self.add_il([ [ r, "=", tsz, args[0]], ])
+            return
+        if t == 0 and sz == 8:
+            self.add_il([
+                [ "%0", "=", "zext", tsz, args[0],
+                    "to", "i16" ],
+                [ "%1", "=", "shl", "i16", "%0", ",", "8" ],
+                [ r, "=", "and", "i16", r, ",", "0x00ff" ],
+                [ r, "=", "or", "i16", r, ",", "%1" ],
+            ])
+            return
 
-		a = self.ilarg_ao(sd)
-		self.add_il([
-			[ 'store', tsz, args[0], ',', tsz + "*", a],
-		])
-		return
+        a = self.ilarg_ao(sd)
+        self.add_il([
+            [ 'store', tsz, args[0], ',', tsz + "*", a],
+        ])
+        return
 
-	def pilmacro_SZ(self):
-		return "i%d" % self.sz()
+    def pilmacro_SZ(self):
+        return "i%d" % self.sz()
 
-	def pilmacro_AS(self):
-		return self.ilarg_ao('s')
+    def pilmacro_AS(self):
+        return self.ilarg_ao('s')
 
-	def pilfunc_LS(self, args):
-		self.ilarg_lo('s', args)
+    def pilfunc_LS(self, args):
+        self.ilarg_lo('s', args)
 
-	def pilmacro_RS(self):
-		z = self.cache.get("RS")
-		if z is None:
-			z = self.cache["RS"] = self.ilarg_ro('s')
-		return z
+    def pilmacro_RS(self):
+        z = self.cache.get("RS")
+        if z is None:
+            z = self.cache["RS"] = self.ilarg_ro('s')
+        return z
 
-	def pilmacro_AD(self):
-		return self.ilarg_ao(self['td'], self['d'], 'Gd')
+    def pilmacro_AD(self):
+        return self.ilarg_ao(self['td'], self['d'], 'Gd')
 
-	def pilfunc_LD(self, args):
-		self.ilarg_lo('d', args)
+    def pilfunc_LD(self, args):
+        self.ilarg_lo('d', args)
 
-	def pilmacro_RD(self):
-		z = self.cache.get("RD")
-		if z is None:
-			z = self.cache["RD"] = self.ilarg_ro('d')
-		return z
+    def pilmacro_RD(self):
+        z = self.cache.get("RD")
+        if z is None:
+            z = self.cache["RD"] = self.ilarg_ro('d')
+        return z
 
-	def pilmacro_CRU(self):
-		o = self['cru']
-		l = []
-		l.append([ '%0', "=", "lshr", "i16", "%R12", ",", "1"])
-		if o & 0x80:
-			l.append(
-			    [ '%1', "=", "sub", "i16", "%0", ",",
-				"0x%04x" % (256-o) ])
-		else:
-			l.append(
-			    [ '%1', "=", "add", "i16", "%0", ",",
-				"0x%04x" % o ])
-		l.append([ '%2', "=", "inttoptr", "i16", "%1", "to",
-			    "i1", "address_space", "(", "1", ")", "*"])
-		return self.add_il(l, "%2")
+    def pilmacro_CRU(self):
+        o = self['cru']
+        l = []
+        l.append([ '%0', "=", "lshr", "i16", "%R12", ",", "1"])
+        if o & 0x80:
+            l.append(
+                [ '%1', "=", "sub", "i16", "%0", ",",
+                "0x%04x" % (256-o) ])
+        else:
+            l.append(
+                [ '%1', "=", "add", "i16", "%0", ",",
+                "0x%04x" % o ])
+        l.append([ '%2', "=", "inttoptr", "i16", "%1", "to",
+                "i1", "address_space", "(", "1", ")", "*"])
+        return self.add_il(l, "%2")
 
-	def pilmacro_SCNT1(self):
-		c = self['c']
-		if c == 0:
-			c = 16
-		return "0x%x" % (c - 1)
+    def pilmacro_SCNT1(self):
+        c = self['c']
+        if c == 0:
+            c = 16
+        return "0x%x" % (c - 1)
 
-	def pilmacro_SCNT(self):
-		c = self['c']
-		if c == 0:
-			c = 16
-		return "0x%x" % c
+    def pilmacro_SCNT(self):
+        c = self['c']
+        if c == 0:
+            c = 16
+        return "0x%x" % c
 
-	def pilmacro_BRYES(self):
-		return ["label", "0x%04x" % self.flow_out[0].to]
+    def pilmacro_BRYES(self):
+        return ["label", "0x%04x" % self.flow_out[0].to]
 
-	def pilmacro_BRNO(self):
-		return ["label", "0x%04x" % self.flow_out[1].to]
+    def pilmacro_BRNO(self):
+        return ["label", "0x%04x" % self.flow_out[1].to]
 
-	def pilmacro_NEXT(self):
-		return "0x%04x" % self.hi
+    def pilmacro_NEXT(self):
+        return "0x%04x" % self.hi
 
-	def aliasregs(self):
-		l = []
-		l.append(["%50", "=", "inttoptr", "i16", "%WP", "to", "i16*"])
-		l.append(["%R0", "=", "pyreveng.alias", "(", "%50", ")"])
-		for r in range(1,16):
-			rr = "%%%d" % (50 + r)
-			l.append(
-			    [rr, "=", "add", "i16*", "%50", ",", "%d" % (2*r)])
-			l.append(
-			    ["%%R%d" % r, "=", "pyreveng.alias", "(", rr, ")"])
-		return l
+    def aliasregs(self):
+        l = []
+        l.append(["%50", "=", "inttoptr", "i16", "%WP", "to", "i16*"])
+        l.append(["%R0", "=", "pyreveng.alias", "(", "%50", ")"])
+        for r in range(1,16):
+            rr = "%%%d" % (50 + r)
+            l.append(
+                [rr, "=", "add", "i16*", "%50", ",", "%d" % (2*r)])
+            l.append(
+                ["%%R%d" % r, "=", "pyreveng.alias", "(", rr, ")"])
+        return l
 
-	def pilfunc_BLWP(self, args):
-		l = []
-		l.append(["%0", "=", "i16", "%WP"])
-		l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
-		l += self.aliasregs()
-		l.append(["%R13", "=", "i16", "%0"])
-		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
-		l.append(["%R15", "=", "i16", "%status"])
-		l.append(["br", "label", "i16*",
-		    "0x%04x" % self.cache['blwp2'] ])
-		self.add_il(l)
+    def pilfunc_BLWP(self, args):
+        l = []
+        l.append(["%0", "=", "i16", "%WP"])
+        l.append(["%WP", "=", "i16", "0x%04x" % self.cache['blwp1'] ])
+        l += self.aliasregs()
+        l.append(["%R13", "=", "i16", "%0"])
+        l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
+        l.append(["%R15", "=", "i16", "%status"])
+        l.append(["br", "label", "i16*",
+            "0x%04x" % self.cache['blwp2'] ])
+        self.add_il(l)
 
-	def pilfunc_BLWPDYN(self, args):
-		l = []
-		l.append(["%0", '=', "i16*", args[0]])
-		l.append(["%1", '=', 'load', 'i16', ',', "i16*", "%0"])
-		l.append(["%2", '=', 'add', 'i16*', "%0", ',', '2'])
-		l.append(["%3", '=', 'load', 'i16', ',', "i16*", "%2"])
-		l.append(["%4", "=", "i16", "%WP"])
-		l.append(["%WP", "=", "i16", "%1"])
-		l += self.aliasregs()
-		l.append(["%R13", "=", "i16", "%4"])
-		l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
-		l.append(["%R15", "=", "i16", "%status"])
-		l.append(["br", "label", "i16*", "%3"])
-		self.add_il(l)
+    def pilfunc_BLWPDYN(self, args):
+        l = []
+        l.append(["%0", '=', "i16*", args[0]])
+        l.append(["%1", '=', 'load', 'i16', ',', "i16*", "%0"])
+        l.append(["%2", '=', 'add', 'i16*', "%0", ',', '2'])
+        l.append(["%3", '=', 'load', 'i16', ',', "i16*", "%2"])
+        l.append(["%4", "=", "i16", "%WP"])
+        l.append(["%WP", "=", "i16", "%1"])
+        l += self.aliasregs()
+        l.append(["%R13", "=", "i16", "%4"])
+        l.append(["%R14", "=", "i16", "0x%04x" % self.hi])
+        l.append(["%R15", "=", "i16", "%status"])
+        l.append(["br", "label", "i16*", "%3"])
+        self.add_il(l)
 
-	def pilfunc_RTWP(self, args):
-		l = []
-		l.append(["%status", "=", "i16", "%R15"])
-		l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
-		l.append(["%WP", "=", "i16", "%R13"])
-		l += self.aliasregs()
-		l.append(["br", "label", "i16*", "%1"])
-		self.add_il(l)
+    def pilfunc_RTWP(self, args):
+        l = []
+        l.append(["%status", "=", "i16", "%R15"])
+        l.append(["%1", "=", "inttoptr", "i16", "%R14", "to", "i16*"])
+        l.append(["%WP", "=", "i16", "%R13"])
+        l += self.aliasregs()
+        l.append(["br", "label", "i16*", "%1"])
+        self.add_il(l)
 
-	def pilfunc_PARITY(self, args):
-		# args: [result]
-		assert self.sz() == 8
-		sz = "i%d" % self.sz()
-		self.add_il([
-			["%status.op", "=", "pyreveng.parity.odd.i1",
-			    "(", sz, args[0], ')'],
-		])
+    def pilfunc_PARITY(self, args):
+        # args: [result]
+        assert self.sz() == 8
+        sz = "i%d" % self.sz()
+        self.add_il([
+            ["%status.op", "=", "pyreveng.parity.odd.i1",
+                "(", sz, args[0], ')'],
+        ])
 
-	def pilfunc_FLAGS3(self, args):
-		# args: [result]
-		sz = "i%d" % self.sz()
-		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz,
-			    args[0], ",", "0"],
-			["%status.agt", "=", "icmp", "sgt", sz,
-			    args[0], ",", "0"],
-			["%status.eq",  "=", "icmp", "eq", sz,
-			    args[0], ',', "0" ],
-		])
+    def pilfunc_FLAGS3(self, args):
+        # args: [result]
+        sz = "i%d" % self.sz()
+        self.add_il([
+            ["%status.lgt", "=", "icmp", "ne", sz,
+                args[0], ",", "0"],
+            ["%status.agt", "=", "icmp", "sgt", sz,
+                args[0], ",", "0"],
+            ["%status.eq",  "=", "icmp", "eq", sz,
+                args[0], ',', "0" ],
+        ])
 
-	def pilfunc_FLAGS5(self, args):
-		# args: [src, dst, result]
-		sz = "i%d" % self.sz()
-		self.add_il([
-			["%status.lgt", "=", "icmp", "ne", sz,
-			    args[2], ",", "0"],
-			["%status.eq",  "=", "icmp", "eq", sz,
-			    args[2], ',', "0" ],
-			["%status.c", "=", "pyreveng.carry.i1",
-			    "(", sz, args[0], ",", sz, args[1], ")" ],
-			["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
-			    sz, args[0], ",",
-			    sz, args[1], ",",
-			    sz, args[2], ")" ],
-		])
+    def pilfunc_FLAGS5(self, args):
+        # args: [src, dst, result]
+        sz = "i%d" % self.sz()
+        self.add_il([
+            ["%status.lgt", "=", "icmp", "ne", sz,
+                args[2], ",", "0"],
+            ["%status.eq",  "=", "icmp", "eq", sz,
+                args[2], ',', "0" ],
+            ["%status.c", "=", "pyreveng.carry.i1",
+                "(", sz, args[0], ",", sz, args[1], ")" ],
+            ["%status.ov", "=", "pyreveng.tms99x.ov.i1", "(",
+                sz, args[0], ",",
+                sz, args[1], ",",
+                sz, args[2], ")" ],
+        ])
 
-	def pilfunc_CMPFLAGS(self, args):
-		# args: [sz, src, dst]
-		self.add_il([
-			["%status.lgt", "=", "icmp", "ugt",
-			    args[0], args[1], ",", args[2]],
-			["%status.agt", "=", "icmp", "sgt",
-			    args[0], args[1], ",", args[2]],
-			["%status.eq", "=", "icmp", "eq",
-			    args[0], args[1], ",", args[2]],
-		])
+    def pilfunc_CMPFLAGS(self, args):
+        # args: [sz, src, dst]
+        self.add_il([
+            ["%status.lgt", "=", "icmp", "ugt",
+                args[0], args[1], ",", args[2]],
+            ["%status.agt", "=", "icmp", "sgt",
+                args[0], args[1], ",", args[2]],
+            ["%status.eq", "=", "icmp", "eq",
+                args[0], args[1], ",", args[2]],
+        ])
 
-	def pilfunc_LDCR(self, args):
-		# pg 365
-		c = self['c']
-		if c == 0:
-			c = 16
-		# print(self, "LDCR", c, args)
-		self.pilfunc_FLAGS3(args)
-		l = []
-		ty = "i%d" % self.sz()
-		if c <= 8:
-			self.pilfunc_PARITY(args)
-		l.append(["%0", "=", ty, args[0]])
-		l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
-		l.append(["%2", "=", "inttoptr", "i1", "%1",
-		    "to", "i16", "address_space(1)*"])
-		for j in range(c):
-			l.append(["%3", "=", "trunc", ty, "%0", "to", "i1"])
-			l.append(["store", "i1", "%3",
-			    "i1", "address_space(1)*", "%2"])
-			l.append(["%0", "=", "shr", ty, "%0", ",", "1"])
-			l.append(["%2", "=", "add",
-			    "i1", "address_space(1)*", "%2", ",", "1"])
-		self.add_il(l)
+    def pilfunc_LDCR(self, args):
+        # pg 365
+        c = self['c']
+        if c == 0:
+            c = 16
+        # print(self, "LDCR", c, args)
+        self.pilfunc_FLAGS3(args)
+        l = []
+        ty = "i%d" % self.sz()
+        if c <= 8:
+            self.pilfunc_PARITY(args)
+        l.append(["%0", "=", ty, args[0]])
+        l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
+        l.append(["%2", "=", "inttoptr", "i1", "%1",
+            "to", "i16", "address_space(1)*"])
+        for j in range(c):
+            l.append(["%3", "=", "trunc", ty, "%0", "to", "i1"])
+            l.append(["store", "i1", "%3",
+                "i1", "address_space(1)*", "%2"])
+            l.append(["%0", "=", "shr", ty, "%0", ",", "1"])
+            l.append(["%2", "=", "add",
+                "i1", "address_space(1)*", "%2", ",", "1"])
+        self.add_il(l)
 
-	def pilfunc_STCR(self, args):
-		# pg 367
-		c = self['c']
-		if c == 0:
-			c = 16
-		print(self, "STCR", c, args)
-		l = []
-		ty = "i%d" % self.sz()
-		l.append(["%0", "=", ty, "0"])
-		l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
-		l.append(["%2", "=", "inttoptr", "i1", "%1",
-		    "to", "i16", "address_space(1)*"])
-		for j in range(c):
-			l.append(["%3", "=", "load", "i1", ",",
-			    "i1", "address_space(1)*", "%2"])
-			l.append(["%4", "=", "zext", "i1", "%3", "to", ty])
-			l.append(["%0", "=", "shl", ty, "%0", ",", "1"])
-			l.append(["%0", "=", "or", ty, "%0", ",", "%4"])
-			l.append(["%2", "=", "add",
-			    "i16", "address_space(1)*", "%2", ",", "1"])
-		l.append([args[0], "=", ty, "%0"])
-		self.add_il(l)
-		self.pilfunc_FLAGS3(args)
-		if c <= 8:
-			self.pilfunc_PARITY(args)
+    def pilfunc_STCR(self, args):
+        # pg 367
+        c = self['c']
+        if c == 0:
+            c = 16
+        print(self, "STCR", c, args)
+        l = []
+        ty = "i%d" % self.sz()
+        l.append(["%0", "=", ty, "0"])
+        l.append(["%1", "=", "shr", "i16", "%R12", ",", "1"])
+        l.append(["%2", "=", "inttoptr", "i1", "%1",
+            "to", "i16", "address_space(1)*"])
+        for j in range(c):
+            l.append(["%3", "=", "load", "i1", ",",
+                "i1", "address_space(1)*", "%2"])
+            l.append(["%4", "=", "zext", "i1", "%3", "to", ty])
+            l.append(["%0", "=", "shl", ty, "%0", ",", "1"])
+            l.append(["%0", "=", "or", ty, "%0", ",", "%4"])
+            l.append(["%2", "=", "add",
+                "i16", "address_space(1)*", "%2", ",", "1"])
+        l.append([args[0], "=", ty, "%0"])
+        self.add_il(l)
+        self.pilfunc_FLAGS3(args)
+        if c <= 8:
+            self.pilfunc_PARITY(args)
 
-	def pilfunc_LWPI(self, args):
-		x = int(args[0], 0)
-		self.add_il([ ["%WP", "=", "i16", args[0]] ])
-		self.add_il(self.aliasregs())
+    def pilfunc_LWPI(self, args):
+        x = int(args[0], 0)
+        self.add_il([ ["%WP", "=", "i16", args[0]] ])
+        self.add_il(self.aliasregs())
 
 class Tms9900(assy.Instree_disass):
-	def __init__(self):
-		super().__init__("TMS 9900", 16, 8, ">")
-		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
-		self.add_ins(tms9900_desc, Tms9900_ins)
-		self.n_interrupt = 16
-		self.il = True
+    def __init__(self):
+        super().__init__(
+            "TMS 9900",
+            ins_word=16,
+            mem_word=8,
+            endian=">",
+            abits=16,
+        )
+        self.add_ins(tms9900_desc, Tms9900_ins)
+        self.n_interrupt = 16
+        self.il = True
 
-	def codeptr(self, pj, adr):
-		t = pj.m.bu16(adr)
-		c = data.Codeptr(pj, adr, adr + 2, t)
-		pj.todo(t, self.disass)
-		return c
+    def codeptr(self, pj, adr):
+        t = pj.m.bu16(adr)
+        c = data.Codeptr(pj, adr, adr + 2, t)
+        pj.todo(t, self.disass)
+        return c
 
-	def vector(self, pj, adr):
-		return vector(pj, adr, self)
+    def vector(self, pj, adr):
+        return vector(pj, adr, self)
 
-	def vectors(self, pj, adr=0x0, xops=1):
-		def vect(pj, a, lbl):
-			c = vector(pj, a, self)
-			pj.set_label(c.dstadr, lbl)
-			return c
+    def vectors(self, pj, adr=0x0, xops=1):
+        def vect(pj, a, lbl):
+            c = vector(pj, a, self)
+            pj.set_label(c.dstadr, lbl)
+            return c
 
-		vect(pj, adr, "RESET")
-		for i in range(1, self.n_interrupt):
-			if pj.m.bu16(i * 4) != 0:
-				vect(pj, i * 4, "INT%d" % i)
-		for i in range(xops):
-			vect(pj, 0x40 + i * 4, "XOP%d" % i)
+        vect(pj, adr, "RESET")
+        for i in range(1, self.n_interrupt):
+            if pj.m.bu16(i * 4) != 0:
+                vect(pj, i * 4, "INT%d" % i)
+        for i in range(xops):
+            vect(pj, 0x40 + i * 4, "XOP%d" % i)
 
 class Tms9981(Tms9900):
-	def __init__(self):
-		super().__init__()
-		self.n_interrupt = 5
+    def __init__(self):
+        super().__init__()
+        self.n_interrupt = 5
 
 if __name__ == "__main__":
-	h = Tms9900()
-	h.it.print()
+    h = Tms9900()
+    h.it.print()

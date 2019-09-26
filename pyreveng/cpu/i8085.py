@@ -452,12 +452,6 @@ SIM	-		|0 0 1 1 0 0 0 0| {
 
 """
 
-if __name__ == "__main__":
-    print(i8085_instructions)
-    it = instree.Instree(8)
-    it.load_string(i8085_instructions)
-    it.print()
-
 class i8085_ins(assy.Instree_ins):
     def __init__(self, pj, lim, lang):
         super(i8085_ins, self).__init__(pj, lim, lang)
@@ -591,8 +585,11 @@ class i8085_ins(assy.Instree_ins):
 
 class i8085(assy.Instree_disass):
     def __init__(self):
-        super().__init__("i8085", 8)
-        self.m = mem.mem_mapper(0x0000, 0x10000)
+        super().__init__(
+            "i8085",
+            ins_word=8,
+            abits=16,
+        )
         self.add_ins(i8085_desc, i8085_ins)
         self.verbatim |= set ((
             "(HL)",

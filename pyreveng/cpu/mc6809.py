@@ -949,8 +949,11 @@ class mc6809_ins(assy.Instree_ins):
 
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=False):
-		super().__init__("mc6809", 8)
-		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
+		super().__init__(
+                    "mc6809",
+                    ins_word=8,
+                    abits=16,
+                )
 		self.add_ins(mc6809_desc, mc6809_ins)
 		if macros:
 			self.add_ins(mc6809_macro_desc, mc6809_ins)

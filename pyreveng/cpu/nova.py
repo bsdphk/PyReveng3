@@ -103,84 +103,88 @@ DEVNAMES = {
 
 class nova_ins(assy.Instree_ins):
 
-	def assy_sz(self, pj):
-		self.dstadr = self.hi + 1
+    def assy_sz(self, pj):
+        self.dstadr = self.hi + 1
 
-	def assy_sh(self, pj):
-		r = (None, "L", "R", "S")[self["sh"]]
-		if r:
-			self.mne += r
+    def assy_sh(self, pj):
+        r = (None, "L", "R", "S")[self["sh"]]
+        if r:
+            self.mne += r
 
-	def assy_skip(self, unused__pj):
-		r = (None, "SKP", "SZC", "SNC",
-			 "SZR", "SNR", "SEZ", "SEN")[self["skip"]]
-		if r:
-			self.dstadr = self.hi + 1
-		return r
+    def assy_skip(self, unused__pj):
+        r = (None, "SKP", "SZC", "SNC",
+             "SZR", "SNR", "SEZ", "SEN")[self["skip"]]
+        if r:
+            self.dstadr = self.hi + 1
+        return r
 
-	def assy_c(self, pj):
-		r = (None, "Z", "O", "C")[self["c"]]
-		if r is not None:
-			self.mne += r
+    def assy_c(self, pj):
+        r = (None, "Z", "O", "C")[self["c"]]
+        if r is not None:
+            self.mne += r
 
-	def assy_i(self, pj):
-		if self["i"]:
-			self.mne += "@"
+    def assy_i(self, pj):
+        if self["i"]:
+            self.mne += "@"
 
-	def assy_n(self, pj):
-		if self["n"]:
-			self.mne += "#"
+    def assy_n(self, pj):
+        if self["n"]:
+            self.mne += "#"
 
-	def assy_acs(self, pj):
-		return "%d" % self["acs"]
+    def assy_acs(self, pj):
+        return "%d" % self["acs"]
 
-	def assy_acd(self, pj):
-		return "%d" % self["acd"]
+    def assy_acd(self, pj):
+        return "%d" % self["acd"]
 
-	def assy_dev(self, pj):
-		t = DEVNAMES.get(self["dev"])
-		if t is None:
-			return "0x%x" % self["dev"]
-		return t
+    def assy_dev(self, pj):
+        t = DEVNAMES.get(self["dev"])
+        if t is None:
+            return "0x%x" % self["dev"]
+        return t
 
-	def assy_t(self, pj):
-		self.dstadr = self.hi + 1
-		self.mne += ["BN", "BZ", "DN", "DZ"][self["t"]]
+    def assy_t(self, pj):
+        self.dstadr = self.hi + 1
+        self.mne += ["BN", "BZ", "DN", "DZ"][self["t"]]
 
-	def assy_f(self, pj):
-		self.mne += ["", "S", "C", "P"][self["f"]]
+    def assy_f(self, pj):
+        self.mne += ["", "S", "C", "P"][self["f"]]
 
-	def assy_da(self, pj):
-		i = self["idx"]
-		d = self["displ"]
-		t = None
-		if i == 0:
-			t = d
-		else:
-			if d & 0x80:
-				d -= 256
-			if i == 1:
-				t = self.lo + d
-		if t is None:
-			if d < 0:
-				return "-0x%x,%d" % (-d, i)
-			return "0x%x,%d" % (d, i)
-		if not self['i']:
-			self.dstadr = t
-		return assy.Arg_dst(pj, t)
+    def assy_da(self, pj):
+        i = self["idx"]
+        d = self["displ"]
+        t = None
+        if i == 0:
+            t = d
+        else:
+            if d & 0x80:
+                d -= 256
+            if i == 1:
+                t = self.lo + d
+        if t is None:
+            if d < 0:
+                return "-0x%x,%d" % (-d, i)
+            return "0x%x,%d" % (d, i)
+        if not self['i']:
+            self.dstadr = t
+        return assy.Arg_dst(pj, t)
 
-	def assy_db(self, pj):
-		r = self.assy_da(pj)
-		if not isinstance(r, assy.Arg_dst):
-			return r
-		if not self['i']:
-			return r
-		t = pj.m[r.dst]
-		if t:
-			pj.todo(t, self.lang.disass)
-		return r
+    def assy_db(self, pj):
+        r = self.assy_da(pj)
+        if not isinstance(r, assy.Arg_dst):
+            return r
+        if not self['i']:
+            return r
+        t = pj.m[r.dst]
+        if t:
+            pj.todo(t, self.lang.disass)
+        return r
 
 class nova(assy.Instree_disass):
-	def __init__(self):
-		super().__init__("nova", 16)
-		self.add_ins(nova_instructions, nova_ins)
+    def __init__(self):
+        super().__init__(
+            "nova",
+            ins_word=16,
+            abits=15,
+        )
+        self.add_ins(nova_instructions, nova_ins)

@@ -922,8 +922,11 @@ class mc6800_ins(assy.Instree_ins):
 
 class mc6800(assy.Instree_disass):
     def __init__(self):
-        super(mc6800, self).__init__("mc6800", 8)
-        self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
+        super().__init__(
+            "mc6800",
+            ins_word=8,
+            abits=16,
+        )
         self.add_ins(mc6800_desc, mc6800_ins)
 
     def codeptr(self, pj, adr):

@@ -257,8 +257,11 @@ class mos6500_ins(assy.Instree_ins):
 
 class mos6500(assy.Instree_disass):
     def __init__(self):
-        super().__init__("mos6500", 8)
-        self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
+        super().__init__(
+            "mos6500",
+            ins_word=8,
+            abits=16,
+        )
         self.add_ins(mos6500_desc, mos6500_ins)
 
     def codeptr(self, pj, adr):

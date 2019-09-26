@@ -312,10 +312,13 @@ class BitSpace(mem.AddressSpace):
 
 class MCS51(assy.Instree_disass):
     def __init__(self, lang="mcs51"):
-        super().__init__(lang, 8)
-        self.add_as("mem", mem.MemMapper(0, 1<<12, "Memory"))
-        self.add_as("data", mem.AddressSpace(0x00, 0x100, "RAM/IO"))
-        self.add_as("bit", BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
+        super().__init__(
+            lang,
+            ins_word=8,
+            abits=16,
+        )
+        self.add_as("data", "RAM+I/O", 8)
+        self.add_as("bit", aspace=BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
 
         self.it.load_string(MCS51_DESC, MCS51_Ins)
         self.amask = 0xffff

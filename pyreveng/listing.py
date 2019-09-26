@@ -27,35 +27,36 @@
 from . import mem, misc
 
 class Render_mem():
-    def __init__(self, pj, fmt="x", ascii=True, ncol=None):
+    def __init__(self, aspace, fmt="x", ascii=True, ncol=None):
 
         self.ascii = ascii
 
         i = "%" + fmt
-        j = i % (pj.m.hi - 1)
+        j = i % (aspace.hi - 1)
         self.apct = "%" + "0%d" % len(j) + fmt
 
-        j = i % (1 << pj.m.bits - 1)
+        j = i % (1 << aspace.bits - 1)
         self.dpct = "%" + "0%d" % len(j) + fmt
         self.undef = "-" * len(j)
         self.space = " " * len(j)
-        self.aspace = " " * (pj.m.bits//8)
+        self.aspace = " " * (aspace.bits//8)
 
         if ncol is not None:
             self.ncol = ncol
-        elif pj.m.bits == 8:
+        elif aspace.bits == 8:
             self.ncol = 4
         else:
             self.ncol = 1
 
-    def render_word(self, pj, lo, hi):
+    def render_word(self, aspace, lo, hi):
         s = ""
         t = ""
         s += self.apct % lo + " "
         for i in range(min(self.ncol, hi - lo)):
             try:
-                v = pj.m[lo + i]
+                v = aspace[lo + i]
             except mem.MemError:
+                print("RW", aspace, "%x" % lo, "%x" % hi)
                 v = None
 
             if v is None:
@@ -64,7 +65,7 @@ class Render_mem():
                 s += " " + self.dpct % v
 
             if self.ascii:
-                b = pj.m.bits - 8
+                b = aspace.bits - 8
                 while b >= 0:
                     if v is None:
                         t += " "
@@ -83,7 +84,7 @@ class Render_mem():
             s += "  |" + t + "|"
         return s
 
-    def render(self, pj, lo, hi, nlin):
+    def render(self, aspace, lo, hi, nlin):
         """
         Render 'ncol' words per line
         """
@@ -91,28 +92,29 @@ class Render_mem():
         while lo < hi and nlin > 0:
             s = ""
             t = ""
-            s += self.render_word(pj, lo, hi)
+            s += self.render_word(aspace, lo, hi)
             l.append((lo, s))
             lo += self.ncol
             nlin -= 1
         return l
 
 class Seg_Listing():
-    def __init__(self, pj, fo, mem, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
+    def __init__(self, pj, fo, aspace, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
         self.pj = pj
-        self.mem = mem
+        self.mem = aspace
+        self.aspace = pj.m
         self.fmt = fmt
         self.ncol = ncol
         self.ascii = ascii
         self.pil = pil
         self.pil_col = 132
 
-        self.labels = sorted([adr for adr in mem.labels if low <= adr < high])
-        self.lcmt = sorted([adr for adr in mem.line_comments if low <= adr < high])
-        self.bcmt = sorted([adr for adr in mem.block_comments if low <= adr < high])
-        self.render_mem = Render_mem(pj, fmt, ascii, ncol).render
-        self.line_comment_col = mem.line_comment_col
-        self.line_comment_prefix = mem.line_comment_prefix
+        self.labels = sorted([adr for adr in aspace.labels if low <= adr < high])
+        self.lcmt = sorted([adr for adr in aspace.line_comments if low <= adr < high])
+        self.bcmt = sorted([adr for adr in aspace.block_comments if low <= adr < high])
+        self.render_mem = Render_mem(aspace, fmt, ascii, ncol).render
+        self.line_comment_col = aspace.line_comment_col
+        self.line_comment_prefix = aspace.line_comment_prefix
 
         self.nxxx = 0
         self.cxxx = 0
@@ -201,7 +203,7 @@ class Seg_Listing():
         self.render_subchunk(lo, hi, True, compact, rx, px, lx)
 
     def render_subchunk(self, lo, hi, last, compact, rx, px, lx):
-        cmt = self.pj.m.get_block_comments(lo)
+        cmt = self.aspace.get_block_comments(lo)
         if cmt is not None:
             w = self.line_comment_col - len(self.line_comment_prefix)
             self.fo.write(self.line_comment_prefix + "-" * w + "\n")
@@ -210,7 +212,7 @@ class Seg_Listing():
                 "\n" + self.line_comment_prefix))
             self.fo.write("-" * w + "\n")
 
-        alx = self.pj.m.get_line_comment(lo)
+        alx = self.aspace.get_line_comment(lo)
         if alx:
             lx =  alx.split("\n") + lx
 
@@ -219,7 +221,7 @@ class Seg_Listing():
         else:
             m = 9e9
 
-        hx = self.render_mem(self.pj, lo, hi, m)
+        hx = self.render_mem(self.aspace, lo, hi, m)
         hl = len(hx[0][1] + "\t")
         shx = "\t" * (hl // 8)
 
@@ -254,8 +256,8 @@ class Seg_Listing():
             if ly:
                 t += "\t"
                 l = len(t.expandtabs()) 
-                if l < self.pj.m.line_comment_col:
-                    t += "\t" * ((self.pj.m.line_comment_col - l) // 8)
+                if l < self.aspace.line_comment_col:
+                    t += "\t" * ((self.aspace.line_comment_col - l) // 8)
                 t += self.line_comment_prefix + ly
 
             if self.pil and py:

@@ -1398,12 +1398,13 @@ class m68000_ins(assy.Instree_ins):
 
 class m68000(assy.Instree_disass):
 	def __init__(self, lang="m68000"):
-		super(m68000, self).__init__(
+		super().__init__(
 		    lang,
 		    ins_word=16,
 		    mem_word=8,
-		    endian=">")
-		self.add_as("mem", mem.MemMapper(0, 1<<32, "Memory"))
+		    endian=">",
+                    abits=32,
+                )
 		self.it.load_string(m68000_desc, m68000_ins)
 		self.il = None
 		self.verbatim |= set(["CCR", "SR", "USP"])

@@ -197,104 +197,107 @@ OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
 """
 
 class z80_ins(assy.Instree_ins):
-	def __init__(self, pj, lim, lang):
-		super(z80_ins, self).__init__(pj, lim, lang)
-		self.idx = "HL"
+    def __init__(self, pj, lim, lang):
+        super(z80_ins, self).__init__(pj, lim, lang)
+        self.idx = "HL"
 
-	def assy_e(self, pj):
-		self.dstadr = self.hi
-		e = self['e']
-		if e & 0x80:
-			e -= 256
-		self.dstadr += e
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_e(self, pj):
+        self.dstadr = self.hi
+        e = self['e']
+        if e & 0x80:
+            e -= 256
+        self.dstadr += e
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_nn(self, pj):
-		self.dstadr = (self['n2'] << 8) | self['n1']
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_nn(self, pj):
+        self.dstadr = (self['n2'] << 8) | self['n1']
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_t(self, pj):
-		self.dstadr = self['t'] << 3
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_t(self, pj):
+        self.dstadr = self['t'] << 3
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_inn(self, pj):
-		self.dstadr = (self['n2'] << 8) | self['n1']
-		return assy.Arg_dst(pj, self.dstadr, "(", ")")
+    def assy_inn(self, pj):
+        self.dstadr = (self['n2'] << 8) | self['n1']
+        return assy.Arg_dst(pj, self.dstadr, "(", ")")
 
-	def assy_dd(self, pj):
-		return ["BC", "DE", self.idx, "SP"][self['dd']]
+    def assy_dd(self, pj):
+        return ["BC", "DE", self.idx, "SP"][self['dd']]
 
-	def assy_qq(self, pj):
-		return ["BC", "DE", self.idx, "AF"][self['qq']]
+    def assy_qq(self, pj):
+        return ["BC", "DE", self.idx, "AF"][self['qq']]
 
-	def assy_rs(self, pj):
-		return ["B", "C", "D", "E", "H", "L", None, "A"][self['rs']]
+    def assy_rs(self, pj):
+        return ["B", "C", "D", "E", "H", "L", None, "A"][self['rs']]
 
-	def assy_rd(self, pj):
-		return ["B", "C", "D", "E", "H", "L", None, "A"][self['rd']]
+    def assy_rd(self, pj):
+        return ["B", "C", "D", "E", "H", "L", None, "A"][self['rd']]
 
-	def assy_cc(self, pj):
-		self.cc = [
-		    "NZ", "Z", "NC", "C", "PO", "PE", "P", "M"
-		][self['cc']]
-		return self.cc
+    def assy_cc(self, pj):
+        self.cc = [
+            "NZ", "Z", "NC", "C", "PO", "PE", "P", "M"
+        ][self['cc']]
+        return self.cc
 
-	def assy_b(self, pj):
-		return assy.Arg_imm(pj, self['b'], 8)
+    def assy_b(self, pj):
+        return assy.Arg_imm(pj, self['b'], 8)
 
-	def assy_n(self, pj):
-		return assy.Arg_imm(pj, self['n'], 8)
+    def assy_n(self, pj):
+        return assy.Arg_imm(pj, self['n'], 8)
 
-	def assy_io(self, pj):
-		return assy.Arg_imm(pj, self['io'], 8)
+    def assy_io(self, pj):
+        return assy.Arg_imm(pj, self['io'], 8)
 
-	def assy_iIX(self, pj):
-		self.idx = "IX"
+    def assy_iIX(self, pj):
+        self.idx = "IX"
 
-	def assy_iIY(self, pj):
-		self.idx = "IY"
+    def assy_iIY(self, pj):
+        self.idx = "IY"
 
-	def assy_HL(self, pj):
-		return self.idx
+    def assy_HL(self, pj):
+        return self.idx
 
-	def assy_iHL(self, pj):
-		if self.idx == "HL":
-			return "(HL)"
-		d = pj.m[self.hi]
-		self.hi += 1
-		if d & 0x80:
-			d = 256 - d
-			return "(%s-0x%x)" % (self.idx, d)
-		else:
-			return "(%s+0x%x)" % (self.idx, d)
+    def assy_iHL(self, pj):
+        if self.idx == "HL":
+            return "(HL)"
+        d = pj.m[self.hi]
+        self.hi += 1
+        if d & 0x80:
+            d = 256 - d
+            return "(%s-0x%x)" % (self.idx, d)
+        else:
+            return "(%s+0x%x)" % (self.idx, d)
 
 class z80(assy.Instree_disass):
-	def __init__(self, mask=0xffff):
-		super().__init__("z80", 8)
-		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
-		self.add_as("io", mem.MemMapper(0, 1<<8, "IO"))
-		self.add_ins(z80_desc, z80_ins)
-		self.mask = mask
-		self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",
-		    "(C)", "SP", "I", "2", "C", "NC", "NZ", "Z", "AF", "AF'"])
+    def __init__(self, mask=0xffff):
+        super().__init__(
+            "z80",
+            ins_word=8,
+            abits=16,
+        )
+        self.add_as("io", "I/O", 8)
+        self.add_ins(z80_desc, z80_ins)
+        self.mask = mask
+        self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",
+            "(C)", "SP", "I", "2", "C", "NC", "NZ", "Z", "AF", "AF'"])
 
-	def codeptr(self, pj, adr):
-		t = pj.m.lu16(adr)
-		c = data.Codeptr(pj, adr, adr + 2, t)
-		pj.todo(t, self.disass)
-		return c
+    def codeptr(self, pj, adr):
+        t = pj.m.lu16(adr)
+        c = data.Codeptr(pj, adr, adr + 2, t)
+        pj.todo(t, self.disass)
+        return c
 
-	def vectors(self, pj):
-		for m, a,l in (
-			(None, 0x0000, "VEC_RESET"),
-			(None, 0x0008, "VEC_RST08"),
-			(None, 0x0010, "VEC_RST10"),
-			(None, 0x0018, "VEC_RST18"),
-			(None, 0x0020, "VEC_RST20"),
-			(None, 0x0028, "VEC_RST28"),
-			(None, 0x0030, "VEC_RST30"),
-			(None, 0x0038, "VEC_RST38_IRQ"),
-			(None, 0x0066, "VEC_NMI"),
-		):
-			pj.todo(a, self.disass)
-			pj.set_label(a, l)
+    def vectors(self, pj):
+        for m, a,l in (
+            (None, 0x0000, "VEC_RESET"),
+            (None, 0x0008, "VEC_RST08"),
+            (None, 0x0010, "VEC_RST10"),
+            (None, 0x0018, "VEC_RST18"),
+            (None, 0x0020, "VEC_RST20"),
+            (None, 0x0028, "VEC_RST28"),
+            (None, 0x0030, "VEC_RST30"),
+            (None, 0x0038, "VEC_RST38_IRQ"),
+            (None, 0x0066, "VEC_NMI"),
+        ):
+            pj.todo(a, self.disass)
+            pj.set_label(a, l)
