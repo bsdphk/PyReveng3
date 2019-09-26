@@ -28,7 +28,7 @@
 '''Zilog Z80
 '''
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 z80_desc = """
 LD	rd,rs		|0 1| rd  | rs  |
@@ -271,6 +271,8 @@ class z80_ins(assy.Instree_ins):
 class z80(assy.Instree_disass):
 	def __init__(self, mask=0xffff):
 		super().__init__("z80", 8)
+		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
+		self.add_as("io", mem.MemMapper(0, 1<<8, "IO"))
 		self.add_ins(z80_desc, z80_ins)
 		self.mask = mask
 		self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",

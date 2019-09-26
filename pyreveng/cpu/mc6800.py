@@ -27,7 +27,7 @@
 '''Motorola MC6800/MC68HC11
 '''
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 mc6800_desc = """
 NOP     -       |01     | {
@@ -921,10 +921,10 @@ class mc6800_ins(assy.Instree_ins):
 
 
 class mc6800(assy.Instree_disass):
-    def __init__(self, mask=0xffff):
+    def __init__(self):
         super(mc6800, self).__init__("mc6800", 8)
+        self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
         self.add_ins(mc6800_desc, mc6800_ins)
-        self.mask = mask
 
     def codeptr(self, pj, adr):
         t = pj.m.bu16(adr)
@@ -1004,8 +1004,8 @@ STD     e           |FD     | e1            | e2            |
 """
 
 class mc68hc11(mc6800):
-    def __init__(self, mask=0xffff):
-        super(mc68hc11, self).__init__(mask=mask)
+    def __init__(self):
+        super().__init__()
         self.it.load_string(mc68hc11_desc, mc6800_ins)
 
     def register_labels(self, pj, adr=0x1000):

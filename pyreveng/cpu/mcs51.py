@@ -29,7 +29,7 @@
 
 from pyreveng import mem, assy
 
-mcs51_desc = """
+MCS51_DESC = """
 
 #			|. . . . . . . .|. . . . . . . .|
 ACALL	a11,>C		| ahi |1 0 0 0 1| alo		| {
@@ -216,185 +216,195 @@ XRL	adir,data	|0 1 1 0 0 0 1 1| adir		| data		|
 
 """
 
-class mcs51_ins(assy.Instree_ins):
-	pass
+class MCS51_Ins(assy.Instree_ins):
 
-	def assy_adir(self, pj):
-		self.dstadr = self['adir']
-		return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_d)
+    def assy_adir(self, pj):
+        self.dstadr = self['adir']
+        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_data)
 
-	def assy_adir2(self, pj):
-		self.dstadr = self['adir2']
-		return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_d)
+    def assy_adir2(self, pj):
+        self.dstadr = self['adir2']
+        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_data)
 
-	def assy_a11(self, pj):
-		a = (self['ahi'] << 8) | self['alo']
-		self.dstadr = (self.hi & 0xf800) + a
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_a11(self, pj):
+        a = (self['ahi'] << 8) | self['alo']
+        self.dstadr = (self.hi & 0xf800) + a
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_a16(self, pj):
-		self.dstadr = (self['ahi'] << 8) | self['alo']
-		self.dstadr &= self.lang.amask
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_a16(self, pj):
+        self.dstadr = (self['ahi'] << 8) | self['alo']
+        self.dstadr &= self.lang.amask
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_arel(self, pj):
-		a = self['arel']
-		if a & 0x80:
-			a -= 256
-		self.dstadr = self.hi + a
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_arel(self, pj):
+        a = self['arel']
+        if a & 0x80:
+            a -= 256
+        self.dstadr = self.hi + a
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_iri(self, pj):
-		return "@R%d" % self['i']
+    def assy_iri(self, _pj):
+        return "@R%d" % self['i']
 
-	def assy_Rn(self, pj):
-		return "R%d" % self['rn']
+    def assy_Rn(self, _pj):
+        return "R%d" % self['rn']
 
-	def assy_data(self, pj):
-		return "#0x%02x" % self['data']
+    def assy_data(self, _pj):
+        return "#0x%02x" % self['data']
 
-	def assy_data16(self, pj):
-		v = (self['dhi'] << 8) | self['dlo']
-		return "#0x%04x" % v
+    def assy_data16(self, _pj):
+        v = (self['dhi'] << 8) | self['dlo']
+        return "#0x%04x" % v
 
-	def assy_abit(self, pj):
-		b = self['abit']
-		return assy.Arg_dst(pj, b, aspace=self.lang.as_b)
+    def assy_abit(self, pj):
+        b = self['abit']
+        return assy.Arg_dst(pj, b, aspace=self.lang.as_bit)
 
-	def assy_nabit(self, pj):
-		return "/" + self.assy_abit(pj)
+    def assy_nabit(self, pj):
+        return "/" + self.assy_abit(pj)
 
-	def pilmacro_ABIT(self):
-		b = self['abit']
-		if b < 0x80:
-			return "%0x02.%d" % (0x20 + (b >> 3), b & 7)
-		return "b#%0x2x" % b
+    def pilmacro_ABIT(self):
+        b = self['abit']
+        if b < 0x80:
+            return "%0x02.%d" % (0x20 + (b >> 3), b & 7)
+        return "b#%0x2x" % b
 
-	def pilmacro_ADIR(self):
-		return "0x%02x" % self['adir']
+    def pilmacro_ADIR(self):
+        return "0x%02x" % self['adir']
 
-	def pilmacro_ADIR2(self):
-		return "0x%02x" % self['adir2']
+    def pilmacro_ADIR2(self):
+        return "0x%02x" % self['adir2']
 
-	def pilmacro_DATA(self):
-		return "0x%02x" % self['data']
+    def pilmacro_DATA(self):
+        return "0x%02x" % self['data']
 
-	def pilmacro_DST(self):
-		return "0x%04x" % self.dstadr
+    def pilmacro_DST(self):
+        return "0x%04x" % self.dstadr
 
-	def pilmacro_HI(self):
-		return "0x%04x" % self.hi
+    def pilmacro_HI(self):
+        return "0x%04x" % self.hi
 
-	def pilmacro_RI(self):
-		return "%%R%d" % self['i']
+    def pilmacro_RI(self):
+        return "%%R%d" % self['i']
 
-	def pilmacro_RN(self):
-		return "%%R%d" % self['rn']
+    def pilmacro_RN(self):
+        return "%%R%d" % self['rn']
 
-class bitspace(mem.address_space):
+class BitSpace(mem.AddressSpace):
 
-	def adr(self, dst):
-		l = self.labels.get(dst)
-		if l:
-			return l[0]
-		a = dst & ~7
-		b = dst & 7
-		if a < 0x80:
-			a = 0x20 + (a >> 3)
-		l = self.dspace.get_labels(a)
-		if l:
-			return l[0] + ".%d" % b
-		return "0x%02x.%d" % (a, b)
-			
+    def __init__(self, lo, hi, name, dspace):
+        super().__init__(lo, hi, name)
+        self.dspace = dspace
 
-class mcs51(assy.Instree_disass):
-	def __init__(self, lang="mcs51"):
-		super().__init__(lang, 8)
-		self.as_d = mem.address_space(0x00, 0x100, "RAM/IO")
-		self.as_b = bitspace(0x00, 0x100, "BITSPACE")
-		self.as_b.dspace = self.as_d
-
-		self.it.load_string(mcs51_desc, mcs51_ins)
-		self.amask = 0xffff
-		self.verbatim |= set((
-		    "A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
-		)
-		self.define_bits(0x80, "P0", [
-		    "AD0", "AD1", "AD2", "AD3", "AD4", "AD5", "AD6", "AD7"
-		])
-		self.define_bits(0x81, "SP")
-		self.define_bits(0x82, "DPL")
-		self.define_bits(0x83, "DPH")
-		self.define_bits(0x87, "PCON")
-		self.define_bits(0x88, "TCON", [
-		    "IT0", "IE0", "IT1", "IE1", "TR0", "TF0", "TR1", "TF1"
-		])
-		self.define_bits(0x89, "TMOD")
-		self.define_bits(0x8a, "TL0")
-		self.define_bits(0x8b, "TL1")
-		self.define_bits(0x8c, "TH0")
-		self.define_bits(0x8d, "TH1")
-		self.define_bits(0x90, "P1")
-		self.define_bits(0x98, "SCON", [
-		    "RI", "TI", "RB8", "TB8",
-		    "REN", "SM2", "SM1", "SM0"
-		])
-		self.define_bits(0x99, "SBUF")
-		self.define_bits(0xa0, "P2", [
-		    "A8", "A9", "A10", "A11", "A12", "A13", "A14", "A15"
-		])
-		self.define_bits(0xa8, "IE", [
-		    "EX0", "ET0", "EX1", "ET1", "ES", "5", "6", "EA"
-		])
-		self.define_bits(0xb0, "P3", [
-		    "Rxd", "Txd", "_INT0", "_INT1", "T0", "T1", "_WR", "_RD",
-		])
-		self.define_bits(0xb8, "IP", [
-		    "PX0", "PT0", "PX1", "PT1", "PS",
-		])
-		self.define_bits(0xd0, "PSW", [
-		    "P", "1", "OV", "RS0", "RS1", "F0", "AC", "CY",
-		])
-		self.define_bits(0xe0, "ACC")
-		self.define_bits(0xf0, "B")
-
-	def define_bits(self, a, n, b = None):
-		self.as_d.set_label(a, n)
-		if b and not a & 7:
-			for i in b:
-				self.as_b.set_label(a, n + "." + i)
-				a += 1
+    def adr(self, dst):
+        lbls = self.labels.get(dst)
+        if lbls:
+            return lbls[0]
+        adr = dst & ~7
+        bit = dst & 7
+        if adr < 0x80:
+            adr = 0x20 + (adr >> 3)
+        lbls = self.dspace.get_labels(adr)
+        if lbls:
+            return lbls[0] + ".%d" % bit
+        return "0x%02x.%d" % (adr, bit)
 
 
-	def set_adr_mask(self, a):
-		self.amask = a
+class MCS51(assy.Instree_disass):
+    def __init__(self, lang="mcs51"):
+        super().__init__(lang, 8)
+        self.add_as("mem", mem.MemMapper(0, 1<<12, "Memory"))
+        self.add_as("data", mem.AddressSpace(0x00, 0x100, "RAM/IO"))
+        self.add_as("bit", BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
 
-	def vectors(self, pj, which = None):
-		for a, b in (
-			(0x000, "RESET"),
-			(0x003, "IE0"),
-			(0x00b, "TF0"),
-			(0x013, "IE1"),
-			(0x01b, "TF1"),
-			(0x023, "RI_TI"),
-		):
-			if not which or a in which or b in which:
-				pj.todo(a, self.disass)
-				pj.set_label(a, b)
+        self.it.load_string(MCS51_DESC, MCS51_Ins)
+        self.amask = 0xffff
+        self.verbatim |= set(("A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC"))
+        self.define_bits(
+            0x80,
+            "P0",
+            ["AD0", "AD1", "AD2", "AD3", "AD4", "AD5", "AD6", "AD7"]
+        )
+        self.define_bits(0x81, "SP")
+        self.define_bits(0x82, "DPL")
+        self.define_bits(0x83, "DPH")
+        self.define_bits(0x87, "PCON")
+        self.define_bits(
+            0x88,
+            "TCON",
+            ["IT0", "IE0", "IT1", "IE1", "TR0", "TF0", "TR1", "TF1"]
+        )
+        self.define_bits(0x89, "TMOD")
+        self.define_bits(0x8a, "TL0")
+        self.define_bits(0x8b, "TL1")
+        self.define_bits(0x8c, "TH0")
+        self.define_bits(0x8d, "TH1")
+        self.define_bits(0x90, "P1")
+        self.define_bits(
+            0x98,
+            "SCON",
+            ["RI", "TI", "RB8", "TB8", "REN", "SM2", "SM1", "SM0"]
+        )
+        self.define_bits(0x99, "SBUF")
+        self.define_bits(
+            0xa0,
+            "P2",
+            ["A8", "A9", "A10", "A11", "A12", "A13", "A14", "A15"]
+        )
+        self.define_bits(
+            0xa8,
+            "IE",
+            ["EX0", "ET0", "EX1", "ET1", "ES", "5", "6", "EA"]
+        )
+        self.define_bits(
+            0xb0,
+            "P3",
+            ["Rxd", "Txd", "_INT0", "_INT1", "T0", "T1", "_WR", "_RD"]
+        )
+        self.define_bits(0xb8, "IP", ["PX0", "PT0", "PX1", "PT1", "PS"])
+        self.define_bits(
+            0xd0,
+            "PSW",
+            ["P", "1", "OV", "RS0", "RS1", "F0", "AC", "CY"]
+        )
+        self.define_bits(0xe0, "ACC")
+        self.define_bits(0xf0, "B")
 
-class i8032(mcs51):
-	def __init__(self):
-		super(i8032, self).__init__("i8032")
+    def define_bits(self, a, n, b=None):
+        self.as_data.set_label(a, n)
+        if b and not a & 7:
+            for i in b:
+                self.as_bit.set_label(a, n + "." + i)
+                a += 1
 
-		self.define_bits(0xc8, "T2CON", [
-		    "CP_RL2", "C_T2", "TR2", "EXEN2",
-		    "TCLK", "RCLK", "EXF2", "TF2"
-		])
-		self.define_bits(0xc9, "T2MOD")
-		self.define_bits(0xca, "RCAP2L")
-		self.define_bits(0xcb, "RCAP2H")
-		self.define_bits(0xcc, "TL2")
-		self.define_bits(0xcd, "TH2")
-		self.define_bits(0xd8, "WDTCON")
+    def set_adr_mask(self, a):
+        self.amask = a
 
-		
+    def vectors(self, pj, which=None):
+        for a, b in (
+                (0x000, "RESET"),
+                (0x003, "IE0"),
+                (0x00b, "TF0"),
+                (0x013, "IE1"),
+                (0x01b, "TF1"),
+                (0x023, "RI_TI"),
+        ):
+            if not which or a in which or b in which:
+                pj.todo(a, self.disass)
+                pj.set_label(a, b)
+
+class I8032(MCS51):
+    def __init__(self):
+        super().__init__("i8032")
+
+        self.define_bits(
+            0xc8,
+            "T2CON",
+            ["CP_RL2", "C_T2", "TR2", "EXEN2", "TCLK", "RCLK", "EXF2", "TF2"],
+        )
+        self.define_bits(0xc9, "T2MOD")
+        self.define_bits(0xca, "RCAP2L")
+        self.define_bits(0xcb, "RCAP2H")
+        self.define_bits(0xcc, "TL2")
+        self.define_bits(0xcd, "TH2")
+        self.define_bits(0xd8, "WDTCON")

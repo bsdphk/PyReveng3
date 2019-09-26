@@ -32,17 +32,18 @@ from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.i8086 as i8086
 
 def mem_setup():
-	m = mem.byte_mem(0xe0000, 0x100000)
+	m = mem.ByteMem(0, 0x20000)
 	fn = os.path.join(os.path.dirname(__file__),
 	    "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
-	m.load_binfile(0xe0000, 1, fn)
+	m.load_binfile(0, 1, fn)
 	return m
 
 def setup():
-	pj  = job.Job(mem_setup(), "Apollo618c")
-
 	cx = i8086.i8086()
 	cx.has_8087()
+	cx.m.map(mem_setup(), 0xe0000)
+	pj  = job.Job(cx.m, "Apollo618c")
+
 	return pj,cx
 
 def task(pj, cx):

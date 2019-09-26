@@ -261,17 +261,18 @@ def apply_labels(pj, type):
 #----------------------------------------------------------------------
 def setup(name, binfile, direction):
 	print("\n\nDoing: " + binfile)
-	m = mem.byte_mem(0x6000, 0x8000)
 	fn = os.path.join(os.path.dirname(__file__), binfile)
+	cx = mc6800.mc6800()
+	m = mem.ByteMem(0x0000, 0x2000)
 	if direction == 1:
-		m.load_binfile(0x6000, 1, fn)
+		m.load_binfile(0, 1, fn)
 	else:
-		m.load_binfile(0x7fff, -1, fn)
-	pj = job.Job(m, name)
-	cx = mc6800.mc6800(mask = 0x7fff)
-	eprom(pj, cx.disass, m.lo, m.hi, 0x0400)
-
-	cx.vectors(pj, 0x7ff8)
+		m.load_binfile(0x1fff, -1, fn)
+	cx.m.map(m, 0x6000)
+	cx.m.map(m, 0xfff8, offset=0x1ff8)
+	pj = job.Job(cx.m, name)
+	eprom(pj, cx.disass, 0x6000, 0x8000, 0x0400)
+	cx.vectors(pj)
 	return pj,cx
 
 #----------------------------------------------------------------------

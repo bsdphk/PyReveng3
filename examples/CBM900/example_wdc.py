@@ -34,14 +34,13 @@ from pyreveng import job, mem, data, misc, listing
 import pyreveng.cpu.mcs48 as mcs48
 
 def mem_setup():
-    m = mem.byte_mem(0x0, 0x800)
-    fn = os.path.join(os.path.dirname(__file__), "MCU_WDC_U10.bin")
-    m.load_binfile(0x0, 1, fn)
-    return m
+    return mem.stackup(("MCU_WDC_U10.bin",), nextto=__file__)
 
 def setup():
-    pj = job.Job(mem_setup(), "CBM900_WDC")
     cx = mcs48.mcs48()
+    m = mem_setup()
+    cx.m.map(m, 0)
+    pj = job.Job(cx.m, "CBM900_WDC")
     return pj, cx
 
 def task(pj, cx):

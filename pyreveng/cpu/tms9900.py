@@ -31,7 +31,7 @@
 '''Texas Instruments TMS9990
 '''
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 tms9900_desc = """
 
@@ -923,6 +923,7 @@ class Tms9900_ins(assy.Instree_ins):
 class Tms9900(assy.Instree_disass):
 	def __init__(self):
 		super().__init__("TMS 9900", 16, 8, ">")
+		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
 		self.add_ins(tms9900_desc, Tms9900_ins)
 		self.n_interrupt = 16
 		self.il = True

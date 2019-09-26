@@ -38,16 +38,10 @@ seven_segment.known[0x41] = "="
 seven_segment.known[0x20] = "i"
 seven_segment.known[0x30] = "I"
 
-def mem_setup():
-
-	m = mem.byte_mem(0x8000, 0x10000)
-	fn = os.path.join(os.path.dirname(__file__), "PL99.mc68hc11.bin")
-	m.load_binfile(0x8000, 1, fn)
-	return m
-
 def setup():
-	pj = job.Job(mem_setup(), "PL99")
 	cx = mc6800.mc68hc11()
+	cx.m.map(mem.stackup(("PL99.mc68hc11.bin",), nextto=__file__), 0x8000)
+	pj = job.Job(cx.m, "PL99")
 	return pj, cx
 
 

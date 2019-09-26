@@ -32,7 +32,7 @@ from pyreveng import job, mem, listing, data, code
 import pyreveng.cpu.tms9900 as tms9900
 
 def mem_setup():
-	m = mem.byte_mem(0x0000, 0x2000)
+	m = mem.ByteMem(0x0000, 0x2000)
 	fn = os.path.join(os.path.dirname(__file__), "HP6034A_U25.hex")
 	for i in open(fn):
 		j = i.split()
@@ -40,8 +40,9 @@ def mem_setup():
 	return m
 
 def setup():
-	pj = job.Job(mem_setup(), "HP6034A")
 	cx = tms9900.Tms9981()
+	cx.m.map(mem_setup(), 0)
+	pj = job.Job(cx.m, "HP6034A")
 	return pj, cx
 
 cru_adr = {

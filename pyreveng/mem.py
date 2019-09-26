@@ -24,8 +24,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-Memory classes
+'''
+Address Space and Memory Classes
 
 These classes can be configured to act as memory for images to be
 analysed.
@@ -38,12 +38,13 @@ for instance relocation flags, write-ability etc.
 XXX: Better test-cases needed
 XXX: Need resolution of who controls rendering...
 
-"""
+'''
 
+import os.path
 import ctypes
 
 from . import tree
-from . import job
+from . import leaf
 
 DEFINED = (1 << 7)
 
@@ -58,7 +59,7 @@ class MemError(Exception):
     def __str__(self):
         return repr(self.value)
 
-class address_space():
+class AddressSpace():
 
     '''
     A vacuous address-space, memory-mapper and base-class for actual
@@ -73,8 +74,7 @@ class address_space():
         self.labels = dict()
         self.block_comments = dict()
         self.line_comments = dict()
-        l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-        self.apct = "0x%%0%dx" % l
+        self.set_apct()
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
@@ -98,15 +98,15 @@ class address_space():
 
     def set_apct(self, pct=None):
         if pct is None:
-            l = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-            pct = "0x%%0%dx" % l
+            al = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+            pct = "0x%%0%dx" % al
         self.apct = pct
 
     def adr(self, dst):
         ''' Render an address '''
-        l = self.labels.get(dst)
-        if l:
-            return l[0]
+        lbl = self.labels.get(dst)
+        if lbl:
+            return lbl[0]
         return "0x%x" % dst
 
     def gaps(self):
@@ -161,7 +161,7 @@ class address_space():
     def find_hi(self, adr):
         return self.t.find_hi(adr)
 
-class Map_Leaf(job.Leaf):
+class MapLeaf(leaf.Leaf):
 
     def __init__(self, lo, hi, ref):
         super().__init__(None, lo, hi, "MAPLEAF")
@@ -170,35 +170,42 @@ class Map_Leaf(job.Leaf):
     def render(self, pj):
         return self.ref.render(pj)
 
-class mem_mapper(address_space):
+class MemMapper(AddressSpace):
 
-    def __init__(self, lo, hi, **kwargs):
-        super().__init__(lo, hi, **kwargs)
+    def __init__(self, lo, hi, name="Memory", **kwargs):
+        super().__init__(lo, hi, name=name, **kwargs)
         self.mapping = []
         self.seglist = []
         self.bits = 0
         self.xlat = self.xlat1
 
     def __repr__(self):
-        return "<mem_mapper 0x%x-0x%x>" % (self.lo, self.hi)
+        return "<MemMapper %s 0x%x-0x%x>" % (self.name, self.lo, self.hi)
 
     def map(self, mem, low, high=None, offset=None):
         if offset is None:
             offset = 0
         if high is None:
-            high = low + mem.hi - (mem.lo + offset)
-        self.seglist.append((low, high, offset, mem))
-        self.mapping.append((low, high, offset, mem))
+            high = low + (mem.hi - mem.lo)
+        self.seglist.append([low, high, offset, mem])
+        self.mapping.append([low, high, offset, mem])
+
+        hi = max(self.mapping, key=lambda x:x[1])[1]
+        lo = min(self.mapping, key=lambda x:x[0])[0]
+        al = max(len("%x" % lo), len("%x" % (hi - 1)))
+        self.apct = "0x%%0%dx" % al
+        print("APCT <%s>" % self.apct)
+
         if len(self.mapping) > 1:
-            self.xlat = self.xlatN
+            self.xlat = self.xlatn
         else:
             self.bits = mem.bits
 
     def xlat1(self, adr, _fail=True):
-        low, high, offset, mem = self.mapping[0]
+        low, _high, offset, mem = self.mapping[0]
         return mem, (adr - low) + offset
 
-    def xlatN(self, adr, fail=True):
+    def xlatn(self, adr, fail=True):
         for i, j in enumerate(self.mapping):
             low, high, offset, mem = j
             if low <= adr < high:
@@ -210,72 +217,72 @@ class mem_mapper(address_space):
         return self, adr
 
     def __getitem__(self, adr):
-        m, a = self.xlat(adr)
-        return m[a]
+        ms, sa = self.xlat(adr)
+        return ms[sa]
 
     def segments(self):
         for low, high, _offset, mem in sorted(self.seglist):
             yield mem, low, high
 
     def u8(self, adr):
-        m, a = self.xlat(adr)
-        return m.u8(a)
+        ms, sa = self.xlat(adr)
+        return ms.u8(sa)
 
     def lu16(self, adr):
-        m, a = self.xlat(adr)
-        return m.lu16(a)
+        ms, sa = self.xlat(adr)
+        return ms.lu16(sa)
 
     def bu16(self, adr):
-        m, a = self.xlat(adr)
-        return m.bu16(a)
+        ms, sa = self.xlat(adr)
+        return ms.bu16(sa)
 
     def lu32(self, adr):
-        m, a = self.xlat(adr)
-        return m.lu32(a)
+        ms, sa = self.xlat(adr)
+        return ms.lu32(sa)
 
     def bu32(self, adr):
-        m, a = self.xlat(adr)
-        return m.bu32(a)
+        ms, sa = self.xlat(adr)
+        return ms.bu32(sa)
 
     def lu64(self, adr):
-        m, a = self.xlat(adr)
-        return m.lu64(a)
+        ms, sa = self.xlat(adr)
+        return ms.lu64(sa)
 
     def bu64(self, adr):
-        m, a = self.xlat(adr)
-        return m.bu64(a)
+        ms, sa = self.xlat(adr)
+        return ms.bu64(sa)
 
     def s8(self, adr):
-        m, a = self.xlat(adr)
-        return m.s8(a)
+        ms, sa = self.xlat(adr)
+        return ms.s8(sa)
 
     def ls16(self, adr):
-        m, a = self.xlat(adr)
-        return m.ls16(a)
+        ms, sa = self.xlat(adr)
+        return ms.ls16(sa)
 
     def bs16(self, adr):
-        m, a = self.xlat(adr)
-        return m.bs16(a)
+        ms, sa = self.xlat(adr)
+        return ms.bs16(sa)
 
     def ls32(self, adr):
-        m, a = self.xlat(adr)
-        return m.ls32(a)
+        ms, sa = self.xlat(adr)
+        return ms.ls32(sa)
 
     def bs32(self, adr):
-        m, a = self.xlat(adr)
-        return m.bs32(a)
+        ms, sa = self.xlat(adr)
+        return ms.bs32(sa)
 
     def ls64(self, adr):
-        m, a = self.xlat(adr)
-        return m.ls64(a)
+        ms, sa = self.xlat(adr)
+        return ms.ls64(sa)
 
     def bs64(self, adr):
-        m, a = self.xlat(adr)
-        return m.bs64(a)
+        ms, sa = self.xlat(adr)
+        return ms.bs64(sa)
 
-    def bytearray(self, adr, l):
-        m, a = self.xlat(adr)
-        return m.bytearray(a, l)
+    def bytearray(self, adr, ln):
+        ms, sa = self.xlat(adr)
+        return ms.bytearray(sa, ln)
 
     def gaps(self):
         for glo, ghi in super().gaps():
@@ -288,11 +295,11 @@ class mem_mapper(address_space):
 
     def insert(self, leaf):
         super().insert(leaf)
-        mem, adr = self.xlat(leaf.lo, False)
-        ll = Map_Leaf(adr, leaf.hi - (leaf.lo - adr), leaf)
-        mem.insert(ll)
+        ms, sa = self.xlat(leaf.lo, False)
+        ll = MapLeaf(sa, leaf.hi - (leaf.lo - sa), leaf)
+        ms.insert(ll)
 
-class word_mem(address_space):
+class WordMem(AddressSpace):
 
     """
     Word memory is characteristic for a lot of the earliest computers,
@@ -322,7 +329,7 @@ class word_mem(address_space):
         self.lo = lo
         self.hi = hi
         self.attr = attr
-        l = hi - lo
+        ln = hi - lo
 
         self.msk = (1 << bits) - 1
         self.amsk = (1 << attr) - 1
@@ -336,10 +343,10 @@ class word_mem(address_space):
         else:
             self.mt = ctypes.c_uint64
 
-        self.m = (self.mt * l)()
+        self.m = (self.mt * ln)()
 
         self.at = ctypes.c_uint8
-        self.a = (self.at * l)()
+        self.a = (self.at * ln)()
 
     def __repr__(self):
         return "<word_mem 0x%x-0x%x, @%d bits, %d attr>" % (
@@ -398,7 +405,7 @@ class word_mem(address_space):
             b -= 8
         return s + "|"
 
-class byte_mem(word_mem):
+class ByteMem(WordMem):
 
     """
     Byte memory is characteristic for microcomputers, which
@@ -416,6 +423,10 @@ class byte_mem(word_mem):
         super().__init__(lo, hi, bits=8, **kwargs)
         self.ncol = ncol
         self.ascii = charcol
+
+    def __repr__(self):
+        return "<ByteMem 0x%x-0x%x, %d attr>" % (
+            self.lo, self.hi, self.attr)
 
     def bytearray(self, lo, bcnt):
         i = self._off(lo)
@@ -540,9 +551,9 @@ class byte_mem(word_mem):
         else:
             self.load_data(first, step, d[lo:])
 
-def stackup(files, lo=0, prefix=""):
+def stackup(files, lo=0, prefix="", nextto=None):
     """
-    Convenience function to stack a set of eproms into byte_mem.
+    Convenience function to stack a set of eproms into ByteMem.
     'files' indicate the layout desired, and each element can be
     just a filename or an iterable of filenames:
 
@@ -559,43 +570,47 @@ def stackup(files, lo=0, prefix=""):
         examples/HP8568A
 
     """
-    l = []
+    if nextto is not None:
+        prefix = os.path.dirname(nextto)
+    ll = []
     hi = lo
     for r in files:
-        l.append([])
+        ll.append([])
         if isinstance(r, str):
-            b = open(prefix + r, "rb").read()
+            b = open(os.path.join(prefix, r), "rb").read()
             hi += len(b)
-            l[-1].append(b)
+            ll[-1].append(b)
         else:
             for i in r:
-                b = open(prefix + i, "rb").read()
+                b = open(os.path.join(prefix, i), "rb").read()
                 hi += len(b)
-                l[-1].append(b)
-    m = byte_mem(lo, hi)
+                ll[-1].append(b)
+    mr = ByteMem(lo, hi)
     p = lo
-    for r in l:
+    for r in ll:
         stride = len(r)
-        ll = len(r[0])
+        ln = len(r[0])
         o = stride
         for i in r:
             o -= 1
             pp = p + o
             for j in i:
-                m[pp] = j
+                mr[pp] = j
                 pp += stride
-        p += stride * ll
-    print(m)
-    return m
+        p += stride * ln
+    return mr
 
+
+def do_test():
+    mem = WordMem(0x0000, 0x1000, bits=64, attr=3)
+    print(mem)
+    print(type(mem.m), ctypes.sizeof(mem.m))
+    mem.wr(0x100, 0x123456789)
+    print("%x" % mem[0x100])
+    print(mem.get_attr(0x100))
+    print(mem.get_attr(0x101))
+    print(mem.set_attr(0x101, 4))
+    print(mem.get_attr(0x101))
 
 if __name__ == "__main__":
-    m = word_mem(0x0000, 0x1000, bits=64, attr=3)
-    print(m)
-    print(type(m.m), ctypes.sizeof(m.m))
-    m.wr(0x100, 0x123456789)
-    print("%x" % m[0x100])
-    print(m.get_attr(0x100))
-    print(m.get_attr(0x101))
-    print(m.set_attr(0x101, 4))
-    print(m.get_attr(0x101))
+    do_test()

@@ -34,14 +34,15 @@ from pyreveng import job, mem, data, code, misc, listing
 import pyreveng.cpu.mos6500 as mos6500
 
 def mem_setup():
-    m = mem.byte_mem(0xe000, 0x10000)
-    fn = os.path.join(os.path.dirname(__file__), "EPROM_Z8000_Fl.Cont._S41_6-20-85.bin")
-    m.load_binfile(0xe000, 1, fn)
-    return m
+    return mem.stackup(
+        ("EPROM_Z8000_Fl.Cont._S41_6-20-85.bin",),
+        prefix=os.path.dirname(__file__)
+    )
 
 def setup():
-    pj = job.Job(mem_setup(), "CBM900_FDC")
     cx = mos6500.mos6500()
+    cx.m.map(mem_setup(), 0xe000)
+    pj = job.Job(cx.m, "CBM900_FDC")
     return pj, cx
 
 def task(pj, cx):

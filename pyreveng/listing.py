@@ -274,6 +274,7 @@ def Listing(pj, fn=None, **kwargs):
     fo = open(fn, "w")
     sep = ""
     for mem, low, high in pj.m.segments():
+        print("SEG %x-%x" % (low, high), mem)
         fo.write(sep)
         Seg_Listing(pj, fo, mem, low, high, **kwargs)
         sep = "\n" + "-" * 80 + "\n\n"

@@ -27,7 +27,7 @@
 '''Motorola MC6809
 '''
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 mc6809_desc = """
 
@@ -949,7 +949,8 @@ class mc6809_ins(assy.Instree_ins):
 
 class mc6809(assy.Instree_disass):
 	def __init__(self, mask=0xffff, macros=False):
-		super(mc6809, self).__init__("mc6809", 8)
+		super().__init__("mc6809", 8)
+		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
 		self.add_ins(mc6809_desc, mc6809_ins)
 		if macros:
 			self.add_ins(mc6809_macro_desc, mc6809_ins)

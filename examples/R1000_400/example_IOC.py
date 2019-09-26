@@ -57,7 +57,7 @@ class M200():
 	def __init__(self, filename):
 		self.filename = filename
 		self.size = os.stat(filename).st_size
-		self.m = mem.byte_mem(0, self.size)
+		self.m = mem.ByteMem(0, self.size)
 		self.m.load_binfile(first = 0, step = 0x1, filename=filename)
 		M200S.append(self)
 
@@ -78,23 +78,23 @@ def mem_setup():
 	top = 0
 	for obj in M200S:
 		top = max(top, obj.load_address() + obj.size)
-	m = mem.byte_mem(0, top)
+	m = mem.ByteMem(0, top)
 	for obj in M200S:
 		print("Load", obj, "at 0x%x" % obj.load_address())
 		a = obj.load_address()
 		for i in range(obj.size):
 			m[a + i] = obj.m[i]
-
 	return m
 
 def setup():
 	m = mem_setup()
 
-	pj = job.Job(m, "R1000_400_IOC")
 	cpu = m68020.m68020()
+	cpu.m.map(m, 0)
 	cpu.flow_check.append(flow_check)
 	cpu.trap_returns[0] = False
 	cpu.it.load_string(mytrap_desc, mytrap_ins)
+	pj = job.Job(cpu.m, "R1000_400_IOC")
 	return pj, cpu
 
 def switch(pj, cpu, lo, hi):

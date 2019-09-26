@@ -27,7 +27,7 @@
 '''Intel i8088/i8086
 '''
 
-from pyreveng import instree, assy, binutils
+from pyreveng import instree, assy, binutils, mem
 
 i8086_desc="""
 #		|- - - - - - - -|- - - - - - - -|- - - - - - - -|
@@ -50,9 +50,9 @@ POP	sr	|0 0 0|sr |1 1 1|
 XCHG	r,ea	|1 0 0 0 0 1 1|w|mod| reg | rm  |
 XCHG	W,a,r2	|1 0 0 1 0| reg	|
 NOP	-	|1 0 0 1 0 0 0 0|
-IN	i1,a	|1 1 1 0 0 1 0|w| i1		|
+IN	io1,a	|1 1 1 0 0 1 0|w| io1		|
 IN	dx,a	|1 1 1 0 1 1 0|w|
-OUT	a,i1	|1 1 1 0 0 1 1|w| i1		|
+OUT	a,io1	|1 1 1 0 0 1 1|w| io1		|
 OUT	a,dx	|1 1 1 0 1 1 1|w|
 XLAT	-	|1 1 0 1 0 1 1 1|
 LEA	W,ea,r	|1 0 0 0 1 1 0 1|mod| reg | rm  |
@@ -307,240 +307,243 @@ FNOP	-	|1 1 0 1 1|0 0 1|1 1 0 1 0 0 0 0|
 """
 
 def fixup_mod_reg_rm(ins):
-	ins_list = []
-	for i in ins.split("\n"):
-		if len(i) == 0 or i[0] == "#":
-			continue
-		i = i.expandtabs()
-		j = i.find("|mod|")
-		ins_list.append(i)
-		if j >= 0:
+    ins_list = []
+    for i in ins.split("\n"):
+        if len(i) == 0 or i[0] == "#":
+            continue
+        i = i.expandtabs()
+        j = i.find("|mod|")
+        ins_list.append(i)
+        if j >= 0:
 
-			k = i.replace("|mod|", "|0 1|")
-			k = k.replace("ea", "e1")
-			k = k[:j+16] + "|  dlo          " + k[j+16:]
-			ins_list.append(k)
+            k = i.replace("|mod|", "|0 1|")
+            k = k.replace("ea", "e1")
+            k = k[:j+16] + "|  dlo          " + k[j+16:]
+            ins_list.append(k)
 
-			k = i.replace("|mod|", "|1 0|")
-			k = k.replace("ea", "e2")
-			k = k[:j+16] + "|  dlo          |  dhi          " + k[j+16:]
-			ins_list.append(k)
+            k = i.replace("|mod|", "|1 0|")
+            k = k.replace("ea", "e2")
+            k = k[:j+16] + "|  dlo          |  dhi          " + k[j+16:]
+            ins_list.append(k)
 
-			k = i.replace("|mod|", "|0 0|")
-			k = k.replace("| rm  |", "|1 1 0|")
-			k = k.replace("ea", "e3")
-			k = k[:j+16] + "|  dlo          |  dhi          " + k[j+16:]
-			ins_list.append(k)
-	return "\n".join(ins_list)
+            k = i.replace("|mod|", "|0 0|")
+            k = k.replace("| rm  |", "|1 1 0|")
+            k = k.replace("ea", "e3")
+            k = k[:j+16] + "|  dlo          |  dhi          " + k[j+16:]
+            ins_list.append(k)
+    return "\n".join(ins_list)
 
 i8086_desc = fixup_mod_reg_rm(i8086_desc)
 i8087_desc = fixup_mod_reg_rm(i8087_desc)
 if __name__ == "__main__":
-	print(i8086_desc)
-	print(i8087_desc)
-	it = instree.InsTree(8)
-	it.load_string(i8086_desc)
-	it.load_string(i8087_desc)
-	it.dump()
+    print(i8086_desc)
+    print(i8087_desc)
+    it = instree.InsTree(8)
+    it.load_string(i8086_desc)
+    it.load_string(i8087_desc)
+    it.dump()
 
 wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
 breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
 ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 
 class i8086_ins(assy.Instree_ins):
-	def __init__(self, pj, lim, lang):
-		super(i8086_ins, self).__init__(pj, lim, lang)
-		self.seg = ""
+    def __init__(self, pj, lim, lang):
+        super(i8086_ins, self).__init__(pj, lim, lang)
+        self.seg = ""
 
-	def assy_i1(self, pj):
-		""" Immediate 8 bit """
-		return "#0x%02x" % self['i1']
+    def assy_io1(self, pj):
+        """ Immediate I/O 8 bit """
+        return assy.Arg_dst(pj, self['io1'], "#", aspace=self.lang.as_io)
 
-	def assy_i2(self, pj):
-		""" Immediate 16 bit """
-		self.dstadr = self['i1'] | self['i2'] << 8
-		return assy.Arg_dst(pj, self.dstadr, "#")
+    def assy_i1(self, pj):
+        """ Immediate 8 bit """
+        return "#0x%02x" % self['i1']
 
-	def assy_da(self, pj):
-		""" Direct address """
-		self.dstadr = self['alo'] | self['ahi'] << 8
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_i2(self, pj):
+        """ Immediate 16 bit """
+        self.dstadr = self['i1'] | self['i2'] << 8
+        return assy.Arg_dst(pj, self.dstadr, "#")
 
-	def assy_Rel(self, pj):
-		""" 16 bit Relative address """
-		d = self['i1'] | (self['i2'] << 8)
-		if d & 0x8000:
-			d -= 65536
-		self.dstadr = self.hi + d
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_da(self, pj):
+        """ Direct address """
+        self.dstadr = self['alo'] | self['ahi'] << 8
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_rel(self, pj):
-		""" Relative address """
-		d = self['disp']
-		if d & 0x80:
-			d -= 256
-		self.dstadr = self.hi + d
-		return assy.Arg_dst(pj, self.dstadr)
+    def assy_Rel(self, pj):
+        """ 16 bit Relative address """
+        d = self['i1'] | (self['i2'] << 8)
+        if d & 0x8000:
+            d -= 65536
+        self.dstadr = self.hi + d
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_cs(self, pj):
-		self.seg = "%cs:"
+    def assy_rel(self, pj):
+        """ Relative address """
+        d = self['disp']
+        if d & 0x80:
+            d -= 256
+        self.dstadr = self.hi + d
+        return assy.Arg_dst(pj, self.dstadr)
 
-	def assy_es(self, pj):
-		self.seg = "%es:"
+    def assy_cs(self, pj):
+        self.seg = "%cs:"
 
-	def assy_ss(self, pj):
-		self.seg = "%ss:"
+    def assy_es(self, pj):
+        self.seg = "%es:"
 
-	def assy_ds(self, pj):
-		self.seg = "%ds:"
+    def assy_ss(self, pj):
+        self.seg = "%ss:"
 
-	def assy_sr(self, pj):
-		""" Segment register """
-		return ["%es", "%cs", "%ss", "%ds"][self['sr']]
+    def assy_ds(self, pj):
+        self.seg = "%ds:"
 
-	def assy_r1(self, pj):
-		""" Byte register """
-		return breg[self['reg']]
+    def assy_sr(self, pj):
+        """ Segment register """
+        return ["%es", "%cs", "%ss", "%ds"][self['sr']]
 
-	def assy_r2(self, pj):
-		""" Word register """
-		return wreg[self['reg']]
+    def assy_r1(self, pj):
+        """ Byte register """
+        return breg[self['reg']]
 
-	def assy_a(self, pj):
-		""" Accumulator """
-		if self['w']:
-			return "%ax"
-		else:
-			return "%al"
+    def assy_r2(self, pj):
+        """ Word register """
+        return wreg[self['reg']]
 
-	def assy_r(self, pj):
-		""" Register """
-		if self['w']:
-			return wreg[self['reg']]
-		else:
-			return breg[self['reg']]
+    def assy_a(self, pj):
+        """ Accumulator """
+        if self['w']:
+            return "%ax"
+        else:
+            return "%al"
 
-	def assy_v(self, pj):
-		if self['v']:
-			return "%cl"
+    def assy_r(self, pj):
+        """ Register """
+        if self['w']:
+            return wreg[self['reg']]
+        else:
+            return breg[self['reg']]
 
-	def assy_W(self, pj):
-		""" Instruction is Word sized """
-		self['w'] = 1
+    def assy_v(self, pj):
+        if self['v']:
+            return "%cl"
 
-	def assy_B(self, pj):
-		""" Instruction is Byte sized """
-		self['w'] = 9
+    def assy_W(self, pj):
+        """ Instruction is Word sized """
+        self['w'] = 1
 
-	def assy_S(self, pj):
-		""" Mark Byte sized instrustions"""
-		if not self['w']:
-			self.mne += "B"
+    def assy_B(self, pj):
+        """ Instruction is Byte sized """
+        self['w'] = 9
 
-	def assy_dx(pj, ins):
-		return "(%dx)"
+    def assy_S(self, pj):
+        """ Mark Byte sized instrustions"""
+        if not self['w']:
+            self.mne += "B"
 
-	def assy_ipcs(self, pj):
-		""" Long address (seg:off) """
-		self.seg = self['slo'] | (self['shi'] << 8)
-		self.off = self['alo'] | (self['ahi'] << 8)
-		self.dstadr = (self.seg << 4) + self.off
-		return "0x%04x:0x%04x" % (self.seg, self.off)
+    def assy_dx(pj, ins):
+        return "(%dx)"
 
-	def assy_ea(self, pj):
-		s = self.seg
-		if self['mod'] == 0 and self['rm'] == 6:
-			dst = self['dlo'] | (self['dhi'] << 8)
-			s += "0x%04x" % dst
-		elif self['mod'] == 0:
-			s += "(" + ireg[self['rm']] + ")"
-		elif self['mod'] == 1:
-			v = self['dlo']
-			if v & 0x80:
-				s += "-0x%02x+(" % (-v + 256)
-			else:
-				s += "0x%02x+(" % v
-			s += ireg[self['rm']]
-			s += ")"
-		elif self['mod'] == 2:
-			v = self['dlo'] | self['dhi'] << 8
-			if v & 0x8000:
-				s += "-0x%04x+(" % (-v + 65536)
-			else:
-				s += "0x%04x+(" % (v)
-			s += ireg[self['rm']]
-			s += ")"
-		elif self['mod'] == 3:
-			try:
-				if self['w']:
-					s += wreg[self['rm']]
-				else:
-					s += breg[self['rm']]
-			except:
-				s += "*FAIL*miss_w*"
-				print(self.im, "missing w")
-		else:
-			s += "<EA mod=%d r/m=%d>" % (self['mod'], self['rm'])
-		return s
+    def assy_ipcs(self, pj):
+        """ Long address (seg:off) """
+        self.seg = self['slo'] | (self['shi'] << 8)
+        self.off = self['alo'] | (self['ahi'] << 8)
+        self.dstadr = (self.seg << 4) + self.off
+        return "0x%04x:0x%04x" % (self.seg, self.off)
 
-	def assy_e1(self, pj):
-		""" Effective address 8 bit offset """
-		self['mod'] = 1
-		return self.assy_ea(pj)
+    def assy_ea(self, pj):
+        s = self.seg
+        if self['mod'] == 0 and self['rm'] == 6:
+            dst = self['dlo'] | (self['dhi'] << 8)
+            s += "0x%04x" % dst
+        elif self['mod'] == 0:
+            s += "(" + ireg[self['rm']] + ")"
+        elif self['mod'] == 1:
+            v = self['dlo']
+            if v & 0x80:
+                s += "-0x%02x+(" % (-v + 256)
+            else:
+                s += "0x%02x+(" % v
+            s += ireg[self['rm']]
+            s += ")"
+        elif self['mod'] == 2:
+            v = self['dlo'] | self['dhi'] << 8
+            if v & 0x8000:
+                s += "-0x%04x+(" % (-v + 65536)
+            else:
+                s += "0x%04x+(" % (v)
+            s += ireg[self['rm']]
+            s += ")"
+        elif self['mod'] == 3:
+            try:
+                if self['w']:
+                    s += wreg[self['rm']]
+                else:
+                    s += breg[self['rm']]
+            except:
+                s += "*FAIL*miss_w*"
+                print(self.im, "missing w")
+        else:
+            s += "<EA mod=%d r/m=%d>" % (self['mod'], self['rm'])
+        return s
 
-	def assy_e2(self, pj):
-		""" Effective address 16 bit offset """
-		self['mod'] = 2
-		return self.assy_ea(pj)
+    def assy_e1(self, pj):
+        """ Effective address 8 bit offset """
+        self['mod'] = 1
+        return self.assy_ea(pj)
 
-	def assy_e3(self, pj):
-		""" Effective address -- direct address """
-		self['mod'] = 0
-		self['rm'] = 6
-		return self.assy_ea(pj)
+    def assy_e2(self, pj):
+        """ Effective address 16 bit offset """
+        self['mod'] = 2
+        return self.assy_ea(pj)
 
-#class i808687_ins(i8086_ins):
-#	pass
+    def assy_e3(self, pj):
+        """ Effective address -- direct address """
+        self['mod'] = 0
+        self['rm'] = 6
+        return self.assy_ea(pj)
 
-	def assy_st(self, pj):
-		return "%%st(%d)" % self['st']
+    def assy_st(self, pj):
+        return "%%st(%d)" % self['st']
 
-	def assy_mf(self, pj):
-		self.mne += "fids" [self['mf']]
+    def assy_mf(self, pj):
+        self.mne += "fids" [self['mf']]
 
 class i8086(assy.Instree_disass):
-	def __init__(self):
-		super(i8086, self).__init__("i8086", 8)
-		self.add_ins(i8086_desc, i8086_ins)
+    def __init__(self):
+        super().__init__("i8086", 8)
+        self.add_as("mem", mem.MemMapper(0, 1<<20, "Memory"))
+        self.add_as("io", mem.MemMapper(0, 1<<16, "IO"))
+        self.add_ins(i8086_desc, i8086_ins)
 
-	def has_8087(self):
-		self.add_ins(i8087_desc, i8086_ins)
+    def has_8087(self):
+        self.add_ins(i8087_desc, i8086_ins)
 
-	def disass(self, pj, adr):
-		y = pj.find(adr, self.name)
-		if y != None:
-			return False
-		if (pj.m[adr] & 0xf8) == 0xd8 or (pj.m[adr + 1] & 0xf8) == 0xd8:
-			#x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
-			#ll = len(x[10:30].split())
-			x = ""
-			ll = 0
-		else:
-			x = ""
-			ll = 0
-		# print("%05x" % adr)
-		b = super(i8086, self).disass(pj, adr)
-		if not b:
-			y = pj.add(adr, adr + 1, "XXX")
-			y.rendered = "FAIL_DISASS"
-			if x != "":
-				y.lcmt += x + "\n"
-			return False
-		return (b)
-		y = pj.find(adr, self.name)
-		if y != "":
-			y.lcmt += x + "\n"
-		if ll > 0 and y.hi - y.lo != ll:
-			print("FAIL", y.render(pj), x)
-			return False
-		return b
+    def disass(self, pj, adr):
+        y = pj.find(adr, self.name)
+        if y != None:
+            return False
+        if (pj.m[adr] & 0xf8) == 0xd8 or (pj.m[adr + 1] & 0xf8) == 0xd8:
+            #x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
+            #ll = len(x[10:30].split())
+            x = ""
+            ll = 0
+        else:
+            x = ""
+            ll = 0
+        # print("%05x" % adr)
+        b = super(i8086, self).disass(pj, adr)
+        if not b:
+            y = pj.add(adr, adr + 1, "XXX")
+            y.rendered = "FAIL_DISASS"
+            if x != "":
+                y.lcmt += x + "\n"
+            return False
+        return (b)
+        y = pj.find(adr, self.name)
+        if y != "":
+            y.lcmt += x + "\n"
+        if ll > 0 and y.hi - y.lo != ll:
+            print("FAIL", y.render(pj), x)
+            return False
+        return b

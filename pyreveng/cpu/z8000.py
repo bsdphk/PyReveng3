@@ -842,9 +842,9 @@ class z8001(assy.Instree_disass):
 
     def __init__(self):
         super().__init__("z8001", 16, 8, ">")
-        self.as_mem = mem.mem_mapper(0, 0x80<<24)
-        self.as_io = mem.address_space(0, 1<<16, "I/O")
-        self.as_sio = mem.address_space(0, 1<<16, "Special I/O")
+        self.add_as("mem", mem.MemMapper(0, 0x80<<24, "Memory"))
+        self.add_as("io", mem.AddressSpace(0, 1<<16, "I/O"))
+        self.add_as("sio", mem.AddressSpace(0, 1<<16, "Special I/O"))
         self.add_ins(z8000_desc, z8001_ins)
 
     def codeptr(self, pj, adr):

@@ -35,16 +35,16 @@ import pyreveng.cpu.mc6809 as mc6809
 fwd="/critter/Doc/TestAndMeasurement/HP6626A/FW/"
 
 def mem_setup():
-	m = mem.byte_mem(0x8000, 0x10000)
+	m = mem.ByteMem(0x8000, 0x10000)
 	for i in open(fwd + "06626-80005-REV-A-00-04.hex"):
 		j = i.split()
 		m.wr(int(j[0],16), int(j[1],16))
 	return m
 
 def setup():
-	pj = job.Job(mem_setup(), "HP6626")
-
 	cpu = mc6809.mc6809()
+	cpu.m.map(mem_setup(), 0x8000, offset=0x8000)
+	pj = job.Job(cpu.m, "HP6626")
 	return pj, cpu
 
 def task(pj, cpu):

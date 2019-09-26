@@ -31,17 +31,12 @@ import os
 from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80
 
-def mem_setup():
-	dn = os.path.dirname(__file__)
-	m = mem.mem_mapper(0x0000, 0x10000)
-	mraw = mem.stackup(files=(os.path.join(dn, "EPROM_ROA_375.bin"),))
-	m.map(mraw, 0, 0x68)
-	m.map(mraw, 0x7000, offset = 0x69)
-	return m
-
 def setup():
-	pj = job.Job(mem_setup(), "RC702_bootrom_roa_375")
 	cx = z80.z80()
+	m = mem.stackup(files=("EPROM_ROA_375.bin",), nextto=__file__)
+	cx.m.map(m, 0, 0x68)
+	cx.m.map(m, 0x7000, offset = 0x69)
+	pj = job.Job(cx.m, "RC702_bootrom_roa_375")
 	return pj, cx
 
 def task(pj, cx):

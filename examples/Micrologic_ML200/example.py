@@ -32,7 +32,7 @@ from pyreveng import job, mem, listing, code
 import pyreveng.cpu.mcs4 as mcs4
 
 def mem_setup():
-	m = mem.byte_mem(0x0, 0x900)
+	m = mem.ByteMem(0x0, 0x900)
 	def hexfile(bn, a0):
 		fn = os.path.join(os.path.dirname(__file__), bn)
 		fi = open(fn)
@@ -53,10 +53,11 @@ def mem_setup():
 
 
 def setup():
-	pj = job.Job(mem_setup(), "Micrologic_ML200")
 
 	cpu = mcs4.mcs4()
+	cpu.m.map(mem_setup(), 0)
 
+	pj = job.Job(cpu.m, "Micrologic_ML200")
 	return pj, cpu
 
 def task(pj, cpu):

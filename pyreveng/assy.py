@@ -231,6 +231,14 @@ class Instree_disass(code.Decoder):
         self.flow_check = []
         self.verbatim = set()
         self.it = instree.InsTree(ins_word)
+        self.m = None
+        self.aspace = {}
+
+    def add_as(self, name, aspace):
+        self.aspace[name] = aspace
+        if name == "mem":
+            self.m = aspace
+        setattr(self, "as_" + name, aspace)
 
     def add_ins(self, desc, ins):
         assert issubclass(ins, Instree_ins)

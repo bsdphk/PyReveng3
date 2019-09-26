@@ -38,13 +38,13 @@ def mem_setup():
 			"A13U3.bin",
 			"A13U4.bin",
 		),
-		lo = 0x6800,
-		prefix = os.path.dirname(__file__) + "/"
+		nextto=__file__,
 	)
 
 def setup():
-	pj = job.Job(mem_setup(), "HP3335A")
 	cpu = mc6800.mc6800(mask = 0x7fff)
+	cpu.m.map(mem_setup(), 0x6800)
+	pj = job.Job(cpu.m, "HP3335A")
 
 	return pj, cpu
 

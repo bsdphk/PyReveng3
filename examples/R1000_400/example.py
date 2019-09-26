@@ -33,8 +33,7 @@ from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020
 
 def mem_setup():
-	o = 1<<31
-	m = mem.byte_mem(o, o | 0x8000)
+	m = mem.ByteMem(0, 0x8000)
 
 	filename=os.path.join(os.path.dirname(__file__), "IOC_EEPROM.bin")
 
@@ -46,7 +45,7 @@ def mem_setup():
 		(0x6000, 0x6000, 0x8000),
 	):
 		m.load_binfile(
-			first = o + oo,
+			first = oo,
 			step = 0x1,
 			filename=filename,
 			lo = lo,
@@ -90,11 +89,12 @@ def inline_text(pj, ins):
 def setup():
 	m = mem_setup()
 
-	pj = job.Job(m, "R1000_400")
 	cpu = my68k20()
-	cpu.set_adr_mask(0x7fffffff)
+	cpu.m.map(m, 0x0, 0x8)
+	cpu.m.map(m, 0x80000000)
 	cpu.flow_check.append(inline_text)
 	cpu.trap_returns[0] = True
+	pj = job.Job(cpu.m, "R1000_400")
 	return pj, cpu
 
 

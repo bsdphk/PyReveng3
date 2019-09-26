@@ -27,7 +27,7 @@
 '''MOS Technology 6500 Family
 '''
 
-from pyreveng import assy, data
+from pyreveng import assy, data, mem
 
 mos6500_desc = '''
 ADC	Imm	| 69		|
@@ -258,6 +258,7 @@ class mos6500_ins(assy.Instree_ins):
 class mos6500(assy.Instree_disass):
     def __init__(self):
         super().__init__("mos6500", 8)
+        self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
         self.add_ins(mos6500_desc, mos6500_ins)
 
     def codeptr(self, pj, adr):

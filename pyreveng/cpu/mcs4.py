@@ -29,7 +29,7 @@
 "Worlds First Micro Processor"
 '''
 
-from pyreveng import assy
+from pyreveng import assy, mem
 
 mcs4_desc="""
 NOP	-		|0 0 0 0|0 0 0 0|
@@ -122,5 +122,6 @@ class mcs4_ins(assy.Instree_ins):
 class mcs4(assy.Instree_disass):
 	def __init__(self):
 		super().__init__("mcs4", 8)
+		self.add_as("mem", mem.MemMapper(0, 1<<12, "Memory"))
 		self.it.load_string(mcs4_desc, mcs4_ins)
 		self.verbatim.add("(rr0)")

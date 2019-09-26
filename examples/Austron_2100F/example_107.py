@@ -32,16 +32,21 @@ from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():
-	m = mem.byte_mem(0xd000,0x10000)
-	dn = os.path.dirname(__file__)
-	m.load_binfile(0xf000, 1, os.path.join(dn, "Rev107f0.BIN"))
-	m.load_binfile(0xe000, 1, os.path.join(dn, "Rev107f1.BIN"))
-	m.load_binfile(0xd000, 1, os.path.join(dn, "Rev107f2.BIN"))
+	dn = os.path.dirname(__file__) + "/"
+	m = mem.stackup(
+	    (
+		("Rev107f2.BIN",),
+		("Rev107f1.BIN",),
+		("Rev107f0.BIN",),
+	    ),
+	    prefix = dn
+	)
 	return m
 
 def setup():
-	pj = job.Job(mem_setup(), "Austron2100F_107")
 	cx = mc6800.mc6800()
+	cx.m.map(mem_setup(), 0xd000)
+	pj = job.Job(cx.m, "Austron2100F_107")
 	return pj, cx
 
 class w8(data.Const):

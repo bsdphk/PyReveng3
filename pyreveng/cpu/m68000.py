@@ -1403,15 +1403,13 @@ class m68000(assy.Instree_disass):
 		    ins_word=16,
 		    mem_word=8,
 		    endian=">")
+		self.add_as("mem", mem.MemMapper(0, 1<<32, "Memory"))
 		self.it.load_string(m68000_desc, m68000_ins)
 		self.il = None
 		self.verbatim |= set(["CCR", "SR", "USP"])
 		self.ea_fullext = False
 		self.ea_scale = False
 		self.trap_returns = {}
-
-	def set_adr_mask(self, a):
-		self.amask = a
 
 	def vector_name(self, v):
 		n = {

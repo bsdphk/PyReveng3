@@ -31,7 +31,7 @@ This disassembler is prepared for bank-switching, in that it
 assumes that the upper (0xf800) address bits are preserved.
 '''
 
-from pyreveng import assy
+from pyreveng import assy, mem
 
 # Lower-case means we guessed
 # Uppercase came from 09411 listing
@@ -171,6 +171,7 @@ class hp_nanoproc_pg_ins(hp_nanoproc_ins):
 class hp_nanoproc_pg(hp_nanoproc):
 	def __init__(self):
 		super(hp_nanoproc_pg, self).__init__()
+		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
 		self.add_ins(hp_nanoproc_pg_desc, hp_nanoproc_pg_ins)
 		# self.it.print()
 

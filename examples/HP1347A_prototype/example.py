@@ -153,26 +153,6 @@ CMDS = {
 	"ZZ":	[ 0, "Segment Size"],
 }
 
-def mem_setup():
-	dn = os.path.dirname(__file__) + "/"
-	m = mem.mem_mapper(0x0000, 0x10000)
-	mlo = mem.stackup(prefix=dn, files=("hp1347a_proto.low.rom",))
-	m.map(mlo, 0x0000)
-	mhi = mem.stackup(prefix=dn, files=("hp1347a_proto.high.rom",))
-	m.map(mhi, 0xe000)
-
-	s = 0
-	for a in range(0x0000, 0x2000, 2):
-		s += m.bu16(a)
-	print("SUM 0x0000-0x1fff = 0x%x" % s)
-
-	s = 0
-	for a in range(0xe000, 0x10000, 2):
-		s += m.bu16(a)
-	print("SUM 0xe000-0xffff = 0x%x" % s)
-
-	return m
-
 # Interrupts do not return
 our_desc = '''
 CWAI	x	| 3C		| FF		|
@@ -185,10 +165,28 @@ class our_ins(mc6809.mc6809_ins):
 		return "#0xff"
 
 def setup():
-	pj = job.Job(mem_setup(), "HP1347A_proto")
-
 	cpu = mc6809.mc6809()
+	cpu.m.map(
+	    mem.stackup(("hp1347a_proto.low.rom",), nextto=__file__),
+	    0x0000,
+	)
+	cpu.m.map(
+	    mem.stackup(("hp1347a_proto.high.rom",), nextto=__file__),
+	    0xe000,
+	)
+
+	s = 0
+	for a in range(0x0000, 0x2000, 2):
+		s += cpu.m.bu16(a)
+	print("SUM 0x0000-0x1fff = 0x%x" % s)
+
+	s = 0
+	for a in range(0xe000, 0x10000, 2):
+		s += cpu.m.bu16(a)
+	print("SUM 0xe000-0xffff = 0x%x" % s)
+
 	cpu.add_ins(our_desc, our_ins)
+	pj = job.Job(cpu.m, "HP1347A_proto")
 	return pj, cpu
 
 def ttab(pj, a, b):

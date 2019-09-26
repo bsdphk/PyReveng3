@@ -109,9 +109,10 @@ def setup():
 	for i in s:
 		assert i & 0xff == 0
 
-	pj = job.Job(m, "HP8568B")
 	cpu = mycpu()
+	cpu.m.map(m, 0)
 	cpu.macro("DISPLAY_READY()", "0838 0007 c0e1 66f8")
+	pj = job.Job(cpu.m, "HP8568B")
 	return pj,cpu
 
 

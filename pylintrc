@@ -1,6 +1,3 @@
 [BASIC]
 
 good-names=i,j,k,pj,hi,lo,a,s,t,x,y
-
-[FORMAT]
-indent-string = "\t"

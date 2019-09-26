@@ -27,7 +27,7 @@
 '''Intel MCS-48 - 8035/39/40/48/49/50
 '''
 
-from pyreveng import assy
+from pyreveng import assy, mem
 
 mcs48_desc = """
 # 4-8
@@ -211,6 +211,8 @@ class mcs48_ins(assy.Instree_ins):
 class mcs48(assy.Instree_disass):
 	def __init__(self, lang="mcs48"):
 		super().__init__(lang, 8)
+		self.add_as("mem", mem.MemMapper(0, 1<<16, "Memory"))
+		print(self.m)
 		self.it.load_string(mcs48_desc, mcs48_ins)
 
 		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",
