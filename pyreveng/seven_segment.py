@@ -126,7 +126,7 @@ class digit(job.Leaf):
 		if drive is None:
 			drive = default_drive
 		assert len(drive) == 9
-		super().__init__(pj, adr, adr+1, "7seg")
+		super().__init__(adr, adr+1, "7seg")
 		k, lst = resolve(pj, adr, drive, inv)
 		self.resolv = k
 		s = ".7SEG"

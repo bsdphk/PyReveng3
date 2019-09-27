@@ -35,7 +35,7 @@ def fill_gaps(aspace):
 
 	def add_gap(aspace, lo, hi):
 		print("... adding .GAP 0x%x-0x%x" % (lo, hi))
-		x = leaf.Leaf(None, lo, hi, "gap")
+		x = leaf.Leaf(lo, hi, "gap")
 		x.rendered = ".GAP\t0x%x" % (hi - lo)
 		x.compact = True
 		aspace.insert(x)
@@ -102,7 +102,7 @@ def fill_blanks(aspace, lo, hi, func=None, width=1, minsize=64, all_vals=False):
 				pass
 			break
 		if b - a >= minsize:
-			x = leaf.Leaf(None, a, b, "blank")
+			x = leaf.Leaf(a, b, "blank")
 			x.rendered = ".BLANK\t" + fmt % c + "[0x%x]" % ((b-a) // width)
 			x.compact = True
 			x = aspace.insert(x)

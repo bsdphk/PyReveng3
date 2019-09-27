@@ -34,7 +34,7 @@ class Leaf():
 
     Many datatypes will sub-type this class and add functionality
     """
-    def __init__(self, p, lo, hi, tag):
+    def __init__(self, lo, hi, tag):
         self.lo = lo
         self.hi = hi
         self.tag = tag
@@ -57,9 +57,8 @@ class Leaf():
 class Link(Leaf):
 
     def __init__(self, lo, hi, link):
-        super().__init__(None, lo, hi, "LinkLeaf")
+        super().__init__(lo, hi, "LinkLeaf")
         self.link = link
-        self.aspace = link.aspace
 
     def render(self):
         return self.link.render()

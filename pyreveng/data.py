@@ -30,15 +30,15 @@ Data of various sorts
 
 import struct
 
-from . import job
+from . import job, leaf
 
 
 #######################################################################
 
-class Data(job.Leaf):
+class Data(leaf.Leaf):
 	def __init__(self, pj, lo, hi, t="data", fmt=None):
-		super().__init__(pj, lo, hi, t)
-		pj.insert(self)
+		super().__init__(lo, hi, t)
+		pj.m.insert(self)
 		self.fmt = fmt
 
 	def render(self):

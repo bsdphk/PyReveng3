@@ -117,7 +117,7 @@ def task(pj, cpu):
 
 	class ptr(job.Leaf):
 		def __init__(self, pj, adr):
-			super(ptr, self).__init__(pj, adr, adr + 2, "ptr")
+			super(ptr, self).__init__(adr, adr + 2, "ptr")
 			pj.insert(self)
 
 		def render(self):

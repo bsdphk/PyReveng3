@@ -83,7 +83,7 @@ class Job():
 		self.m.insert(leaf)
 
 	def add(self, lo, hi, tag):
-		l = Leaf(self, lo, hi, tag)
+		l = Leaf(lo, hi, tag)
 		self.m.insert(l)
 		return l
 

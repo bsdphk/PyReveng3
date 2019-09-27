@@ -109,7 +109,7 @@ class Code(Leaf):
     def __init__(self, pj, lo, hi, lang):
         assert isinstance(lang, Decoder)
         self.lang = lang
-        super().__init__(pj, lo, hi, lang.name)
+        super().__init__(lo, hi, lang.name)
         self.flow_in = []
         self.flow_out = []
 
