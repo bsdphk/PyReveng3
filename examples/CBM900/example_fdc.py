@@ -48,34 +48,34 @@ def setup():
 def task(pj, cx):
     cx.vectors(pj)
     for i in range(7):
-        data.Const(pj, 0xe28a + i, 0xe28a + i + 1)
+        data.Const(pj.m, 0xe28a + i, 0xe28a + i + 1)
     for i in range(6):
         cx.codeptr(pj, 0xe291 + 2 * i)
 
     a = 0xe7bf
     pj.set_label(a, "GEOMETRY")
     for i in range(5):
-        y = data.Pstruct(pj, a, "<4B")
+        y = data.Pstruct(pj.m, a, "<4B")
         a = y.hi
 
     a = 0xe80a
     pj.set_label(a, "STEPPER_PHASE")
-    y = data.Pstruct(pj, a, "<4B")
+    y = data.Pstruct(pj.m, a, "<4B")
 
     a = 0xe675
-    y = data.Pstruct(pj, a, "<4B")
+    y = data.Pstruct(pj.m, a, "<4B")
     a = y.hi
-    y = data.Pstruct(pj, a, "<4B")
+    y = data.Pstruct(pj.m, a, "<4B")
 
     a = 0xe962
-    y = data.Pstruct(pj, a, "<5B")
+    y = data.Pstruct(pj.m, a, "<5B")
     a = 0xe967
-    y = data.Pstruct(pj, a, "<B")
+    y = data.Pstruct(pj.m, a, "<B")
     a = 0xe968
-    y = data.Pstruct(pj, a, "<5B")
+    y = data.Pstruct(pj.m, a, "<5B")
 
     a = 0xff9c
-    y = data.Pstruct(pj, a, "<HH")
+    y = data.Pstruct(pj.m, a, "<HH")
 
     for a in (
         0xe034,

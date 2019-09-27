@@ -773,7 +773,7 @@ class Arm_Thumb(assy.Instree_disass):
 
 	def codeptr(self, pj, adr):
 		t = pj.m.lu32(adr)
-		c = data.Codeptr(pj, adr, adr + 4, t)
+		c = data.Codeptr(pj.m, adr, adr + 4, t)
 		pj.todo(t, self.disass)
 		return c
 

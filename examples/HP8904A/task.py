@@ -654,7 +654,7 @@ def lexer(pj):
 	pj.set_label(0x9780, "LEXTAB_ALPHABET")
 	n = 65
 	for i in range(0x9780, 0x97b4, 2):
-		data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
+		data.Dataptr(pj.m, i, i + 2, pj.m.bu16(i))
 		a = pj.m.bu16(i)
 		if n != 0x5a:
 			pj.set_label(a, "LEX_%c" % n)
@@ -810,7 +810,7 @@ def hints(pj, cpu):
 			cpu.codeptr(pj, a)
 
 		for a in range(0x4018, 0x4022, 2):
-			y = data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
+			y = data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 			u = pj.m.bu16(a)
 			y = data.Txt(pj, u, u + 40, label=False)
 			y.compact = True
@@ -889,7 +889,7 @@ def hints(pj, cpu):
 			y.fmt = "%d, %d" % (pj.m[a], pj.m.[a + 1])
 			u = pj.m.bu16(a + 2)
 			l = pj.m[a + 1]
-			data.Dataptr(pj, a + 2, a + 4, pj.m.bu16(a + 2))
+			data.Dataptr(pj.m, a + 2, a + 4, pj.m.bu16(a + 2))
 			y = data.Txt(pj, u, u + l, label=False)
 			y.compact = True
 		for a,b in (
@@ -940,13 +940,13 @@ def hints(pj, cpu):
 		data.Const(pj, 0xfd6e, 0xfd70)
 		for a in range(0xee62, 0xee88, 2):
 			u = pj.m.bu16(a)
-			y = data.Dataptr(pj, a, a + 2, u)
+			y = data.Dataptr(pj.m, a, a + 2, u)
 			y = data.Const(pj, u, u + 1)
 			y = data.Txt(pj, u + 1, u + 1 + pj.m[u], label=False)
 			y.compact = True
 		for a in range(0xeeee, 0x0ef0e, 2):
 			u = pj.m.bu16(a)
-			y = data.Dataptr(pj, a, a + 2, u)
+			y = data.Dataptr(pj.m, a, a + 2, u)
 			y = data.Const(pj, u, u + 1)
 			y = data.Txt(pj, u + 1, u + 1 + pj.m[u], label=False)
 			y.compact = True

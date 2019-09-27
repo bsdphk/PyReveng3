@@ -28,7 +28,7 @@
 # Render 7-segment decoding tables
 #
 
-from . import job, mem
+from . import job, mem, data
 
 # Default driver layout (A, B, C, D, E ,F, G, RDP, LDP)
 default_drive = (1, 2, 4, 8, 16, 32, 64, 128, 0)
@@ -118,7 +118,7 @@ def resolve(pj, adr, drive, inv):
 		print("NB! Unknown 7seg (TBL idx: 0x%x)" % n)
 	return k, lst
 
-class digit(job.Leaf):
+class digit(data.Data):
 	def __init__(self, pj, adr, drive=None, inv=False, verbose=False):
 		"""
 		drive = [A, B, C, D, E, F, G, RDP, LDP]
@@ -126,7 +126,8 @@ class digit(job.Leaf):
 		if drive is None:
 			drive = default_drive
 		assert len(drive) == 9
-		super().__init__(adr, adr+1, "7seg")
+		super().__init__(pj.m, adr, adr+1, "7seg")
+		pj.m.insert(self)
 		k, lst = resolve(pj, adr, drive, inv)
 		self.resolv = k
 		s = ".7SEG"
@@ -147,7 +148,6 @@ class digit(job.Leaf):
 		if verbose:
 			self.lcmt = lcmt(lst)
 		self.rendered = s
-		pj.insert(self)
 
 def table(pj, lo, hi, drive=None, inv=False, verbose=False):
 	"""

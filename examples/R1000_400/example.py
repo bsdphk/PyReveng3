@@ -61,7 +61,7 @@ INLTXT		inltxt		0	|0 1 0 0 1 1 1 0 1 0 0 1 0 1 1 0| a1            | a2          
 class my68k20_ins(m68020.m68020_ins):
 
 	def assy_inltxt(self, pj):
-		y = data.Txt(pj, self.lo + 2, label=False, splitnl=True, align=2)
+		y = data.Txt(pj.m, self.lo + 2, label=False, splitnl=True, align=2)
 		pj.todo(y.hi, self.lang.disass)
 		raise assy.Invalid("Inline text hack")
 
@@ -83,7 +83,7 @@ def inline_text(pj, ins):
 		0x80002028,
 	):
 		return
-	y = data.Txt(pj, ins.hi, label=False, splitnl=True, align=2)
+	y = data.Txt(pj.m, ins.hi, label=False, splitnl=True, align=2)
 	pj.todo(y.hi, ins.lang.disass)
 
 def setup():
@@ -149,11 +149,11 @@ def task(pj, cpu):
 		0x80004b68,
 		0x80007e0b,
 	):
-		data.Txt(pj, a, label=False, align=2)
+		data.Txt(pj.m, a, label=False, align=2)
 
 	def txts(a, b, align=2):
 		while a < b:
-			y = data.Txt(pj, a, label=False, align=align, splitnl=True)
+			y = data.Txt(pj.m, a, label=False, align=align, splitnl=True)
 			a = y.hi
 
 	txts(0x800010cc, 0x80001122, align=1)
@@ -163,9 +163,9 @@ def task(pj, cpu):
 	txts(0x800027ee, 0x800028ca, align=1)
 
 	##########
-	data.Txt(pj, 0x8000221c, align=1)
-	data.Txt(pj, 0x80002232, align=1, splitnl=True)
-	data.Txt(pj, 0x8000223d, align=1, splitnl=True)
+	data.Txt(pj.m, 0x8000221c, align=1)
+	data.Txt(pj.m, 0x80002232, align=1, splitnl=True)
+	data.Txt(pj.m, 0x8000223d, align=1, splitnl=True)
 	l = []
 	for a in range(0x8000228f, 0x800024a8):
 		x = pj.m[a]
@@ -175,17 +175,17 @@ def task(pj, cpu):
 		if x & 0x80:
 			l.append(a)
 	for i in range(len(l)-1):
-		data.Txt(pj, l[i], l[i+1], align=1, label=not i)
-	data.Txt(pj, l[-1] + 1, align=1, label=False)
+		data.Txt(pj.m, l[i], l[i+1], align=1, label=not i)
+	data.Txt(pj.m, l[-1] + 1, align=1, label=False)
 
 	# 0x8000298e
-	y = data.Txt(pj, 0x8000240c, splitnl=True, align=1)
-	y = data.Txt(pj, 0x80002481, splitnl=True, align=1)
-	y = data.Txt(pj, 0x8000254e, splitnl=True, align=1)
-	y = data.Txt(pj, 0x8000256e, splitnl=True, align=1)
-	y = data.Txt(pj, 0x8000257d, splitnl=True, align=1)
-	y = data.Txt(pj, 0x8000258c, splitnl=True, align=1)
-	y = data.Txt(pj, 0x8000259b, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000240c, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x80002481, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000254e, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000256e, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000257d, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000258c, splitnl=True, align=1)
+	y = data.Txt(pj.m, 0x8000259b, splitnl=True, align=1)
 
 	for a in (
 		0x8000000c,
@@ -223,8 +223,8 @@ def task(pj, cpu):
 		pj.todo(a, cpu.disass)
 
 	for a in range(0x800043aa, 0x80004492, 6):
-		y = data.Const(pj, a, a + 4, func=pj.m.bu32, size=4)
-		z = data.Const(pj, y.hi, y.hi + 2, func=pj.m.bu16, size=2)
+		y = data.Const(pj.m, a, a + 4, func=pj.m.bu32, size=4)
+		z = data.Const(pj.m, y.hi, y.hi + 2, func=pj.m.bu16, size=2)
 		w = pj.m.bu16(a + 4)
 		w >>= 4
 		w &= 0xffe
@@ -234,21 +234,21 @@ def task(pj, cpu):
 
 	for a in range(0x80004a7a, 0x80004a98, 4):
 		d = pj.m.bu32(a)
-		data.Dataptr(pj, a, a + 4, d)
-		data.Txt(pj, d, align=1)
+		data.Dataptr(pj.m, a, a + 4, d)
+		data.Txt(pj.m, d, align=1)
 
 	for a in range(0x800036e8, 0x800036fc, 4):
 		d = pj.m.bu32(a)
-		data.Dataptr(pj, a, a + 4, d)
-		data.Txt(pj, d)
+		data.Dataptr(pj.m, a, a + 4, d)
+		data.Txt(pj.m, d)
 
-	data.Const(pj, 0x80001ffa, 0x80002000)
-	data.Const(pj, 0x80003ffa, 0x80004000)
-	data.Const(pj, 0x80005ffa, 0x80006000)
-	data.Const(pj, 0x80007dfa, 0x80007e00)
+	data.Const(pj.m, 0x80001ffa, 0x80002000)
+	data.Const(pj.m, 0x80003ffa, 0x80004000)
+	data.Const(pj.m, 0x80005ffa, 0x80006000)
+	data.Const(pj.m, 0x80007dfa, 0x80007e00)
 
 	# See 0x800039e0
-	data.Const(pj, 0x80003a2a, 0x80003a2a + 0x16)
+	data.Const(pj.m, 0x80003a2a, 0x80003a2a + 0x16)
 
 	while pj.run():
 		pass

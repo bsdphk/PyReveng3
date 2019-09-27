@@ -243,16 +243,16 @@ def task(pj, cpu):
 		):
 		pj.set_label(a, n)
 
-	data.Const(pj, 0x8000, 0x8002)
+	data.Const(pj.m, 0x8000, 0x8002)
 
 	pj.set_label(0xd472, "chan_ptr")
 	for a in range(0xd472, 0xd47a, 2):
-		data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
+		data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 
 	for a,b in (
 		(0x8002, 0x802a),
 		):
-		y = data.Txt(pj, a, b, align=1)
+		y = data.Txt(pj.m, a, b, align=1)
 
 	for a in (
 		0x827b,
@@ -269,7 +269,7 @@ def task(pj, cpu):
 		0xcf01,
 		0xd262,
 		):
-		y = data.Txt(pj, a, a + 12, align=1)
+		y = data.Txt(pj.m, a, a + 12, align=1)
 
 	for a in (
 		0xa183,
@@ -278,12 +278,12 @@ def task(pj, cpu):
 		0xa198,
 		0xaffe,
 		):
-		y = data.Txt(pj, a, pfx=1, align=1)
+		y = data.Txt(pj.m, a, pfx=1, align=1)
 
 	pj.set_label(0x8ec2, "ERROR_TEXTS")
 	n = 0
 	for a in range(0x8ec2, 0x9036, 12):
-		y = data.Txt(pj, a, a + 12, align=1, label=False)
+		y = data.Txt(pj.m, a, a + 12, align=1, label=False)
 		err[n] = y.txt
 		n += 1
 
@@ -293,7 +293,7 @@ def task(pj, cpu):
 		b = pj.m[a]
 		if b == 0:
 			break
-		y = data.Txt(pj, a, pfx=1, align=1, label=False)
+		y = data.Txt(pj.m, a, pfx=1, align=1, label=False)
 		token[nn] = y.txt
 		a = y.hi
 		nn += 1
@@ -301,16 +301,16 @@ def task(pj, cpu):
 	print("NN", nn)
 
 	for a in range(0x87d0, 0x8810, 8):
-		data.Const(pj, a, a + 8)
+		data.Const(pj.m, a, a + 8)
 
 	def t1(a, l):
 		pj.set_label(a, l)
 		while True:
-			data.Const(pj, a, a + 1)
+			data.Const(pj.m, a, a + 1)
 			if pj.m[a] == 0:
 				return;
 			a += 1
-			y = data.Txt(pj, a, align=1, label=False)
+			y = data.Txt(pj.m, a, align=1, label=False)
 			a = y.hi
 			cpu.codeptr(pj, a)
 			z = pj.m.bu16(a)
@@ -342,7 +342,7 @@ def task(pj, cpu):
 	class tt_5(data.Data):
 		def __init__(self, pj, lo):
 			hi = lo + 4
-			super(tt_5, self).__init__(pj, lo, hi, "tt_5")
+			super(tt_5, self).__init__(pj.m, lo, hi, "tt_5")
 
 		def render(self):
 			s = ".TT5\t"
@@ -366,7 +366,7 @@ def task(pj, cpu):
 			ll = list(l)
 			if pj.m[a] == 0:
 				if not pj.m.find_lo(a):
-					data.Const(pj, a, a + 1)
+					data.Const(pj.m, a, a + 1)
 				break
 			t = pj.m[a]
 			if t in token:
@@ -395,16 +395,16 @@ def task(pj, cpu):
 	tt5(0xa3a2, 0xa5d1)
 
 	for a in range(0xb7ac, 0xb7c4, 2):
-		data.Const(pj, a, a + 2)
+		data.Const(pj.m, a, a + 2)
 
 
 	# Task or coroutine table
 	for a in range(0xce62, 0xce80, 6):
-		data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
+		data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 		z = pj.m.bu16(a + 2)
 		softlbl(z, "task_%04x" % z)
 		cpu.codeptr(pj, a + 2)
-		data.Dataptr(pj, a + 4, a + 6, pj.m.bu16(a + 4))
+		data.Dataptr(pj.m, a + 4, a + 6, pj.m.bu16(a + 4))
 
 
 	if True:
@@ -462,7 +462,7 @@ def task(pj, cpu):
 
 	class fp(data.Data):
 		def __init__(self, pj, lo, hi):
-			super(fp, self).__init__(pj, lo, hi, "fp")
+			super().__init__(pj.m, lo, hi, "fp")
 			self.val = fp_val(pj, lo, hi)
 
 		def render(self):
@@ -471,7 +471,7 @@ def task(pj, cpu):
 	class tt_2(data.Data):
 		def __init__(self, pj, lo):
 			hi = lo + 5 + pj.m[lo + 4] * 4
-			super(tt_2, self).__init__(pj, lo, hi, "tt_2")
+			super().__init__(pj.m, lo, hi, "tt_2")
 
 		def render(self):
 			s = ".TT2\t{\n"
@@ -493,7 +493,7 @@ def task(pj, cpu):
 	class tt_output1(data.Data):
 		def __init__(self, pj, lo):
 			hi = lo + 39
-			super(tt_output1, self).__init__(pj, lo, hi, "tt_output1")
+			super().__init__(pj.m, lo, hi, "tt_output1")
 			self.compact = True
 
 		def render(self):
@@ -513,7 +513,7 @@ def task(pj, cpu):
 	class tt_output2(data.Data):
 		def __init__(self, pj, lo):
 			hi = lo + 44
-			super(tt_output2, self).__init__(pj, lo, hi, "tt_output2")
+			super().__init__(pj.m, lo, hi, "tt_output2")
 			self.compact = True
 
 		def render(self):
@@ -547,45 +547,45 @@ def task(pj, cpu):
 		while True:
 			if pj.m[a + 2] > 2:
 				break
-			data.Const(pj, a, a+2, fmt="0x%02x")
+			data.Const(pj.m, a, a+2, fmt="0x%02x")
 			fp(pj, a + 2, a + 6)
 			a += 6
-		data.Const(pj, a, a+2, fmt="0x%02x")
+		data.Const(pj.m, a, a+2, fmt="0x%02x")
 
 	a = 0xb39c
 	while a:
 		pj.set_label(a, "tt2_%04x" % a)
 		x = pj.m.bu16(a)
 		if x == 0:
-			data.Dataptr(pj, a, a + 2, x)
+			data.Dataptr(pj.m, a, a + 2, x)
 			break
 		y = tt_2(pj, a);
 		a = x
 		continue
-		data.Const(pj, a + 2, a + 4, fmt="%d")
-		data.Const(pj, a + 4, a + 5)
+		data.Const(pj.m, a + 2, a + 4, fmt="%d")
+		data.Const(pj.m, a + 4, a + 5)
 		y = pj.m[a + 4]
 		a += 5
 		for i in range(y * 2):
 			z = pj.m.bu16(a)
 			tt3_1(z)
-			data.Dataptr(pj, a, a + 2, z)
+			data.Dataptr(pj.m, a, a + 2, z)
 			a += 2
 			z = pj.m.bu16(a)
 			tt3_2(z)
-			data.Dataptr(pj, a, a + 2, z)
+			data.Dataptr(pj.m, a, a + 2, z)
 			a += 2
 		a = x
 
 	##############
 	for a in range(0xb437, 0xb46e, 5):
 		pj.set_label(a, "tt1_%04x" % a)
-		data.Const(pj, a, a+1)
+		data.Const(pj.m, a, a+1)
 		z = pj.m.bu16(a + 1)
-		data.Dataptr(pj, a + 1, a + 3, z)
+		data.Dataptr(pj.m, a + 1, a + 3, z)
 		tt3_1(z)
 		z = pj.m.bu16(a + 3)
-		data.Dataptr(pj, a + 3, a + 5, z)
+		data.Dataptr(pj.m, a + 3, a + 5, z)
 		tt3_2(z)
 
 	##############

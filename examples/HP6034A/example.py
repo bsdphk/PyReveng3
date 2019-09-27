@@ -92,7 +92,7 @@ def task(pj, cx):
 
 	def dptr(pj, a):
 		v = pj.m.bu16(a)
-		data.Dataptr(pj, a, a + 2, v)
+		data.Dataptr(pj.m, a, a + 2, v)
 		return v
 
 
@@ -112,7 +112,7 @@ def task(pj, cx):
 			for j in i:
 				if j == "i":
 					d = pj.m.bu16(a)
-					data.Dataptr(pj, a, a + 2, d)
+					data.Dataptr(pj.m, a, a + 2, d)
 					a += 2
 				else:
 					print("IARG:", j)
@@ -126,7 +126,7 @@ def task(pj, cx):
 		# HPIB input command dispatch
 		l = []
 		for a in range(0x0cd3, 0x0ce2):
-			c = data.Txt(pj, a, a + 1, False)
+			c = data.Txt(pj.m, a, a + 1, False)
 			l.append(c.txt)
 		# print(l)
 		for a in range(0xcee, 0xd0c, 2):
@@ -143,12 +143,12 @@ def task(pj, cx):
 
 	if True:
 		for a in range(0x0d0c, 0x0d0f):
-			data.Txt(pj, a, a + 1, False)
+			data.Txt(pj.m, a, a + 1, False)
 		for a in range(0xf43, 0xf4a):
-			data.Txt(pj, a, a + 1, False)
-		data.Txt(pj, 0xf4a, 0xf4c, False)
+			data.Txt(pj.m, a, a + 1, False)
+		data.Txt(pj.m, 0xf4a, 0xf4c, False)
 		for a in range(0xf54, 0xf56):
-			data.Txt(pj, a, a + 1, False)
+			data.Txt(pj.m, a, a + 1, False)
 
 	if True:
 
@@ -185,7 +185,7 @@ def task(pj, cx):
 
 	if True:
 		for a in range(0xf1c, 0xf20):
-			data.Txt(pj, a, a + 1, False)
+			data.Txt(pj.m, a, a + 1, False)
 
 	if True:
 		pj.todo(0x10b2, cx.disass)
@@ -206,15 +206,15 @@ def task(pj, cx):
 
 	if True:
 		for a in range(0xf5a, 0xf7a, 2):
-			c = data.Const(pj, a, a + 2)
+			c = data.Const(pj.m, a, a + 2)
 			c.typ = ".WORD"
 			c.fmt = "0x%04x" % pj.m.bu16(a)
 		for a in range(0xf7a, 0xf7e, 2):
-			c = data.Const(pj, a, a + 2)
+			c = data.Const(pj.m, a, a + 2)
 			c.typ = ".WORD"
 			c.fmt = "%d" % pj.m.bu16(a)
 		for a in range(0xf7e, 0xfaa, 2):
-			c = data.Const(pj, a, a + 2)
+			c = data.Const(pj.m, a, a + 2)
 			c.typ = ".WORD"
 			c.fmt = "%d" % pj.m.bu16(a)
 

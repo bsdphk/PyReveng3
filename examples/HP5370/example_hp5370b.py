@@ -39,10 +39,10 @@ def task(pj, cpu):
 	cta = utils.arg_range(pj, ct, 0x7d6c, 0x7d88)
 
 	def ptr(pj, a):
-		return data.Dataptr(pj, a, a + 2, pj.m.bu16(a))
+		return data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 
 	def cbyte(pj, a):
-		c = data.Const(pj, a, a + 1)
+		c = data.Const(pj.m, a, a + 1)
 		c.val = pj.m[a]
 		c.typ = ".BYTE"
 		c.fmt = "0x%02x" % c.val
@@ -72,11 +72,11 @@ def task(pj, cpu):
 		utils.data24(pj, i)
 
 	for a in range(0x77d7, 0x77f7, 4):
-		data.Txt(pj, a, a + 4)
+		data.Txt(pj.m, a, a + 4)
 
-	data.Txt(pj, 0x78f3, 0x78f7)
-	data.Txt(pj, 0x78f7, 0x78fd)
-	data.Txt(pj, 0x78fd, 0x78ff)
+	data.Txt(pj.m, 0x78f3, 0x78f7)
+	data.Txt(pj.m, 0x78f7, 0x78fd)
+	data.Txt(pj.m, 0x78fd, 0x78ff)
 
 	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
 

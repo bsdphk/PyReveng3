@@ -42,7 +42,7 @@ def fc_outstr(pj, ins):
             continue
         if pj.m.bu16(ins.lo - 8) != 0x1400:
             continue
-        y = data.Txt(pj, pj.m.bu32(ins.lo - 6), align=1, label=False)
+        y = data.Txt(pj.m, pj.m.bu32(ins.lo - 6), align=1, label=False)
         pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
 
 def setup():
@@ -61,7 +61,7 @@ def setup():
     cx.z8010_mmu(0xfc)
 
     pj = job.Job(cx.as_mem, "CBM900_BOOT")
-    y = job.Leaf(0x6800, 0x6800 + 0x1016, tag = "MAP SEG1")
+    y = data.Data(pj.m, 0x6800, 0x6800 + 0x1016, "MAP SEG1")
     y.compact = None
     y.rendered = str(y)
     pj.m.insert(y)
@@ -82,7 +82,7 @@ def chargen(pj, a):
         for j in range(26):
             l.append(pj.m.bu16(a + 10 + i * 66 + j * 2))
         s.set_char(i // 16, i % 16, l)
-        y = data.Pstruct(pj, a + 8 + i * 66, ">BB32H")
+        y = data.Pstruct(pj.m, a + 8 + i * 66, ">BB32H")
         y.compact = True
     s.render()
 
@@ -110,16 +110,16 @@ def hd6845_tab(pj):
     a = 0x434a
     pj.set_label(a, "HD6845_PARAMS[]")
     while a < 0x436a:
-        x = data.Pstruct(pj, a, "BB")
+        x = data.Pstruct(pj.m, a, "BB")
         y = pj.m[a]
         if y < len(hd6845reg):
             x.lcmt += hd6845reg[y]
         a += 2
-    data.Pstruct(pj, a, ">H")
+    data.Pstruct(pj.m, a, ">H")
 
 def segptr(pj, a):
     u = pj.m.bu32(a)
-    y = data.Data(pj, a, a + 4)
+    y = data.Data(pj.m, a, a + 4)
     y.fmt = "0x%02x:0x%04x" % (u >> 24, u & 0xffff)
     y.dst = u
     return y
@@ -281,20 +281,20 @@ def task(pj, cx):
         ):
             while a < b:
                 y1 = segptr(pj, a)
-                y2 = data.Txt(pj, y1.dst, align=1, label=False)
+                y2 = data.Txt(pj.m, y1.dst, align=1, label=False)
                 pj.m.set_line_comment(y1.lo, '"' + y2.txt + '"')
                 a += c
 
         for a in range(0x0100065a, 0x01000708, 6):
-            data.Txt(pj, a, label=False, align=2)
+            data.Txt(pj.m, a, label=False, align=2)
 
         for a in range(0x01000c26, 0x01000e19, 6):
-            y1 = data.Pstruct(pj, a, ">HHH")
+            y1 = data.Pstruct(pj.m, a, ">HHH")
 
-        data.Txt(pj, 0x0c75, align=1, label=False)
-        data.Txt(pj, 0x0cb1, align=1, label=False)
+        data.Txt(pj.m, 0x0c75, align=1, label=False)
+        data.Txt(pj.m, 0x0cb1, align=1, label=False)
         for a in range(0xc4a, 0xc74, 2):
-            data.Pstruct(pj, a, "BB")
+            data.Pstruct(pj.m, a, "BB")
 
         hd6845_tab(pj)
 

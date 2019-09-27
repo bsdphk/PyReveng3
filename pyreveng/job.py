@@ -79,7 +79,7 @@ class Job():
 				return i
 		return None
 
-	def insert(self, leaf):
+	def x_insert(self, leaf):
 		self.m.insert(leaf)
 
 	def add(self, lo, hi, tag):

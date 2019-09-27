@@ -124,7 +124,7 @@ DATA = {}
 def data_double(pj, a):
 	y = DATA.get(a)
 	if not y:
-		y = data.Pstruct(pj, a, ">d", "%g", ".DOUBLE")
+		y = data.Pstruct(pj.m, a, ">d", "%g", ".DOUBLE")
 		y.val = y.data[0]
 		DATA[a] = y
 	return y
@@ -132,7 +132,7 @@ def data_double(pj, a):
 def data_float(pj, a):
 	y = DATA.get(a)
 	if not y:
-		y = data.Data(pj, a, a + 4)
+		y = data.Data(pj.m, a, a + 4)
 		x = pj.m.bu32(a)
 		e = x & 0xff
 		if e & 0x80:
@@ -149,15 +149,15 @@ def data_float(pj, a):
 	return y
 
 def data_bcd(pj, a):
-	return data.Pstruct(pj, a, ">Q", "%016x", ".BCD")
+	return data.Pstruct(pj.m, a, ">Q", "%016x", ".BCD")
 
 
 def task(pj, cpu):
 
 	# Where ?
-	# y = data.Const(pj, 0xfffe, 0x10000)
+	# y = data.Const(pj.m, 0xfffe, 0x10000)
 	# pj.set_label(y.lo, "eprom_lo_chksum")
-	y = data.Const(pj, 0x19854, 0x19856)
+	y = data.Const(pj.m, 0x19854, 0x19856)
 	pj.set_label(y.lo, "eprom_hi_chksum")
 
 	###############################################################
@@ -231,7 +231,7 @@ def task(pj, cpu):
 			return
 		ins.flow_out.pop(-1)
 		if len(z) <= 1:
-			a = data.Pstruct(pj, ins.hi, ">h", "%d", ".INFIX").hi
+			a = data.Pstruct(pj.m, ins.hi, ">h", "%d", ".INFIX").hi
 			ins.add_flow(pj, ">", True, a)
 			return
 		l = []
@@ -266,7 +266,7 @@ def task(pj, cpu):
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
 				if not pj.m.find_lo(r):
-					data.Pstruct(pj, r, ">L", "%d", ".LONG")
+					data.Pstruct(pj.m, r, ">L", "%d", ".LONG")
 				l.append("%d" % pj.m.bu32(r))
 			elif i == "frel":
 				r = ins.hi + pj.m.bs16(ins.hi)
@@ -276,7 +276,7 @@ def task(pj, cpu):
 				l.append("%g" % y.val)
 			elif i == "bcd":
 				r = pj.m.bu16(ins.hi)
-				# y = data.Pstruct(pj, ins.hi, ">H", "%x", ".BCD")
+				# y = data.Pstruct(pj.m, ins.hi, ">H", "%x", ".BCD")
 				l.append("%04x" % r)
 				ins.hi += 2
 			else:
@@ -304,7 +304,7 @@ def task(pj, cpu):
 		ins.add_flow(pj, ">", "?", ins.hi)
 		pj.set_label(ins.hi, "break_%04x" % ins.lo)
 
-		y = data.Const(pj, ins.lo - 2, ins.lo)
+		y = data.Const(pj.m, ins.lo - 2, ins.lo)
 		ncase = pj.m.bu16(ins.lo - 2)
 		y.typ = ".NCASE"
 		y.fmt = "%d" % ncase
@@ -318,7 +318,7 @@ def task(pj, cpu):
 			if ct == None:
 				ct = "_%d" % i
 
-			w = data.Const(pj, a, a + 2)
+			w = data.Const(pj.m, a, a + 2)
 			z = pj.m.bs16(a)
 			w.typ = ".CASE"
 			w.fmt = "0x%x, %d" % (i,z)
@@ -443,12 +443,12 @@ def task(pj, cpu):
 			self.args = []
 			for a in range(j):
 				self.args.append(pj.m[self.b + i + 1 + a])
-			super(params, self).__init__(pj, self.b + i, self.b + i + 1 + j)
+			super().__init__(pj.m, self.b + i, self.b + i + 1 + j)
 
 			self.fp = 0x196b6 + self.fi * 4
 			self.fa = pj.m.bu32(self.fp)
 			pj.todo(self.fa, cpu.disass)
-			data.Codeptr(pj, self.fp, self.fp + 4, self.fa)
+			data.Codeptr(pj.m, self.fp, self.fp + 4, self.fa)
 			pj.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
 
 		def render(self):
@@ -490,12 +490,12 @@ def task(pj, cpu):
 			self.type = self.c >> 12
 
 			lo -= (self.len + 1) & 0xffe
-			super(mnem, self).__init__(pj, lo, hi)
+			super().__init__(pj.m, lo, hi)
 
 
 			self.compact = True
 
-			a,b,c = data.stringify(pj, self.lo, self.len)
+			a,b,c = data.stringify(pj.m, self.lo, self.len)
 			self.string = b
 
 			self.hash = 0
@@ -535,8 +535,8 @@ def task(pj, cpu):
 
 	class oldcmd(data.Data):
 		def __init__(self, pj, lo, n):
-			super(oldcmd, self).__init__(pj, lo, lo + 2)
-			x,self.name,y = data.stringify(pj, self.lo, 2)
+			super().__init__(pj.m, lo, lo + 2)
+			x,self.name,y = data.stringify(pj.m, self.lo, 2)
 
 			self.key = pj.m[0x194b2 + n]
 			self.imm = (pj.m[0x1951e + (n >> 3)] >> (n & 7)) & 1
@@ -568,17 +568,17 @@ def task(pj, cpu):
 
 		pj.set_label(0x194b2, "KEYTAB")
 		for a in range(0x194b2, 0x1951e, 8):
-			y = data.Const(pj, a, min(a + 8, 0x1951e), fmt="0x%02x")
+			y = data.Const(pj.m, a, min(a + 8, 0x1951e), fmt="0x%02x")
 		# print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
 
 		pj.set_label(0x1951e, "IMEDBITS")
 		for a in range(0x1951e, 0x1952c, 8):
-			y = data.Const(pj, a, min(a + 8, 0x1952c), fmt="0x%02x")
+			y = data.Const(pj.m, a, min(a + 8, 0x1952c), fmt="0x%02x")
 		# print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
 
 		pj.set_label(0x1952c, "SFLGVAL")
 		for a in range(0x1952c, 0x195c4, 16):
-			y = data.Const(pj, a, min(a + 16, 0x195c4),
+			y = data.Const(pj.m, a, min(a + 16, 0x195c4),
 			    "0x%08x", pj.m.bu32, 4)
 		# print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
 
@@ -655,10 +655,10 @@ def task(pj, cpu):
 		):
 			for a in range(b, e, 4):
 				x = pj.m.bu32(a)
-				data.Dataptr(pj, a, a + 4, x)
-				data.Txt(pj, x, pfx=1, align=2)
+				data.Dataptr(pj.m, a, a + 4, x)
+				data.Txt(pj.m, x, pfx=1, align=2)
 
-		data.Txt(pj, 0x15dfc, pfx=1, align=2)
+		data.Txt(pj.m, 0x15dfc, pfx=1, align=2)
 
 		#######################################################
 
@@ -674,14 +674,14 @@ def task(pj, cpu):
 			0x1694e,
 			0x16954,
 		):
-			y = data.Txt(pj, a, pfx=1, align=2)
+			y = data.Txt(pj.m, a, pfx=1, align=2)
 
 		#######################################################
 
-		data.Dataptr(pj, 0xe39a, 0xe39a + 4, pj.m.bu32(0xe39a))
+		data.Dataptr(pj.m, 0xe39a, 0xe39a + 4, pj.m.bu32(0xe39a))
 
-		data.Const(pj, 0x2140, 0x2148, "%d", pj.m.bu64, 8)
-		data.Const(pj, 0x2148, 0x214c, "%d", pj.m.bu32, 4)
+		data.Const(pj.m, 0x2140, 0x2148, "%d", pj.m.bu64, 8)
+		data.Const(pj.m, 0x2148, 0x214c, "%d", pj.m.bu32, 4)
 
 		for a in (
 			0x0645e,
@@ -710,7 +710,7 @@ def task(pj, cpu):
 
 		pj.set_label(0x0693c, "MSG_ADR_X_Y")
 		for a in range(0x693c, 0x6a2c, 6):
-			data.Const(pj, a, a+6, "0x%04x", pj.m.bu16, 2)
+			data.Const(pj.m, a, a+6, "0x%04x", pj.m.bu16, 2)
 
 		#######################################################
 
@@ -728,7 +728,7 @@ def task(pj, cpu):
 		while a < 0x6c98:
 			x = pj.m.bs16(a)
 			if x < 0:
-				y = data.Data(pj, a, a + 2)
+				y = data.Data(pj.m, a, a + 2)
 				y.fmt = ".DSPLOC\t0x%04x" % -x
 				y.lcmt = "adr=%d" % -x
 				dsp = hp85662a.hp85662a()
@@ -740,7 +740,7 @@ def task(pj, cpu):
 
 		pj.set_label(0x0e3be, "UNITS")
 		for a in range(0x0e3be, 0x0e3d4, 2):
-			data.Txt(pj, a, a + 2, label=False)
+			data.Txt(pj.m, a, a + 2, label=False)
 
 		#######################################################
 		# 0ee98  00 01 93 be
@@ -786,13 +786,13 @@ def task(pj, cpu):
 
 		pj.set_label(0x4fac, "SCANTAB")
 		for a in range(0x4fac, 0x4fec, 2):
-			y = data.Const(pj, a, a+2, "0x%04x", pj.m.bu16, 2)
+			y = data.Const(pj.m, a, a+2, "0x%04x", pj.m.bu16, 2)
 
 		#######################################################
 
-		y = data.Const(pj, 0x193a2, 0x193be, "%d", pj.m.bu16, 2)
+		y = data.Const(pj.m, 0x193a2, 0x193be, "%d", pj.m.bu16, 2)
 		pj.set_label(y.lo, "HASHPTR2")
-		y = data.Const(pj, 0x193be, 0x193da, "%d", pj.m.bu16, 2)
+		y = data.Const(pj.m, 0x193be, 0x193da, "%d", pj.m.bu16, 2)
 		pj.set_label(y.lo, "HASHPTR")
 
 
@@ -800,7 +800,7 @@ def task(pj, cpu):
 		#######################################################
 		pj.set_label(0x19826, "PFXSCALE")
 		for a in range(0x19826, 0x19853, 1):
-			y = data.Const(pj, a, a + 1, fmt="0x%02x")
+			y = data.Const(pj.m, a, a + 1, fmt="0x%02x")
 		# print("PFXSCALE %d" % ((0x19853-0x19826)/1))
 
 
@@ -838,7 +838,7 @@ def task(pj, cpu):
 			y = y[0]
 			if y.mne != "PEA.L":
 				continue
-			z = data.Txt(pj, y.dstadr, pfx=1, align=2)
+			z = data.Txt(pj.m, y.dstadr, pfx=1, align=2)
 			y.lcmt = "'" + z.txt + "'"
 		if i.dstadr in (0xe718, 0x3456, 0x6ce0):
 			y = pj.m.find_hi(i.lo)
@@ -848,7 +848,7 @@ def task(pj, cpu):
 			if pj.m.bu16(y.lo) != 0x203c:
 				continue
 			a = pj.m.bu32(y.lo + 2)
-			z = data.Txt(pj, a, pfx=1, align=2)
+			z = data.Txt(pj.m, a, pfx=1, align=2)
 			y.lcmt = "'" + z.txt + "'"
 			if i.dstadr == 0xe718:
 				w = pj.m.find_hi(y.lo)
@@ -857,18 +857,18 @@ def task(pj, cpu):
 				w = w[0]
 				if w.mne != "PEA.L":
 					continue
-				z = data.Txt(pj, w.dstadr, pfx=1, align=2)
+				z = data.Txt(pj.m, w.dstadr, pfx=1, align=2)
 				w.lcmt = "'" + z.txt + "'"
 
-	y = data.Const(pj, 0x693a, 0x693c, "%d", pj.m.bu16, 2)
+	y = data.Const(pj.m, 0x693a, 0x693c, "%d", pj.m.bu16, 2)
 
 	pj.set_label(0x009b8, "RESET")
 	pj.set_label(0x00c2e, "SELFTEST")
 	pj.set_label(0x00d7a, "CPUTEST_FAIL")
 	pj.set_label(0x00e9a, "epromsize")
-	y = data.Const(pj, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
+	y = data.Const(pj.m, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
 	pj.set_label(0x00ef2, "ramaddress")
-	y = data.Const(pj, 0x00ef2, 0x00efe, "0x%08x", pj.m.bu32, 4)
+	y = data.Const(pj.m, 0x00ef2, 0x00efe, "0x%08x", pj.m.bu32, 4)
 	pj.set_label(0x00e9e, "ROMSUM")
 	pj.set_label(0x00ec0, "ROMTEST")
 	pj.set_label(0x01ae2, "BCD_FMT(BCD, PTR)")

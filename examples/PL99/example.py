@@ -52,14 +52,14 @@ def task(pj, cx):
 
 
 	def cbyte(pj, a):
-		c = data.Const(pj, a, a + 1)
+		c = data.Const(pj.m, a, a + 1)
 		c.val = pj.m[a]
 		c.typ = ".BYTE"
 		c.fmt = "0x%02x" % c.val
 		return c
 
 	def cword(pj, a):
-		c = data.Const(pj, a, a + 2)
+		c = data.Const(pj.m, a, a + 2)
 		c.val = pj.m.bu16(a)
 		c.typ = ".WORD"
 		c.fmt = "0x%04x" % c.val
@@ -67,7 +67,7 @@ def task(pj, cx):
 
 	class d_chain(data.Data):
 		def __init__(self, pj, a):
-			super(d_chain, self).__init__(pj, a, a + 4)
+			super().__init__(pj.m, a, a + 4)
 			self.num = '%c%c%c' % (
 				pj.m[self.lo],
 				pj.m[self.lo + 1],
@@ -84,7 +84,7 @@ def task(pj, cx):
 
 	class d_asf(data.Data):
 		def __init__(self, pj, a):
-			super(d_asf, self).__init__(pj, a, a + 16)
+			super().__init__(pj.m, a, a + 16)
 
 		def render(self):
 			s = ".STRUCT asf {"
@@ -103,7 +103,7 @@ def task(pj, cx):
 		def __init__(self, pj, a, lbl=True):
 			if pj.find(a, ".D4") != None:
 				return
-			super(d_q, self).__init__(pj, a, a + 4, ".D4")
+			super().__init__(pj.m, a, a + 4, ".D4")
 			self.val = pj.m.bu32(a)
 			self.dec = self.val
 			if self.dec & 0x80000000:
@@ -250,7 +250,7 @@ def task(pj, cx):
 			for j in i:
 				if j == "W":
 					d = pj.m.bu16(a)
-					data.Dataptr(pj, a, a + 2, d)
+					data.Dataptr(pj.m, a, a + 2, d)
 					a += 2
 					if d >= 0x8000:
 						d_q(pj, d)
@@ -305,7 +305,7 @@ def task(pj, cx):
 	x = pj.add(0x9b81, 0x9bff, "cmd-tbl")
 	pj.set_label(x.lo, "CMDTBL")
 	for a in range(x.lo, x.hi, 3):
-		y = data.Txt(pj, a, a+1, label=False)
+		y = data.Txt(pj.m, a, a+1, label=False)
 		z = cx.codeptr(pj, a + 1)
 		if y.txt == " ":
 			pj.set_label(z.dst, "CMD_SP")
@@ -470,11 +470,11 @@ def task(pj, cx):
 		d_q(pj, a)
 
 	for i in range(0xf220, 0xf226, 2):
-		data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
+		data.Dataptr(pj.m, i, i + 2, pj.m.bu16(i))
 		cword(pj, i + 6)
 
 	#for i in range(0x89d8, 0x8a20, 2):
-	#	data.Dataptr(pj, i, i + 2, pj.m.bu16(i))
+	#	data.Dataptr(pj.m, i, i + 2, pj.m.bu16(i))
 
 	for i in range(0xe363, 0xe369, 2):
 		x = cx.codeptr(pj, i)
@@ -485,12 +485,12 @@ def task(pj, cx):
 
 
 
-	data.Data(pj, 0xca73, 0xca7c)
+	data.Data(pj.m, 0xca73, 0xca7c)
 
-	data.Data(pj, 0xec7c, 0xec81)
-	data.Data(pj, 0xec81, 0xec85)
-	data.Data(pj, 0xec85, 0xec8b)
-	data.Data(pj, 0xec8b, 0xec91)
+	data.Data(pj.m, 0xec7c, 0xec81)
+	data.Data(pj.m, 0xec81, 0xec85)
+	data.Data(pj.m, 0xec85, 0xec8b)
+	data.Data(pj.m, 0xec8b, 0xec91)
 
 	d_q(pj, 0xcb70)
 	d_q(pj, 0xd4f5)

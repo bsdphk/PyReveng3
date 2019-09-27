@@ -30,7 +30,7 @@ from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020
 
 def fc_puts_inline(pj, ins, flow):
-	y = data.Txt(pj, ins.hi, label=False, align=2)
+	y = data.Txt(pj.m, ins.hi, label=False, align=2)
 	flow.to = y.hi
 
 def flow_check(pj, ins):
@@ -98,7 +98,7 @@ def setup():
 	return pj, cpu
 
 def switch(pj, cpu, lo, hi):
-	y = data.Data(pj, lo, hi)
+	y = data.Data(pj.m, lo, hi)
 	y.fmt = ""
 	n = 0
 	for a in range(lo, hi, 2):
@@ -125,11 +125,11 @@ def task(pj, cpu):
 	pj.todo(0x08ad2, cpu.disass)
 
 	if True:
-		data.Txt(pj, 0x294cc, 0x294da)
+		data.Txt(pj.m, 0x294cc, 0x294da)
 		
 	if True:
 		for a in (0x08ad6, 0x08ada):
-			data.Const(pj, a, a + 4)
+			data.Const(pj.m, a, a + 4)
 
 	if True:
 		for a in range(0x09080, 0x09098, 4):
@@ -216,14 +216,14 @@ def task(pj, cpu):
 		):
 			for a in range(lo, hi, 2):
 				y = pj.m.bu16(a)
-				data.Const(pj, a, a + 2, func=pj.m.bu16, size=2, fmt="0x%x")
+				data.Const(pj.m, a, a + 2, func=pj.m.bu16, size=2, fmt="0x%x")
 				pj.todo(y, cpu.disass)
 				pj.set_label(y, "PTR_FM_%x" % a)
 			
 
 	if True:
 		for a in range(0x092ac, 0x092bc, 4):
-			data.Const(pj, a, a + 4)
+			data.Const(pj.m, a, a + 4)
 
 	if True:
 		for a in (

@@ -418,7 +418,7 @@ def dsp_dispatch(pj, cx, start, end):
 
 class data24(data.Const):
 	def __init__(self, pj, lo):
-		super(data24, self).__init__(pj, lo, lo + 3)
+		super(data24, self).__init__(pj.m, lo, lo + 3)
 		v = pj.m[self.lo] << 16
 		v |= pj.m[self.lo + 1] << 8
 		v |= pj.m[self.lo + 2]
@@ -429,7 +429,7 @@ class data24(data.Const):
 
 class float70(data.Const):
 	def __init__(self, pj, lo):
-		super(float70, self).__init__(pj, lo, lo + 7)
+		super(float70, self).__init__(pj.m, lo, lo + 7)
 		x = pj.m[self.lo]
 		if x & 0x80:
 			s = -1

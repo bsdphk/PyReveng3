@@ -666,7 +666,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			t = self.hi + 4 - imm32
 		try:
 			v = pj.m.lu32(t)
-			data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
+			data.Const(pj.m, t, t + 4, func=pj.m.lu32, size=4)
 			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
 			return "#0x%x" % v
 		except:
@@ -727,7 +727,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			t = self.hi + 4 - imm32
 		try:
 			v = pj.m.lu32(t)
-			data.Const(pj, t, t + 4, func=pj.m.lu32, size=4)
+			data.Const(pj.m, t, t + 4, func=pj.m.lu32, size=4)
 			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
 			return assy.Arg_dst(pj, v, pfx="#")
 			return "#0x%x" % v
@@ -779,7 +779,7 @@ class Arm(assy.Instree_disass):
 
 	def codeptr(self, pj, adr):
 		t = pj.m.lu32(adr)
-		c = data.Codeptr(pj, adr, adr + 4, t)
+		c = data.Codeptr(pj.m, adr, adr + 4, t)
 		pj.todo(t, self.disass)
 		return c
 

@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, listing, code, seven_segment
+from pyreveng import job, mem, listing, data, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():
@@ -115,10 +115,9 @@ def task(pj, cpu):
 
 	#######################################################################
 
-	class ptr(job.Leaf):
+	class ptr(data.Data):
 		def __init__(self, pj, adr):
-			super(ptr, self).__init__(adr, adr + 2, "ptr")
-			pj.insert(self)
+			super(ptr, self).__init__(pj.m, adr, adr + 2, "ptr")
 
 		def render(self):
 			v = self.aspace.bu16(self.lo)

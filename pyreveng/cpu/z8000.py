@@ -853,16 +853,16 @@ class z8001(assy.Instree_disass):
         self.add_ins(z8000_desc, z8001_ins)
 
     def codeptr(self, pj, adr):
-        y = data.Codeptr(pj, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
+        y = data.Codeptr(pj.m, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
         pj.todo(y.dst, self.disass)
         return y
 
     def vector(self, pj, a, n):
         pj.set_label(a, n + "_RSV")
-        data.Const(pj, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
+        data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         pj.set_label(a, n + "_PSW")
-        data.Const(pj, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
+        data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         y = self.codeptr(pj, a)
         pj.todo(y.dst, self.disass)

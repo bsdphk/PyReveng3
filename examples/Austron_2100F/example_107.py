@@ -51,21 +51,21 @@ def setup():
 
 class w8(data.Const):
 	def __init__(self, pj, a):
-		super(w8, self).__init__(pj, a, a + 1)
+		super(w8, self).__init__(pj.m, a, a + 1)
 		self.typ = ".BYTE"
 		self.val = pj.m[a]
 		self.fmt = "0x%02x" % self.val
 
 class w16(data.Const):
 	def __init__(self, pj, a):
-		super(w16, self).__init__(pj, a, a + 2)
+		super(w16, self).__init__(pj.m, a, a + 2)
 		self.typ = ".WORD"
 		self.val = pj.m.bu16(a)
 		self.fmt = "0x%04x" % self.val
 
 class w32(data.Const):
 	def __init__(self, pj, a):
-		super(w32, self).__init__(pj, a, a + 4)
+		super(w32, self).__init__(pj.m, a, a + 4)
 		self.typ = ".LWORD"
 		self.val = pj.m.bu32(a)
 		self.fmt = "0x%08x" % self.val

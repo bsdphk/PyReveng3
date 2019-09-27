@@ -129,7 +129,7 @@ class Code(Leaf):
         '''
         for f in self.flow_out:
             f.propagate(pj)
-        pj.insert(self)
+        pj.m.insert(self)
 
 #######################################################################
 

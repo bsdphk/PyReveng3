@@ -486,7 +486,7 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 
 class vector(data.Data):
     def __init__(self, pj, adr, cx):
-        super().__init__(pj, adr, adr + 4)
+        super().__init__(pj.m, adr, adr + 4)
         self.ws = pj.m.bu16(adr)
         self.dstadr = pj.m.bu16(adr + 2)
         pj.todo(self.dstadr, cx.disass)
@@ -529,11 +529,11 @@ class Tms9900_ins(assy.Instree_ins):
                 return assy.Arg_dst(pj, v, "@")
 
             if self.mne[-1] == "b":
-                c = data.Const(pj, v, v + 1)
+                c = data.Const(pj.m, v, v + 1)
                 c.typ = ".BYTE"
                 c.fmt = "0x%02x" % pj.m[v]
             else:
-                c = data.Const(pj, v, v + 2)
+                c = data.Const(pj.m, v, v + 2)
                 c.typ = ".WORD"
                 c.fmt = "0x%04x" % w
             return assy.Arg_ref(pj, c)
@@ -552,7 +552,7 @@ class Tms9900_ins(assy.Instree_ins):
         a = self['ptr']
         self.cache['blwp1'] = pj.m.bu16(a)
         if not pj.m.find_lo(a):
-            data.Pstruct(pj, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+            data.Pstruct(pj.m, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
         return "WP=0x%04x" % pj.m.bu16(a)
 
     def assy_blwp2(self, pj):
@@ -935,7 +935,7 @@ class Tms9900(assy.Instree_disass):
 
     def codeptr(self, pj, adr):
         t = pj.m.bu16(adr)
-        c = data.Codeptr(pj, adr, adr + 2, t)
+        c = data.Codeptr(pj.m, adr, adr + 2, t)
         pj.todo(t, self.disass)
         return c
 

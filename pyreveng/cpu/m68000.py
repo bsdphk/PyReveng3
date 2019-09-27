@@ -1479,11 +1479,11 @@ class m68000(assy.Instree_disass):
 
 	def codeptr(self, pj, adr):
 		t = pj.m.bu32(adr)
-		c = data.Codeptr(pj, adr, adr + 4, t)
+		c = data.Codeptr(pj.m, adr, adr + 4, t)
 		pj.todo(t, self.disass)
 		return c
 
 	def dataptr(self, pj, adr):
-		return data.Dataptr(pj, adr, adr + 4, pj.m.bu32(adr))
+		return data.Dataptr(pj.m, adr, adr + 4, pj.m.bu32(adr))
 		
 

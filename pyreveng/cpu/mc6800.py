@@ -931,7 +931,7 @@ class mc6800(assy.Instree_disass):
 
     def codeptr(self, pj, adr):
         t = pj.m.bu16(adr)
-        c = data.Codeptr(pj, adr, adr + 2, t)
+        c = data.Codeptr(pj.m, adr, adr + 2, t)
         pj.todo(t, self.disass)
         return c
 

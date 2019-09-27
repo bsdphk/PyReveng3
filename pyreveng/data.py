@@ -36,21 +36,23 @@ from . import job, leaf
 #######################################################################
 
 class Data(leaf.Leaf):
-	def __init__(self, pj, lo, hi, t="data", fmt=None):
+	def __init__(self, asp, lo, hi, t="data", fmt=None):
 		super().__init__(lo, hi, t)
-		pj.m.insert(self)
+		asp.insert(self)
 		self.fmt = fmt
 
 	def render(self):
-		if self.fmt is None:
-			return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
-		return self.fmt
+		if self.rendered:
+			return self.rendered
+		if self.fmt:
+			return self.fmt
+		return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 
 class Const(Data):
-	def __init__(self, pj, lo, hi, fmt=None, func=None, size=1):
-		super().__init__(pj, lo, hi, "const")
+	def __init__(self, asp, lo, hi, fmt=None, func=None, size=1):
+		super().__init__(asp, lo, hi, "const")
 		if func is None:
-			func = pj.m.__getitem__
+			func = asp.__getitem__
 		if fmt is None:
 			fmt = "0x%x"
 		v = []
@@ -66,10 +68,10 @@ class Const(Data):
 
 class Pstruct(Data):
 	''' Uses python struct.* to untangle data '''
-	def __init__(self, pj, lo, spec, fmt=None, typ=".PSTRUCT"):
+	def __init__(self, asp, lo, spec, fmt=None, typ=".PSTRUCT"):
 		bcnt = struct.calcsize(spec)
-		super().__init__(pj, lo, lo + bcnt, "const")
-		self.data = struct.unpack(spec, pj.m.bytearray(lo, bcnt))
+		super().__init__(asp, lo, lo + bcnt, "const")
+		self.data = struct.unpack(spec, asp.bytearray(lo, bcnt))
 		self.spec = spec
 		self.fmt = fmt
 		self.typ = typ
@@ -80,8 +82,8 @@ class Pstruct(Data):
 		return self.typ + "\t" + self.spec + " = " + str(self.data)
 
 class Codeptr(Data):
-	def __init__(self, pj, lo, hi, dst):
-		super().__init__(pj, lo, hi, "codeptr")
+	def __init__(self, asp, lo, hi, dst):
+		super().__init__(asp, lo, hi, "codeptr")
 		self.dst = dst
 
 	def render(self):
@@ -91,20 +93,20 @@ class Codeptr(Data):
 		return self.aspace.adr(self.dst)
 
 class Dataptr(Data):
-	def __init__(self, pj, lo, hi, dst):
-		super().__init__(pj, lo, hi, "dataptr")
+	def __init__(self, asp, lo, hi, dst):
+		super().__init__(asp, lo, hi, "dataptr")
 		self.dst = dst
 
 	def render(self):
 		return ".PTR\t" + self.aspace.adr(self.dst)
 
-def stringify(pj, lo, length=None, term=None):
+def stringify(asp, lo, length=None, term=None):
 	if term is None:
 		term = (0,)
 	s = ""
 	v = ""
 	while True:
-		x = pj.m[lo]
+		x = asp[lo]
 		lo += 1
 		if length is None and x in term:
 			return lo, s, v
@@ -128,30 +130,30 @@ def stringify(pj, lo, length=None, term=None):
 				return lo, s, v
 
 class Txt(Data):
-	def __init__(self, pj, lo, hi=None,
+	def __init__(self, asp, lo, hi=None,
 	    label=True, term=None, pfx=None, align=1, splitnl=False):
 		self.splitnl = splitnl
 		self.pre = ""
 		if pfx == 1:
-			x = pj.m[lo]
+			x = asp[lo]
 			self.pre = '%d,' % x
-			hi, s, v = stringify(pj, lo + 1, length=x)
+			hi, s, v = stringify(asp, lo + 1, length=x)
 			while hi % align:
 				hi += 1
 		elif pfx is not None:
 			raise Exception("unknown pfx")
 		elif hi is None:
-			hi, s, v = stringify(pj, lo, term=term)
+			hi, s, v = stringify(asp, lo, term=term)
 			while hi % align:
 				hi += 1
 		else:
-			hi, s, v = stringify(pj, lo, hi - lo, term=term)
+			hi, s, v = stringify(asp, lo, hi - lo, term=term)
 
-		super().__init__(pj, lo, hi, "txt")
+		super().__init__(asp, lo, hi, "txt")
 		self.txt = s
 		self.fmt = "'" + s + "'"
 		if label:
-			pj.set_label(lo, "t_" + v.strip())
+			asp.set_label(lo, "t_" + v.strip())
 		self.compact = True
 
 	def render(self):

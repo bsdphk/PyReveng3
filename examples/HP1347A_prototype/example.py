@@ -191,7 +191,7 @@ def setup():
 
 def ttab(pj, a, b):
 	while a < b:
-		y = data.Txt(pj, a, pfx=1, align=1, label=True)
+		y = data.Txt(pj.m, a, pfx=1, align=1, label=True)
 		a = y.hi
 
 class Scrtxt(data.Data):
@@ -230,7 +230,7 @@ class Scrtxt(data.Data):
 		ll = l[0].replace(" ", "_")
 		pj.set_label(lo, "SCRTXT_" + ll)
 
-		super(Scrtxt, self).__init__(pj, lo, hi, "scrtxt")
+		super(Scrtxt, self).__init__(pj.m, lo, hi, "scrtxt")
 		self.fmt = f
 		self.compact = True
 
@@ -246,10 +246,10 @@ def task(pj, cpu):
 			z = Scrtxt(pj, a)
 			a = z.hi
 			continue
-			y = data.Pstruct(pj, a, ">HH")
-			y = data.Pstruct(pj, a + 4, ">bbb")
+			y = data.Pstruct(pj.m, a, ">HH")
+			y = data.Pstruct(pj.m, a + 4, ">bbb")
 			l = pj.m.bu16(a)
-			y = data.Txt(pj, a + 7, a + 7 + l, align=1)
+			y = data.Txt(pj.m, a + 7, a + 7 + l, align=1)
 			a += 7 + l
 
 		Scrtxt(pj, 0x01db)
@@ -264,10 +264,10 @@ def task(pj, cpu):
 		n = 0
 		c = {}
 		while pj.m.bu16(0xfd0 + n):
-			y = data.Txt(pj, 0xfd0 + n, 0xfd0 + n + 2, align=1)
+			y = data.Txt(pj.m, 0xfd0 + n, 0xfd0 + n + 2, align=1)
 			ta = 0x1062 + n
 			t = pj.m.bu16(ta)
-			z = data.Codeptr(pj, ta, ta + 2, t)
+			z = data.Codeptr(pj.m, ta, ta + 2, t)
 			z.lcmt += y.txt
 			pj.todo(t, cpu.disass)
 			if t not in c:
@@ -299,7 +299,7 @@ def task(pj, cpu):
 			t = pj.m.bu16(a + 4)
 			for i in range(w):
 				d = pj.m.bu16(t)
-				data.Codeptr(pj, t, t + 2, d)
+				data.Codeptr(pj.m, t, t + 2, d)
 				pj.todo(d, cpu.disass)
 				t += 2
 
@@ -313,13 +313,13 @@ def task(pj, cpu):
 	if True:
 		a = 0xf56e
 		while pj.m[a]:
-			y = data.Txt(pj, a, a + 6, label=False, align=1)
+			y = data.Txt(pj.m, a, a + 6, label=False, align=1)
 			a = y.hi
 
 	if True:
 		for a in range(0xf811, 0xf825, 2):
 			d = pj.m.bu16(a)
-			data.Codeptr(pj, a, a + 2, d)
+			data.Codeptr(pj.m, a, a + 2, d)
 			pj.todo(d, cpu.disass)
 
 	if True:
@@ -328,7 +328,7 @@ def task(pj, cpu):
 		pj.set_label(0xfd41, "IMG_FOCUS")
 		for a0 in (0xfbed, 0xfd41):
 			a = a0
-			data.Const(pj, a, a + 2,
+			data.Const(pj.m, a, a + 2,
 				func=pj.m.bu16, fmt="0x%x", size=2)
 			l = pj.m.bu16(a)
 			a += 2
@@ -340,7 +340,7 @@ def task(pj, cpu):
 
 	if True:
 		# No idea, possibly length error in IMG_FOCUS ?
-		data.Const(pj, 0xff17, 0xff19, fmt="0x%04x", func=pj.m.bu16, size=2)
+		data.Const(pj.m, 0xff17, 0xff19, fmt="0x%04x", func=pj.m.bu16, size=2)
 
 	if True:
 		# Special character handling
@@ -348,14 +348,14 @@ def task(pj, cpu):
 		c = 0xf778
 		pj.set_label(b, "CHR_TBL_KEY")
 		pj.set_label(c, "CHR_TBL_PTR")
-		data.Const(pj, b, c, fmt="0x%x")
+		data.Const(pj.m, b, c, fmt="0x%x")
 		a = c
 		while b < c:
 			p = pj.m.bu16(a)
-			y = data.Dataptr(pj, a, a + 2, p)
+			y = data.Dataptr(pj.m, a, a + 2, p)
 			pj.set_label(p, "CHR_TBL_%02x" % pj.m[b])
 			while True:
-				z = data.Const(pj, p, p + 2,
+				z = data.Const(pj.m, p, p + 2,
 				    func=pj.m.bu16, fmt="0x%x", size=2)
 				if pj.m[p + 1] & 0x80:
 					break

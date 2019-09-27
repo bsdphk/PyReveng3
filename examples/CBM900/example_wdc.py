@@ -47,13 +47,13 @@ def task(pj, cx):
     cx.vectors(pj)
     for a in range(0x0a, 0x21):
         t = pj.m[a]
-        data.Codeptr(pj, a, a + 1, t)
+        data.Codeptr(pj.m, a, a + 1, t)
         pj.todo(t, cx.disass)
         pj.m.set_block_comment(t, "From PTR 0x%x" % a)
     for a in range(0x000, 0x800, 0x100):
         cx.disass(pj, a + 0xfe)
-    data.Txt(pj, 0x5ae, 0x5dc, label=False)
-    data.Txt(pj, 0x5dc, 0x5f4, label=False)
+    data.Txt(pj.m, 0x5ae, 0x5dc, label=False)
+    data.Txt(pj.m, 0x5dc, 0x5f4, label=False)
 
     for a in (
             0x695,
