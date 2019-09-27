@@ -766,7 +766,13 @@ class Arm_ins(arm_base.Arm_Base_ins):
 
 class Arm(assy.Instree_disass):
 	def __init__(self):
-		super().__init__("arm", 32, 8, "<")
+		super().__init__(
+			"arm",
+			32,
+			8,
+			"<",
+			abits=32,
+		)
 		self.add_ins(arm_desc, Arm_ins)
 		self.verbatim.add("CPSR")
 		self.verbatim.add("SPSR")

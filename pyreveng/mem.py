@@ -162,15 +162,6 @@ class AddressSpace():
     def find_hi(self, adr):
         return self.t.find_hi(adr)
 
-class MapLeaf(leaf.Leaf):
-
-    def __init__(self, lo, hi, ref):
-        super().__init__(None, lo, hi, "MAPLEAF")
-        self.ref = ref
-
-    def render(self, pj):
-        return self.ref.render(pj)
-
 class MemMapper(AddressSpace):
 
     def __init__(self, lo, hi, name="Memory", **kwargs):
@@ -183,19 +174,19 @@ class MemMapper(AddressSpace):
     def __repr__(self):
         return "<MemMapper %s 0x%x-0x%x>" % (self.name, self.lo, self.hi)
 
-    def map(self, mem, low, high=None, offset=None):
+    def map(self, mem, lo, hi=None, offset=None):
         if offset is None:
             offset = 0
-        if high is None:
-            high = low + (mem.hi - mem.lo)
-        self.seglist.append([low, high, offset, mem])
-        self.mapping.append([low, high, offset, mem])
+        if hi is None:
+            hi = lo + (mem.hi - mem.lo)
+        assert hi > lo
+        self.seglist.append([lo, hi, offset, mem])
+        self.mapping.append([lo, hi, offset, mem])
 
         hi = max(self.mapping, key=lambda x:x[1])[1]
         lo = min(self.mapping, key=lambda x:x[0])[0]
         al = max(len("%x" % lo), len("%x" % (hi - 1)))
         self.apct = "0x%%0%dx" % al
-        print("APCT <%s>" % self.apct)
 
         if len(self.mapping) > 1:
             self.xlat = self.xlatn
@@ -294,11 +285,12 @@ class MemMapper(AddressSpace):
                 ghi = min(ghi, shi)
                 yield glo, ghi
 
-    def insert(self, leaf):
-        super().insert(leaf)
-        ms, sa = self.xlat(leaf.lo, False)
-        ll = MapLeaf(sa, leaf.hi - (leaf.lo - sa), leaf)
-        ms.insert(ll)
+    def insert(self, item):
+        super().insert(item)
+        ms, sa = self.xlat(item.lo, False)
+        ll = leaf.Link(sa, item.hi - (item.lo - sa), item)
+        if ms != self:
+            ms.insert(ll)
 
 class WordMem(AddressSpace):
 
@@ -426,8 +418,8 @@ class ByteMem(WordMem):
         self.ascii = charcol
 
     def __repr__(self):
-        return "<ByteMem 0x%x-0x%x, %d attr>" % (
-            self.lo, self.hi, self.attr)
+        return "<ByteMem 0x%x-0x%x, %d attr %s>" % (
+            self.lo, self.hi, self.attr, self.name)
 
     def bytearray(self, lo, bcnt):
         i = self._off(lo)

@@ -270,7 +270,6 @@ def Listing(aspace, fn, **kwargs):
     fo = open(fn, "w")
     sep = ""
     for seg, low, high in aspace.segments():
-        print("SEG %x-%x" % (low, high), mem)
         fo.write(sep)
         Seg_Listing(aspace, fo, seg, low, high, **kwargs)
         sep = "\n" + "-" * 80 + "\n\n"

@@ -29,27 +29,37 @@ The Leaf class used everywhere
 """
 
 class Leaf():
-	"""
-	These are the leaves we hang into the tree class.
+    """
+    These are the leaves we hang into the tree class.
 
-	Many datatypes will sub-type this class and add functionality
-	"""
-	def __init__(self, p, lo, hi, tag):
-		self.lo = lo
-		self.hi = hi
-		self.tag = tag
-		self.pil = None
-		self.lcmt = ""
-		self.rendered = None
-		self.compact = False
-		self.aspace = None
+    Many datatypes will sub-type this class and add functionality
+    """
+    def __init__(self, p, lo, hi, tag):
+        self.lo = lo
+        self.hi = hi
+        self.tag = tag
+        self.pil = None
+        self.lcmt = ""
+        self.rendered = None
+        self.compact = False
+        self.aspace = None
 
-	def __repr__(self):
-		s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
-		return s + ">"
+    def __repr__(self):
+        s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
+        return s + ">"
 
-	def render(self):
-		return self.rendered
+    def render(self):
+        return self.rendered
 
-	def arg_render(self):
-		return ""
+    def arg_render(self):
+        return ""
+
+class Link(Leaf):
+
+    def __init__(self, lo, hi, link):
+        super().__init__(None, lo, hi, "LinkLeaf")
+        self.link = link
+        self.aspace = link.aspace
+
+    def render(self):
+        return self.link.render()

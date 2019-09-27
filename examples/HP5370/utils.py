@@ -269,7 +269,7 @@ def setup(name, binfile, direction):
 	else:
 		m.load_binfile(0x1fff, -1, fn)
 	cx.m.map(m, 0x6000)
-	cx.m.map(m, low=0xfff8, high=0x10000, offset=0x1ff8)
+	cx.m.map(m, lo=0xfff8, hi=0x10000, offset=0x1ff8)
 	pj = job.Job(cx.m, name)
 	eprom(pj, cx.disass, 0x6000, 0x8000, 0x0400)
 	cx.vectors(pj)
