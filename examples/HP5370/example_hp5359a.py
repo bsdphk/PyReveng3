@@ -34,7 +34,7 @@ def setup():
 	return utils.setup("HP5359A", "HP5359A.ROM", 1)
 
 def task(pj, cpu):
-	seven_segment.table(pj, 0x7fbf, 0x7fda, verbose=False)
+	seven_segment.table(pj.m, 0x7fbf, 0x7fda, verbose=False)
 
 	ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
 	print(ct)

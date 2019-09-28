@@ -35,7 +35,7 @@ def setup():
 
 def task(pj, cpu):
 
-	seven_segment.table(pj, 0x7e29, 0x7e39, verbose=False)
+	seven_segment.table(pj.m, 0x7e29, 0x7e39, verbose=False)
 
 	ct = utils.cmd_tbl(pj, 0x7c5d, 0x7c91)
 	cta = utils.arg_range(pj, ct, 0x7d65, 0x7d81)

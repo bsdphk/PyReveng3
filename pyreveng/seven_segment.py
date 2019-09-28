@@ -98,9 +98,9 @@ def lcmt(segs):
 		r = r.replace(x, '#' if segs[y] else z)
 	return r
 
-def resolve(pj, adr, drive, inv):
+def resolve(asp, adr, drive, inv):
 	assert len(drive) == 9
-	x = pj.m[adr]
+	x = asp[adr]
 	if inv:
 		x ^= 255
 	lst = list()
@@ -119,16 +119,16 @@ def resolve(pj, adr, drive, inv):
 	return k, lst
 
 class digit(data.Data):
-	def __init__(self, pj, adr, drive=None, inv=False, verbose=False):
+	def __init__(self, asp, adr, drive=None, inv=False, verbose=False):
 		"""
 		drive = [A, B, C, D, E, F, G, RDP, LDP]
 		"""
 		if drive is None:
 			drive = default_drive
 		assert len(drive) == 9
-		super().__init__(pj.m, adr, adr+1, "7seg")
-		pj.m.insert(self)
-		k, lst = resolve(pj, adr, drive, inv)
+		super().__init__(asp, adr, adr+1, "7seg")
+		asp.insert(self)
+		k, lst = resolve(asp, adr, drive, inv)
 		self.resolv = k
 		s = ".7SEG"
 		if k is not None:
@@ -142,30 +142,30 @@ class digit(data.Data):
 				s += " + LDP"
 		else:
 			print("NB! @0x%x: Unknown 7seg (0x%x)" %
-			    (adr, pj.m[adr]), "\n" + lcmt(lst))
+			    (adr, asp[adr]), "\n" + lcmt(lst))
 			verbose = True
 			# s += " 0x%02x" % n
 		if verbose:
 			self.lcmt = lcmt(lst)
 		self.rendered = s
 
-def table(pj, lo, hi, drive=None, inv=False, verbose=False):
+def table(asp, lo, hi, drive=None, inv=False, verbose=False):
 	"""
 	drive = [A, B, C, D, E, F, G, RDP, LDP]
 	"""
 	if drive is None:
 		drive = default_drive
 	assert len(drive) == 9
-	data.Range(pj.m, lo, hi, "7segtable")
+	data.Range(asp, lo, hi, "7segtable")
 	t = []
 	for a in range(lo, hi):
-		t.append(digit(pj, a, drive, inv, verbose).resolv)
+		t.append(digit(asp, a, drive, inv, verbose).resolv)
 	return t
 
 #######################################################################
 # Hunt for 7segment decoding tables
 
-def hunt(pj, lo, hi, pattern="01234567", distance=1):
+def hunt(asp, lo, hi, pattern="01234567", distance=1):
 	def bc(a):
 		return bin(a).count("1")
 	print('7-segment hunt (0x%x-0x%x) for "%s"' % (lo, hi, pattern))
@@ -186,7 +186,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		y = list()
 		for i, z in enumerate(lst):
 			try:
-				x = pj.m[a + i * distance]
+				x = asp[a + i * distance]
 			except mem.MemError:
 				p = False
 				n = False
@@ -255,7 +255,7 @@ def hunt(pj, lo, hi, pattern="01234567", distance=1):
 		print("\t\tPossible drive bits:", drive)
 		s = "\t\tProbable table contents:"
 		while True:
-			x, y = resolve(pj, adr, drive, inv)
+			x, y = resolve(asp, adr, drive, inv)
 			if x is None:
 				break
 			s += " " + x

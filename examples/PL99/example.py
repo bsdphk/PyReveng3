@@ -56,8 +56,6 @@ def setup():
 			0xbca1:		"WWW",
 			0xbdeb:		"WW",
 		}
-		if ins.flow_out:
-			print(ins, ins.flow_out)
 		for f in ins.flow_out:
 			i = post_arg_funcs.get(f.to)
 			if i == None:
@@ -180,7 +178,7 @@ def task(pj, cx):
 
 	led_drive = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
-	seven_segment.table(pj, 0xecb4, 0xecd4, drive=led_drive, verbose=True)
+	seven_segment.table(pj.m, 0xecb4, 0xecd4, drive=led_drive, verbose=True)
 	pj.m.set_label(0xecb4, "7SEG_TBL")
 
 	LED_lbl = {
@@ -263,7 +261,7 @@ def task(pj, cx):
 	}
 
 	for a in range(0xf94d, 0xfdfe, 16):
-		c = seven_segment.table(pj, a, a + 16, drive=led_drive, verbose=False)
+		c = seven_segment.table(pj.m, a, a + 16, drive=led_drive, verbose=False)
 		t = LED_lbl.get(a)
 		assert t != None
 		if t == None:

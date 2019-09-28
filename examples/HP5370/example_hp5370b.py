@@ -58,7 +58,7 @@ def task(pj, cpu):
 	c = ptr(pj, 0x7915)
 	pj.m.set_label(c.lo, "@7SEGCODES")
 	pj.m.set_label(c.dst, "7SEGCODES")
-	c = seven_segment.table(pj, c.dst, c.dst + 0x10, verbose=False)
+	c = seven_segment.table(pj.m, c.dst, c.dst + 0x10, verbose=False)
 
 	pj.m.set_label(0x7ead, "ROM_LOCS")
 	for a in range(0x7ead, 0x7ebf, 2):
