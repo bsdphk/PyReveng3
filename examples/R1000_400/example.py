@@ -60,9 +60,9 @@ INLTXT		inltxt		0	|0 1 0 0 1 1 1 0 1 0 0 1 0 1 1 0| a1            | a2          
 
 class my68k20_ins(m68020.m68020_ins):
 
-	def assy_inltxt(self, pj):
-		y = data.Txt(pj.m, self.lo + 2, label=False, splitnl=True, align=2)
-		self.lang.disass(pj, y.hi)
+	def assy_inltxt(self):
+		y = data.Txt(self.lang.m, self.lo + 2, label=False, splitnl=True, align=2)
+		# self.lang.disass(pj, y.hi)
 		raise assy.Invalid("Inline text hack")
 
 class my68k20(m68020.m68020):

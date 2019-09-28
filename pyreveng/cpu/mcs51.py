@@ -218,49 +218,49 @@ XRL	adir,data	|0 1 1 0 0 0 1 1| adir		| data		|
 
 class MCS51_Ins(assy.Instree_ins):
 
-    def assy_adir(self, pj):
+    def assy_adir(self):
         self.dstadr = self['adir']
         return assy.Arg_dst(self.lang.as_data, self.dstadr)
 
-    def assy_adir2(self, pj):
+    def assy_adir2(self):
         self.dstadr = self['adir2']
         return assy.Arg_dst(self.lang.as_data, self.dstadr)
 
-    def assy_a11(self, pj):
+    def assy_a11(self):
         a = (self['ahi'] << 8) | self['alo']
         self.dstadr = (self.hi & 0xf800) + a
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_a16(self, pj):
+    def assy_a16(self):
         self.dstadr = (self['ahi'] << 8) | self['alo']
         self.dstadr &= self.lang.amask
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_arel(self, pj):
+    def assy_arel(self):
         a = self['arel']
         if a & 0x80:
             a -= 256
         self.dstadr = self.hi + a
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_iri(self, _pj):
+    def assy_iri(self):
         return "@R%d" % self['i']
 
-    def assy_Rn(self, _pj):
+    def assy_Rn(self):
         return "R%d" % self['rn']
 
-    def assy_data(self, _pj):
+    def assy_data(self):
         return "#0x%02x" % self['data']
 
-    def assy_data16(self, _pj):
+    def assy_data16(self):
         v = (self['dhi'] << 8) | self['dlo']
         return "#0x%04x" % v
 
-    def assy_abit(self, pj):
+    def assy_abit(self):
         b = self['abit']
         return assy.Arg_dst(self.lang.as_bit, b)
 
-    def assy_nabit(self, pj):
+    def assy_nabit(self):
         return "/" + self.assy_abit(pj)
 
     def pilmacro_ABIT(self):

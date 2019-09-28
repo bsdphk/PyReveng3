@@ -503,7 +503,7 @@ class Tms9900_ins(assy.Instree_ins):
             return 8
         return 16
 
-    def arg_o(self, pj, sd):
+    def arg_o(self, sd):
         to = self['t' + sd]
         o = self[sd]
         nm = 'G' + sd
@@ -513,30 +513,30 @@ class Tms9900_ins(assy.Instree_ins):
             return "*R%d" % o
 
         if to == 2:
-            v = pj.m.bu16(self.hi)
+            v = self.lang.m.bu16(self.hi)
             self.hi += 2
             self[nm] = v
             if o != 0:
                 return "R%d+#0x%04x" % (o, v)
 
-            x = pj.m.find_lo(v)
+            x = self.lang.m.find_lo(v)
             if x:
-                return assy.Arg_ref(pj, x[0])
+                return assy.Arg_ref(self.lang.m, x[0])
 
             try:
-                w = pj.m.bu16(v)
+                w = self.lang.m.bu16(v)
             except:
-                return assy.Arg_dst(pj.m, v, "@")
+                return assy.Arg_dst(self.lang.m, v, "@")
 
             if self.mne[-1] == "b":
-                c = data.Const(pj.m, v, v + 1)
+                c = data.Const(self.lang.m, v, v + 1)
                 c.typ = ".BYTE"
-                c.fmt = "0x%02x" % pj.m[v]
+                c.fmt = "0x%02x" % self.lang.m[v]
             else:
-                c = data.Const(pj.m, v, v + 2)
+                c = data.Const(self.lang.m, v, v + 2)
                 c.typ = ".WORD"
                 c.fmt = "0x%04x" % w
-            return assy.Arg_ref(pj, c)
+            return assy.Arg_ref(self.lang.m, c)
 
         if to == 3:
             return "*R%d+" % o
@@ -545,23 +545,23 @@ class Tms9900_ins(assy.Instree_ins):
     # Methods related to assembly output
     #-----------------------------------
 
-    def assy_b(self, pj):
+    def assy_b(self):
         if self['b']:
             ins.mne += "B"
-    def assy_blwp1(self, pj):
+    def assy_blwp1(self):
         a = self['ptr']
-        self.cache['blwp1'] = pj.m.bu16(a)
-        if not pj.m.find_lo(a):
-            data.Pstruct(pj.m, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
-        return "WP=0x%04x" % pj.m.bu16(a)
+        self.cache['blwp1'] = self.lang.m.bu16(a)
+        if not self.lang.m.find_lo(a):
+            data.Pstruct(self.lang.m, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
+        return "WP=0x%04x" % self.lang.m.bu16(a)
 
-    def assy_blwp2(self, pj):
+    def assy_blwp2(self):
         a = self['ptr']
-        self.cache['blwp2'] = pj.m.bu16(a + 2)
-        self.dstadr = pj.m.bu16(a+2)
-        return assy.Arg_dst(pj.m, self.dstadr)
+        self.cache['blwp2'] = self.lang.m.bu16(a + 2)
+        self.dstadr = self.lang.m.bu16(a+2)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_c(self, pj):
+    def assy_c(self):
         x = self['c']
         if x == 0:
             x = 16
@@ -569,7 +569,7 @@ class Tms9900_ins(assy.Instree_ins):
             self.mne += "b"
         return assy.Arg_imm(x)
 
-    def assy_cru(self, pj):
+    def assy_cru(self):
         i = self['cru']
         if i & 0x80:
             i -= 0x100
@@ -578,33 +578,33 @@ class Tms9900_ins(assy.Instree_ins):
         i *= 2
         return "R12%#+x" % i
 
-    def assy_da(self, pj):
+    def assy_da(self):
         self.dstadr = self['da']
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_do(self, pj):
-        return self.arg_o(pj, 'd')
+    def assy_do(self):
+        return self.arg_o('d')
 
-    def assy_i(self, pj):
+    def assy_i(self):
         return assy.Arg_imm(self['iop'], 16)
 
-    def assy_so(self, pj):
-        return self.arg_o(pj, 's')
+    def assy_so(self):
+        return self.arg_o('s')
 
-    def assy_r(self, pj):
+    def assy_r(self):
         i = self['disp']
         if i & 0x80:
             i -= 256
         self.dstadr = self.hi + i * 2
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_sc(self, pj):
+    def assy_sc(self):
         if self['c'] == 0:
             return "R0"
         else:
             return "#%d" % self['c']
 
-    def assy_w(self, pj):
+    def assy_w(self):
         return "R%d" % self['w']
 
     #-----------------------------

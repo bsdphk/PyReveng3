@@ -693,29 +693,29 @@ class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 		if self.lo & 1:
 			raise assy.Invalid("Unaligned Instruction")
 
-	def assy_Cc(self, pj):
+	def assy_Cc(self):
 		self.mne += arm_base.CC[self['cc']]
 
-	def assy_Dst8(self, pj):
+	def assy_Dst8(self):
 		imm32 = self['imm8'] << 1
 		if imm32 & 0x100:
 			imm32 |= 0xfffffe00
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dimm8(self, pj):
+	def assy_Dimm8(self):
 		imm32 = self['imm11'] << 2
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dst11(self, pj):
+	def assy_Dst11(self):
 		imm32 = self['imm11'] << 1
 		if imm32 & 0x1000:
 			imm32 |= 0xffffe000
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dst1011(self, pj):
+	def assy_Dst1011(self):
 		i1 = not (self['j'] ^ self['s'])
 		i2 = not (self['k'] ^ self['s'])
 
@@ -730,37 +730,37 @@ class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 		imm32 |= self['imm11']
 		imm32 <<= 1
 		self.dstadr = (self.hi + imm32) & 0xffffffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Rel8(self, pj):
+	def assy_Rel8(self):
 		self.dstadr = (self.hi + 2 + (self['imm8'] << 2)) & 0xffffffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Imm3(self, pj):
+	def assy_Imm3(self):
 		return "#0x%x" % self['imm3']
 
-	def assy_Imm8(self, pj):
+	def assy_Imm8(self):
 		return "#0x%x" % self['imm8']
 
-	def assy_ReglistP(self, pj):
+	def assy_ReglistP(self):
 		return self.assy_wreglist(pj, r=(self['p'] << 15) | self['reglist'])
 
-	def assy_ReglistM(self, pj):
+	def assy_ReglistM(self):
 		return self.assy_reglist(pj, r=(self['m'] << 14) | self['reglist'])
 
-	def assy_Sh5(self, pj):
+	def assy_Sh5(self):
 		return self.assy_sh(pj, typ=0)
 
-	def assy_Sp8(self, pj):
+	def assy_Sp8(self):
 		return "[R13+0x%x]" % (self['imm8'] << 2)
 
-	def assy_Rn5(self, pj):
+	def assy_Rn5(self):
 		return "[%s+0x%x]" % (arm_base.REG[self['rn']], self['imm5'] << 2)
 
-	def assy_Rnm(self, pj):
+	def assy_Rnm(self):
 		return "[%s+%s]" % (arm_base.REG[self['rn']], arm_base.REG[self['rm']])
 
-	def assy_Rdn(self, pj):
+	def assy_Rdn(self):
 		return arm_base.REG[self['rdn']]
 
 

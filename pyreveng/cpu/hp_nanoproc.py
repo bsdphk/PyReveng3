@@ -88,33 +88,33 @@ STR	reg,imm		|1 1 0 1| reg   | imm		|
 class hp_nanoproc_ins(assy.Instree_ins):
 	pass
 
-	def assy_imm(self, pj):
+	def assy_imm(self):
 		return "#0x%x" % self['imm']
 
-	def assy_adrl(self, pj):
+	def assy_adrl(self):
 		self.dstadr = (self.lo & 0xf800)
 		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_reg(self, pj):
+	def assy_reg(self):
 		return self.lang.reg[self['reg']]
 
-	def assy_bno(self, pj):
+	def assy_bno(self):
 		return self.lang.bno[self['bno']]
 
-	def assy_dctl(self, pj):
+	def assy_dctl(self):
 		return self.lang.dctl[self['dctl']]
 
-	def assy_dev(self, pj):
+	def assy_dev(self):
 		return self.lang.dev[self['dev']]
 
-	def assy_iA(self, pj):
+	def assy_iA(self):
 		return "(0x%x+A)" % (self.lo & 0xf800)
 
-	def assy_dA(self, pj):
+	def assy_dA(self):
 		return "(0x%x-A)" % (0x800 + self.lo & 0xf800)
 
-	def assy_S(self, pj):
+	def assy_S(self):
 		self.cc = self.mne[1:]
 		self.dstadr = self.hi + 2
 
@@ -150,12 +150,12 @@ MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
 class hp_nanoproc_pg_ins(hp_nanoproc_ins):
 	pass
 
-	def assy_pgadr(self, pj):
+	def assy_pgadr(self):
 		self.dstadr = self['pgno'] << 11
 		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_mctl(self, pj):
+	def assy_mctl(self):
 		self.mctl = self['mctl']
 		l = list()
 		if self.mctl & 0x10:

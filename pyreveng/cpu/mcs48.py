@@ -188,24 +188,24 @@ XRL	A,im		|1 1 0 1|0 0 1 1| im		|
 class mcs48_ins(assy.Instree_ins):
 	pass
 
-	def assy_adr(self, pj):
+	def assy_adr(self):
 		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_a8(self, pj):
+	def assy_a8(self):
 		self.dstadr = (self.lo & ~0x0ff) | self['a8']
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_p(self, pj):
+	def assy_p(self):
 		return "P%d" % self['p']
 
-	def assy_ar(self, pj):
+	def assy_ar(self):
 		return "@R%d" % self['r']
 
-	def assy_r(self, pj):
+	def assy_r(self):
 		return "R%d" % self['r']
 
-	def assy_im(self, pj):
+	def assy_im(self):
 		return "#0x%02x" % self['im']
 
 class mcs48(assy.Instree_disass):

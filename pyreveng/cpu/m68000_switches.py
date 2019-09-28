@@ -182,17 +182,17 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.nm = "SWITCH_%x" % self.lo
 		self.sz = None
 
-	def assy_W(self, pj):
+	def assy_W(self):
 		if self.sz not in ('W', None):
 			raise assy.Invalid("Inconsitent width in SWITCH")
 		self.sz = 'W'
 			
-	def assy_L(self, pj):
+	def assy_L(self):
 		if self.sz not in ('L', None):
 			raise assy.Invalid("Inconsitent width in SWITCH")
 		self.sz = 'L'
 
-	def assy_BARE(self, pj):
+	def assy_BARE(self):
 
 		assert self.lim[-1].assy[0] == "SWITCH"
 
@@ -216,7 +216,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		self.wordtable(pj)
 		raise assy.Invalid()
 
-	def assy_SW(self, pj):
+	def assy_SW(self):
 
 		assert self.lim[-1].assy[0] == "SWITCH"
 

@@ -66,39 +66,39 @@ DSPG	-		|?				|
 class hp85662a_ins(assy.Instree_ins):
 	pass
 
-	def assy_dst(self, pj):
+	def assy_dst(self):
 		return "#0x%04x" % self['dst']
 
-	def assy_b(self, pj):
+	def assy_b(self):
 		if self['b']:
 			return "bex"
 
-	def assy_i(self, pj):
+	def assy_i(self):
 		if self['i']:
 			return "brt"
 
-	def assy_e(self, pj):
+	def assy_e(self):
 		if self['e']:
 			return "exs"
 
-	def assy_c(self, pj):
+	def assy_c(self):
 		if self['c']:
 			return "clx"
 
-	def assy_d(self, pj):
+	def assy_d(self):
 		if self['d']:
 			return "dim"
 
-	def assy_V(self, pj):
+	def assy_V(self):
 		self.lang.it = self.lang.itv
 
-	def assy_L(self, pj):
+	def assy_L(self):
 		self.lang.it = self.lang.itl
 
-	def assy_G(self, pj):
+	def assy_G(self):
 		self.lang.it = self.lang.itg
 
-	def assy_C(self, pj):
+	def assy_C(self):
 		x = self['chr']
 		t = "0x%02x" % x
 		if x >= 0x20 and x < 0x7e:
@@ -119,7 +119,7 @@ class hp85662a_ins(assy.Instree_ins):
 			t += " " + a
 		return t
 
-	def assy_R(self, pj):
+	def assy_R(self):
 		t = ""
 		if self['R']:
 			t += "+%d" % (self['X'])

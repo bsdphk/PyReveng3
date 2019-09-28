@@ -530,10 +530,10 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			if self['cond'] != 14:
 				self.add_flow('>', '?', self.hi)
 
-	def assy_UN(self, pj):
+	def assy_UN(self):
 		raise assy.Invalid("UNPREDICTABLE")
 
-	def assy_COP(self, pj):
+	def assy_COP(self):
 		return ([
 			assy.Arg_verbatim("%d" % self['cop']),
 			assy.Arg_verbatim("%d" % self['opc1']),
@@ -543,7 +543,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			assy.Arg_verbatim("{%d}" % self['opc2']),
 		])
 
-	def assy_amode(self, pj):
+	def assy_amode(self):
 		self.mne += {
 			0: "DA",
 			1: "",		# IA
@@ -552,7 +552,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 		}[self['p'] * 2 + self['u']]
 		
 
-	def assy_cpsr(self, pj):
+	def assy_cpsr(self):
 		t = "CPSR_"
 		if self['msk'] & 8:
 			t += "f"
@@ -574,38 +574,38 @@ class Arm_ins(arm_base.Arm_Base_ins):
 		b = b >> (r * 2)
 		return b & 0xffffffff
 
-	def assy_adr_plus(self, pj):
+	def assy_adr_plus(self):
 		v = self.imm12_rotate()
-		return assy.Arg_dst(pj.m, self.hi + 4 + v, "")
+		return assy.Arg_dst(self.lang.m, self.hi + 4 + v, "")
 
-	def assy_adr_minus(self, pj):
+	def assy_adr_minus(self):
 		v = self.imm12_rotate()
-		return assy.Arg_dst(pj.m, self.hi + 4 - v, "")
+		return assy.Arg_dst(self.lang.m, self.hi + 4 - v, "")
 	
-	def assy_S(self, pj):
+	def assy_S(self):
 		if self['s']:
 			self.mne += "S"
 
-	def assy_C(self, pj):
+	def assy_C(self):
 		return
 		cond = self['cond']
 		self.mne += CC[cond]
 		if self['cond'] != 14:
 			self.add_flow('>', '?', self.hi)
 
-	def assy_dst(self, pj):
+	def assy_dst(self):
 		o = self['off'] << 2
 		if o & (1<<25):
 			o |= 0xfc000000
 		self.dstadr = 4 + (self.hi + o) & 0xffffffff
 		if self.mne.find("L") != -1:
 			pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
-		return assy.Arg_dst(pj.m, self.dstadr, "")
+		return assy.Arg_dst(self.lang.m, self.dstadr, "")
 
-	def assy_imm5(self, pj):
+	def assy_imm5(self):
 		return assy.Arg_verbatim("#0x%x" % self['imm5'])
 
-	def assy_imm12(self, pj):
+	def assy_imm12(self):
 		v = self['imm12']
 		s = v >> 8
 		v = v & 0xff
@@ -615,10 +615,10 @@ class Arm_ins(arm_base.Arm_Base_ins):
 		v &= 0xffffffff
 		return "#0x%x" % v
 
-	def assy_vrn(self, pj):
+	def assy_vrn(self):
 		return assy.Arg_verbatim("[%s]" % REG[self['rn']])
 
-	def assy_a_rnrm(self, pj):
+	def assy_a_rnrm(self):
 		rn = REG[self['rn']]
 		rm = REG[self['rm']]
 		if not self['u']:
@@ -637,7 +637,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 		return "[%s," % rn + rm + "]"
 
 
-	def assy_a_imm4(self, pj):
+	def assy_a_imm4(self):
 		imm32 = (self['imm4h'] << 4) | self['imm4l']
 		if self['u']:
 			imm = "#0x%x" % imm32
@@ -673,7 +673,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			self.lcmt += "[%s,%s]\n" % (rn, imm)
 			return "[#0x%x]" % t
 
-	def assy_a_imm5(self, pj):
+	def assy_a_imm5(self):
 		''' Addressing mode Rn/U/P/W/imm5 '''
 		shf = self.assy_sh(pj)
 		if shf is None:
@@ -695,7 +695,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 				return "[%s],%s%s" % (rn, rm, shf)
 			raise assy.Invalid("a_imm5 mode wrong (!p,w)")
 
-	def assy_a_rn(self, pj):
+	def assy_a_rn(self):
 		''' Addressing mode Rn/U/P/W '''
 		imm32 = self['imm12']
 		rn = REG[self['rn']]
@@ -709,7 +709,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 
 		if not p:
 			if not w:
-				#return [assy.Arg_verbatim("[%s]" % rn), assy.Arg_dst(pj.m, imm)]
+				#return [assy.Arg_verbatim("[%s]" % rn), assy.Arg_dst(self.lang.m, imm)]
 				return "[%s]," % rn + imm
 			raise assy.Invalid("a_rn mode wrong (!p,w)")
 
@@ -729,38 +729,38 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			v = pj.m.lu32(t)
 			data.Const(pj.m, t, t + 4, func=pj.m.lu32, size=4)
 			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
-			return assy.Arg_dst(pj.m, v, pfx="#")
+			return assy.Arg_dst(self.lang.m, v, pfx="#")
 			return "#0x%x" % v
 		except:
 			self.lcmt += "[%s,%s]\n" % (rn, imm)
 			return "[#0x%x]" % t
 
-	def assy_w(self, pj):
+	def assy_w(self):
 		if (self['w']):
 			return assy.Arg_verbatim("!")
 		
-	def assy_Rs(self, pj):
+	def assy_Rs(self):
 		typ = self['typ']
 		rs = self['rs']
 		return assy.Arg_verbatim("%s,%s" % (
 			["lsl", "lsr", "asr", "ror"][typ], REG[rs]
 		))
 		
-	def assy_Rnw(self, pj):
+	def assy_Rnw(self):
 		if self['w']:
 			return REG[self['rn']] + "!"
 		return REG[self['rn']]
 
-	def assy_Ra(self, pj):
+	def assy_Ra(self):
 		return REG[self['ra']]
 
-	def assy_Rm(self, pj):
+	def assy_Rm(self):
 		return REG[self['rm']]
 
-	def assy_reglist2(self, pj):
+	def assy_reglist2(self):
 		return self.assy_reglist(pj) + "^"
 
-	def assy_reglist3(self, pj):
+	def assy_reglist3(self):
 		return self.assy_reglist(pj)[:-1] + "," + REG[15] + "}^"
 
 

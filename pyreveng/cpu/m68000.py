@@ -743,55 +743,55 @@ class m68000_ins(assy.Instree_ins):
 					v >>= 1
 		return l
 
-	def assy_An(self, pj):
+	def assy_An(self):
 		return "A%d" % self['An']
 
-	def assy_decAx(self, pj):
+	def assy_decAx(self):
 		return "-(A%d)" % self['Ax']
 
-	def assy_Axinc(self, pj):
+	def assy_Axinc(self):
 		return "(A%d)+" % self['Ax']
 
-	def assy_Ax(self, pj):
+	def assy_Ax(self):
 		return "A%d" % self['Ax']
 
-	def assy_decAy(self, pj):
+	def assy_decAy(self):
 		return "-(A%d)" % self['Ay']
 
-	def assy_Ayinc(self, pj):
+	def assy_Ayinc(self):
 		return "(A%d)+" % self['Ay']
 
-	def assy_Ay(self, pj):
+	def assy_Ay(self):
 		return "A%d" % self['Ay']
 
-	def assy_B(self, pj):
+	def assy_B(self):
 		self.sz = 1
 		self.isz = "i8"
 		self.imsk = 0xff
 		self.mne += ".B"
 
-	def assy_bn(self, pj):
+	def assy_bn(self):
 		return "#0x%x" % (self['bn'] % (self.sz*8))
 
-	def assy_cc(self, pj):
+	def assy_cc(self):
 		c = cond_code[self['cc']]
 		if c != 'T':
 			self.mne += c
 		# XXX: remove flow
 
-	def assy_const(self, pj):
+	def assy_const(self):
 		o = self['const']
 		if o == 0:
 			o = 8
 		return "#0x%x" % o
 
-	def assy_data(self, pj):
+	def assy_data(self):
 		if self.sz == 1:
-			self.v = pj.m.bu16(self.hi)
+			self.v = self.lang.m.bu16(self.hi)
 		elif self.sz == 2:
-			self.v = pj.m.bu16(self.hi)
+			self.v = self.lang.m.bu16(self.hi)
 		elif self.sz == 4:
-			self.v = pj.m.bu32(self.hi)
+			self.v = self.lang.m.bu32(self.hi)
 		else:
 			assert False
 		self.hi += self.sz
@@ -799,7 +799,7 @@ class m68000_ins(assy.Instree_ins):
 			self.hi += 1
 		return "#0x%0*x" % (self.sz * 2, self.v)
 
-	def assy_data8(self, pj):
+	def assy_data8(self):
 		i = self['data8']
 		if i & 0x80:
 			i -= 256
@@ -808,14 +808,14 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return "#0x%02x" % (i)
 
-	def assy_disp16(self, pj):
+	def assy_disp16(self):
 		o = self['disp16']
 		if o & 0x8000:
 			o -= 1 << 16
 		self.dstadr = self.hi + o - 2
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Andisp16(self, pj):
+	def assy_Andisp16(self):
 		o = self['disp16']
 		if o & 0x8000:
 			o -= 1 << 16
@@ -823,16 +823,16 @@ class m68000_ins(assy.Instree_ins):
 		else:
 			return "A%d" % self['An'] + "+0x%x" % o
 
-	def assy_Dn(self, pj):
+	def assy_Dn(self):
 		return "D%d" % self['Dn']
 
-	def assy_dst(self, pj):
+	def assy_dst(self):
 		x = self['disp8']
 		if x == 0x00:
-			self.dstadr = self.hi + pj.m.bs16(self.hi)
+			self.dstadr = self.hi + self.lang.m.bs16(self.hi)
 			self.hi += 2
 		elif x == 0xff:
-			self.dstadr = self.hi + pj.m.bs32(self.hi)
+			self.dstadr = self.hi + self.lang.m.bs32(self.hi)
 			self.hi += 4
 		elif x & 0x01:
 			raise assy.Invalid("Odd numbered destination address")
@@ -840,20 +840,20 @@ class m68000_ins(assy.Instree_ins):
 			self.dstadr = self.hi + x - 0x100
 		else:
 			self.dstadr = self.hi + x
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dx(self, pj):
+	def assy_Dx(self):
 		return "D%d" % self['Dx']
 
-	def assy_Dy(self, pj):
+	def assy_Dy(self):
 		return "D%d" % self['Dy']
 
-	def assy_eaxt(self, pj, id, ref):
+	def assy_eaxt(self, id, ref):
 		'''Extension Word Controlled Address Mode'''
 		il = self.ea[id]
 		iltyp = self.isz + "*"
 		ll = [None]
-		ew = pj.m.bu16(self.hi)
+		ew = self.lang.m.bu16(self.hi)
 		self.hi += 2
 
 		if ew & 0x100 and not self.ea_fullext:
@@ -870,20 +870,20 @@ class m68000_ins(assy.Instree_ins):
 			# Full extension word
 			bd = (ew >> 4) & 3
 			if bd == 2:
-				basedisp = pj.m.bu16(self.hi)
+				basedisp = self.lang.m.bu16(self.hi)
 				self.hi += 2
 			elif bd == 3:
-				basedisp = pj.m.bu32(self.hi)
+				basedisp = self.lang.m.bu32(self.hi)
 				self.hi += 4
 
 			IS = (ew >> 6) & 1
 			IIS = (ew & 7)
 			if (IIS & 2) and (not IS or IIS < 4):
 				if ew & 1:
-					outherdisp = pj.m.bu32(self.hi)
+					outherdisp = self.lang.m.bu32(self.hi)
 					self.hi += 4
 				else:
-					outherdisp = pj.m.bu16(self.hi)
+					outherdisp = self.lang.m.bu16(self.hi)
 					self.hi += 2
 		else:
 			basedisp = ew & 0xff
@@ -957,7 +957,7 @@ class m68000_ins(assy.Instree_ins):
 		return s
 
 
-	def assy_eax(self, pj, id, eam, ear):
+	def assy_eax(self, id, eam, ear):
 		il = []
 		self.ea[id] = il
 		eax = 1 << eam
@@ -995,7 +995,7 @@ class m68000_ins(assy.Instree_ins):
 			return "-(%s)" % r
 		if eax == 0x0020:
 			'''Address Register Indirect with Displacement'''
-			o = pj.m.bs16(self.hi)
+			o = self.lang.m.bs16(self.hi)
 			self.hi += 2
 			if o < 0:
 				il += [ "%0", [
@@ -1010,92 +1010,91 @@ class m68000_ins(assy.Instree_ins):
 				]]
 				return "(A%d+0x%x)" % (ear, o)
 		if eax == 0x0040:
-			return self.assy_eaxt(pj, id, "A%d" % ear)
+			return self.assy_eaxt(id, "A%d" % ear)
 		if eax == 0x0100:
-			o = pj.m.bu16(self.hi)
+			o = self.lang.m.bu16(self.hi)
 			self.hi += 2
 			if o & 0x8000:
 				o |= 0xffff0000
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj.m, o)
+			return assy.Arg_dst(self.lang.m, o)
 		if eax == 0x0200:
-			o = pj.m.bu32(self.hi)
+			o = self.lang.m.bu32(self.hi)
 			self.hi += 4
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj.m, o)
+			return assy.Arg_dst(self.lang.m, o)
 		if eax == 0x0400:
-			o = self.hi + pj.m.bs16(self.hi)
+			o = self.hi + self.lang.m.bs16(self.hi)
 			self.hi += 2
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj.m, o)
+			return assy.Arg_dst(self.lang.m, o)
 		if eax == 0x0800:
-			return self.assy_eaxt(pj, id, "PC")
+			return self.assy_eaxt(id, "PC")
 		if eax == 0x1000 and self.sz == 1:
-			v = pj.m[self.hi+1]
+			v = self.lang.m[self.hi+1]
 			self.hi += 2
 			il += ["0x%x" % v]
 			return "#0x%02x" % v
 		if eax == 0x1000 and self.sz == 2:
-			v = pj.m.bu16(self.hi)
+			v = self.lang.m.bu16(self.hi)
 			self.hi += 2
 			il += ["0x%x" % v]
 			return "#0x%04x" % v
 		if eax == 0x1000 and self.sz == 4:
-			v = pj.m.bu32(self.hi)
+			v = self.lang.m.bu32(self.hi)
 			self.hi += 4
 			il += ["0x%x" % v]
 			return "#0x%08x" % v
 		raise assy.Invalid(
 		    "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
-	def assy_ea(self, pj):
+	def assy_ea(self):
 		try:
 			j = self['ea']
 		except KeyError as e:
 			raise assy.Invalid("0x%x no EA?" % self.lo, e, self.lim)
-		return self.assy_eax(pj, "s", j >> 3, j & 7)
+		return self.assy_eax("s", j >> 3, j & 7)
 
-	def assy_ead(self, pj):
+	def assy_ead(self):
 		j = self['ead']
-		return self.assy_eax(pj, "d", j & 7, j >> 3)
+		return self.assy_eax("d", j & 7, j >> 3)
 
-	def assy_L(self, pj):
+	def assy_L(self):
 		self.sz = 4
 		self.isz = "i32"
 		self.imsk = 0xffffffff
 		self.mne += ".L"
 
-	def assy_rlist(self, pj):
+	def assy_rlist(self):
 		return "+".join(self.subr_rlist())
 
-	def assy_rot(self, pj):
+	def assy_rot(self):
 		a = self['rot']
 		if a == 0:
 			a = 8
 		return "#0x%x" % a
 
-	def assy_vect(self, pj):
+	def assy_vect(self):
 		if self.lang.trap_returns.get(self['vect']):
-			# XXX: use flow
-			self.lang.disass(pj, self.hi)
+			self.add_flow(">", True, self.hi)
 		return "#%d" % self['vect']
 
-	def assy_W(self, pj):
+	def assy_W(self):
 		self.sz = 2
 		self.isz = "i16"
 		self.imsk = 0xffff
 		self.mne += ".W"
 
-	def assy_long(self, pj):
+	def assy_long(self):
 		return "#0x%08x" % ((self['word1'] << 16) | self['word2'])
 
-	def assy_word(self, pj):
+	def assy_word(self):
 		return "#0x%04x" % self['word']
 
-	def assy_Z(self, pj):
+	def assy_Z(self):
 		if self['sz'] == 3:
 			raise assy.Invalid('0x%x F_sz == 3' % self.lo, self.lim)
 		i, j, m = [

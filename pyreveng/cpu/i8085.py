@@ -457,7 +457,7 @@ class i8085_ins(assy.Instree_ins):
         super(i8085_ins, self).__init__(pj, lim, lang)
         self.seg = ""
 
-    def assy_cmdx(self, pj):
+    def assy_cmdx(self):
         c = self['cmd']
         l = c & 0x0f
         if c & 0xd0 == 0x00:
@@ -472,43 +472,43 @@ class i8085_ins(assy.Instree_ins):
             return "CMD=0x%x - " % l + I7220_CMDS[l]
         return "0x%02x" % c
 
-    def assy_r2(self, pj):
+    def assy_r2(self):
         r = self['sss']
         if r == 6:
             raise assy.Invalid('0x%x rs=6' % self.lo)
         return "BCDEHL-A"[r]
 
-    def assy_r1(self, pj):
+    def assy_r1(self):
         r = self['ddd']
         if r == 6:
             raise assy.Invalid('0x%x rd=6' % self.lo)
         return "BCDEHL-A"[r]
 
-    def assy_cc(self, pj):
+    def assy_cc(self):
         self.cc = (
             'nz', 'z', 'nc', 'c', 'po', 'pe', 'p', 'm')[self['cc']]
         self.mne += self.cc
 
-    def assy_rp(self, pj):
+    def assy_rp(self):
         rp = self['rp']
         if rp == 3:
             raise assy.Invalid('0x%x RP=3' % self.lo)
         return ('BC', 'DE', 'HL')[rp]
 
-    def assy_II(self, pj):
+    def assy_II(self):
         return "#0x%02x%02x" % (self['immh'], self['imml'])
 
-    def assy_n(self, pj):
+    def assy_n(self):
         self.dstadr = 8 * self['n']
         return "#%d" % self['n']
-        # return assy.Arg_dst(pj.m, self.dstadr)
+        # return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_I(self, pj):
+    def assy_I(self):
         return "#0x%02x" % self['imm']
 
-    def assy_a(self, pj):
+    def assy_a(self):
         self.dstadr = self['hi'] << 8 | self['lo']
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def pilmacro_RD(self):
         return "%%%s" % "BCDEHL-A"[self['ddd']]

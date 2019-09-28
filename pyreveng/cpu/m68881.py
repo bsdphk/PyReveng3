@@ -150,7 +150,7 @@ class m68881_ins(m68000_ins):
 		if self['cid'] != 1:
 			raise assy.Invalid("FP cid != 1")
 
-	def assy_fop(self, pj):
+	def assy_fop(self):
 		op = FOPS.get(self['fop'])
 		if op is not None:
 			self.mne = op
@@ -158,10 +158,10 @@ class m68881_ins(m68000_ins):
 		self.isz = "i32"
 		self.imsk = 0xffffffff
 
-	def assy_Fx(self, pj):
+	def assy_Fx(self):
 		return "F%d" % self['Fx']
 
-	def assy_Fy(self, pj):
+	def assy_Fy(self):
 		return "F%d" % self['Fy']
 
 	def assy_X(self, pk):

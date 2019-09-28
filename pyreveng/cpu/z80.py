@@ -201,66 +201,66 @@ class z80_ins(assy.Instree_ins):
         super(z80_ins, self).__init__(pj, lim, lang)
         self.idx = "HL"
 
-    def assy_e(self, pj):
+    def assy_e(self):
         self.dstadr = self.hi
         e = self['e']
         if e & 0x80:
             e -= 256
         self.dstadr += e
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_nn(self, pj):
+    def assy_nn(self):
         self.dstadr = (self['n2'] << 8) | self['n1']
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_t(self, pj):
+    def assy_t(self):
         self.dstadr = self['t'] << 3
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_inn(self, pj):
+    def assy_inn(self):
         self.dstadr = (self['n2'] << 8) | self['n1']
-        return assy.Arg_dst(pj.m, self.dstadr, "(", ")")
+        return assy.Arg_dst(self.lang.m, self.dstadr, "(", ")")
 
-    def assy_dd(self, pj):
+    def assy_dd(self):
         return ["BC", "DE", self.idx, "SP"][self['dd']]
 
-    def assy_qq(self, pj):
+    def assy_qq(self):
         return ["BC", "DE", self.idx, "AF"][self['qq']]
 
-    def assy_rs(self, pj):
+    def assy_rs(self):
         return ["B", "C", "D", "E", "H", "L", None, "A"][self['rs']]
 
-    def assy_rd(self, pj):
+    def assy_rd(self):
         return ["B", "C", "D", "E", "H", "L", None, "A"][self['rd']]
 
-    def assy_cc(self, pj):
+    def assy_cc(self):
         self.cc = [
             "NZ", "Z", "NC", "C", "PO", "PE", "P", "M"
         ][self['cc']]
         return self.cc
 
-    def assy_b(self, pj):
+    def assy_b(self):
         return assy.Arg_imm(self['b'], 8)
 
-    def assy_n(self, pj):
+    def assy_n(self):
         return assy.Arg_imm(self['n'], 8)
 
-    def assy_io(self, pj):
+    def assy_io(self):
         return assy.Arg_imm(self['io'], 8)
 
-    def assy_iIX(self, pj):
+    def assy_iIX(self):
         self.idx = "IX"
 
-    def assy_iIY(self, pj):
+    def assy_iIY(self):
         self.idx = "IY"
 
-    def assy_HL(self, pj):
+    def assy_HL(self):
         return self.idx
 
-    def assy_iHL(self, pj):
+    def assy_iHL(self):
         if self.idx == "HL":
             return "(HL)"
-        d = pj.m[self.hi]
+        d = self.lang.m[self.hi]
         self.hi += 1
         if d & 0x80:
             d = 256 - d

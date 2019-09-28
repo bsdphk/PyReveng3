@@ -798,34 +798,34 @@ class mc6800_ins(assy.Instree_ins):
         self.idx = "X"
         super(mc6800_ins, self).__init__(pj, lim, lang)
 
-    def assy_ACC(self, pj):
+    def assy_ACC(self):
         self.mne += ["A", "B"][self['A']]
 
-    def assy_d(self, pj):
+    def assy_d(self):
         self.dstadr = self['d']
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_e(self, pj):
+    def assy_e(self):
         self.dstadr = (self['e1'] << 8) | self['e2']
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_i(self, pj):
+    def assy_i(self):
         return assy.Arg_imm(self['i'], 8)
 
-    def assy_I(self, pj):
+    def assy_I(self):
         self.dstadr = (self['I1'] << 8) | self['I2']
-        return assy.Arg_dst(pj.m, self.dstadr, "#")
+        return assy.Arg_dst(self.lang.m, self.dstadr, "#")
 
-    def assy_r(self, pj):
+    def assy_r(self):
         a = self['r']
         if a & 0x80:
             a -= 256
         self.dstadr = self.hi + a
         if self.mne != "BRA":
             self.cc = self.mne[1:]
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_x(self, pj):
+    def assy_x(self):
         return "0x%02x+" % self['x'] + self.idx
 
     def pilmacro_ACC(self):
@@ -910,11 +910,11 @@ class mc6800_ins(assy.Instree_ins):
                 self.add_il(["%" + i + '= i1 undef'])
 
     # 68HC11 only
-    def assy_y(self, pj):
+    def assy_y(self):
         return "0x%02x+Y" % self['y']
 
     # 68HC11 only
-    def assy_Y(self, pj):
+    def assy_Y(self):
         if self.mne[-1] == "X":
             self.mne = self.mne[:-1] + "Y"
         self.idx = "Y"

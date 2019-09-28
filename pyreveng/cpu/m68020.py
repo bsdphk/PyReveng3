@@ -96,7 +96,7 @@ class m68020_ins(m68010_ins):
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
 
-	def assy_BF(self, pj):
+	def assy_BF(self):
 		t = "{"
 		if self['o']:
 			t += "D%d" % self['off']

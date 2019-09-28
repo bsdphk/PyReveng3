@@ -626,23 +626,23 @@ class z8000_ins(assy.Instree_ins):
         super().__init__(pj, lim, lang)
         self.word = 1
 
-    def assy_Adr(self, pj):
-        return self.adr(pj)
+    def assy_Adr(self):
+        return self.adr()
 
-    def assy_B(self, pj):
+    def assy_B(self):
         self.word = 0
         self.mne += "B"
 
-    def assy_Bard(self, pj):
-        return self.dreg(pj, self['rd']) + "(#0x%x)" % self['disp']
+    def assy_Bard(self):
+        return self.dreg(self['rd']) + "(#0x%x)" % self['disp']
 
-    def assy_Bars(self, pj):
-        return self.dreg(pj, self['rs']) + "(#0x%x)" % self['disp']
+    def assy_Bars(self):
+        return self.dreg(self['rs']) + "(#0x%x)" % self['disp']
 
-    def assy_Bit(self, pj):
+    def assy_Bit(self):
         return "#%d" % self['bit']
 
-    def assy_Cc(self, pj):
+    def assy_Cc(self):
         cc = {
             0: False,
             8: True,
@@ -674,7 +674,7 @@ class z8000_ins(assy.Instree_ins):
                     self.flow_out.pop(i)
                     break
 
-    def assy_Ctl(self, pj):
+    def assy_Ctl(self):
         n = {
             0x2: "FCW",
             0x3: "REFRESH",
@@ -687,7 +687,7 @@ class z8000_ins(assy.Instree_ins):
             return n
         raise assy.Invalid("CTL REG 0x%x" % self['ctl'])
 
-    def assy_Data(self, pj):
+    def assy_Data(self):
         d = self.lang.as_mem.bu16(self.hi)
         self.hi += 2
         if not self.word:
@@ -700,42 +700,42 @@ class z8000_ins(assy.Instree_ins):
             self.hi += 2
         return "#0x%x" % d
 
-    def assy_Disp(self, pj):
+    def assy_Disp(self):
         d = self['disp']
         if d & 0x8000:
             d -= 0x10000
         return "0x%x" % (d + self.hi)
 
-    def assy_Imm4(self, pj):
+    def assy_Imm4(self):
         return "#0x%x" % self['imm4']
 
-    def assy_Imm8(self, pj):
+    def assy_Imm8(self):
         return "#0x%x" % self['imm8']
 
-    def assy_Ird(self, pj):
+    def assy_Ird(self):
         r = self['rd']
         if not r:
             raise assy.Invalid("RD = 0")
         return "@RR%d" % r
 
-    def assy_Irs(self, pj):
+    def assy_Irs(self):
         r = self['rs']
         if not r:
             raise assy.Invalid("RS = 0")
         return "@RR%d" % r
 
-    def assy_L(self, pj):
+    def assy_L(self):
         self.mne += "L"
         self.word = 2
 
-    def assy_N(self, pj):
+    def assy_N(self):
         return "#0x%x" % (self['n'] + 1)
 
-    def assy_Nvi(self, pj):
+    def assy_Nvi(self):
         if not self['n']:
             return "NVI"
 
-    def assy_Port(self, pj):
+    def assy_Port(self):
         if self['s']:
             return assy.Arg_dst(self.lang.as_sio, self['port'])
         return assy.Arg_dst(self.lang.as_io, self['port'])
@@ -749,42 +749,42 @@ class z8000_ins(assy.Instree_ins):
             return "RL%d" % (r & 7)
         return "RH%d" % (r & 7)
 
-    def assy_Q(self, pj):
+    def assy_Q(self):
         if not self['q']:
             self.word = 2
 
-    def assy_Qd(self, pj):
+    def assy_Qd(self):
         if self.word == 2:
             return "RQ%d" % self['rd']
         else:
             return "RR%d" % self['rd']
 
-    def assy_R(self, pj):
+    def assy_R(self):
         return "R%d" % self['r']
 
-    def assy_Rd(self, pj):
+    def assy_Rd(self):
         return self.reg(self['rd'])
 
-    def assy_Rel7(self, pj):
+    def assy_Rel7(self):
         d = self['disp'] << 1
         self.dstadr = self.hi - d
         return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
-    def assy_Rel8(self, pj):
+    def assy_Rel8(self):
         d = self['disp']
         if d & 0x80:
             d -= 0x100
         self.dstadr = self.hi + d * 2
         return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
-    def assy_Rs(self, pj):
+    def assy_Rs(self):
         return self.reg(self['rs'])
 
-    def assy_S(self, pj):
+    def assy_S(self):
         if self['s']:
             self.mne = "S" + self.mne
 
-    def assy_Sbit(self, pj):
+    def assy_Sbit(self):
         d = self['b']
         if d & 0x8000:
             self.mne = self.mne.replace('x', 'R')
@@ -792,34 +792,34 @@ class z8000_ins(assy.Instree_ins):
         self.mne = self.mne.replace('x', 'L')
         return '#%d' % d
 
-    def assy_Sd(self, pj):
+    def assy_Sd(self):
         return 'R' + self.reg(self['rd'])
 
-    def assy_Vi(self, pj):
+    def assy_Vi(self):
         if not self['v']:
             return "VI"
 
-    def assy_W(self, pj):
+    def assy_W(self):
         self.word = self['w']
         if not self.word:
             self.mne += "B"
 
-    def assy_Xrd(self, pj):
-        return self.adr(pj) + "(R%d)" % self['rd']
+    def assy_Xrd(self):
+        return self.adr() + "(R%d)" % self['rd']
 
-    def assy_Xrs(self, pj):
-        return self.adr(pj) + "(R%d)" % self['rs']
+    def assy_Xrs(self):
+        return self.adr() + "(R%d)" % self['rs']
 
-    def assy_Y(self, pj):
+    def assy_Y(self):
         return "#%d" % (self['s'] + 1)
 
 
 class z8001_ins(z8000_ins):
 
-    def dreg(self, pj, rn):
+    def dreg(self, rn):
         return "RR%d" % rn
 
-    def seg(self, pj):
+    def seg(self):
         a1 = self.lang.as_mem.bu16(self.hi)
         self.hi += 2
         if a1 < 0x8000:
@@ -828,12 +828,12 @@ class z8001_ins(z8000_ins):
         self.hi += 2
         return ((a1 >> 8) & 0x7f, a2)
 
-    def adr(self, pj):
-        a1, a2 = self.seg(pj)
+    def adr(self):
+        a1, a2 = self.seg()
         return "0x%x:0x%x" % (a1, a2)
 
-    def assy_Dst(self, pj):
-        a1, a2 = self.seg(pj)
+    def assy_Dst(self):
+        a1, a2 = self.seg()
         self.dstadr = a2    # XXX
         return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 

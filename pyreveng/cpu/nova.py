@@ -103,10 +103,10 @@ DEVNAMES = {
 
 class nova_ins(assy.Instree_ins):
 
-    def assy_sz(self, pj):
+    def assy_sz(self):
         self.dstadr = self.hi + 1
 
-    def assy_sh(self, pj):
+    def assy_sh(self):
         r = (None, "L", "R", "S")[self["sh"]]
         if r:
             self.mne += r
@@ -118,39 +118,39 @@ class nova_ins(assy.Instree_ins):
             self.dstadr = self.hi + 1
         return r
 
-    def assy_c(self, pj):
+    def assy_c(self):
         r = (None, "Z", "O", "C")[self["c"]]
         if r is not None:
             self.mne += r
 
-    def assy_i(self, pj):
+    def assy_i(self):
         if self["i"]:
             self.mne += "@"
 
-    def assy_n(self, pj):
+    def assy_n(self):
         if self["n"]:
             self.mne += "#"
 
-    def assy_acs(self, pj):
+    def assy_acs(self):
         return "%d" % self["acs"]
 
-    def assy_acd(self, pj):
+    def assy_acd(self):
         return "%d" % self["acd"]
 
-    def assy_dev(self, pj):
+    def assy_dev(self):
         t = DEVNAMES.get(self["dev"])
         if t is None:
             return "0x%x" % self["dev"]
         return t
 
-    def assy_t(self, pj):
+    def assy_t(self):
         self.dstadr = self.hi + 1
         self.mne += ["BN", "BZ", "DN", "DZ"][self["t"]]
 
-    def assy_f(self, pj):
+    def assy_f(self):
         self.mne += ["", "S", "C", "P"][self["f"]]
 
-    def assy_da(self, pj):
+    def assy_da(self):
         i = self["idx"]
         d = self["displ"]
         t = None
@@ -167,9 +167,9 @@ class nova_ins(assy.Instree_ins):
             return "0x%x,%d" % (d, i)
         if not self['i']:
             self.dstadr = t
-        return assy.Arg_dst(pj.m, t)
+        return assy.Arg_dst(self.lang.m, t)
 
-    def assy_db(self, pj):
+    def assy_db(self):
         r = self.assy_da(pj)
         if not isinstance(r, assy.Arg_dst):
             return r

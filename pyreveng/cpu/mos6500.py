@@ -185,74 +185,74 @@ TYA	-	| 98		|
 
 class mos6500_ins(assy.Instree_ins):
 
-    def assy_A(self, pj):
+    def assy_A(self):
         return "A"
 
-    def assy_Abs(self, pj):
-        self.dstadr = pj.m.lu16(self.hi)
+    def assy_Abs(self):
+        self.dstadr = self.lang.m.lu16(self.hi)
         self.hi += 2   
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_Absx(self, pj):
-        d = pj.m.lu16(self.hi)
+    def assy_Absx(self):
+        d = self.lang.m.lu16(self.hi)
         self.hi += 2   
         return [
-            assy.Arg_dst(pj.m, d),
+            assy.Arg_dst(self.lang.m, d),
             assy.Arg_verbatim("X"),
         ]
 
-    def assy_Absy(self, pj):
-        d = pj.m.lu16(self.hi)
+    def assy_Absy(self):
+        d = self.lang.m.lu16(self.hi)
         self.hi += 2   
         return [
-            assy.Arg_dst(pj.m, d),
+            assy.Arg_dst(self.lang.m, d),
             assy.Arg_verbatim("Y"),
         ]
 
-    def assy_Ind(self, pj):
-        d = pj.m.lu16(self.hi)
+    def assy_Ind(self):
+        d = self.lang.m.lu16(self.hi)
         self.hi += 2   
         return "(0x%04x)" % d
 
-    def assy_Indx(self, pj):
-        d = pj.m[self.hi]
+    def assy_Indx(self):
+        d = self.lang.m[self.hi]
         self.hi += 1
         return [
-            assy.Arg_dst(pj.m, d),
+            assy.Arg_dst(self.lang.m, d),
             assy.Arg_verbatim("X"),
         ]
 
-    def assy_Indy(self, pj):
-        d = pj.m[self.hi]
+    def assy_Indy(self):
+        d = self.lang.m[self.hi]
         self.hi += 1   
         return [
-            assy.Arg_dst(pj.m, d),
+            assy.Arg_dst(self.lang.m, d),
             assy.Arg_verbatim("Y"),
         ]
 
-    def assy_Imm(self, pj):
-        v = pj.m[self.hi]
+    def assy_Imm(self):
+        v = self.lang.m[self.hi]
         self.hi += 1
         return "#0x%02x" % v
 
-    def assy_Pz(self, pj):
-        self.dstadr = pj.m[self.hi]
+    def assy_Pz(self):
+        self.dstadr = self.lang.m[self.hi]
         self.hi += 1   
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-    def assy_Pzx(self, pj):
-        d = pj.m[self.hi]
+    def assy_Pzx(self):
+        d = self.lang.m[self.hi]
         self.hi += 1   
         return [
-            assy.Arg_dst(pj.m, d),
+            assy.Arg_dst(self.lang.m, d),
             assy.Arg_verbatim("X"),
         ]
 
-    def assy_Rel(self, pj):
-        v = pj.m.s8(self.hi)
+    def assy_Rel(self):
+        v = self.lang.m.s8(self.hi)
         self.hi += 1
         self.dstadr = self.hi + v
-        return assy.Arg_dst(pj.m, self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
   
 
 class mos6500(assy.Instree_disass):

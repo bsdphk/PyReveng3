@@ -433,13 +433,13 @@ class mc6809_ins(assy.Instree_ins):
 		self.pfx = None
 		self.off = None
 
-	def assy_PFX10(self, pj):
+	def assy_PFX10(self):
 		self.pfx = 0x10
 
-	def assy_AB(self, pj):
+	def assy_AB(self):
 		self.mne += "AB"[self['a']]
 
-	def assy_M2(self, pj, mm):
+	def assy_M2(self, mm):
 		if self.mne[-1] in ('U', 'S', 'D', 'X', 'Y'):
 			self.isz = "i16"
 		self.icache["AM"] = mm
@@ -447,7 +447,7 @@ class mc6809_ins(assy.Instree_ins):
 		if mm == "I":
 			if self.isz == "i16":
 				self.hi += 1
-				self.off = pj.m.bu16(self.hi - 2)
+				self.off = self.lang.m.bu16(self.hi - 2)
 				return "#0x%x" % self.off
 			else:
 				self.off = self['m']
@@ -458,8 +458,8 @@ class mc6809_ins(assy.Instree_ins):
 
 		if mm == "D":
 			self.hi += 1
-			self.dstadr = pj.m.bu16(self.hi - 2)
-			return assy.Arg_dst(pj.m, self.dstadr)
+			self.dstadr = self.lang.m.bu16(self.hi - 2)
+			return assy.Arg_dst(self.lang.m, self.dstadr)
 
 		assert mm == "C"
 
@@ -493,18 +493,18 @@ class mc6809_ins(assy.Instree_ins):
 		elif m == 6:
 			s = r + "+A"
 		elif m == 8:
-			self.off = pj.m.s8(self.hi - 1)
+			self.off = self.lang.m.s8(self.hi - 1)
 			s = r + "%+d" % self.off
 		elif m == 0x9:
-			self.off = pj.m.bs16(self.hi - 2)
+			self.off = self.lang.m.bs16(self.hi - 2)
 			s = r + "%+d" % self.off
 		elif m == 0xb:
 			s = r + "+D"
 		elif m == 0xd:
-			self.off = pj.m.bs16(self.hi - 2)
+			self.off = self.lang.m.bs16(self.hi - 2)
 			s = "0x%x" % ((0x10000 + self.hi + self.off & 0xffff))
 		elif m == 0xf:
-			self.off = pj.m.bs16(self.hi - 2)
+			self.off = self.lang.m.bs16(self.hi - 2)
 			s = "0x%x" % self.off
 		else:
 			return "XXX"
@@ -513,68 +513,68 @@ class mc6809_ins(assy.Instree_ins):
 		else:
 			return s
 
-	def assy_M(self, pj):
+	def assy_M(self):
 		M = self.get('M')
 		if not M is None:
-			return self.assy_M2(pj, "IZCD"[M])
+			return self.assy_M2("IZCD"[M])
 		e = self.get('e')
 		if not e is None:
-			return self.assy_M2(pj, "CD"[e])
-		return self.assy_M2(pj, "C")
+			return self.assy_M2("CD"[e])
+		return self.assy_M2("C")
 
-	def assy_MM(self, pj):
+	def assy_MM(self):
 		mm = self.get('mm')
 		if mm == 0:
-			return self.assy_M2(pj, "Z")
+			return self.assy_M2("Z")
 		if mm == 6:
-			return self.assy_M2(pj, "C")
+			return self.assy_M2("C")
 		if mm == 7:
-			return self.assy_M2(pj, "D")
+			return self.assy_M2("D")
 		raise assy.Invalid()
 
-	def assy_XY(self, pj):
+	def assy_XY(self):
 		if self.pfx == 0x10:
 			self.mne += "Y"
 		else:
 			self.mne += "X"
 
-	def assy_SU(self, pj):
+	def assy_SU(self):
 		if self.pfx == 0x10:
 			self.mne += "S"
 		else:
 			self.mne += "U"
 
-	def assy_i(self, pj):
+	def assy_i(self):
 		return "#0x%02x" % self['i']
 
-	def assy_CC(self, pj):
+	def assy_CC(self):
 		self.cc = [
 			"RA", "RN", "HI", "LS", "CC", "CS", "NE", "EQ",
 			"VC", "VS", "PL", "MI", "GE", "LT", "GT", "LE"
 		][self['cc']]
 		self.mne += self.cc
 		if self['cc'] == 0:
-			self.flow_J(pj)
+			self.flow_J()
 		elif self['cc'] > 1:
-			self.flow_JC(pj)
+			self.flow_JC()
 
-	def assy_I(self, pj):
+	def assy_I(self):
 		self.dstadr = (self['I1'] << 8) | self['I2']
-		return assy.Arg_dst(pj.m, self.dstadr, "#")
+		return assy.Arg_dst(self.lang.m, self.dstadr, "#")
 
-	def assy_r(self, pj):
+	def assy_r(self):
 		a = self['r']
 		if a & 0x80:
 			a += 0xff00
 		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_R(self, pj):
+	def assy_R(self):
 		a = self['R1'] << 8 | self['R2']
 		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(pj.m, self.dstadr)
+		return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_s(self, pj):
+	def assy_s(self):
 		# XXX: if PULL PC fix flow record
 		x = self['i']
 		l = []
@@ -592,7 +592,7 @@ class mc6809_ins(assy.Instree_ins):
 		return ",".join(l)
 
 
-	def assy_t(self, pj):
+	def assy_t(self):
 		val = self['t']
 		sr = val >> 4
 		dr = val & 0xf

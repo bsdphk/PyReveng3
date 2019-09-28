@@ -91,7 +91,7 @@ class ArmSwitchIns(assy.Instree_ins):
 				raise assy.Invalid("NOT A switch construction")
 			ref.pop(0)
 
-	def assy_not(self, pj):
+	def assy_not(self):
 
 		def fail(why):
 			print("FAIL", why)

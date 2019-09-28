@@ -56,7 +56,7 @@ class m68010_ins(m68000_ins):
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
 
-	def assy_Rc(self, pj):
+	def assy_Rc(self):
 		x = self.lang.cregs.get(self['Rc'])
 		if x is None:
 			return "RC_%03x" % self['Rc']

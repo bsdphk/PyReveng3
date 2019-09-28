@@ -58,40 +58,40 @@ class Arm_Base_ins(assy.Instree_ins):
 	def __init__(self, pj, lim, lang):
 		super().__init__(pj, lim, lang)
 
-	def assy_Rd(self, pj):
+	def assy_Rd(self):
 		if self['rd'] == 15:
 			self.flow_R(pj)
 		return REG[self['rd']]
 
-	def assy_WRt(self, pj):
+	def assy_WRt(self):
 		if self['rt'] == 15:
 			self.flow_J(pj)
 		return REG[self['rt']]
 
-	def assy_Rt(self, pj):
+	def assy_Rt(self):
 		return REG[self['rt']]
 
-	def assy_Rt2(self, pj):
+	def assy_Rt2(self):
 		return REG[self['rt2']]
 
-	def assy_Rn(self, pj):
+	def assy_Rn(self):
 		return REG[self['rn']]
 
-	def assy_Rdhi(self, pj):
+	def assy_Rdhi(self):
 		return REG[self['rdhi']]
 
-	def assy_Rdlo(self, pj):
+	def assy_Rdlo(self):
 		return REG[self['rdlo']]
 
-	def assy_Rnw(self, pj):
+	def assy_Rnw(self):
 		if self['w']:
 			return REG[self['rn']] + "!"
 		return REG[self['rn']]
 
-	def assy_Ra(self, pj):
+	def assy_Ra(self):
 		return REG[self['ra']]
 
-	def assy_Rm(self, pj):
+	def assy_Rm(self):
 		return REG[self['rm']]
 
 	def assy_reglist(self, pj, r=None):

@@ -95,19 +95,19 @@ class Instree_ins(Assy):
     def args_done(self, unused_pj):
         return
 
-    def flow_R(self, pj):
+    def flow_R(self):
         self.add_flow("R", self.cc)
 
-    def flow_J(self, pj):
+    def flow_J(self):
         self.add_flow(">", True, self.dstadr)
 
-    def flow_RC(self, pj):
+    def flow_RC(self):
         if self.cc is not False:
             self.add_flow("R", self.cc)
         if self.cc is not True:
             self.add_flow(True, "!" + self.cc, self.hi)
 
-    def flow_JC(self, pj):
+    def flow_JC(self):
         if self.cc is True:
             self.add_flow(">", "?", self.dstadr)
             self.add_flow(True, "!?", self.hi)
@@ -115,7 +115,7 @@ class Instree_ins(Assy):
             self.add_flow(">", self.cc, self.dstadr)
             self.add_flow(True, "!" + self.cc, self.hi)
 
-    def flow_C(self, pj):
+    def flow_C(self):
         self.add_flow("C", True, self.dstadr)
         self.add_flow(True, True, self.hi)
 
@@ -147,7 +147,7 @@ class Instree_ins(Assy):
             x = "?" + arg + "?"
             print(self.im, "ERROR: ARG <%s> not translated" % arg)
         if not isinstance(x, str):
-            x = x(pj)
+            x = x()
         if isinstance(x, str):
             x = Arg_verbatim(x)
         if x is None:
@@ -343,13 +343,13 @@ class Arg_dst(Arg):
         return self.pfx + self.asp.adr(self.dst) + self.sfx
 
 class Arg_ref(Arg):
-    def __init__(self, pj, obj):
+    def __init__(self, asp, obj):
         super().__init__()
         self.obj = obj
-        self.aspace = pj.m
+        self.asp = asp
 
     def __str__(self):
-        s = "(" + self.aspace.adr(self.obj.lo) + ")"
+        s = "(" + self.asp.adr(self.obj.lo) + ")"
         a = self.obj.arg_render()
         if a != "":
             s += "=" + a

@@ -160,8 +160,8 @@ CWAI	x	| 3C		| FF		|
 
 class our_ins(mc6809.mc6809_ins):
 
-	def assy_x(self, pj):
-		self.flow_J(pj)
+	def assy_x(self):
+		self.flow_J()
 		return "#0xff"
 
 def setup():
