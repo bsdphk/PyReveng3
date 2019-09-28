@@ -203,7 +203,7 @@ class m68000_switch_ins(assy.Instree_ins):
 		top = 128
 		n = 0
 		while True:
-			d = pj.m.bs16(self.hi + n * 2)
+			d = self.lang.m.bs16(self.hi + n * 2)
 			if d < 0:
 				raise assy.Invalid("BARE switch with (too) negative offset")
 			top = min(d, top)
@@ -213,7 +213,7 @@ class m68000_switch_ins(assy.Instree_ins):
 				break
 		self.low = 0
 		self.high = n - 1
-		self.wordtable(pj)
+		self.wordtable()
 		raise assy.Invalid()
 
 	def assy_SW(self):
@@ -300,36 +300,36 @@ class m68000_switch_ins(assy.Instree_ins):
 			raise assy.Invalid()
 
 		self.nm = "SWITCH_%x" % self.lo
-		pj.m.set_label(self.lo, self.nm)
+		self.lang.m.set_label(self.lo, self.nm)
 
-		self.wordtable(pj)
-		self.range(pj)
+		self.wordtable()
+		self.range()
 		# raise assy.Invalid()
 		
-	def wordtable(self, pj):
-		pj.m.set_label(self.hi, self.nm + '_TAB')
+	def wordtable(self):
+		self.lang.m.set_label(self.hi, self.nm + '_TAB')
 		hh = self.hi
 		for j in range(self.low, self.high + 1):
-			o = pj.m.bs16(hh) + self.hi
-			self.dst(pj, j, o)
-			y = data.Data(pj, hh, hh + 2, fmt=self.nm + '_TAB[%d] = 0x%x' % (j, o))
+			o = self.lang.m.bs16(hh) + self.hi
+			self.dst(self.lang, j, o)
+			y = data.Data(self.lang.m, hh, hh + 2, fmt=self.nm + '_TAB[%d] = 0x%x' % (j, o))
 			hh = y.hi
 
-	def range(self, pj):
+	def range(self):
 		if self.go_lo == self.go_hi:
-			pj.m.set_label(self.go_lo, self.nm + "_DEFAULT")
-			self.lang.disass(pj, self.go_lo)
+			self.lang.m.set_label(self.go_lo, self.nm + "_DEFAULT")
+			self.lang.disass(self.lang.m, self.go_lo)
 			return
 		if self.go_lo is not None:
-			pj.m.set_label(self.go_lo, self.nm + "_LOW")
-			self.lang.disass(pj, self.go_lo)
+			self.lang.m.set_label(self.go_lo, self.nm + "_LOW")
+			self.lang.disass(self.lang.m, self.go_lo)
 		if self.go_hi is not None:
-			pj.m.set_label(self.go_hi, self.nm + "_HIGH")
-			self.lang.disass(pj, self.go_hi)
+			self.lang.m.set_label(self.go_hi, self.nm + "_HIGH")
+			self.lang.disass(self.lang.m, self.go_hi)
 
 	def dst(self, pj, no, dst):
 		# XXX: Add flow
-		self.lang.disass(pj, dst)
+		self.lang.disass(pj.m, dst)
 		pj.m.set_label(dst, self.nm + "_CASE_%d" % no)
 
 def m68000_switches(disass):

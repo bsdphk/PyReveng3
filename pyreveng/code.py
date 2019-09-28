@@ -167,6 +167,7 @@ class Decoder():
         '''
         a0 = adr
         xx = None
+        assert isinstance(asp, mem.AddressSpace)
         self.todo.append([asp, adr, None])
         if self.busy:
             return

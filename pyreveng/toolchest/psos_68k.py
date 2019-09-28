@@ -29,13 +29,13 @@ from pyreveng import data
 
 class PSOS():
 
-	def __init__(self, pj, cpu, a0):
-		self.pj = pj
+	def __init__(self, cpu, a0):
+		print("CPU", cpu)
 		self.cpu = cpu
 		self.a0 = a0
 		self.cfg = {}
 
-		pj.m.set_label(a0, "PSOS_CFG")
+		cpu.m.set_label(a0, "PSOS_CFG")
 		for o,l,t,n in (
 			(  0, 4, self.const,	"ramstart1"),
 			(  4, 4, self.const,	"ramend1"),
@@ -60,30 +60,30 @@ class PSOS():
 			( 66, 4, self.const,	"probe_present"),
 			( 70, 4, self.const,	"phile_present"),
 		):
-			pj.m.set_label(self.a0 + o, "PSOS_CFG." + n)
+			cpu.m.set_label(self.a0 + o, "PSOS_CFG." + n)
 			t(self.a0 + o, self.a0 + o + l, n)
 			if l == 2:
-				self.cfg[n] = pj.m.bu16(self.a0 + o)
+				self.cfg[n] = cpu.m.bu16(self.a0 + o)
 			if l == 4:
-				self.cfg[n] = pj.m.bu32(self.a0 + o)
+				self.cfg[n] = cpu.m.bu32(self.a0 + o)
 
 		self.iotable(self.cfg["niod"], self.cfg["iotable"])
 
 	def const(self, lo, hi, lbl):
-		data.Const(self.pj, lo, hi)
+		data.Const(self.cpu.m, lo, hi)
 
 	def codeptr(self, lo, hi, lbl):
 		assert hi == lo + 4
-		x = self.pj.m.bu32(lo)
+		x = self.cpu.m.bu32(lo)
 		if x:
-			self.pj.m.set_label(x, "FOR_PSOS_" + lbl)
-			self.cpu.codeptr(self.pj, lo)
+			self.cpu.m.set_label(x, "FOR_PSOS_" + lbl)
+			self.cpu.codeptr(lo)
 
 	def iotable(self, niod, iotable):
 		n = 0
 		a = iotable
 		while n <= niod:
-			self.pj.m.set_label(a, "PSOS_IOTABLE[%d]" % n)
+			self.cpu.m.set_label(a, "PSOS_IOTABLE[%d]" % n)
 			for o, f in (
 				(  0, "func0"),
 				(  6, "func1"),
@@ -92,8 +92,8 @@ class PSOS():
 				( 24, "func4"),
 				( 30, "func5"),
 			):
-				self.pj.m.set_label(a + o,
+				self.cpu.m.set_label(a + o,
 				    "PSOS_IO_TABLE[%d]." % n + f)
-				self.cpu.disass(self.pj, a + o)
+				self.cpu.disass(self.cpu.m, a + o)
 			a += 30
 			n += 1
