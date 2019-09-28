@@ -852,6 +852,10 @@ class z8001(assy.Instree_disass):
         self.add_as("sio", "Special I/O", 16)
         self.add_ins(z8000_desc, z8001_ins)
 
+    def dataptr(self, adr):
+        y = data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr) & 0x7f00ffff)
+        return y
+
     def codeptr(self, adr):
         y = data.Codeptr(self.m, adr, adr + 4, self.m.bu32(adr) & 0x7f00ffff)
         self.disass(y.dst)
