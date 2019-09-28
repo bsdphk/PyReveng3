@@ -120,8 +120,8 @@ def task(pj, cpu):
 		print(s)
 
 	def softlbl(a,n):
-		if not pj.get_labels(a):
-			pj.set_label(a, n)
+		if not pj.m.get_labels(a):
+			pj.m.set_label(a, n)
 
 	for a,n in (
 		(0x002b, "display_chan"),
@@ -241,11 +241,11 @@ def task(pj, cpu):
 		(0xceb7, "task__vimes"),
 		(0xd448, "init_slavetbl"),
 		):
-		pj.set_label(a, n)
+		pj.m.set_label(a, n)
 
 	data.Const(pj.m, 0x8000, 0x8002)
 
-	pj.set_label(0xd472, "chan_ptr")
+	pj.m.set_label(0xd472, "chan_ptr")
 	for a in range(0xd472, 0xd47a, 2):
 		data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 
@@ -280,7 +280,7 @@ def task(pj, cpu):
 		):
 		y = data.Txt(pj.m, a, pfx=1, align=1)
 
-	pj.set_label(0x8ec2, "ERROR_TEXTS")
+	pj.m.set_label(0x8ec2, "ERROR_TEXTS")
 	n = 0
 	for a in range(0x8ec2, 0x9036, 12):
 		y = data.Txt(pj.m, a, a + 12, align=1, label=False)
@@ -304,7 +304,7 @@ def task(pj, cpu):
 		data.Const(pj.m, a, a + 8)
 
 	def t1(a, l):
-		pj.set_label(a, l)
+		pj.m.set_label(a, l)
 		while True:
 			data.Const(pj.m, a, a + 1)
 			if pj.m[a] == 0:
@@ -318,7 +318,7 @@ def task(pj, cpu):
 				# XXX: doesn't work for ERROR
 				print("XXX %04x" % (z-3), y.txt)
 				pj.todo(z - 3, cpu.disass)
-			pj.set_label(z, "func_" + y.txt)
+			pj.m.set_label(z, "func_" + y.txt)
 			a += 2
 
 	t1(0x8824, "HP6626_func_01_key")
@@ -361,7 +361,7 @@ def task(pj, cpu):
 	def tt5(a, f, l = None, ex = 0):
 		if l == None:
 			l = []
-		pj.set_label(a, "tt5_%04x" % a)
+		pj.m.set_label(a, "tt5_%04x" % a)
 		while True:
 			ll = list(l)
 			if pj.m[a] == 0:
@@ -378,7 +378,7 @@ def task(pj, cpu):
 				ex = f + e * 2
 				z = pj.m.bu16(ex)
 				# print("%04x" % a, "%04x" % z, "A %02x" % e, ll)
-				pj.set_label(z, "cmd_" + "_".join(ll))
+				pj.m.set_label(z, "cmd_" + "_".join(ll))
 			if a not in tt5s:
 				tt5s[a] = tt_5(pj, a)
 			x = pj.m.bu16(a + 2)
@@ -554,7 +554,7 @@ def task(pj, cpu):
 
 	a = 0xb39c
 	while a:
-		pj.set_label(a, "tt2_%04x" % a)
+		pj.m.set_label(a, "tt2_%04x" % a)
 		x = pj.m.bu16(a)
 		if x == 0:
 			data.Dataptr(pj.m, a, a + 2, x)
@@ -579,7 +579,7 @@ def task(pj, cpu):
 
 	##############
 	for a in range(0xb437, 0xb46e, 5):
-		pj.set_label(a, "tt1_%04x" % a)
+		pj.m.set_label(a, "tt1_%04x" % a)
 		data.Const(pj.m, a, a+1)
 		z = pj.m.bu16(a + 1)
 		data.Dataptr(pj.m, a + 1, a + 3, z)

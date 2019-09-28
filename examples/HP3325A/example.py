@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, listing, code
+from pyreveng import job, mem, listing, code, data
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 def mem_setup():
@@ -85,13 +85,13 @@ def task(pj, dx):
 			ix1.flow_out = list()
 			pg = dpf & ~0x7ff
 			print("DISP_%d %x" % (a0 >> 2, dpf))
-			pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
+			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			for a1 in range(pg, dpf, 2):
 				ix1.add_flow(pj, ">", to=a1)
 				pj.todo(a1, dx.disass)
 				v = a0 << 3
 				v |= (a1 - pg) >> 1
-				pj.set_label(a1, "PTR_%02x" % v)
+				pj.m.set_label(a1, "PTR_%02x" % v)
 
 	#######################################################################
 
@@ -101,7 +101,7 @@ def task(pj, dx):
 
 	#######################################################################
 	def jmp_table(lo, hi, span, txt = "table", src = None):
-		x = pj.add(lo, hi, "table")
+		x = data.Range(pj.m, lo, hi, "table")
 		if src != None:
 			ins = pj.find(src)
 			print("JMPTABLE %x" % src, ins)
@@ -117,7 +117,6 @@ def task(pj, dx):
 			if ins != None:
 				ins.add_flow(pj, ">", to=a)
 			pj.todo(a, dx.disass)
-		return x
 
 	if True:
 		jmp_table(0x07d0, 0x0800, 8, "table", 0x007f)

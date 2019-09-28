@@ -41,7 +41,7 @@ def task(pj, cpu):
 	cta = utils.arg_range(pj, ct, 0x7d65, 0x7d81)
 	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
 
-	pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
+	pj.m.set_label(0x66ea, "ERR5_UNDEF_KEY")
 	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
 
 	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)

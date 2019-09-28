@@ -53,13 +53,13 @@ def task(pj, cx):
         cx.codeptr(pj, 0xe291 + 2 * i)
 
     a = 0xe7bf
-    pj.set_label(a, "GEOMETRY")
+    pj.m.set_label(a, "GEOMETRY")
     for i in range(5):
         y = data.Pstruct(pj.m, a, "<4B")
         a = y.hi
 
     a = 0xe80a
-    pj.set_label(a, "STEPPER_PHASE")
+    pj.m.set_label(a, "STEPPER_PHASE")
     y = data.Pstruct(pj.m, a, "<4B")
 
     a = 0xe675

@@ -68,7 +68,7 @@ def task(pj, cx):
 
 	discover.Discover(pj, cx)
 
-	pj.set_label(0x7068, "memcpy(BC, DE,  L)")
+	pj.m.set_label(0x7068, "memcpy(BC, DE,  L)")
 
 
 if __name__ == '__main__':

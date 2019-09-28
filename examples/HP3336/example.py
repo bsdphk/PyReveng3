@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, code, listing
+from pyreveng import job, mem, code, listing, data
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 def mem_setup():
@@ -147,7 +147,7 @@ def task(pj, dx):
 			dpf |= pj.m[a0 + 3]
 			dpf &= 0x7ff
 			dpf |= pg
-			pj.set_label(dpf, "DISP_%d" % (a0 >> 2))
+			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			pj.todo(a0, dx.disass)
 			pj.todo(dpf, dx.disass)
 			for a1 in range(pg, dpf, 2):
@@ -157,14 +157,15 @@ def task(pj, dx):
 				da |= pg
 				v = a0 << 3
 				v |= (a1 - pg) >> 1
-				pj.set_label(a1, "PTR_%02x" % v)
-				pj.set_label(da, "FN_%02x" % v)
+				pj.m.set_label(a1, "PTR_%02x" % v)
+				pj.m.set_label(da, "FN_%02x" % v)
 				pj.todo(a1, dx.disass)
 
 
 	#######################################################################
 	def jmp_table(lo, hi, span, txt = "table"):
-		x = pj.add(lo, hi, "table")
+		x = data.Range(pj.m, lo, hi, "table")
+		# x = pj.m.set_line_comment(lo, "table")
 		for a in range(lo, hi, span):
 			pj.todo(a, dx.disass)
 		# x.blockcmt = "-\n" + txt + "\n-\n"
@@ -215,7 +216,7 @@ def task(pj, dx):
 	#######################################################################
 	if True:
 		for a,l in symbols.items():
-			pj.set_label(a,l)
+			pj.m.set_label(a,l)
 
 
 	while pj.run():

@@ -35,6 +35,12 @@ from . import job, leaf
 
 #######################################################################
 
+class Range(leaf.Leaf):
+	def __init__(self, asp, lo, hi, desc):
+		super().__init__(lo, hi, "Range")
+		asp.insert(self)
+		self.rendered = desc
+
 class Data(leaf.Leaf):
 	def __init__(self, asp, lo, hi, t="data", fmt=None):
 		super().__init__(lo, hi, t)

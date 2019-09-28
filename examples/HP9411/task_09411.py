@@ -102,7 +102,7 @@ def do_one(fn, alist):
 			# print(x)
 
 	for i in labels:
-		pj.set_label(i, labels[i])
+		pj.m.set_label(i, labels[i])
 
 	listing.Listing(pj, fn="/tmp/_.HP" + fn, fmt="o", ncol=1)
 

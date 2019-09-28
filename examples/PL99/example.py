@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, data, seven_segment, code, listing
+from pyreveng import job, mem, data, seven_segment, code, listing, leaf
 import pyreveng.cpu.mc6800 as mc6800
 
 seven_segment.known[0x21] = "r"
@@ -111,7 +111,7 @@ def task(pj, cx):
 				self.dec *= -1
 			self.dec *= 2**-31
 			if lbl:
-				pj.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
+				pj.m.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
 
 		def render(self):
 			if self.dec != 0.0:
@@ -126,7 +126,7 @@ def task(pj, cx):
 	led_drive = [1, 2, 4, 128, 64, 16, 32, 8, 0]
 
 	seven_segment.table(pj, 0xecb4, 0xecd4, drive=led_drive, verbose=True)
-	pj.set_label(0xecb4, "7SEG_TBL")
+	pj.m.set_label(0xecb4, "7SEG_TBL")
 
 	LED_lbl = {
 		0xf94d:  "_PL-99___LORAN-C",
@@ -223,7 +223,7 @@ def task(pj, cx):
 					t += "_"
 				else:
 					t += "?"
-		pj.set_label(a, "MSG_" + t)
+		pj.m.set_label(a, "MSG_" + t)
 
 	#######################################################################
 	def post_arg_func(pj, ins):
@@ -278,8 +278,8 @@ def task(pj, cx):
 	#######################################################################
 
 	chains = []
-	x = pj.add(0x9d20, 0x9d68, "chain-tbl")
-	pj.set_label(x.lo, "CHAINS")
+	x = data.Range(pj.m, 0x9d20, 0x9d68, "chain-tbl")
+	pj.m.set_label(x.lo, "CHAINS")
 	for a in range(x.lo, x.hi, 4):
 		chains.append("GRI_" + d_chain(pj, a).num + "0")
 
@@ -288,33 +288,33 @@ def task(pj, cx):
 	This is probably ASF data
 	(Based partially on number of records = 204)
 	"""
-	x = pj.add(0x9d68, 0xaa28, "asf-tbl")
+	x = data.Range(pj.m, 0x9d68, 0xaa28, "asf-tbl")
 	for a in range(x.lo, x.hi, 16):
 		d_asf(pj, a)
 
 	# ON_KEY table
-	x = pj.add(0xe072, 0xe0e2, "on-key-tbl")
-	pj.set_label(x.lo, "ON_KEY_TBL")
+	x = data.Range(pj.m, 0xe072, 0xe0e2, "on-key-tbl")
+	pj.m.set_label(x.lo, "ON_KEY_TBL")
 	n = 0x80
 	for a in range(x.lo, x.hi, 2):
 		x = cx.codeptr(pj, a)
-		pj.set_label(x.dst, "ON_KEY_0x%02x" % n)
+		pj.m.set_label(x.dst, "ON_KEY_0x%02x" % n)
 		n += 1
 
 	# CMD table
-	x = pj.add(0x9b81, 0x9bff, "cmd-tbl")
-	pj.set_label(x.lo, "CMDTBL")
+	x = data.Range(pj.m, 0x9b81, 0x9bff, "cmd-tbl")
+	pj.m.set_label(x.lo, "CMDTBL")
 	for a in range(x.lo, x.hi, 3):
 		y = data.Txt(pj.m, a, a+1, label=False)
 		z = cx.codeptr(pj, a + 1)
 		if y.txt == " ":
-			pj.set_label(z.dst, "CMD_SP")
+			pj.m.set_label(z.dst, "CMD_SP")
 		else:
-			pj.set_label(z.dst, "CMD_%s" % y.txt)
+			pj.m.set_label(z.dst, "CMD_%s" % y.txt)
 
 	# FN table
-	x = pj.add(0xf885, 0xf94d, "fn-tbl")
-	pj.set_label(x.lo, "FN_TBL")
+	x = data.Range(pj.m, 0xf885, 0xf94d, "fn-tbl")
+	pj.m.set_label(x.lo, "FN_TBL")
 	d = dict()
 	n = 0
 	for a in range(x.lo, x.hi, 2):
@@ -326,11 +326,11 @@ def task(pj, cx):
 	for i in d:
 		e = d[i]
 		if len(e) == 1:
-			pj.set_label(i, "FN_%02d" % e[0])
+			pj.m.set_label(i, "FN_%02d" % e[0])
 		elif len(e) > 10:
-			pj.set_label(i, "FN_UNDEF")
+			pj.m.set_label(i, "FN_UNDEF")
 		else:
-			pj.set_label(i, "FN_%02d_%02d" % (e[0], e[-1]))
+			pj.m.set_label(i, "FN_%02d_%02d" % (e[0], e[-1]))
 
 	def longitude(pj, a):
 		"""
@@ -392,30 +392,30 @@ def task(pj, cx):
 	#
 	# Chain data, idx'ed by 0x9d20
 	#
-	x = pj.add(0xaa29, 0xb131, "tbl")
+	x = data.Range(pj.m, 0xaa29, 0xb131, "tbl")
 	n = 0
 	for a in range(x.lo, x.hi, 100):
-		x = pj.add(a, a + 100, "chain-tbl")
-		pj.set_label(a, "CHAIN_" + chains[n])
+		x = data.Range(pj.m, a, a + 100, "chain-tbl")
+		pj.m.set_label(a, "CHAIN_" + chains[n])
 		x = cword(pj, a)
 		x.lcmt = "GRI %d * 5" % (x.val / 5)
 		#data.Data(pj, a, a + 100)
-		x = pj.add(a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
-		x = pj.add(a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
-		x = pj.add(a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
+		x = data.Range(pj.m, a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
+		x = data.Range(pj.m, a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
+		x = data.Range(pj.m, a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
 		for c in range(5):
 			d_q(pj, a + 0x02 + c * 4, lbl=False)
 			lat = lattitude(pj, a + 0x16 + c * 4)
 			lon = longitude(pj, a + 0x2a + c * 4)
 
-		x = pj.add(a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
-		x = pj.add(a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
+		x = data.Range(pj.m, a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
+		x = data.Range(pj.m, a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
 		for c in range(4):
 			x = d_q(pj, a + 0x3e + c * 4, lbl=False)
 			x.lcmt = "%.3f us / 2^23" % (x.dec * 2**23)
 			d_q(pj, a + 0x4e + c * 4, lbl=False)
 
-		x = pj.add(a + 0x5e, a + 0x5e + 5, "epsilon-tbl")
+		x = data.Range(pj.m, a + 0x5e, a + 0x5e + 5, "epsilon-tbl")
 		for c in range(5):
 			cbyte(pj, a + 0x5e + c)
 
@@ -429,15 +429,15 @@ def task(pj, cx):
 	# idx into tbl at b156
 	# Chain data (18 pieces)
 	#
-	x = pj.add(0xb132, 0xb155, "tbl")
+	x = data.Range(pj.m, 0xb132, 0xb155, "tbl")
 	n = 0
 	for a in range(x.lo, x.hi, 2):
 		y = cword(pj, a)
 		y.lcmt = chains[n]
-		pj.set_label(0xb156 + y.val, "CHAIN_I_" + chains[n])
+		pj.m.set_label(0xb156 + y.val, "CHAIN_I_" + chains[n])
 		n += 1
 
-	x = pj.add(0xb156, 0xb43e, "tbl")
+	x = data.Range(pj.m, 0xb156, 0xb43e, "tbl")
 	for a in range(x.lo, x.hi, 4):
 		#data.Data(pj, a, a + 4)
 		d_q(pj, a, lbl=False)
@@ -449,7 +449,7 @@ def task(pj, cx):
 		c = cword(pj, a)
 		c.fmt = "%d" % c.val
 
-	x = pj.add(0x9d00, 0x9d20, "tbl")
+	x = data.Range(pj.m, 0x9d00, 0x9d20, "tbl")
 	x.lcmt += "accessed via 0x9cc2 pointer"
 	for a in range(x.lo, x.hi, 2):
 		c = cword(pj, a)
@@ -479,7 +479,7 @@ def task(pj, cx):
 	for i in range(0xe363, 0xe369, 2):
 		x = cx.codeptr(pj, i)
 
-	x = pj.add(0xb963, 0xb975, "tbl")
+	x = data.Range(pj.m, 0xb963, 0xb975, "tbl")
 	for i in range(x.lo, x.hi):
 		cbyte(pj, i)
 
@@ -501,28 +501,28 @@ def task(pj, cx):
 	while pj.run():
 		pass
 
-	pj.set_label(0x6489, "CHAIN_PTR")
+	pj.m.set_label(0x6489, "CHAIN_PTR")
 
-	pj.set_label(0xb800, "MEMCPY(X, Y, B)")
-	pj.set_label(0xb80c, "SHR_Q")
-	pj.set_label(0xb821, "SHL_Q")
-	pj.set_label(0xb836, "COM_Q")
-	pj.set_label(0xb846, "ADD_Q")
-	pj.set_label(0xb86c, "SUB_Q")
-	pj.set_label(0xb892, "MUL_Q")
+	pj.m.set_label(0xb800, "MEMCPY(X, Y, B)")
+	pj.m.set_label(0xb80c, "SHR_Q")
+	pj.m.set_label(0xb821, "SHL_Q")
+	pj.m.set_label(0xb836, "COM_Q")
+	pj.m.set_label(0xb846, "ADD_Q")
+	pj.m.set_label(0xb86c, "SUB_Q")
+	pj.m.set_label(0xb892, "MUL_Q")
 
-	pj.set_label(0xec91, "7SEG_XLAT(0x66a9)")
-	pj.set_label(0xecaa, "7SEG_DIG(B)")
+	pj.m.set_label(0xec91, "7SEG_XLAT(0x66a9)")
+	pj.m.set_label(0xecaa, "7SEG_DIG(B)")
 
-	pj.set_label(0xecd4, "DISPLAY(Y)")
+	pj.m.set_label(0xecd4, "DISPLAY(Y)")
 
-	pj.set_label(0xf1a9, "DISPLAY_YES_NO(Y)")
-	pj.set_label(0xf1b7, "IS_YES()")
-	pj.set_label(0xf878, "PAUSE()")
-	pj.set_label(0xfe5c, "Analog_Capture")
-	pj.set_label(0xfe6e, "Capture_One_Analog")
+	pj.m.set_label(0xf1a9, "DISPLAY_YES_NO(Y)")
+	pj.m.set_label(0xf1b7, "IS_YES()")
+	pj.m.set_label(0xf878, "PAUSE()")
+	pj.m.set_label(0xfe5c, "Analog_Capture")
+	pj.m.set_label(0xfe6e, "Capture_One_Analog")
 
-	pj.set_label(0xf9, "ON_KEY")
+	pj.m.set_label(0xf9, "ON_KEY")
 
 
 if __name__ == '__main__':

@@ -945,7 +945,7 @@ class Tms9900(assy.Instree_disass):
     def vectors(self, pj, adr=0x0, xops=1):
         def vect(pj, a, lbl):
             c = vector(pj, a, self)
-            pj.set_label(c.dstadr, lbl)
+            pj.m.set_label(c.dstadr, lbl)
             return c
 
         vect(pj, adr, "RESET")

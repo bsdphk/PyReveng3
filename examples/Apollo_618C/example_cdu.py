@@ -84,14 +84,14 @@ def task(pj, cx):
 
 	#######################################################################
 	def cmd_func(a1, a2, n):
-		pj.set_label(a1, "DO_CMD%d" % n)
+		pj.m.set_label(a1, "DO_CMD%d" % n)
 		a = a2
 		while True:
 			if pj.m[a] != 0xb4:
 				break
 			c = pj.m[a + 1]
 			d = pj.m[a + 2]
-			pj.set_label(a, "CMD%d_%02x" % (n, c))
+			pj.m.set_label(a, "CMD%d_%02x" % (n, c))
 			a += 3 + d
 
 
@@ -100,16 +100,16 @@ def task(pj, cx):
 	cmd_func(0x84f, 0x851, 3)
 	#######################################################################
 
-	pj.set_label(0x028, "ZERO_RAM")
-	pj.set_label(0x039, "MAIN_LOOP")
-	pj.set_label(0x050, "SETUP")
-	pj.set_label(0x70e, "CHAR_XLAT")
+	pj.m.set_label(0x028, "ZERO_RAM")
+	pj.m.set_label(0x039, "MAIN_LOOP")
+	pj.m.set_label(0x050, "SETUP")
+	pj.m.set_label(0x70e, "CHAR_XLAT")
 	# 0x5b...0x5d are bits to blink characters
-	pj.set_label(0x72e, "CHAR_BLINK")
-	pj.set_label(0x76d, "WATCHDOG")
-	pj.set_label(0x800, "MAIN_CMD")
-	pj.set_label(0xc8c, "RX_INTR")
-	pj.set_label(0xc54, "TX_INTR")
+	pj.m.set_label(0x72e, "CHAR_BLINK")
+	pj.m.set_label(0x76d, "WATCHDOG")
+	pj.m.set_label(0x800, "MAIN_CMD")
+	pj.m.set_label(0xc8c, "RX_INTR")
+	pj.m.set_label(0xc54, "TX_INTR")
 
 	#######################################################################
 	for a in range(0xba, 0x100, 2):
@@ -120,7 +120,7 @@ def task(pj, cx):
 
 	#######################################################################
 
-	x = pj.add(0x100, 0x600, "chargen")
+	x = data.Data(pj.m, 0x100, 0x600, "chargen")
 	x.rendered = "*CHARGEN*"
 	x.compact = True
 
@@ -141,7 +141,7 @@ def task(pj, cx):
 
 	#######################################################################
 
-	#data--- pj.set_label(0x5e, "timeout")
+	#data--- pj.m.set_label(0x5e, "timeout")
 	#######################################################################
 
 if __name__ == '__main__':

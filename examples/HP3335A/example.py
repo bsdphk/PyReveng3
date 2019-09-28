@@ -91,7 +91,7 @@ def task(pj, cpu):
 	#######################################################################
 
 	def rom(lo, hi):
-		pj.add(lo, hi, "ROM")
+		data.Range(pj.m, lo, hi, "ROM")
 		s = 0
 		for a in range(lo, hi):
 			s += pj.m[a]
@@ -106,7 +106,7 @@ def task(pj, cpu):
 	rom(0x7800, 0x8000)
 
 	for i in (0x6fff, 0x77ff, 0x7ff7):
-		c = pj.add(i, i + 1, "csum")
+		c = data.Data(pj.m, i, i + 1, "csum")
 		c.rendered = c.tag
 
 	#######################################################################
@@ -124,7 +124,7 @@ def task(pj, cpu):
 			return ".PTR " + self.aspace.adr(v)
 
 	def jmptbl(lo, hi, x = None):
-		c = pj.add(lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))
+		c = data.Range(pj.m, lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))
 		# c.rendered = c.tag
 		n = 0
 		for a in range(lo, hi, 2):
@@ -144,7 +144,7 @@ def task(pj, cpu):
 	#######################################################################
 
 	def tblx(a):
-		c = pj.add(a, a + 16, "tblx")
+		c = data.Data(pj.m, a, a + 16, "tblx")
 		s = ""
 		for i in range(10):
 			v = pj.m[a + i]
@@ -175,7 +175,7 @@ def task(pj, cpu):
 	#######################################################################
 	if True:
 		for a,l in symbols.items():
-			pj.set_label(a,l)
+			pj.m.set_label(a,l)
 
 
 	while pj.run():

@@ -253,9 +253,9 @@ def apply_labels(pj, type):
 		raise "Wrong Type"
 	for j in hp5370_lbls:
 		if j[i] != None:
-			pj.set_label(j[i], j[2])
+			pj.m.set_label(j[i], j[2])
 		else:
-			print("No address", pj.afmt(j[1-i]), j[2])
+			print("No address", pj.m.adr(j[1-i]), j[2])
 
 
 #----------------------------------------------------------------------
@@ -291,13 +291,13 @@ def one_eprom(pj, disass, start, eprom_size):
 		print("NB: Bad Eprom checksum @%x" % start)
 		j = "BAD"
 
-	c = pj.add(start, start + eprom_size, "EPROM")
+	c = data.Range(pj.m, start, start + eprom_size, "EPROM")
 
-	c = pj.add(start, start + 2, "u16")
+	c = data.Data(pj.m, start, start + 2, "u16")
 	c.rendered = ".WORD 0x%04x" % pj.m.bu16(start)
 	c.lcmt = "EPROM checksum (%s)" % j
 
-	c = pj.add(start + 2, start + 3, "byte")
+	c = data.Data(pj.m, start + 2, start + 3, "byte")
 	c.rendered = ".BYTE 0x%02x" % pj.m[start + 2]
 	c.lcmt = "EPROM ID"
 
@@ -328,27 +328,17 @@ def eprom(p, disass, start, end, sz):
 	(None,	l[0], "EPROM_TBL")
 
 def cmd_tbl(pj, start, end):
-	x = pj.add(start, end, "CMD_TABLE")
-	pj.set_label(start, "CMD_TABLE")
+	x = data.Range(pj.m, start, end, "CMD_TABLE")
+	pj.m.set_label(start, "CMD_TABLE")
 	l = list()
 	for a in range(start, end, 2):
-		s = ""
-		for i in range(2):
-			j = pj.m[a + i]
-			if i == 1 and j == 0:
-				pass
-			elif j <= 32 or j > 126:
-				s += "\\x%02x" % j
-			else:
-				s += "%c" % j
-		x = pj.add(a, a + 2, "string")
-		x.rendered = ".TXT\t'%s'" % s
-		l.append(s)
+		x = data.Txt(pj.m, a, a + 2, label=False)
+		l.append(x.txt)
 	return l
 
 def arg_range(pj, cmds, start, end):
-	x = pj.add(start, end, "ARG_RANGE")
-	pj.set_label(start, "ARG_RANGE")
+	x = data.Range(pj.m, start, end, "ARG_RANGE")
+	pj.m.set_label(start, "ARG_RANGE")
 	l = list()
 	n = 0
 	for a in range(start, end, 2):
@@ -356,7 +346,7 @@ def arg_range(pj, cmds, start, end):
 		n += 1
 		lo = pj.m[a]
 		hi = pj.m[a + 1]
-		x = pj.add(a, a + 2, "byte")
+		x = data.Data(pj.m, a, a + 2, "byte")
 		x.rendered = ".BYTE\t0x%02x, 0x%02x" % (lo, hi)
 		x.lcmt = c + "[%d" % lo + "-%d]" % hi
 		for j in range(lo, hi + 1):
@@ -371,10 +361,10 @@ def cmd_dispatch(pj, cx, cmds, start):
 		c = cx.codeptr(pj, a)
 		if i in cmd_desc:
 			c.lcmt = cmd_desc[i]
-		pj.set_label(c.dst, "CMD_%s" % i)
+		pj.m.set_label(c.dst, "CMD_%s" % i)
 		a += 2
-	x = pj.add(start, a, "CMD_DISPATCH")
-	pj.set_label(start, "CMD_DISPATCH")
+	x = data.Range(pj.m, start, a, "CMD_DISPATCH")
+	pj.m.set_label(start, "CMD_DISPATCH")
 
 def key_dispatch(pj, cx, start, end):
 	keys = {
@@ -385,34 +375,34 @@ def key_dispatch(pj, cx, start, end):
 	assert end == start + 64
 	a = start
 	for col in range(8, 0, -1):
-		# pj.set_label(a, "KEY_COL_%d" % col)
+		# pj.m.set_label(a, "KEY_COL_%d" % col)
 		for row in range(4, 0, -1):
 			n = "KEY_C%d_R%d" % (col,row)
 			c = cx.codeptr(pj, a)
-			if not pj.get_labels(c.dst):
+			if not pj.m.get_labels(c.dst):
 				if n in keys:
 					m = keys[n]
 				else:
 					print("Unknown Key %s" % n)
 					m = n
-				pj.set_label(c.dst, m)
-			l = pj.get_labels(c.dst)
+				pj.m.set_label(c.dst, m)
+			l = pj.m.get_labels(c.dst)
 			if l[:4] == "CMD_" and l[4:] in cmd_desc:
 				c.lcmt = n + " = " + cmd_desc[l[4:]]
 			else:
-				c.lcmt = n + " = " + str(pj.get_labels(c.dst))
+				c.lcmt = n + " = " + str(pj.m.get_labels(c.dst))
 			a += 2
-	x = pj.add(start, a, "KEY_DISPATCH")
-	pj.set_label(start, "KEY_DISPATCH")
+	x = data.Range(pj.m, start, a, "KEY_DISPATCH")
+	pj.m.set_label(start, "KEY_DISPATCH")
 
 def dsp_dispatch(pj, cx, start, end):
 	assert start + 16 == end
-	x = pj.add(start, end, "DSP_DISPATCH")
-	pj.set_label(start, "DSP_DISPATCH")
+	x = data.Range(pj.m, start, end, "DSP_DISPATCH")
+	pj.m.set_label(start, "DSP_DISPATCH")
 	a = start
 	for i in ("AVG", "STD", "MIN", "MAX", "REF", "EVT", "ALL", "ALL"):
 		c = cx.codeptr(pj, a)
-		pj.set_label(c.dst, "DSP_" + i)
+		pj.m.set_label(c.dst, "DSP_" + i)
 		c.lcmt = "DSP_" + i
 		a += 2
 
@@ -425,7 +415,7 @@ class data24(data.Const):
 		self.val = v
 		self.fmt = "%d" % v
 		self.typ = ".24bit"
-		pj.set_label(lo, "c_" + self.fmt)
+		pj.m.set_label(lo, "c_" + self.fmt)
 
 class float70(data.Const):
 	def __init__(self, pj, lo):
@@ -453,7 +443,7 @@ class float70(data.Const):
 		self.fmt = x
 		self.typ = ".FLOAT"
 		self.compact = False
-		pj.set_label(lo, "c_" + x)
+		pj.m.set_label(lo, "c_" + x)
 		print(self, self.fmt)
 
 def square_tbl(pj):
@@ -465,15 +455,15 @@ def square_tbl(pj):
 		y = (i * i) >> 8
 		assert x == y
 
-	x = pj.add(0x6e00, 0x6f00, "TBL_6E00")
+	x = data.Data(pj.m, 0x6e00, 0x6f00, "TBL_6E00")
 	x.rendered = "FOR I (0..255):\n    .BYTE ((I * I) & 0xff)"
 	x.compact = True
-	pj.set_label(0x6e00, "SQUARE_TBL_LO")
+	pj.m.set_label(0x6e00, "SQUARE_TBL_LO")
 
-	x = pj.add(0x6f00, 0x7000, "TBL_6F00")
+	x = data.Data(pj.m, 0x6f00, 0x7000, "TBL_6F00")
 	x.rendered = "FOR I (0..255):\n    .BYTE ((I * I) >> 8)"
 	x.compact = True
-	pj.set_label(0x6f00, "SQUARE_TBL_HI")
+	pj.m.set_label(0x6f00, "SQUARE_TBL_HI")
 
 def tramp(pj):
 	l = list()
@@ -493,8 +483,8 @@ def tramp(pj):
 		did = 0
 		for i in l:
 			da = i.flow_out[0].to
-			lx = pj.get_labels(i.lo)
-			ly = pj.get_labels(da)
+			lx = pj.m.get_labels(i.lo)
+			ly = pj.m.get_labels(da)
 			if lx != None:
 				if ly != None:
 					print("LX", lx)
@@ -503,12 +493,12 @@ def tramp(pj):
 				else:
 					#print(pj.afmt(i.lo), "->", pj.afmt(da), lx)
 					for j in lx:
-						pj.set_label(da, j)
+						pj.m.set_label(da, j)
 					did += 1
 			elif ly != None:
 				#print(pj.afmt(i.lo), "<-", pj.afmt(da), ly)
 				for j in ly:
-					pj.set_label(i.lo, j)
+					pj.m.set_label(i.lo, j)
 				did += 1
 		if did == 0:
 			break

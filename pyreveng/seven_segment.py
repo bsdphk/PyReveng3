@@ -156,7 +156,7 @@ def table(pj, lo, hi, drive=None, inv=False, verbose=False):
 	if drive is None:
 		drive = default_drive
 	assert len(drive) == 9
-	pj.add(lo, hi, "7segtable")
+	data.Range(pj.m, lo, hi, "7segtable")
 	t = []
 	for a in range(lo, hi):
 		t.append(digit(pj, a, drive, inv, verbose).resolv)

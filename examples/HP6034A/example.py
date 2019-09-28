@@ -138,8 +138,8 @@ def task(pj, cx):
 				n = "SIGN"
 			elif n == "C":
 				n = "CP"
-			if not pj.get_labels(c.dst):
-				pj.set_label(c.dst, "CMD_" + n)
+			if not pj.m.get_labels(c.dst):
+				pj.m.set_label(c.dst, "CMD_" + n)
 
 	if True:
 		for a in range(0x0d0c, 0x0d0f):
@@ -226,39 +226,39 @@ def task(pj, cx):
 	while pj.run():
 		pass
 
-	pj.set_label(0x00cc, "FAIL_LEDS")
-	pj.set_label(0x0140, "FAIL_1")
-	pj.set_label(0x0146, "FAIL_2")
-	pj.set_label(0x018a, "FAIL_3")
-	pj.set_label(0x0190, "FAIL_4")
-	pj.set_label(0x01d6, "FAIL_5")
-	pj.set_label(0x01e2, "FAIL_6")
-	pj.set_label(0x0212, "FLASH_FAIL")
-	pj.set_label(0x0656, "MESH_PREMPTED")
-	pj.set_label(0x0660, "HPIB_PREMPTED")
-	pj.set_label(0x066a, "TIMER_PREMPTED")
-	pj.set_label(0x0912, "PON2_1")
-	pj.set_label(0x08e4, "PON2_2")
-	pj.set_label(0x0894, "PON2_3")
-	pj.set_label(0x08bc, "PON2_4")
-	pj.set_label(0x0920, "PON2_5")
-	pj.set_label(0x0abe, "TIMER_INTR")
-	pj.set_label(0x0b7c, "HPIB_INTR")
-	pj.set_label(0x0ccc, "HPIP_INCHAR")
-	pj.set_label(0x0ce2, "END_INCHAR")
-	pj.set_label(0x0d18, "INCHAR_MAIN")
-	pj.set_label(0x0f7e, "1_10_100_1000")
-	pj.set_label(0x1328, "MESH_INTR")
-	pj.set_label(0x175c, "SET_CC_CV_LEDS")
-	pj.set_label(0x2002, "NEXT_CHAR_PROC")
-	pj.set_label(0x20ca, "CV_DAC_VAL")
-	pj.set_label(0x20cc, "CC_DAC_VAL")
-	pj.set_label(0x20ce, "CV_DAC_SET")
-	pj.set_label(0x20d0, "CC_DAC_SET")
-	pj.set_label(0x20d6, "DELAY_VAL")
-	pj.set_label(0x20d8, "MODE_SET")
-	pj.set_label(0x20da, "MODE_VAL")
-	pj.set_label(0x20d4, "COUNT_DOWN")
+	pj.m.set_label(0x00cc, "FAIL_LEDS")
+	pj.m.set_label(0x0140, "FAIL_1")
+	pj.m.set_label(0x0146, "FAIL_2")
+	pj.m.set_label(0x018a, "FAIL_3")
+	pj.m.set_label(0x0190, "FAIL_4")
+	pj.m.set_label(0x01d6, "FAIL_5")
+	pj.m.set_label(0x01e2, "FAIL_6")
+	pj.m.set_label(0x0212, "FLASH_FAIL")
+	pj.m.set_label(0x0656, "MESH_PREMPTED")
+	pj.m.set_label(0x0660, "HPIB_PREMPTED")
+	pj.m.set_label(0x066a, "TIMER_PREMPTED")
+	pj.m.set_label(0x0912, "PON2_1")
+	pj.m.set_label(0x08e4, "PON2_2")
+	pj.m.set_label(0x0894, "PON2_3")
+	pj.m.set_label(0x08bc, "PON2_4")
+	pj.m.set_label(0x0920, "PON2_5")
+	pj.m.set_label(0x0abe, "TIMER_INTR")
+	pj.m.set_label(0x0b7c, "HPIB_INTR")
+	pj.m.set_label(0x0ccc, "HPIP_INCHAR")
+	pj.m.set_label(0x0ce2, "END_INCHAR")
+	pj.m.set_label(0x0d18, "INCHAR_MAIN")
+	pj.m.set_label(0x0f7e, "1_10_100_1000")
+	pj.m.set_label(0x1328, "MESH_INTR")
+	pj.m.set_label(0x175c, "SET_CC_CV_LEDS")
+	pj.m.set_label(0x2002, "NEXT_CHAR_PROC")
+	pj.m.set_label(0x20ca, "CV_DAC_VAL")
+	pj.m.set_label(0x20cc, "CC_DAC_VAL")
+	pj.m.set_label(0x20ce, "CV_DAC_SET")
+	pj.m.set_label(0x20d0, "CC_DAC_SET")
+	pj.m.set_label(0x20d6, "DELAY_VAL")
+	pj.m.set_label(0x20d8, "MODE_SET")
+	pj.m.set_label(0x20da, "MODE_VAL")
+	pj.m.set_label(0x20d4, "COUNT_DOWN")
 
 
 if __name__ == '__main__':

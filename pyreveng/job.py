@@ -52,24 +52,6 @@ class Job():
 		# This supresses WARNING about todo's into these banks
 		self.banks = []
 
-	def set_label(self, *args, **kwargs):
-		self.m.set_label(*args, **kwargs)
-
-	def get_labels(self, *args):
-		return self.m.get_labels(*args)
-
-	def set_block_comment(self, *args, **kwargs):
-		self.m.set_block_comment(*args, **kwargs)
-
-	def afmt(self, a):
-		return self.m.apct % a
-
-	def render_adr(self, a):
-		x = self.m.get_labels(a)
-		if x is None:
-			return self.afmt(a)
-		return x[0]
-
 	def find(self, adr, tag=None):
 		x = self.m.find_lo(adr)
 		if tag is None:
@@ -78,14 +60,6 @@ class Job():
 			if i.tag == tag:
 				return i
 		return None
-
-	def x_insert(self, leaf):
-		self.m.insert(leaf)
-
-	def add(self, lo, hi, tag):
-		l = Leaf(lo, hi, tag)
-		self.m.insert(l)
-		return l
 
 	def todo(self, adr, func):
 		assert isinstance(adr, int)
@@ -117,5 +91,5 @@ class Job():
 			if err is None:
 				continue
 			print("Todo fail: " + self.name + " " + str(err) + "\n" +
-			    "    adr= " + self.afmt(adr) + " func=", func)
+			    "    adr= " + self.m.adr(adr) + " func=", func)
 		return rv

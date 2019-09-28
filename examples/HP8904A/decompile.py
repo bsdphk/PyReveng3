@@ -272,14 +272,14 @@ class switch(object):
 			return False
 		l[-1].lcmt += "SWITCH type=%d lo=%d hi=%d\n" % (w, lo, hi)
 		# print("S1 %04x" % self.top, w, lo, hi, "D", d)
-		self.pj.set_label(d, "default")
+		self.pj.m.set_label(d, "default")
 		a = self.i.hi
 		for i in range(lo, hi + 1):
 			self.pj.cc_locs.add(a)
 			self.pj.cc_locs.add(a + 1)
 			u = self.pj.m.bu16(a)
 			if u != d:
-				self.pj.set_label(u, "case_%d" % i)
+				self.pj.m.set_label(u, "case_%d" % i)
 			self.i.add_flow(self.pj, ">JC", "%d" % i,
 			    u, self.i.lang)
 			self.i.lang.disass(self.pj, u)

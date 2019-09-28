@@ -51,16 +51,16 @@ def task(pj, cpu):
 	ptr(pj, 0x6405)
 	ptr(pj, 0x6407)
 
-	pj.set_label(0x7eed, "RAM_TEST_VALS")
+	pj.m.set_label(0x7eed, "RAM_TEST_VALS")
 	for a in range(0x7eed, 0x7ef9):
 		cbyte(pj,a)
 
 	c = ptr(pj, 0x7915)
-	pj.set_label(c.lo, "@7SEGCODES")
-	pj.set_label(c.dst, "7SEGCODES")
+	pj.m.set_label(c.lo, "@7SEGCODES")
+	pj.m.set_label(c.dst, "7SEGCODES")
 	c = seven_segment.table(pj, c.dst, c.dst + 0x10, verbose=False)
 
-	pj.set_label(0x7ead, "ROM_LOCS")
+	pj.m.set_label(0x7ead, "ROM_LOCS")
 	for a in range(0x7ead, 0x7ebf, 2):
 		ptr(pj, a)
 
@@ -80,7 +80,7 @@ def task(pj, cpu):
 
 	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
 
-	pj.set_label(0x66ea, "ERR5_UNDEF_KEY")
+	pj.m.set_label(0x66ea, "ERR5_UNDEF_KEY")
 	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
 
 	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
@@ -89,7 +89,7 @@ def task(pj, cpu):
 		utils.float70(pj, i)
 
 	c = cpu.codeptr(pj, 0x7909)
-	pj.set_label(c.dst, "HPIB_CMD_PARSE")
+	pj.m.set_label(c.dst, "HPIB_CMD_PARSE")
 
 	utils.square_tbl(pj)
 

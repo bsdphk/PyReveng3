@@ -55,7 +55,7 @@ def task(pj, cx):
 		a = (seg << 4) + off
 		# print("VECTOR %05x" % a)
 		pj.todo(a, cx.disass)
-		pj.set_label(a, "VECTOR")
+		pj.m.set_label(a, "VECTOR")
 
 	# Vectors initialized at 0xe21b2...
 	vect(0xe000, 0x1e67)
@@ -93,7 +93,7 @@ def task(pj, cx):
 	###################################################################################
 
 	def tbl(seg, off_lo, off_hi):
-		pj.add(off_lo, off_hi, "%04x-jmp-tbl" % seg)
+		data.Range(pj.m, off_lo, off_hi, "%04x-jmp-tbl" % seg)
 		for i in range(off_lo, off_hi, 2):
 			off = pj.m.lu16(i)
 			a = (seg << 4) + off
@@ -166,7 +166,8 @@ def task(pj, cx):
 	#######################################################################
 
 	def text_lines(pj, a):
-		pj.add(a, a + 24, "text-tbl")
+		# pj.m.set_line_comment(a, "txt-tbl")
+		data.Range(pj.m, a, a + 24, "text-tbl")
 		data.Txt(pj.m, a, a + 8, label=False)
 		data.Txt(pj.m, a + 8, a + 16, label=False)
 		data.Txt(pj.m, a + 16, a + 24, label=False)

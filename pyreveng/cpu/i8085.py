@@ -615,7 +615,7 @@ class i8085(assy.Instree_disass):
             ("RST7.5",    0x003c),
         ):
             pj.todo(a, self.disass)
-            pj.set_label(a, l)
+            pj.m.set_label(a, l)
 
     def codeptr(self, pj, adr):
         t = self.m.lu16(adr)

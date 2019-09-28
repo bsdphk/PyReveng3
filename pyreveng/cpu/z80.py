@@ -300,4 +300,4 @@ class z80(assy.Instree_disass):
             (None, 0x0066, "VEC_NMI"),
         ):
             pj.todo(a, self.disass)
-            pj.set_label(a, l)
+            pj.m.set_label(a, l)

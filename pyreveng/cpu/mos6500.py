@@ -272,6 +272,6 @@ class mos6500(assy.Instree_disass):
 
     def vectors(self, pj):
         y = self.codeptr(pj, 0xfffe)
-        pj.set_label(y.dst, "IRQ")
+        pj.m.set_label(y.dst, "IRQ")
         y = self.codeptr(pj, 0xfffc)
-        pj.set_label(y.dst, "RESET")
+        pj.m.set_label(y.dst, "RESET")

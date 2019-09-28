@@ -35,7 +35,7 @@ class PSOS():
 		self.a0 = a0
 		self.cfg = {}
 
-		pj.set_label(a0, "PSOS_CFG")
+		pj.m.set_label(a0, "PSOS_CFG")
 		for o,l,t,n in (
 			(  0, 4, self.const,	"ramstart1"),
 			(  4, 4, self.const,	"ramend1"),
@@ -60,7 +60,7 @@ class PSOS():
 			( 66, 4, self.const,	"probe_present"),
 			( 70, 4, self.const,	"phile_present"),
 		):
-			pj.set_label(self.a0 + o, "PSOS_CFG." + n)
+			pj.m.set_label(self.a0 + o, "PSOS_CFG." + n)
 			t(self.a0 + o, self.a0 + o + l, n)
 			if l == 2:
 				self.cfg[n] = pj.m.bu16(self.a0 + o)
@@ -76,14 +76,14 @@ class PSOS():
 		assert hi == lo + 4
 		x = self.pj.m.bu32(lo)
 		if x:
-			self.pj.set_label(x, "FOR_PSOS_" + lbl)
+			self.pj.m.set_label(x, "FOR_PSOS_" + lbl)
 			self.cpu.codeptr(self.pj, lo)
 
 	def iotable(self, niod, iotable):
 		n = 0
 		a = iotable
 		while n <= niod:
-			self.pj.set_label(a, "PSOS_IOTABLE[%d]" % n)
+			self.pj.m.set_label(a, "PSOS_IOTABLE[%d]" % n)
 			for o, f in (
 				(  0, "func0"),
 				(  6, "func1"),
@@ -92,7 +92,7 @@ class PSOS():
 				( 24, "func4"),
 				( 30, "func5"),
 			):
-				self.pj.set_label(a + o,
+				self.pj.m.set_label(a + o,
 				    "PSOS_IO_TABLE[%d]." % n + f)
 				self.cpu.disass(self.pj, a + o)
 			a += 30

@@ -24,7 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from . import mem, misc
+from . import mem, misc, data
 
 class Render_mem():
     def __init__(self, aspace, fmt="x", ascii=True, ncol=None):
@@ -130,6 +130,9 @@ class Seg_Listing():
                 a0 = i.lo
 
             rx = i.render()
+            if isinstance(i, data.Range):
+                self.fo.write("%s-%s [%s]\n" % (aspace.apct % i.lo, aspace.apct % i.hi, rx))
+                continue
             if rx is None:
                 alo = aspace.apct % i.lo
                 ahi = aspace.apct % i.hi

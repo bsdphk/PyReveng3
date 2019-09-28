@@ -394,7 +394,7 @@ class MCS51(assy.Instree_disass):
         ):
             if not which or a in which or b in which:
                 pj.todo(a, self.disass)
-                pj.set_label(a, b)
+                pj.m.set_label(a, b)
 
 class I8032(MCS51):
     def __init__(self):

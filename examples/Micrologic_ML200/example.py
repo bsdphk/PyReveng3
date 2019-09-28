@@ -67,8 +67,8 @@ def task(pj, cpu):
 	while pj.run():
 		pass
 
-	pj.set_label(0x6e8, "Incr_rr0()")
-	pj.set_label(0x6bc, "Count_Down()")
+	pj.m.set_label(0x6e8, "Incr_rr0()")
+	pj.m.set_label(0x6bc, "Count_Down()")
 
 	if False:
 		cmt = """-
@@ -83,7 +83,7 @@ def task(pj, cpu):
 		It calls 0x5ca a lot, presumably to let the analog stuff settle ?
 		"""
 
-	pj.set_label(0x7df, "Update_Display()")
+	pj.m.set_label(0x7df, "Update_Display()")
 
 	if False:
 		cmt = """

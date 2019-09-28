@@ -88,8 +88,8 @@ def collect_keys():
 		x = pj.m.bu16(y + 1)
 		y = data.Txt(pj, x, x + 9)
 		t = y.txt[:-4].strip().replace(" ","_")
-		pj.set_label(a, "k_0x%02x" % n)
-		pj.set_label(y, "test_key_" + t)
+		pj.m.set_label(a, "k_0x%02x" % n)
+		pj.m.set_label(y, "test_key_" + t)
 		keys[n] = t
 		n += 1
 	return keys
@@ -571,7 +571,7 @@ def symb(pj, cpu):
 			assert a >= pj.m.lo and a < pj.m.hi
 			cpu.disass(pj, a)
 		if p == pj.pg or p >= 4:
-			pj.set_label(a, n)
+			pj.m.set_label(a, n)
 
 
 #######################################################################
@@ -588,17 +588,17 @@ def romsum(pj):
 
 	if pj.pg == 0:
 		y = data.Const(pj, 0x4002, 0x4003)
-		pj.set_label(y.lo, "EPROM_PAGES")
+		pj.m.set_label(y.lo, "EPROM_PAGES")
 
 	if pj.pg < 4:
 		assert b == pj.pg
 
 		y = data.Const(pj, 0x4001, 0x4002)
-		pj.set_label(y.lo, "EPROM_SUM_%d" % pj.pg)
+		pj.m.set_label(y.lo, "EPROM_SUM_%d" % pj.pg)
 
 		y = data.Const(pj, 0x4000, 0x4001, "'%c'")
 		assert pj.m[y.lo] == 0x30 + pj.pg
-		pj.set_label(y.lo, "EPROM_PAGE_%d" % pj.pg)
+		pj.m.set_label(y.lo, "EPROM_PAGE_%d" % pj.pg)
 
 	else:
 		assert b == 0
@@ -621,8 +621,8 @@ def lexer(pj):
 			if self.f > 0 and self.pfx in hpib:
 				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
-			if self.f > 0 and not pj.get_labels(self.t):
-				pj.set_label(self.t, "J_" + self.pfx)
+			if self.f > 0 and not pj.m.get_labels(self.t):
+				pj.m.set_label(self.t, "J_" + self.pfx)
 				cpu.disass(pj, self.t)
 				h = hpib.get(self.pfx)
 				if h == None:
@@ -647,23 +647,23 @@ def lexer(pj):
 			if y.f == 0:
 				b = pj.m.bu16(y.lo + 2)
 				p = pfx + "%c" % pj.m[y.lo]
-				pj.set_label(b, "LEX_" + p)
+				pj.m.set_label(b, "LEX_" + p)
 				tx(b, p)
 		data.Const(pj, a, a + 1)
 
-	pj.set_label(0x9780, "LEXTAB_ALPHABET")
+	pj.m.set_label(0x9780, "LEXTAB_ALPHABET")
 	n = 65
 	for i in range(0x9780, 0x97b4, 2):
 		data.Dataptr(pj.m, i, i + 2, pj.m.bu16(i))
 		a = pj.m.bu16(i)
 		if n != 0x5a:
-			pj.set_label(a, "LEX_%c" % n)
+			pj.m.set_label(a, "LEX_%c" % n)
 		else:
-			pj.set_label(a, "LEX_NULL")
+			pj.m.set_label(a, "LEX_NULL")
 		tx(a, "%c" % n)
 		n += 1
 
-	pj.set_label(0x9a22, "LEXTAB_OTHER")
+	pj.m.set_label(0x9a22, "LEXTAB_OTHER")
 	tx(0x9a22, "")
 
 #######################################################################
@@ -676,7 +676,7 @@ class Num(data.Data):
 		a += pj.m[lo + 2]
 		self.val = a
 		self.fmt = ".NUM\t%d" % a
-		pj.set_label(lo, "N%d" % a)
+		pj.m.set_label(lo, "N%d" % a)
 
 #######################################################################
 
@@ -708,7 +708,7 @@ class MenuPage(data.Data):
 		return s
 
 def Menu(pj, cpu, a, nm):
-	pj.set_label(a, nm)
+	pj.m.set_label(a, nm)
 	data.Const(pj, a - 1, a)
 	n = pj.m[a - 1]
 	for i in range(0, n + 1):
@@ -801,8 +801,8 @@ def hints(pj, cpu):
 		]:
 			cpu.codeptr(pj, a)
 			u = pj.m.bu16(a)
-			pj.set_label(u, n.lower())
-			pj.set_label(a, n)
+			pj.m.set_label(u, n.lower())
+			pj.m.set_label(a, n)
 
 		cpu.codeptr(pj, 0x4004)
 		cpu.codeptr(pj, 0x4006)
@@ -931,7 +931,7 @@ def hints(pj, cpu):
 			z = pj.m.find_lo(x)
 			if len(z) > 0:
 				t = z[0].txt[:-4].strip().replace(" ","_")
-				pj.set_label(y, "test_key_" + t)
+				pj.m.set_label(y, "test_key_" + t)
 
 		Num(pj, 0x684a)
 
@@ -986,7 +986,7 @@ def hints(pj, cpu):
 		l = [ "LCD_CHR_f", "LCD_CHR_1", "LCD_CHR_2", "LCD_CHR_3",
 		      "LCD_CHR_4", "LCD_CHR_phi", "LCD_CHR_mu", "LCD_CHR_is", ]
 		for a in range(0xea15, 0xea4e, 8):
-			pj.set_label(a, l.pop(0))
+			pj.m.set_label(a, l.pop(0))
 			char_def(pj, a)
 
 		data.Const(pj, 0x929d, 0x929d + 8)
@@ -1002,7 +1002,7 @@ def hints(pj, cpu):
 			print("%x -> " % a + keys[n])
 			u = pj.m.bu16(a)
 			if u != 0xae22:
-				pj.set_label(u, "key_" + keys[n])
+				pj.m.set_label(u, "key_" + keys[n])
 			n += 1
 
 		Num(pj, 0xea55)

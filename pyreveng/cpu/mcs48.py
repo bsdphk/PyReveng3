@@ -231,7 +231,7 @@ class mcs48(assy.Instree_disass):
 			(0x007, "TINT"),
 		):
 			pj.todo(a, self.disass)
-			pj.set_label(a, l)
+			pj.m.set_label(a, l)
 
 
 class i8748(mcs48):

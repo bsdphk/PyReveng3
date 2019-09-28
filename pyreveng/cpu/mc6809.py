@@ -972,7 +972,7 @@ class mc6809(assy.Instree_disass):
 		):
 			if which and (adr in which or v in which):
 				c = self.codeptr(pj, adr)
-				pj.set_label(c.dst, "VEC" + v)
+				pj.m.set_label(c.dst, "VEC" + v)
 			adr += 2
 
 if __name__ == '__main__':

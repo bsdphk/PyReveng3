@@ -129,9 +129,9 @@ def task(pj, dx):
 
 	if True:
 		for a,l in symbols.items():
-			pj.set_label(a,l)
+			pj.m.set_label(a,l)
 
-	pj.set_block_comment(0x000, """HP 3455A inguard ROM
+	pj.m.set_block_comment(0x000, """HP 3455A inguard ROM
 
 The nanoprocessor takes two clocks per instruction.
 The clock runs at 819.2 kHz if 50Hz line frequency is selected
@@ -151,11 +151,11 @@ DEV1 bits:        REG3 bits:
 0x01    LVIN      5
 Note all device output is inverted in hardware, so the complement must be written to DEV1
 """)
-	pj.set_block_comment(0x03C, """AtoD Auto-Zero
+	pj.m.set_block_comment(0x03C, """AtoD Auto-Zero
 0x14 = HAZ on, everything else off
 AUTOZERO_LOOP is 16 instructions per iteration
 """)
-	pj.set_block_comment(0x05A, """Main Integration Loop
+	pj.m.set_block_comment(0x05A, """Main Integration Loop
 
 Register usage:
 REG0			# PLCs
@@ -191,13 +191,13 @@ REG11 is set during slow rundown, REG13:REG12 are used during integration and fa
 The doubling of the count rate and inherent 8 bit shift give the 128:1 weighting between
 fast and slow rundown.
 """)
-	pj.set_block_comment(0x60, """Select discharge type
+	pj.m.set_block_comment(0x60, """Select discharge type
 
 This code assumes that if DCTL0 (0DETECT) is zero, then DCTL2 is set.
 The instruction counts and control bits in REG5 will be wrong otherwise.
 DCTL2 was initialized to 1 and does not appear to change during the integration phase.
 """)
-	pj.set_block_comment(0x8B, """Start discharge during integration
+	pj.m.set_block_comment(0x8B, """Start discharge during integration
 
 The loop initialization code assumes that there will be no overflow of REG12
 when it increments it.  This is usually true since this loop will increment
@@ -213,14 +213,14 @@ Note that the 0V detect signal was used to set up REG5 and is also used in
 CHECK_RESULT_SIGN to determine whether we will increment of decrement the count.
 Since we are over 10V here, there is no chance it changed inbetween.
 """)
-	pj.set_block_comment(0xFF, """Interrupt Handler
+	pj.m.set_block_comment(0xFF, """Interrupt Handler
 
 The interrupt breaks the slow rundown loop which was accumulating the count in A.
 The slow rundown count is saved in REG11 and added to/subtracted from the
 rest of the count in REG13:REG12.
 The rundown is stopped and auto-zero started immediately.
 """)
-	pj.set_block_comment(0x14A, """Stop integrating the input and start the rundown
+	pj.m.set_block_comment(0x14A, """Stop integrating the input and start the rundown
 
 First, counts accumulated during the integration phase are multiplied by 8.
 This is because each count represented 32 instruction periods and in the fast
@@ -229,7 +229,7 @@ It's possible the rundown during integration overshot 0V, so the counts here
 may need subtracting from the count, hence the two loops, one that increments
 and one that decrements.
 """)
-	pj.set_block_comment(0x19B, """Slow Rundown
+	pj.m.set_block_comment(0x19B, """Slow Rundown
 
 In the slow rundown, counts represent 2 instruction periods.  This, along with the
 fact that the current count is effectively shifted left by 8 bits when the slow
@@ -239,7 +239,7 @@ must be set accordingly.  The interrupt is armed to fire when 0VDETECT changes -
 It's the only way you can increment a counter and conditionally loop with two instructions
 (it took four instructions per iteration during the fast rundown).
 """)
-	pj.set_block_comment(0x1CB, """Increment the PLC Counter
+	pj.m.set_block_comment(0x1CB, """Increment the PLC Counter
 
 This is called every 32 instructions during integration, hence every 64 clocks.
 (256 * 64 * clock period) is one PLC, so the high byte of the counter (REG9) ends

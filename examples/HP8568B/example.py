@@ -156,9 +156,9 @@ def task(pj, cpu):
 
 	# Where ?
 	# y = data.Const(pj.m, 0xfffe, 0x10000)
-	# pj.set_label(y.lo, "eprom_lo_chksum")
+	# pj.m.set_label(y.lo, "eprom_lo_chksum")
 	y = data.Const(pj.m, 0x19854, 0x19856)
-	pj.set_label(y.lo, "eprom_hi_chksum")
+	pj.m.set_label(y.lo, "eprom_hi_chksum")
 
 	###############################################################
 
@@ -223,7 +223,7 @@ def task(pj, cpu):
 	for i in post_arg:
 		j = post_arg[i]
 		if len(j) > 0 and j[0] != "":
-			pj.set_label(i, j[0])
+			pj.m.set_label(i, j[0])
 
 	def flow_post_arg(pj, ins):
 		z = post_arg.get(ins.dstadr)
@@ -302,7 +302,7 @@ def task(pj, cpu):
 			return
 		ins.flow_out.pop(0)
 		ins.add_flow(pj, ">", "?", ins.hi)
-		pj.set_label(ins.hi, "break_%04x" % ins.lo)
+		pj.m.set_label(ins.hi, "break_%04x" % ins.lo)
 
 		y = data.Const(pj.m, ins.lo - 2, ins.lo)
 		ncase = pj.m.bu16(ins.lo - 2)
@@ -326,7 +326,7 @@ def task(pj, cpu):
 			w.fmt += ", 0x%04x" % (ins.hi + z)
 			ins.add_flow(pj, ">", "0x%x" % i, ins.hi + z)
 			if z < 0:
-				pj.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
+				pj.m.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
 
 	cpu.flow_check.append(flow_switch)
 	pj.todo(0x2f38, cpu.disass)
@@ -449,7 +449,7 @@ def task(pj, cpu):
 			self.fa = pj.m.bu32(self.fp)
 			pj.todo(self.fa, cpu.disass)
 			data.Codeptr(pj.m, self.fp, self.fp + 4, self.fa)
-			pj.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
+			pj.m.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
 
 		def render(self):
 			t = ".PARAM\t"
@@ -524,7 +524,7 @@ def task(pj, cpu):
 			return t
 
 	if True:
-		pj.set_label(0x18c3a, "MNETABLE")
+		pj.m.set_label(0x18c3a, "MNETABLE")
 		a = 0x193a0
 		while a > 0x18c3a:
 			y = mnem(pj, a)
@@ -559,24 +559,24 @@ def task(pj, cpu):
 			return t
 
 	if True:
-		pj.set_label(0x193da, "OLDCMDS")
+		pj.m.set_label(0x193da, "OLDCMDS")
 		n = 0
 		for a in range(0x193da, 0x194b2, 2):
 			y = oldcmd(pj, a, n)
 			n += 1
 		# print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
 
-		pj.set_label(0x194b2, "KEYTAB")
+		pj.m.set_label(0x194b2, "KEYTAB")
 		for a in range(0x194b2, 0x1951e, 8):
 			y = data.Const(pj.m, a, min(a + 8, 0x1951e), fmt="0x%02x")
 		# print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
 
-		pj.set_label(0x1951e, "IMEDBITS")
+		pj.m.set_label(0x1951e, "IMEDBITS")
 		for a in range(0x1951e, 0x1952c, 8):
 			y = data.Const(pj.m, a, min(a + 8, 0x1952c), fmt="0x%02x")
 		# print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
 
-		pj.set_label(0x1952c, "SFLGVAL")
+		pj.m.set_label(0x1952c, "SFLGVAL")
 		for a in range(0x1952c, 0x195c4, 16):
 			y = data.Const(pj.m, a, min(a + 16, 0x195c4),
 			    "0x%08x", pj.m.bu32, 4)
@@ -703,24 +703,24 @@ def task(pj, cpu):
 			0x15da0,
 		):
 			y = data_bcd(pj, a)
-			pj.set_label(a, "BCD_%x" % y.data[0])
+			pj.m.set_label(a, "BCD_%x" % y.data[0])
 
 
 		#######################################################
 
-		pj.set_label(0x0693c, "MSG_ADR_X_Y")
+		pj.m.set_label(0x0693c, "MSG_ADR_X_Y")
 		for a in range(0x693c, 0x6a2c, 6):
 			data.Const(pj.m, a, a+6, "0x%04x", pj.m.bu16, 2)
 
 		#######################################################
 
-		pj.set_label(0x6b84, "G_CTRL")
-		pj.set_label(0x6ba8, "G_CENTER")
-		pj.set_label(0x6bcc, "G_MARKER")
-		pj.set_label(0x6be2, "G_DSP_LINE")
-		pj.set_label(0x6bf8, "G_GRATICULE")
-		pj.set_label(0x6c4c, "G_HP_LOGO")
-		pj.set_label(0x6c5e, "G_ACT_FUNC")
+		pj.m.set_label(0x6b84, "G_CTRL")
+		pj.m.set_label(0x6ba8, "G_CENTER")
+		pj.m.set_label(0x6bcc, "G_MARKER")
+		pj.m.set_label(0x6be2, "G_DSP_LINE")
+		pj.m.set_label(0x6bf8, "G_GRATICULE")
+		pj.m.set_label(0x6c4c, "G_HP_LOGO")
+		pj.m.set_label(0x6c5e, "G_ACT_FUNC")
 
 		a = 0x6b84
 
@@ -738,7 +738,7 @@ def task(pj, cpu):
 
 		#######################################################
 
-		pj.set_label(0x0e3be, "UNITS")
+		pj.m.set_label(0x0e3be, "UNITS")
 		for a in range(0x0e3be, 0x0e3d4, 2):
 			data.Txt(pj.m, a, a + 2, label=False)
 
@@ -784,21 +784,21 @@ def task(pj, cpu):
 		#######################################################
 		# pat 4,244,024 pg 262 lin 3700
 
-		pj.set_label(0x4fac, "SCANTAB")
+		pj.m.set_label(0x4fac, "SCANTAB")
 		for a in range(0x4fac, 0x4fec, 2):
 			y = data.Const(pj.m, a, a+2, "0x%04x", pj.m.bu16, 2)
 
 		#######################################################
 
 		y = data.Const(pj.m, 0x193a2, 0x193be, "%d", pj.m.bu16, 2)
-		pj.set_label(y.lo, "HASHPTR2")
+		pj.m.set_label(y.lo, "HASHPTR2")
 		y = data.Const(pj.m, 0x193be, 0x193da, "%d", pj.m.bu16, 2)
-		pj.set_label(y.lo, "HASHPTR")
+		pj.m.set_label(y.lo, "HASHPTR")
 
 
 
 		#######################################################
-		pj.set_label(0x19826, "PFXSCALE")
+		pj.m.set_label(0x19826, "PFXSCALE")
 		for a in range(0x19826, 0x19853, 1):
 			y = data.Const(pj.m, a, a + 1, fmt="0x%02x")
 		# print("PFXSCALE %d" % ((0x19853-0x19826)/1))
@@ -862,88 +862,88 @@ def task(pj, cpu):
 
 	y = data.Const(pj.m, 0x693a, 0x693c, "%d", pj.m.bu16, 2)
 
-	pj.set_label(0x009b8, "RESET")
-	pj.set_label(0x00c2e, "SELFTEST")
-	pj.set_label(0x00d7a, "CPUTEST_FAIL")
-	pj.set_label(0x00e9a, "epromsize")
+	pj.m.set_label(0x009b8, "RESET")
+	pj.m.set_label(0x00c2e, "SELFTEST")
+	pj.m.set_label(0x00d7a, "CPUTEST_FAIL")
+	pj.m.set_label(0x00e9a, "epromsize")
 	y = data.Const(pj.m, 0x00e9a, 0x00e9e, "%d", pj.m.bu32, 4)
-	pj.set_label(0x00ef2, "ramaddress")
+	pj.m.set_label(0x00ef2, "ramaddress")
 	y = data.Const(pj.m, 0x00ef2, 0x00efe, "0x%08x", pj.m.bu32, 4)
-	pj.set_label(0x00e9e, "ROMSUM")
-	pj.set_label(0x00ec0, "ROMTEST")
-	pj.set_label(0x01ae2, "BCD_FMT(BCD, PTR)")
-	pj.set_label(0x01b34, "BCD_ABS(BCD)")
-	pj.set_label(0x01b38, "BCD_NEG(BCD)")
-	pj.set_label(0x01be6, "BCD_CMP(R01,R23)")
-	pj.set_label(0x01bea, "BCD_CMP(R23,R01)")
-	pj.set_label(0x01c00, "stk_64")
-	pj.set_label(0x01c14, "rel_64")
-	pj.set_label(0x01c28, "abs_64")
-	pj.set_label(0x01c3c, "loc_64")
-	pj.set_label(0x01b48, "BCD_NEG8(&A0)")
-	pj.set_label(0x01b62, "BCD_NEG(D23)")
-	pj.set_label(0x01b72, "BCD_ADD8(&A0,&A1)")
-	pj.set_label(0x01c60, "BCD_ADD(D01, D23)")
-	pj.set_label(0x01c98, "BCD_SUBR(D23, D01(order?)")
-	pj.set_label(0x01c9c, "BCD_SUB(D01, D23(order?)")
-	pj.set_label(0x01cb0, "BCD_SUB8(&A0,&A1)")
-	pj.set_label(0x0214c, "BCD_MUL5(D01)")
-	pj.set_label(0x0217e, "BCD_MUL3(D01)")
-	pj.set_label(0x0218c, "BCD_MUL6(D01)")
-	pj.set_label(0x021be, "BCD_MUL8(D01)")
-	pj.set_label(0x021c0, "BCD_MUL4(D01)")
-	pj.set_label(0x021c4, "BCD_MUL2(D01)")
-	pj.set_label(0x021f6, "BCD_DIV2(D01)")
-	pj.set_label(0x02224, "BCD_LD(D0.W)")
-	pj.set_label(0x0222c, "BCD_LD(D0.L)")
-	pj.set_label(0x023ec, "FD_ABS(R2+R3)")
-	pj.set_label(0x0287e, "rel_32")
-	pj.set_label(0x02892, "abs_32")
-	pj.set_label(0x028a4, "loc_32")
-	pj.set_label(0x02f38, "SWITCH")
-	pj.set_label(0x0320e, "BZERO(PTR,INT)")
-	pj.set_label(0x033fc, "SHOW_CHAR")
-	pj.set_label(0x03412, "SHOW_SEMI")
-	pj.set_label(0x0341a, "SHOW_COMMA")
-	pj.set_label(0x03422, "SHOW_CRNL")
-	pj.set_label(0x03428, "SHOW_NL")
-	pj.set_label(0x03430, "SHOW_MINUS")
-	pj.set_label(0x03438, "SHOW_2CHAR")
-	pj.set_label(0x03498, "SHOW_INT")
-	pj.set_label(0x03932, "DISP_RD(INT ADR)")
-	pj.set_label(0x03958, "SHOW_TXT_AT(ADR,STR)")
-	pj.set_label(0x03906, "DISP_WR(INT ADR, INT DATA)")
-	pj.set_label(0x039b0, "SHOW_WORD(INT)")
-	pj.set_label(0x03c0a, "FREQ_CNT_SET_PERIOD(INT)")
-	pj.set_label(0x03c26, "FREQ_CNT_WAIT()")
-	pj.set_label(0x03c3a, "FREQ_CNT_10MHZ(INT)")
-	pj.set_label(0x06936, "REVISION")
-	pj.set_label(0x0693a, "MODEL")
-	pj.set_label(0x06a2c, "MSG_TXT")
-	pj.set_label(0x06ce0, "SHOW_TXT(STR)")
-	pj.set_label(0x06cf2, "SHOW_CRNL")
-	pj.set_label(0x06cfc, "SET_IF_LEDS(INT)")
-	pj.set_label(0x06d20, "SHOW_MSG")
-	pj.set_label(0x070be, "UPD_DETECTOR")
-	pj.set_label(0x07b4e, "FILL_DISPLAY")
-	pj.set_label(0x08164, "SHOW_CR[NL]")
-	pj.set_label(0x0940c, "EXEC(INT KEY)")
-	pj.set_label(0x0e39a, "VAR_HEAD")
-	pj.set_label(0x0ed54, "EXEC2(INT KEY)")
-	pj.set_label(0x0eddc, "SEARCH(NAMLEN.W, CHAIN.L, HASH.L, NAME.L)")
-	pj.set_label(0x0ee6a, "FIND_OLDCMD(INT)")
-	pj.set_label(0x0f72c, "NAME2TRACE")
-	pj.set_label(0x0a986, "CALIBRATING")
-	pj.set_label(0x0aa7a, "AUTOCAL")
-	pj.set_label(0x13092, "WHICH(PTR TABLE, STR KEY, INT N)")
-	pj.set_label(0x14158, "TRACE_MATH(LONG, INT, STR, STR, STR)")
-	pj.set_label(0x17dce, "SHOW_COMMA")
-	pj.set_label(0x17e9e, "PL_MOVE")
-	pj.set_label(0x17eac, "PL_LINE")
+	pj.m.set_label(0x00e9e, "ROMSUM")
+	pj.m.set_label(0x00ec0, "ROMTEST")
+	pj.m.set_label(0x01ae2, "BCD_FMT(BCD, PTR)")
+	pj.m.set_label(0x01b34, "BCD_ABS(BCD)")
+	pj.m.set_label(0x01b38, "BCD_NEG(BCD)")
+	pj.m.set_label(0x01be6, "BCD_CMP(R01,R23)")
+	pj.m.set_label(0x01bea, "BCD_CMP(R23,R01)")
+	pj.m.set_label(0x01c00, "stk_64")
+	pj.m.set_label(0x01c14, "rel_64")
+	pj.m.set_label(0x01c28, "abs_64")
+	pj.m.set_label(0x01c3c, "loc_64")
+	pj.m.set_label(0x01b48, "BCD_NEG8(&A0)")
+	pj.m.set_label(0x01b62, "BCD_NEG(D23)")
+	pj.m.set_label(0x01b72, "BCD_ADD8(&A0,&A1)")
+	pj.m.set_label(0x01c60, "BCD_ADD(D01, D23)")
+	pj.m.set_label(0x01c98, "BCD_SUBR(D23, D01(order?)")
+	pj.m.set_label(0x01c9c, "BCD_SUB(D01, D23(order?)")
+	pj.m.set_label(0x01cb0, "BCD_SUB8(&A0,&A1)")
+	pj.m.set_label(0x0214c, "BCD_MUL5(D01)")
+	pj.m.set_label(0x0217e, "BCD_MUL3(D01)")
+	pj.m.set_label(0x0218c, "BCD_MUL6(D01)")
+	pj.m.set_label(0x021be, "BCD_MUL8(D01)")
+	pj.m.set_label(0x021c0, "BCD_MUL4(D01)")
+	pj.m.set_label(0x021c4, "BCD_MUL2(D01)")
+	pj.m.set_label(0x021f6, "BCD_DIV2(D01)")
+	pj.m.set_label(0x02224, "BCD_LD(D0.W)")
+	pj.m.set_label(0x0222c, "BCD_LD(D0.L)")
+	pj.m.set_label(0x023ec, "FD_ABS(R2+R3)")
+	pj.m.set_label(0x0287e, "rel_32")
+	pj.m.set_label(0x02892, "abs_32")
+	pj.m.set_label(0x028a4, "loc_32")
+	pj.m.set_label(0x02f38, "SWITCH")
+	pj.m.set_label(0x0320e, "BZERO(PTR,INT)")
+	pj.m.set_label(0x033fc, "SHOW_CHAR")
+	pj.m.set_label(0x03412, "SHOW_SEMI")
+	pj.m.set_label(0x0341a, "SHOW_COMMA")
+	pj.m.set_label(0x03422, "SHOW_CRNL")
+	pj.m.set_label(0x03428, "SHOW_NL")
+	pj.m.set_label(0x03430, "SHOW_MINUS")
+	pj.m.set_label(0x03438, "SHOW_2CHAR")
+	pj.m.set_label(0x03498, "SHOW_INT")
+	pj.m.set_label(0x03932, "DISP_RD(INT ADR)")
+	pj.m.set_label(0x03958, "SHOW_TXT_AT(ADR,STR)")
+	pj.m.set_label(0x03906, "DISP_WR(INT ADR, INT DATA)")
+	pj.m.set_label(0x039b0, "SHOW_WORD(INT)")
+	pj.m.set_label(0x03c0a, "FREQ_CNT_SET_PERIOD(INT)")
+	pj.m.set_label(0x03c26, "FREQ_CNT_WAIT()")
+	pj.m.set_label(0x03c3a, "FREQ_CNT_10MHZ(INT)")
+	pj.m.set_label(0x06936, "REVISION")
+	pj.m.set_label(0x0693a, "MODEL")
+	pj.m.set_label(0x06a2c, "MSG_TXT")
+	pj.m.set_label(0x06ce0, "SHOW_TXT(STR)")
+	pj.m.set_label(0x06cf2, "SHOW_CRNL")
+	pj.m.set_label(0x06cfc, "SET_IF_LEDS(INT)")
+	pj.m.set_label(0x06d20, "SHOW_MSG")
+	pj.m.set_label(0x070be, "UPD_DETECTOR")
+	pj.m.set_label(0x07b4e, "FILL_DISPLAY")
+	pj.m.set_label(0x08164, "SHOW_CR[NL]")
+	pj.m.set_label(0x0940c, "EXEC(INT KEY)")
+	pj.m.set_label(0x0e39a, "VAR_HEAD")
+	pj.m.set_label(0x0ed54, "EXEC2(INT KEY)")
+	pj.m.set_label(0x0eddc, "SEARCH(NAMLEN.W, CHAIN.L, HASH.L, NAME.L)")
+	pj.m.set_label(0x0ee6a, "FIND_OLDCMD(INT)")
+	pj.m.set_label(0x0f72c, "NAME2TRACE")
+	pj.m.set_label(0x0a986, "CALIBRATING")
+	pj.m.set_label(0x0aa7a, "AUTOCAL")
+	pj.m.set_label(0x13092, "WHICH(PTR TABLE, STR KEY, INT N)")
+	pj.m.set_label(0x14158, "TRACE_MATH(LONG, INT, STR, STR, STR)")
+	pj.m.set_label(0x17dce, "SHOW_COMMA")
+	pj.m.set_label(0x17e9e, "PL_MOVE")
+	pj.m.set_label(0x17eac, "PL_LINE")
 
-	#pj.set_label(0x18d24, "MNEM")
-	#pj.set_label(0x195c4, "PARMTYPE")
-	#pj.set_label(0x196b6, "PRCADRS")
+	#pj.m.set_label(0x18d24, "MNEM")
+	#pj.m.set_label(0x195c4, "PARMTYPE")
+	#pj.m.set_label(0x196b6, "PRCADRS")
 
 
 	# 0xffff0005
@@ -955,14 +955,14 @@ def task(pj, cpu):
 	# 0xffff0027
 	# 0xffff0035
 
-	#pj.set_label(0xffff4000, "PIT_PGCR")
-	#pj.set_label(0xffff4002, "PIT_PSRR")
-	#pj.set_label(0xffff4004, "PIT_PADDR")
-	#pj.set_label(0xffff4006, "PIT_PBDDR")
-	#pj.set_label(0xffff4008, "PIT_PCDDR")
+	#pj.m.set_label(0xffff4000, "PIT_PGCR")
+	#pj.m.set_label(0xffff4002, "PIT_PSRR")
+	#pj.m.set_label(0xffff4004, "PIT_PADDR")
+	#pj.m.set_label(0xffff4006, "PIT_PBDDR")
+	#pj.m.set_label(0xffff4008, "PIT_PCDDR")
 
-	#pj.set_label(0xffff4010, "PIT_PADR")
-	#pj.set_label(0xffff4012, "PIT_PBDR")
+	#pj.m.set_label(0xffff4010, "PIT_PADR")
+	#pj.m.set_label(0xffff4012, "PIT_PBDR")
 
 	# 0xffff8000
 
@@ -978,7 +978,7 @@ def task(pj, cpu):
 	# 0xffffa6c6
 	# 0xffffa6ca
 	# 0xffffa6ce
-	pj.set_label(0xffffa6d2, "ram_var_hash")
+	pj.m.set_label(0xffffa6d2, "ram_var_hash")
 	# 0xffffa6ec
 	# 0xffffa6f0
 	# 0xffffa6f2
@@ -1029,12 +1029,12 @@ def task(pj, cpu):
 	# 0xffffaa28
 	# 0xffffaa29
 	# 0xffffaa2a
-	pj.set_label(0xffffaa2c, "ram_center_freq")
+	pj.m.set_label(0xffffaa2c, "ram_center_freq")
 	# 0xffffaa2d
-	pj.set_label(0xffffaa34, "ram_freq_span")
+	pj.m.set_label(0xffffaa34, "ram_freq_span")
 	# 0xffffaa38
-	pj.set_label(0xffffaa3c, "ram_rf_fp_leds")
-	pj.set_label(0xffffaa3e, "ram_if_fp_leds")
+	pj.m.set_label(0xffffaa3c, "ram_rf_fp_leds")
+	pj.m.set_label(0xffffaa3e, "ram_if_fp_leds")
 	# 0xffffaa3f
 	# 0xffffaa40	if_scale_gain copy
 	# 0xffffaa41
@@ -1105,7 +1105,7 @@ def task(pj, cpu):
 	# 0xffffaaf2
 	# 0xffffaaf4
 	# 0xffffaaf6
-	pj.set_label(0xffffaaf8, "ram_kbd_row")
+	pj.m.set_label(0xffffaaf8, "ram_kbd_row")
 	# 0xffffaafa
 	# 0xffffaafc
 	# 0xffffaafe
@@ -1136,7 +1136,7 @@ def task(pj, cpu):
 	# 0xffffabc8
 	# 0xffffabce
 	# 0xffffabd0
-	pj.set_label(0xffffabd2, "func_ptr+a6+a7")
+	pj.m.set_label(0xffffabd2, "func_ptr+a6+a7")
 	# 0xffffabd6
 	# 0xffffabda
 	# 0xffffabde
@@ -1194,8 +1194,8 @@ def task(pj, cpu):
 	# 0xffffbfdf
 	# 0xffffbfe0
 	# 0xffffbfe1
-	pj.set_label(0xffffbfe2, "ram_hpib_address")
-	pj.set_label(0xffffbfe3, "ram_not_hpib_address")
+	pj.m.set_label(0xffffbfe2, "ram_hpib_address")
+	pj.m.set_label(0xffffbfe3, "ram_not_hpib_address")
 	# 0xffffbfe4
 	# 0xffffbfe5
 	# 0xffffbfe6
@@ -1227,59 +1227,59 @@ def task(pj, cpu):
 
 	# BIO/BOTTOM/RF
 	###############
-	pj.set_label(0xffffc000, "rf_50vto_lo_dac")
-	pj.set_label(0xffffc002, "rf_50vto_hi_dac")
-	pj.set_label(0xffffc006, "rf_yig_dac")
-	pj.set_label(0xffffc008, "rf_scan_atten_vto")
-	pj.set_label(0xffffc00a, "rf_scantime")
-	pj.set_label(0xffffc00c, "rf_yig_lock_scan")
-	pj.set_label(0xffffc00e, "rf_scan_mode")
+	pj.m.set_label(0xffffc000, "rf_50vto_lo_dac")
+	pj.m.set_label(0xffffc002, "rf_50vto_hi_dac")
+	pj.m.set_label(0xffffc006, "rf_yig_dac")
+	pj.m.set_label(0xffffc008, "rf_scan_atten_vto")
+	pj.m.set_label(0xffffc00a, "rf_scantime")
+	pj.m.set_label(0xffffc00c, "rf_yig_lock_scan")
+	pj.m.set_label(0xffffc00e, "rf_scan_mode")
 
 	# A12
-	pj.set_label(0xffffc010, "rf_fp_leds")
-	pj.set_label(0xffffc012, "rf_kbd_row")
-	pj.set_label(0xffffc014, "rf_kbd_col")
-	pj.set_label(0xffffc016, "rf_rpg")
-	pj.set_label(0xffffc018, "rf_srq_resets")
-	pj.set_label(0xffffc01a, "rf_phase_lock")
-	pj.set_label(0xffffc01c, "rf_245_lock")
-	pj.set_label(0xffffc01e, "rf_attn")
+	pj.m.set_label(0xffffc010, "rf_fp_leds")
+	pj.m.set_label(0xffffc012, "rf_kbd_row")
+	pj.m.set_label(0xffffc014, "rf_kbd_col")
+	pj.m.set_label(0xffffc016, "rf_rpg")
+	pj.m.set_label(0xffffc018, "rf_srq_resets")
+	pj.m.set_label(0xffffc01a, "rf_phase_lock")
+	pj.m.set_label(0xffffc01c, "rf_245_lock")
+	pj.m.set_label(0xffffc01e, "rf_attn")
 
 	# A15
-	pj.set_label(0xffffc020, "dbus_test_0")
-	pj.set_label(0xffffc022, "dbus_test_2")
-	pj.set_label(0xffffc025, "dbus_test_5")
+	pj.m.set_label(0xffffc020, "dbus_test_0")
+	pj.m.set_label(0xffffc022, "dbus_test_2")
+	pj.m.set_label(0xffffc025, "dbus_test_5")
 
 	# A17
-	pj.set_label(0xffffc028, "rf_freqcnt_ctrl")
-	pj.set_label(0xffffc02a, "rf_freqcnt_msb")
-	pj.set_label(0xffffc02c, "rf_freqcnt_lsb")
+	pj.m.set_label(0xffffc028, "rf_freqcnt_ctrl")
+	pj.m.set_label(0xffffc02a, "rf_freqcnt_msb")
+	pj.m.set_label(0xffffc02c, "rf_freqcnt_lsb")
 
 	#
-	pj.set_label(0xffffc030, "rf_inputs_atten_20")
-	pj.set_label(0xffffc032, "rf_vunit_atten_30")
-	pj.set_label(0xffffc034, "rf_atten_40")
-	pj.set_label(0xffffc034, "rf_atten_50")
-	pj.set_label(0xffffc034, "rf_atten_60")
-	pj.set_label(0xffffc034, "rf_atten_70")
+	pj.m.set_label(0xffffc030, "rf_inputs_atten_20")
+	pj.m.set_label(0xffffc032, "rf_vunit_atten_30")
+	pj.m.set_label(0xffffc034, "rf_atten_40")
+	pj.m.set_label(0xffffc034, "rf_atten_50")
+	pj.m.set_label(0xffffc034, "rf_atten_60")
+	pj.m.set_label(0xffffc034, "rf_atten_70")
 
 	# TIO/TOP/IF
 	############
-	pj.set_label(0xffffc040, "display_address")
-	pj.set_label(0xffffc042, "display_rd_store")
-	pj.set_label(0xffffc044, "display_wr_store")
-	pj.set_label(0xffffc046, "display_wr_offset")
-	pj.set_label(0xffffc048, "display_control")
-	pj.set_label(0xffffc04a, "display_rd_scan")
-	pj.set_label(0xffffc04c, "display_wr_marker")
-	pj.set_label(0xffffc04e, "display_wr_scan")
+	pj.m.set_label(0xffffc040, "display_address")
+	pj.m.set_label(0xffffc042, "display_rd_store")
+	pj.m.set_label(0xffffc044, "display_wr_store")
+	pj.m.set_label(0xffffc046, "display_wr_offset")
+	pj.m.set_label(0xffffc048, "display_control")
+	pj.m.set_label(0xffffc04a, "display_rd_scan")
+	pj.m.set_label(0xffffc04c, "display_wr_marker")
+	pj.m.set_label(0xffffc04e, "display_wr_scan")
 
 	# SWEEP
-	pj.set_label(0xffffc064, "if_sweep_src_trig")
-	pj.set_label(0xffffc066, "if_sweep_time")
-	pj.set_label(0xffffc068, "if_scale_gain")
-	pj.set_label(0xffffc06a, "if_bw_fine")
-	pj.set_label(0xffffc06c, "if_fp_leds")
+	pj.m.set_label(0xffffc064, "if_sweep_src_trig")
+	pj.m.set_label(0xffffc066, "if_sweep_time")
+	pj.m.set_label(0xffffc068, "if_scale_gain")
+	pj.m.set_label(0xffffc06a, "if_bw_fine")
+	pj.m.set_label(0xffffc06c, "if_fp_leds")
 
 	# HPIB
 	######
@@ -1298,9 +1298,9 @@ def task(pj, cpu):
 	# 0xffffc0e0 ?
 
 	# HPIBSW
-	pj.set_label(0xffffc0e1, "adrsw_srq_display_ready")
+	pj.m.set_label(0xffffc0e1, "adrsw_srq_display_ready")
 
-	pj.set_label(0xffffc0e5, "latr_test")
+	pj.m.set_label(0xffffc0e5, "latr_test")
 
 	###############################################################
 

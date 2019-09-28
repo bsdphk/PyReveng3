@@ -161,7 +161,7 @@ class Decoder():
         Decode at adr and run with it.
         Complain if it fails.
         '''
-        y = pj.find(adr)
+        y = pj.m.find_lo(adr)
         if y:
             return y
         x = self.decode(pj, adr)

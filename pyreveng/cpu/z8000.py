@@ -858,15 +858,15 @@ class z8001(assy.Instree_disass):
         return y
 
     def vector(self, pj, a, n):
-        pj.set_label(a, n + "_RSV")
+        pj.m.set_label(a, n + "_RSV")
         data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
-        pj.set_label(a, n + "_PSW")
+        pj.m.set_label(a, n + "_PSW")
         data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         y = self.codeptr(pj, a)
         pj.todo(y.dst, self.disass)
-        pj.set_label(y.dst, n + "_VEC")
+        pj.m.set_label(y.dst, n + "_VEC")
         return y.dst
 
     def vectors(self, pj, adr=0,psap=0):

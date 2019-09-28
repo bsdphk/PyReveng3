@@ -300,14 +300,14 @@ class m68000_switch_ins(assy.Instree_ins):
 			raise assy.Invalid()
 
 		self.nm = "SWITCH_%x" % self.lo
-		pj.set_label(self.lo, self.nm)
+		pj.m.set_label(self.lo, self.nm)
 
 		self.wordtable(pj)
 		self.range(pj)
 		# raise assy.Invalid()
 		
 	def wordtable(self, pj):
-		pj.set_label(self.hi, self.nm + '_TAB')
+		pj.m.set_label(self.hi, self.nm + '_TAB')
 		hh = self.hi
 		for j in range(self.low, self.high + 1):
 			o = pj.m.bs16(hh) + self.hi
@@ -317,20 +317,20 @@ class m68000_switch_ins(assy.Instree_ins):
 
 	def range(self, pj):
 		if self.go_lo == self.go_hi:
-			pj.set_label(self.go_lo, self.nm + "_DEFAULT")
+			pj.m.set_label(self.go_lo, self.nm + "_DEFAULT")
 			pj.todo(self.go_lo, self.lang.disass)
 			return
 		if self.go_lo is not None:
-			pj.set_label(self.go_lo, self.nm + "_LOW")
+			pj.m.set_label(self.go_lo, self.nm + "_LOW")
 			pj.todo(self.go_lo, self.lang.disass)
 		if self.go_hi is not None:
-			pj.set_label(self.go_hi, self.nm + "_HIGH")
+			pj.m.set_label(self.go_hi, self.nm + "_HIGH")
 			pj.todo(self.go_hi, self.lang.disass)
 
 	def dst(self, pj, no, dst):
 		# XXX: Add flow
 		pj.todo(dst, self.lang.disass)
-		pj.set_label(dst, self.nm + "_CASE_%d" % no)
+		pj.m.set_label(dst, self.nm + "_CASE_%d" % no)
 
 def m68000_switches(disass):
 	disass.add_ins(switches, m68000_switch_ins)

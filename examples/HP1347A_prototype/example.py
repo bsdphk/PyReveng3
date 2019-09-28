@@ -228,7 +228,7 @@ class Scrtxt(data.Data):
 			l.append(t)
 
 		ll = l[0].replace(" ", "_")
-		pj.set_label(lo, "SCRTXT_" + ll)
+		pj.m.set_label(lo, "SCRTXT_" + ll)
 
 		super(Scrtxt, self).__init__(pj.m, lo, hi, "scrtxt")
 		self.fmt = f
@@ -281,7 +281,7 @@ def task(pj, cpu):
 			n += 2
 		for i in c:
 			c[i].sort()
-			pj.set_label(i, "CMD_" + "_".join(c[i]))
+			pj.m.set_label(i, "CMD_" + "_".join(c[i]))
 
 		for i in CMDS:
 			c = CMDS[i]
@@ -290,7 +290,7 @@ def task(pj, cpu):
 				continue
 			if c[1][0] == "?":
 				print(i, "CMD not documented (%s)" % c[1][1:])
-			pj.set_block_comment(c[0],
+			pj.m.set_block_comment(c[0],
 				" COMMAND " + i + " - " + c[1])
 
 	if True:
@@ -324,8 +324,8 @@ def task(pj, cpu):
 
 	if True:
 		# HP1345 testpatterns
-		pj.set_label(0xfbed, "IMG_PIKES_PEAK")
-		pj.set_label(0xfd41, "IMG_FOCUS")
+		pj.m.set_label(0xfbed, "IMG_PIKES_PEAK")
+		pj.m.set_label(0xfd41, "IMG_FOCUS")
 		for a0 in (0xfbed, 0xfd41):
 			a = a0
 			data.Const(pj.m, a, a + 2,
@@ -346,14 +346,14 @@ def task(pj, cpu):
 		# Special character handling
 		b = 0xf75b
 		c = 0xf778
-		pj.set_label(b, "CHR_TBL_KEY")
-		pj.set_label(c, "CHR_TBL_PTR")
+		pj.m.set_label(b, "CHR_TBL_KEY")
+		pj.m.set_label(c, "CHR_TBL_PTR")
 		data.Const(pj.m, b, c, fmt="0x%x")
 		a = c
 		while b < c:
 			p = pj.m.bu16(a)
 			y = data.Dataptr(pj.m, a, a + 2, p)
-			pj.set_label(p, "CHR_TBL_%02x" % pj.m[b])
+			pj.m.set_label(p, "CHR_TBL_%02x" % pj.m[b])
 			while True:
 				z = data.Const(pj.m, p, p + 2,
 				    func=pj.m.bu16, fmt="0x%x", size=2)
@@ -366,11 +366,11 @@ def task(pj, cpu):
 	# Stuff not accessed from anywhere
 
 	pj.todo(0xe5a1, cpu.disass)
-	pj.set_label(0xe5a1, "BOGO_TEST_ROM")
-	pj.set_block_comment(0xe5a1, "Unused ROM checksum code")
-	pj.set_block_comment(0xe5a1, "NB: Expects low rom at 0xc000")
+	pj.m.set_label(0xe5a1, "BOGO_TEST_ROM")
+	pj.m.set_block_comment(0xe5a1, "Unused ROM checksum code")
+	pj.m.set_block_comment(0xe5a1, "NB: Expects low rom at 0xc000")
 
-	pj.set_label(0xe5ed, "TEST_IMGRAM")
+	pj.m.set_label(0xe5ed, "TEST_IMGRAM")
 
 	pj.todo(0x1acf, cpu.disass)
 	pj.todo(0xebf0, cpu.disass)
@@ -378,60 +378,60 @@ def task(pj, cpu):
 	while pj.run():
 		pass
 
-	pj.set_label(0x0291, "A=GETCHAR()")
-	pj.set_label(0x02d0, "PUTCHAR(A)")
-	pj.set_label(0x0312, "Y=FIND_CMD()")
-	pj.set_label(0x0338, "CLEAR_SCREEN()")
-	pj.set_label(0x0395, "PUTSTR(',')")
-	pj.set_label(0x039a, "PUTSTR(CRNL)")
-	pj.set_label(0x03a9, "memcpy(Y,X+2,@X)")
-	pj.set_label(0x03b9, "GETNBR()")
-	pj.set_block_comment(0x003b9, "Outputs $0x0c - Term (not comma)")
-	pj.set_block_comment(0x003b9, "Outputs $0x12 - Error")
-	pj.set_block_comment(0x003b9, "Outputs $0x1a = 0")
-	pj.set_block_comment(0x003b9, "Outputs $0x1b - Digits")
-	pj.set_block_comment(0x003b9, "Outputs $0x1f - Decimals")
-	pj.set_block_comment(0x003b9, "Outputs $0x27 - Negative")
-	pj.set_block_comment(0x003b9, "Outputs $0x31+32 - Number")
-	pj.set_label(0x04a2, "PUTNBR(D)")
-	pj.set_label(0x0bcb, "ERR_1_UNKNOWN_INSN()")
-	pj.set_label(0x0bdc, "ERR_2_WRONG_NO_PARAMS()")
-	pj.set_label(0x0bed, "ERR_3_XXX_OUT_OF_RANGE()")
-	pj.set_label(0x0c2e, "ERR_4_ILLEGAL_CHAR()")
-	pj.set_label(0x0c41, "ERR_11_NO_PLOTTER_HANDSHAKE()")
-	pj.set_label(0x0c5d, "ERR_12_UNRECOG_PLOTTER()")
-	pj.set_label(0x0c79, "ERR_22_FILE_NOT_OPEN_ON()")
-	pj.set_label(0x0c8c, "ERR_24_NOT_IN_SCROLL_MODE()")
-	pj.set_label(0x0c9f, "ERR_25_MEMORY_NOT_INIT()")
-	pj.set_label(0x0cb2, "ERR_32_ALL_FILES_NOT_CONFIG()")
-	pj.set_label(0x0cc5, "ERR_33_NO_DATA_TO_SCROLL()")
-	pj.set_label(0x0cd8, "ERR_34_MEMORY_OVERFLOW_ON()")
-	pj.set_label(0x0ceb, "ERR_35_FILE_ALREADY_OPEN_ON()")
-	pj.set_label(0x0f4e, "SCR_MSG(X)")
-	pj.set_label(0x0f77, "X = PREP_SCREEN()")
-	pj.set_label(0x0f8e, "D = ADR2JMP(D)") 
-	pj.set_label(0x0fac, "DELAY(@U)")
-	pj.set_label(0x2800, "dip_switch")
-	pj.set_label(0xe77e, "CMD_nop")
-	pj.set_label(0xef76, "PLOT_pu_sp_lt()")
-	pj.set_label(0xef90, "PLOT_SELECT_PEN(A)")
-	pj.set_label(0xefb9, "PLOT_LINE_TYPE(A)")
-	pj.set_label(0xf004, "PUTSTR(X+1,@X)")
-	pj.set_label(0xf0c0, "SPEC_CHAR()")
-	pj.set_label(0xf56e, "plotter_table")
-	pj.set_label(0xf7fd, "DIAG_MODE()")
-	pj.set_label(0xf825, "DIAG_HPIB_BACK2BACK()")
-	pj.set_label(0xf895, "HPIB_RESET_CHIPS()")
-	pj.set_label(0xf8ae, "HPIB_IFC()")
-	pj.set_block_comment(0xf895, "Set reset, clear interrupt, Clr reset")
-	pj.set_label(0xfa9f, "DIAG_SIGNATURE_EPROM1()")
-	pj.set_label(0xfaaf, "DIAG_SIGNATURE_EPROM2()")
-	pj.set_label(0xfac2, "DIAG_SIGNATURE_3000()")
-	pj.set_label(0xfade, "DIAG_SIGNATURE_RAM()")
-	pj.set_label(0xfaee, "DIAG_RAM()")
-	pj.set_label(0xfb03, "DIAG_IMGRAM()")
-	pj.set_label(0xfbcb, "DIAG_PIKES_PEAK()")
-	pj.set_label(0xfbdc, "DIAG_FOCUS()")
+	pj.m.set_label(0x0291, "A=GETCHAR()")
+	pj.m.set_label(0x02d0, "PUTCHAR(A)")
+	pj.m.set_label(0x0312, "Y=FIND_CMD()")
+	pj.m.set_label(0x0338, "CLEAR_SCREEN()")
+	pj.m.set_label(0x0395, "PUTSTR(',')")
+	pj.m.set_label(0x039a, "PUTSTR(CRNL)")
+	pj.m.set_label(0x03a9, "memcpy(Y,X+2,@X)")
+	pj.m.set_label(0x03b9, "GETNBR()")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x0c - Term (not comma)")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x12 - Error")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x1a = 0")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x1b - Digits")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x1f - Decimals")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x27 - Negative")
+	pj.m.set_block_comment(0x003b9, "Outputs $0x31+32 - Number")
+	pj.m.set_label(0x04a2, "PUTNBR(D)")
+	pj.m.set_label(0x0bcb, "ERR_1_UNKNOWN_INSN()")
+	pj.m.set_label(0x0bdc, "ERR_2_WRONG_NO_PARAMS()")
+	pj.m.set_label(0x0bed, "ERR_3_XXX_OUT_OF_RANGE()")
+	pj.m.set_label(0x0c2e, "ERR_4_ILLEGAL_CHAR()")
+	pj.m.set_label(0x0c41, "ERR_11_NO_PLOTTER_HANDSHAKE()")
+	pj.m.set_label(0x0c5d, "ERR_12_UNRECOG_PLOTTER()")
+	pj.m.set_label(0x0c79, "ERR_22_FILE_NOT_OPEN_ON()")
+	pj.m.set_label(0x0c8c, "ERR_24_NOT_IN_SCROLL_MODE()")
+	pj.m.set_label(0x0c9f, "ERR_25_MEMORY_NOT_INIT()")
+	pj.m.set_label(0x0cb2, "ERR_32_ALL_FILES_NOT_CONFIG()")
+	pj.m.set_label(0x0cc5, "ERR_33_NO_DATA_TO_SCROLL()")
+	pj.m.set_label(0x0cd8, "ERR_34_MEMORY_OVERFLOW_ON()")
+	pj.m.set_label(0x0ceb, "ERR_35_FILE_ALREADY_OPEN_ON()")
+	pj.m.set_label(0x0f4e, "SCR_MSG(X)")
+	pj.m.set_label(0x0f77, "X = PREP_SCREEN()")
+	pj.m.set_label(0x0f8e, "D = ADR2JMP(D)") 
+	pj.m.set_label(0x0fac, "DELAY(@U)")
+	pj.m.set_label(0x2800, "dip_switch")
+	pj.m.set_label(0xe77e, "CMD_nop")
+	pj.m.set_label(0xef76, "PLOT_pu_sp_lt()")
+	pj.m.set_label(0xef90, "PLOT_SELECT_PEN(A)")
+	pj.m.set_label(0xefb9, "PLOT_LINE_TYPE(A)")
+	pj.m.set_label(0xf004, "PUTSTR(X+1,@X)")
+	pj.m.set_label(0xf0c0, "SPEC_CHAR()")
+	pj.m.set_label(0xf56e, "plotter_table")
+	pj.m.set_label(0xf7fd, "DIAG_MODE()")
+	pj.m.set_label(0xf825, "DIAG_HPIB_BACK2BACK()")
+	pj.m.set_label(0xf895, "HPIB_RESET_CHIPS()")
+	pj.m.set_label(0xf8ae, "HPIB_IFC()")
+	pj.m.set_block_comment(0xf895, "Set reset, clear interrupt, Clr reset")
+	pj.m.set_label(0xfa9f, "DIAG_SIGNATURE_EPROM1()")
+	pj.m.set_label(0xfaaf, "DIAG_SIGNATURE_EPROM2()")
+	pj.m.set_label(0xfac2, "DIAG_SIGNATURE_3000()")
+	pj.m.set_label(0xfade, "DIAG_SIGNATURE_RAM()")
+	pj.m.set_label(0xfaee, "DIAG_RAM()")
+	pj.m.set_label(0xfb03, "DIAG_IMGRAM()")
+	pj.m.set_label(0xfbcb, "DIAG_PIKES_PEAK()")
+	pj.m.set_label(0xfbdc, "DIAG_FOCUS()")
 
 if __name__ == '__main__':
 	pj, cx = setup()

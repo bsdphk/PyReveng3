@@ -307,7 +307,7 @@ class Instree_disass(code.Decoder):
             for i in self.flow_check:
                 i(pj, y)
             return y
-        raise Invalid(pj.afmt(adr) +
+        raise Invalid(pj.m.adr(adr) +
             " No matching " + self.name + " instruction")
 
 
@@ -352,7 +352,7 @@ class Arg_ref(Arg):
         self.obj = obj
 
     def __str__(self):
-        s = "(" + self.pj.render_adr(self.obj.lo) + ")"
+        s = "(" + self.pj.m.adr(self.obj.lo) + ")"
         a = self.obj.arg_render()
         if a != "":
             s += "=" + a
