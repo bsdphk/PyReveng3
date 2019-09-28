@@ -313,7 +313,7 @@ def task(pj, cpu):
 			cpu.disass(pj.m, a)
 
 	if False:
-		d = discover.Discover(pj, cpu)
+		d = discover.Discover(cpu)
 
 	return
 
@@ -322,5 +322,5 @@ def task(pj, cpu):
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	code.lcmt_flows(pj)
+	code.lcmt_flows(pj.m)
 	listing.Listing(pj, ncol=8, pil=False)

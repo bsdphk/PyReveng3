@@ -54,7 +54,7 @@ def task(pj, cx):
 	for a in range(12):
 		cx.codeptr(pj, 0xa000 + a * 2)
 
-	#discover.Discover(pj, cx)
+	#discover.Discover(cx)
 
 if __name__ == '__main__':
 	print(__file__)

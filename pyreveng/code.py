@@ -93,11 +93,11 @@ class Flow():
 
 #######################################################################
 
-def lcmt_flows(pj):
+def lcmt_flows(asp):
     '''
     Add line-comments for all flow records
     '''
-    for i in pj.m:
+    for i in asp:
         if isinstance(i, Code):
             for j in i.flow_out:
                 j.lcmt(i)

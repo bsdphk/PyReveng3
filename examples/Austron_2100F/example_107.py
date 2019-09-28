@@ -217,7 +217,7 @@ def task(pj, cx):
 			break
 
 	# Find some dead code
-	discover.Discover(pj, cx)
+	discover.Discover(cx)
 
 	pj.m.set_label(0xe7dd, "?mul2(ce_d2)")
 	pj.m.set_label(0xe7ae, "?mul10(ce_d2)")

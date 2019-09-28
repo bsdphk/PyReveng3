@@ -249,12 +249,12 @@ def task(pj, cpu):
 	# See 0x800039e0
 	data.Const(pj.m, 0x80003a2a, 0x80003a2a + 0x16)
 
-	d = discover.Discover(pj, cpu)
+	d = discover.Discover(cpu)
 
 #######################################################################
 
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)
-	code.lcmt_flows(pj)
+	code.lcmt_flows(pj.m)
 	listing.Listing(pj, ncol=8, pil=False)

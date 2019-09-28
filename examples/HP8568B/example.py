@@ -329,7 +329,6 @@ def task(pj, cpu):
 				asp.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
 
 	cpu.flow_check.append(flow_switch)
-	cpu.disass(pj.m, 0x2f38)
 
 	###############################################################
 
@@ -430,6 +429,56 @@ def task(pj, cpu):
 		n = 0x20 + r * 8 + c
 		keynos[n] = t
 
+	###############################################################
+
+	class oldcmd(data.Data):
+		def __init__(self, pj, lo, n):
+			super().__init__(pj.m, lo, lo + 2)
+			x,self.name,y = data.stringify(pj.m, self.lo, 2)
+
+			self.key = pj.m[0x194b2 + n]
+			self.imm = (pj.m[0x1951e + (n >> 3)] >> (n & 7)) & 1
+			if not self.imm:
+				self.svf1 = pj.m.bu16(0x1952c + self.key * 4)
+				self.svf2 = pj.m.bu16(0x1952c + self.key * 4 + 2)
+				if not self.svf2 in keynos:
+					keynos[self.svf2] = "CMD_" + self.name
+
+		def render(self):
+			t = ".OLDCMD\t"
+			t += "'" + self.name + "'"
+			t += " imm=%x" % self.imm
+			t += " key=%02x" % self.key
+			if self.imm and self.key in keynos:
+				t += " ('" + keynos[self.key] + "')"
+			if not self.imm:
+				t += " svf=0x%04x,0x%04x" % (self.svf1, self.svf2)
+				t += " xxx=%02x" % (self.svf1 & 0x1e)
+			return t
+
+	if True:
+		pj.m.set_label(0x193da, "OLDCMDS")
+		n = 0
+		for a in range(0x193da, 0x194b2, 2):
+			y = oldcmd(pj, a, n)
+			n += 1
+		# print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
+
+		pj.m.set_label(0x194b2, "KEYTAB")
+		for a in range(0x194b2, 0x1951e, 8):
+			y = data.Const(pj.m, a, min(a + 8, 0x1951e), fmt="0x%02x")
+		# print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
+
+		pj.m.set_label(0x1951e, "IMEDBITS")
+		for a in range(0x1951e, 0x1952c, 8):
+			y = data.Const(pj.m, a, min(a + 8, 0x1952c), fmt="0x%02x")
+		# print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
+
+		pj.m.set_label(0x1952c, "SFLGVAL")
+		for a in range(0x1952c, 0x195c4, 16):
+			y = data.Const(pj.m, a, min(a + 16, 0x195c4),
+			    "0x%08x", pj.m.bu32, 4)
+		# print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
 
 	###############################################################
 
@@ -475,6 +524,8 @@ def task(pj, cpu):
 
 		def funcidx(self):
 			return self.fi
+
+	###############################################################
 
 	class mnem(data.Data):
 		def __init__(self, pj, hi):
@@ -533,57 +584,6 @@ def task(pj, cpu):
 
 	###############################################################
 
-	class oldcmd(data.Data):
-		def __init__(self, pj, lo, n):
-			super().__init__(pj.m, lo, lo + 2)
-			x,self.name,y = data.stringify(pj.m, self.lo, 2)
-
-			self.key = pj.m[0x194b2 + n]
-			self.imm = (pj.m[0x1951e + (n >> 3)] >> (n & 7)) & 1
-			if not self.imm:
-				self.svf1 = pj.m.bu16(0x1952c + self.key * 4)
-				self.svf2 = pj.m.bu16(0x1952c + self.key * 4 + 2)
-				if not self.svf2 in keynos:
-					keynos[self.svf2] = "CMD_" + self.name
-
-		def render(self):
-			t = ".OLDCMD\t"
-			t += "'" + self.name + "'"
-			t += " imm=%x" % self.imm
-			t += " key=%02x" % self.key
-			if self.imm and self.key in keynos:
-				t += " ('" + keynos[self.key] + "')"
-			if not self.imm:
-				t += " svf=0x%04x,0x%04x" % (self.svf1, self.svf2)
-				t += " xxx=%02x" % (self.svf1 & 0x1e)
-			return t
-
-	if True:
-		pj.m.set_label(0x193da, "OLDCMDS")
-		n = 0
-		for a in range(0x193da, 0x194b2, 2):
-			y = oldcmd(pj, a, n)
-			n += 1
-		# print("OLDCMDS %d" % ((0x194b2-0x193da)/2))
-
-		pj.m.set_label(0x194b2, "KEYTAB")
-		for a in range(0x194b2, 0x1951e, 8):
-			y = data.Const(pj.m, a, min(a + 8, 0x1951e), fmt="0x%02x")
-		# print("KEYTAB %d" % ((0x1951e-0x194b2)/1))
-
-		pj.m.set_label(0x1951e, "IMEDBITS")
-		for a in range(0x1951e, 0x1952c, 8):
-			y = data.Const(pj.m, a, min(a + 8, 0x1952c), fmt="0x%02x")
-		# print("IMEDBITS %d" % ((0x1952c-0x1951e)/1))
-
-		pj.m.set_label(0x1952c, "SFLGVAL")
-		for a in range(0x1952c, 0x195c4, 16):
-			y = data.Const(pj.m, a, min(a + 16, 0x195c4),
-			    "0x%08x", pj.m.bu32, 4)
-		# print("SFLGVAL %d" % ((0x195c4-0x1952c)/2))
-
-	###############################################################
-
 	switches[0x09ae8] = {}
 	switches[0x09d78] = {}
 	switches[0x0a5de] = {}
@@ -630,10 +630,13 @@ def task(pj, cpu):
 			for a in range(b, e, 8):
 				data_double(pj, a)
 
+
 	###############################################################
 
 	if True:
 		cpu.vectors(hi = 0xc0)
+
+		cpu.disass(pj.m, 0x2f38)
 
 		#######################################################
 

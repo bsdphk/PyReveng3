@@ -42,8 +42,7 @@ Things to do:
 from pyreveng import mem, assy, code
 
 class Discover():
-	def __init__(self, pj, cx):
-		self.pj = pj
+	def __init__(self, cx):
 		self.cx = cx
 
 		self.build_all()
@@ -69,7 +68,7 @@ class Discover():
 		self.trust = dict()
 		self.prob = dict()
 
-		for i in self.pj.m:
+		for i in self.cx.m:
 			if i.tag == self.cx.name:
 				self.code[i.lo] = i
 				self.trust[i.lo] = 10
@@ -77,10 +76,10 @@ class Discover():
 		print("Known instructions:", len(self.code))
 
 		n = 0
-		for lx, hx in self.pj.m.gaps():
+		for lx, hx in self.cx.m.gaps():
 			for adr in range(lx, hx):
 				try:
-					x = self.cx.decode(self.pj.m, adr)
+					x = self.cx.decode(self.cx.m, adr)
 				except code.Invalid:
 					continue
 				except mem.MemError:
@@ -89,9 +88,9 @@ class Discover():
 					continue
 				assert x is not None
 				for a in range(x.lo + 1, x.hi):
-					if self.pj.m.get_labels(a):
+					if self.cx.m.get_labels(a):
 						break
-					if self.pj.m.get_block_comments(a):
+					if self.cx.m.get_block_comments(a):
 						break
 				else:
 					self.code[adr] = x
@@ -242,6 +241,6 @@ class Discover():
 			if self.trust[i] > 0 and self.trust[i] < 10:
 				c = self.code[i]
 				c.lcmt += "<discover>\n"
-				c.commit(self.pj.m)
+				c.commit(self.cx.m)
 				n += 1
 		print("Committed", n)

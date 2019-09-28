@@ -66,5 +66,5 @@ def task(pj, cx):
 if __name__ == '__main__':
     pj, cx = setup()
     task(pj, cx)
-    code.lcmt_flows(pj)
+    code.lcmt_flows(pj.m)
     listing.Listing(pj, ncol=8)

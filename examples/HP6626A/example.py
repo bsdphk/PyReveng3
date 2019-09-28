@@ -607,7 +607,7 @@ def task(pj, cpu):
 		j.lcmt += "Error: " + err[y] + "\n"
 
 	#############
-	# discover.Discover(pj, cpu)
+	# discover.Discover(cpu)
 
 if __name__ == '__main__':
 	pj, cx = setup()

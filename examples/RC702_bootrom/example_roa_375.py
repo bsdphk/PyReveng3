@@ -66,7 +66,7 @@ def task(pj, cx):
 	for a in range(16):
 		cx.codeptr(pj, 0x7300 + a * 2)
 
-	discover.Discover(pj, cx)
+	discover.Discover(cx)
 
 	pj.m.set_label(0x7068, "memcpy(BC, DE,  L)")
 

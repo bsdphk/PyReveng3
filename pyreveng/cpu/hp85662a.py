@@ -32,39 +32,38 @@
 from pyreveng import instree, assy
 
 hp85662a_instructions = """
-DSPJMP	dst		|?      |0 1 0|?|0 0 0|?|1 0 1 1| dst				|
-DSPJSB	dst		|?      |0 1 0|?|1 0 0|?|1 0 1 1| dst				|
-DSPRET	-		|?      |0 1 0|?|1 1 0|?|1 0 1 1|
-DSPSKC	-		|?      |0 1 0|?    |0|?|0 0 1 1|
-DSPSKP	-		|?      |0 1 0|?    |1|?|0 0 0 0|
-DSPDSZ	-		|?      |0 1 0|?|0 1 0|?|1 0 1 1|
-DSPEND	-		|?      |0 1 0|?          |1|?  |
-DSPLDC	dst		|?	|0 1 1 0| dst		|
-DSPTHO	-		|?	|0 1 1 1| ?		|
-DSPVEC	V,b,i,e,c,d	|?      |0 1 0|b|i|e|0|c|d|0|1 0|
-DSPLBL	L,b,i,e,c,d	|?      |0 1 0|b|i|e|0|c|d|0|0 1|
-DSPGRA	G,b,i,e,c,d	|?      |0 1 0|b|i|e|0|c|d|0|0 0|
+DSPJMP	dst		|0 0 0 0|0 1 0|?|0 0 0|?|1 0 1 1| dst				|
+DSPJSB	dst		|0 0 0 0|0 1 0|?|1 0 0|?|1 0 1 1| dst				|
+DSPRET	-		|0 0 0 0|0 1 0|?|1 1 0|?|1 0 1 1|
+DSPSKC	-		|0 0 0 0|0 1 0|?    |0|?|0 0 1 1|
+DSPSKP	-		|0 0 0 0|0 1 0|?    |1|?|0 0 0 0|
+DSPDSZ	-		|0 0 0 0|0 1 0|?|0 1 0|?|1 0 1 1|
+DSPEND	-		|0 0 0 0|0 1 0|?          |1|?  |
+DSPLDC	dst		|0 0 0 0|0 1 1 0| dst		|
+DSPTHO	-		|0 0 0 0|0 1 1 1| ?		|
+DSPVEC	V,b,i,e,c,d	|0 0 0 0|0 1 0|b|i|e|0|c|d|0|1 0|
+DSPLBL	L,b,i,e,c,d	|0 0 0 0|0 1 0|b|i|e|0|c|d|0|0 1|
+DSPGRA	G,b,i,e,c,d	|0 0 0 0|0 1 0|b|i|e|0|c|d|0|0 0|
 """
 
 hp85662a_c_instructions = """
-DSPX	-		|?				|
+DSPX	-		|0 0 0 0| ?			|
 """
 
 hp85662a_v_instructions = """
-DSPMOVE	R		|?	|R|0| X			|?	|1|0| Y			|
-DSPLINE	R		|?	|R|0| X			|?	|0|0| Y			|
+DSPMOVE	R		|0 0 0 0|R|0| X			|?	|1|0| Y			|
+DSPLINE	R		|0 0 0 0|R|0| X			|?	|0|0| Y			|
 """
 
 hp85662a_l_instructions = """
-DSPCHR	C		|?		| chr		|
+DSPCHR	C		|0 0 0 0|	 chr		|
 """
 
 hp85662a_g_instructions = """
-DSPG	-		|?				|
+DSPG	-		|0 0 0 0| ?			|
 """
 
 class hp85662a_ins(assy.Instree_ins):
-	pass
 
 	def assy_dst(self):
 		return "#0x%04x" % self['dst']
@@ -151,11 +150,3 @@ class hp85662a(assy.Instree_disass):
 		self.itv.load_string(hp85662a_v_instructions, hp85662a_ins)
 
 		self.it = self.itc
-
-		self.amask_ = 0xfff
-
-	def set_adr_mask(self, a):
-		self.amask = a
-
-	def vectors(self, pj):
-		return
