@@ -276,3 +276,8 @@ def Listing(aspace, fn, **kwargs):
         fo.write(sep)
         Seg_Listing(aspace, fo, seg, low, high, **kwargs)
         sep = "\n" + "-" * 80 + "\n\n"
+
+def Example(func):
+    nm, ms = func()
+    for n, m in enumerate(ms):
+        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), ncol=3)

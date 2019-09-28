@@ -178,7 +178,7 @@ class MemMapper(AddressSpace):
         if offset is None:
             offset = 0
         if hi is None:
-            hi = lo + (mem.hi - mem.lo)
+            hi = lo + mem.hi - offset
         assert hi > lo
         self.seglist.append([lo, hi, offset, mem])
         self.mapping.append([lo, hi, offset, mem])

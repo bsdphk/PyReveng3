@@ -27,53 +27,47 @@
 '''Regnecentralen Piccolo - RC702 boot EPROM
 '''
 
-import os
-from pyreveng import job, mem, listing, code, discover, data
+from pyreveng import mem, listing, discover, data
 import pyreveng.cpu.z80 as z80
 
-def setup():
-	cx = z80.z80()
-	m = mem.stackup(files=("EPROM_ROA_375.bin",), nextto=__file__)
-	cx.m.map(m, 0, 0x68)
-	cx.m.map(m, 0x7000, offset = 0x69)
-	pj = job.Job(cx.m, "RC702_bootrom_roa_375")
-	return pj, cx
+NAME = "RC702_bootrom_roa_375"
 
-def task(pj, cx):
+def example():
+    '''A pretty vanilla example'''
+    cpu = z80.z80()
+    eprom = mem.stackup(files=("EPROM_ROA_375.bin",), nextto=__file__)
+    cpu.m.map(eprom, 0, 0x69)
+    cpu.m.map(eprom, 0x7000, offset=0x69)
 
-	data.Txt(pj.m, 0x7071, 0x7071 + 0x6, label=False)
-	data.Txt(pj.m, 0x7077, 0x7077 + 0x6, label=False)
-	data.Txt(pj.m, 0x707d, 0x707d + 0x15, label=False)
-	data.Txt(pj.m, 0x7092, 0x7092 + 0x1e, label=False)
-	data.Txt(pj.m, 0x70b0, 0x70b0 + 0x10, label=False)
-	data.Txt(pj.m, 0x70c3, 0x70c3 + 0x5, label=False)
-	data.Txt(pj.m, 0x70c8, 0x70c8 + 0x5, label=False)
-	data.Txt(pj.m, 0x73f0, 0x73f0 + 0x12, label=False)
+    data.Txt(cpu.m, 0x7071, 0x7071 + 0x6, label=False)
+    data.Txt(cpu.m, 0x7077, 0x7077 + 0x6, label=False)
+    data.Txt(cpu.m, 0x707d, 0x707d + 0x15, label=False)
+    data.Txt(cpu.m, 0x7092, 0x7092 + 0x1e, label=False)
+    data.Txt(cpu.m, 0x70b0, 0x70b0 + 0x10, label=False)
+    data.Txt(cpu.m, 0x70c3, 0x70c3 + 0x5, label=False)
+    data.Txt(cpu.m, 0x70c8, 0x70c8 + 0x5, label=False)
+    data.Txt(cpu.m, 0x73f0, 0x73f0 + 0x12, label=False)
 
-	cx.disass(0x0000)
+    cpu.disass(0x0000)
 
-	# 0x70e5
-	cx.disass(0x0027)
+    # 0x70e5
+    cpu.disass(0x0027)
 
-	cx.disass(0x0066)
+    cpu.disass(0x0066)
 
-	cx.disass(0x70d0)
+    cpu.disass(0x70d0)
 
-	cx.disass(0x7322)
-	cx.disass(0x7615)
+    cpu.disass(0x7322)
+    cpu.disass(0x7615)
 
-	# Interrupt vector table
-	for a in range(16):
-		cx.codeptr(0x7300 + a * 2)
+    # Interrupt vector table
+    for a in range(16):
+        cpu.codeptr(0x7300 + a * 2)
 
-	discover.Discover(cx)
+    discover.Discover(cpu)
 
-	pj.m.set_label(0x7068, "memcpy(BC, DE,  L)")
-
+    cpu.m.set_label(0x7068, "memcpy(BC, DE,  L)")
+    return NAME, (cpu.m,)
 
 if __name__ == '__main__':
-	print(__file__)
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj, ncol = 3)
-
+    listing.Example(example)

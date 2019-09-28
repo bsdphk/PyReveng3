@@ -35,42 +35,51 @@ import cProfile
 
 l = []
 if len(sys.argv) == 1:
-	l += glob.glob("*/example*.py")
+    l += glob.glob("*/example*.py")
 else:
-	for i in sys.argv[1:]:
-		if i[:2] == "./":
-			i = i[2:]
-		if os.path.isdir(i):
-			l += glob.glob(i + "/example*.py")
-		else:
-			l += glob.glob(i)
+    for i in sys.argv[1:]:
+        if i[:2] == "./":
+            i = i[2:]
+        if os.path.isdir(i):
+            l += glob.glob(i + "/example*.py")
+        else:
+            l += glob.glob(i)
 
 try:
-	os.mkdir("_output")
+    os.mkdir("_output")
 except:
-	pass
+    pass
 
 l.sort()
 
 def one_example(dir, example):
-	sys.path.append(dir)
-	y = importlib.import_module(dir + "." + example)
-	sys.path.pop(-1)
-	pj, cx = y.setup()
-	# return
-	y.task(pj, cx)
-	listing.Listing(pj.m, ncol = 8, 
-			fn = "_output/" + pj.name + ".asm", pil=False)
-	listing.Listing(pj.m, ncol = 8,
-			fn = "_output/" + pj.name + ".pil", pil=True)
-	sys.stdout.flush()
+    sys.path.append(dir)
+    y = importlib.import_module(dir + "." + example)
+    sys.path.pop(-1)
+    if not hasattr(y, "example"):
+        pj, cx = y.setup()
+        y.task(pj, cx)
+        fn = "_output/" + pj.name
+        listing.Listing(pj.m, ncol = 8, fn = fn + ".asm", pil=False)
+        listing.Listing(pj.m, ncol = 8, fn = fn + ".pil", pil=True)
+    else:
+        nm, ms = y.example()
+        for i,j in enumerate(ms):
+            print(i, j)
+            if i:
+                fn = "_output/" + nm + ".%d" % i
+            else:
+                fn = "_output/" + nm
+            listing.Listing(j, ncol = 8, fn = fn + ".asm", pil=False)
+            listing.Listing(j, ncol = 8, fn = fn + ".pil", pil=True)
+    sys.stdout.flush()
 
 def all_examples():
-	for i in l:
-		j = i.split("/")
-		k = j[1].replace(".py", "")
-		print(j[0], k)
-		one_example(j[0], k)
+    for i in l:
+        j = i.split("/")
+        k = j[1].replace(".py", "")
+        print(j[0], k)
+        one_example(j[0], k)
 
 #cProfile.run("all_examples()", sort=1)
 all_examples()
