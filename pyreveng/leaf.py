@@ -61,4 +61,5 @@ class Link(Leaf):
         self.link = link
 
     def render(self):
+        self.compact = self.link.compact
         return self.link.render()

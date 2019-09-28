@@ -266,7 +266,7 @@ class Seg_Listing():
                     t += "\t" * ((self.pil_col - l) // 8)
                 t += "| " + py + "\t"
 
-            self.fo.write(t + "\n")
+            self.fo.write(t.rstrip() + "\n")
 
 def Listing(aspace, fn, **kwargs):
     print("Listing into", fn)
@@ -276,8 +276,9 @@ def Listing(aspace, fn, **kwargs):
         fo.write(sep)
         Seg_Listing(aspace, fo, seg, low, high, **kwargs)
         sep = "\n" + "-" * 80 + "\n\n"
+        fo.flush()
 
-def Example(func):
+def Example(func, ncol=8):
     nm, ms = func()
     for n, m in enumerate(ms):
-        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), ncol=3)
+        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), ncol=ncol)

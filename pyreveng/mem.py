@@ -212,6 +212,10 @@ class MemMapper(AddressSpace):
         ms, sa = self.xlat(adr)
         return ms[sa]
 
+    def __setitem__(self, adr, dat):
+        ms, sa = self.xlat(adr)
+        ms[sa] = dat
+
     def segments(self):
         for low, high, _offset, mem in sorted(self.seglist):
             yield mem, low, high
