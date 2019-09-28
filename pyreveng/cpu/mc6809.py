@@ -459,7 +459,7 @@ class mc6809_ins(assy.Instree_ins):
 		if mm == "D":
 			self.hi += 1
 			self.dstadr = pj.m.bu16(self.hi - 2)
-			return assy.Arg_dst(pj, self.dstadr)
+			return assy.Arg_dst(pj.m, self.dstadr)
 
 		assert mm == "C"
 
@@ -560,19 +560,19 @@ class mc6809_ins(assy.Instree_ins):
 
 	def assy_I(self, pj):
 		self.dstadr = (self['I1'] << 8) | self['I2']
-		return assy.Arg_dst(pj, self.dstadr, "#")
+		return assy.Arg_dst(pj.m, self.dstadr, "#")
 
 	def assy_r(self, pj):
 		a = self['r']
 		if a & 0x80:
 			a += 0xff00
 		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_R(self, pj):
 		a = self['R1'] << 8 | self['R2']
 		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_s(self, pj):
 		# XXX: if PULL PC fix flow record

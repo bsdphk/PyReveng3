@@ -167,7 +167,7 @@ class nova_ins(assy.Instree_ins):
             return "0x%x,%d" % (d, i)
         if not self['i']:
             self.dstadr = t
-        return assy.Arg_dst(pj, t)
+        return assy.Arg_dst(pj.m, t)
 
     def assy_db(self, pj):
         r = self.assy_da(pj)

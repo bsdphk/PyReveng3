@@ -526,7 +526,7 @@ class Tms9900_ins(assy.Instree_ins):
             try:
                 w = pj.m.bu16(v)
             except:
-                return assy.Arg_dst(pj, v, "@")
+                return assy.Arg_dst(pj.m, v, "@")
 
             if self.mne[-1] == "b":
                 c = data.Const(pj.m, v, v + 1)
@@ -559,7 +559,7 @@ class Tms9900_ins(assy.Instree_ins):
         a = self['ptr']
         self.cache['blwp2'] = pj.m.bu16(a + 2)
         self.dstadr = pj.m.bu16(a+2)
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_c(self, pj):
         x = self['c']
@@ -567,7 +567,7 @@ class Tms9900_ins(assy.Instree_ins):
             x = 16
         if x <= 8:
             self.mne += "b"
-        return assy.Arg_imm(pj, x)
+        return assy.Arg_imm(x)
 
     def assy_cru(self, pj):
         i = self['cru']
@@ -580,13 +580,13 @@ class Tms9900_ins(assy.Instree_ins):
 
     def assy_da(self, pj):
         self.dstadr = self['da']
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_do(self, pj):
         return self.arg_o(pj, 'd')
 
     def assy_i(self, pj):
-        return assy.Arg_imm(pj, self['iop'], 16)
+        return assy.Arg_imm(self['iop'], 16)
 
     def assy_so(self, pj):
         return self.arg_o(pj, 's')
@@ -596,7 +596,7 @@ class Tms9900_ins(assy.Instree_ins):
         if i & 0x80:
             i -= 256
         self.dstadr = self.hi + i * 2
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_sc(self, pj):
         if self['c'] == 0:

@@ -121,7 +121,7 @@ class Instree_ins(Assy):
 
     def arg(self, pj, arg):
         if arg in self.lang.verbatim:
-            self.oper.append(Arg_verbatim(pj, arg))
+            self.oper.append(Arg_verbatim(arg))
             return
 
         if arg == "-":
@@ -129,7 +129,7 @@ class Instree_ins(Assy):
 
         if arg == "?":
             for i in self.lim:
-                self.oper.append(Arg_verbatim(pj, str(i.flds)))
+                self.oper.append(Arg_verbatim(str(i.flds)))
             return
 
         x = None
@@ -149,7 +149,7 @@ class Instree_ins(Assy):
         if not isinstance(x, str):
             x = x(pj)
         if isinstance(x, str):
-            x = Arg_verbatim(pj, x)
+            x = Arg_verbatim(x)
         if x is None:
             return
         if isinstance(x, list):
@@ -157,7 +157,7 @@ class Instree_ins(Assy):
                 if isinstance(i, Arg):
                     self.oper.append(i)
                 elif isinstance(i, str):
-                    self.oper.append(Arg_verbatim(pj, i))
+                    self.oper.append(Arg_verbatim(i))
                 else:
                     print(self)
                     print(self.lim)
@@ -314,53 +314,50 @@ class Instree_disass(code.Decoder):
 #######################################################################
 
 class Arg():
-    def __init__(self, pj):
-        self.pj = pj
 
     def render(self):
         return str(self)
 
 class Arg_verbatim(Arg):
-    def __init__(self, pj, txt):
-        super().__init__(pj)
+    def __init__(self, txt):
+        super().__init__()
         self.txt = txt
 
     def __str__(self):
         return self.txt
 
 class Arg_dst(Arg):
-    def __init__(self, pj, dst, pfx="", sfx="", aspace=None):
-        super().__init__(pj)
-        if aspace is None:
-            aspace = pj.m
+    def __init__(self, asp, dst, pfx="", sfx=""):
+        super().__init__()
         self.dst = dst
-        self.aspace = aspace
+        self.asp = asp
         self.pfx = pfx
         self.sfx = sfx
 
     def __str__(self):
         if self.dst is None:
             return self.pfx + "0x?" + self.sfx
-        l = self.aspace.get_labels(self.dst)
+        l = self.asp.get_labels(self.dst)
         if l:
             return self.pfx + "%s" % l[0] + self.sfx
-        return self.pfx + self.aspace.adr(self.dst) + self.sfx
+        return self.pfx + self.asp.adr(self.dst) + self.sfx
 
 class Arg_ref(Arg):
     def __init__(self, pj, obj):
-        super().__init__(pj)
+        super().__init__()
         self.obj = obj
+        self.aspace = pj.m
 
     def __str__(self):
-        s = "(" + self.pj.m.adr(self.obj.lo) + ")"
+        s = "(" + self.aspace.adr(self.obj.lo) + ")"
         a = self.obj.arg_render()
         if a != "":
             s += "=" + a
         return s
 
 class Arg_imm(Arg):
-    def __init__(self, pj, val, wid=0):
-        super().__init__(pj)
+    def __init__(self, val, wid=0):
+        super().__init__()
         self.val = val
         self.wid = wid
         assert wid & 3 == 0

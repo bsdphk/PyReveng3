@@ -191,22 +191,22 @@ class mos6500_ins(assy.Instree_ins):
     def assy_Abs(self, pj):
         self.dstadr = pj.m.lu16(self.hi)
         self.hi += 2   
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_Absx(self, pj):
         d = pj.m.lu16(self.hi)
         self.hi += 2   
         return [
-            assy.Arg_dst(pj, d),
-            assy.Arg_verbatim(pj, "X"),
+            assy.Arg_dst(pj.m, d),
+            assy.Arg_verbatim("X"),
         ]
 
     def assy_Absy(self, pj):
         d = pj.m.lu16(self.hi)
         self.hi += 2   
         return [
-            assy.Arg_dst(pj, d),
-            assy.Arg_verbatim(pj, "Y"),
+            assy.Arg_dst(pj.m, d),
+            assy.Arg_verbatim("Y"),
         ]
 
     def assy_Ind(self, pj):
@@ -218,16 +218,16 @@ class mos6500_ins(assy.Instree_ins):
         d = pj.m[self.hi]
         self.hi += 1
         return [
-            assy.Arg_dst(pj, d),
-            assy.Arg_verbatim(pj, "X"),
+            assy.Arg_dst(pj.m, d),
+            assy.Arg_verbatim("X"),
         ]
 
     def assy_Indy(self, pj):
         d = pj.m[self.hi]
         self.hi += 1   
         return [
-            assy.Arg_dst(pj, d),
-            assy.Arg_verbatim(pj, "Y"),
+            assy.Arg_dst(pj.m, d),
+            assy.Arg_verbatim("Y"),
         ]
 
     def assy_Imm(self, pj):
@@ -238,21 +238,21 @@ class mos6500_ins(assy.Instree_ins):
     def assy_Pz(self, pj):
         self.dstadr = pj.m[self.hi]
         self.hi += 1   
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_Pzx(self, pj):
         d = pj.m[self.hi]
         self.hi += 1   
         return [
-            assy.Arg_dst(pj, d),
-            assy.Arg_verbatim(pj, "X"),
+            assy.Arg_dst(pj.m, d),
+            assy.Arg_verbatim("X"),
         ]
 
     def assy_Rel(self, pj):
         v = pj.m.s8(self.hi)
         self.hi += 1
         self.dstadr = self.hi + v
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
   
 
 class mos6500(assy.Instree_disass):

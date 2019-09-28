@@ -701,19 +701,19 @@ class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 		if imm32 & 0x100:
 			imm32 |= 0xfffffe00
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Dimm8(self, pj):
 		imm32 = self['imm11'] << 2
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Dst11(self, pj):
 		imm32 = self['imm11'] << 1
 		if imm32 & 0x1000:
 			imm32 |= 0xffffe000
 		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Dst1011(self, pj):
 		i1 = not (self['j'] ^ self['s'])
@@ -730,11 +730,11 @@ class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 		imm32 |= self['imm11']
 		imm32 <<= 1
 		self.dstadr = (self.hi + imm32) & 0xffffffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Rel8(self, pj):
 		self.dstadr = (self.hi + 2 + (self['imm8'] << 2)) & 0xffffffff
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Imm3(self, pj):
 		return "#0x%x" % self['imm3']

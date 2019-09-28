@@ -207,19 +207,19 @@ class z80_ins(assy.Instree_ins):
         if e & 0x80:
             e -= 256
         self.dstadr += e
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_nn(self, pj):
         self.dstadr = (self['n2'] << 8) | self['n1']
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_t(self, pj):
         self.dstadr = self['t'] << 3
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_inn(self, pj):
         self.dstadr = (self['n2'] << 8) | self['n1']
-        return assy.Arg_dst(pj, self.dstadr, "(", ")")
+        return assy.Arg_dst(pj.m, self.dstadr, "(", ")")
 
     def assy_dd(self, pj):
         return ["BC", "DE", self.idx, "SP"][self['dd']]
@@ -240,13 +240,13 @@ class z80_ins(assy.Instree_ins):
         return self.cc
 
     def assy_b(self, pj):
-        return assy.Arg_imm(pj, self['b'], 8)
+        return assy.Arg_imm(self['b'], 8)
 
     def assy_n(self, pj):
-        return assy.Arg_imm(pj, self['n'], 8)
+        return assy.Arg_imm(self['n'], 8)
 
     def assy_io(self, pj):
-        return assy.Arg_imm(pj, self['io'], 8)
+        return assy.Arg_imm(self['io'], 8)
 
     def assy_iIX(self, pj):
         self.idx = "IX"

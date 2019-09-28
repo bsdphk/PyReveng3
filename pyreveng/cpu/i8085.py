@@ -501,14 +501,14 @@ class i8085_ins(assy.Instree_ins):
     def assy_n(self, pj):
         self.dstadr = 8 * self['n']
         return "#%d" % self['n']
-        # return assy.Arg_dst(pj, self.dstadr)
+        # return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_I(self, pj):
         return "#0x%02x" % self['imm']
 
     def assy_a(self, pj):
         self.dstadr = self['hi'] << 8 | self['lo']
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def pilmacro_RD(self):
         return "%%%s" % "BCDEHL-A"[self['ddd']]

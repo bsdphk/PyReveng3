@@ -144,12 +144,12 @@ class arg_E(assy.Arg_dst):
 		if ins.mne[:2] == "LD" and u >= pj.m.lo and u < pj.m.hi:
 			v = pj.m.bu16(u)
 			ins.dstadr = v
-			super(arg_E, self).__init__(pj, ins.dstadr, "#")
+			super().__init__(pj.m, ins.dstadr, "#")
 			pj.cc_locs.add(u)
 			pj.cc_locs.add(u + 1)
 		else:
 			ins.dstadr = u
-			super(arg_E, self).__init__(pj, ins.dstadr, "")
+			super().__init__(pj.m, ins.dstadr, "")
 
 class mc6809a(mc6809.mc6809):
 	def __init__(self):

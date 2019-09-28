@@ -281,7 +281,7 @@ def task(pj, cpu):
 				ins.hi += 2
 			else:
 				l.append(i)
-		ins.oper.append(assy.Arg_verbatim(pj, "(" + ",".join(l) + ")"))
+		ins.oper.append(assy.Arg_verbatim("(" + ",".join(l) + ")"))
 		ins.add_flow(pj, True, True, ins.hi)
 
 	cpu.flow_check.append(flow_post_arg)

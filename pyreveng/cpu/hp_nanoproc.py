@@ -94,7 +94,7 @@ class hp_nanoproc_ins(assy.Instree_ins):
 	def assy_adrl(self, pj):
 		self.dstadr = (self.lo & 0xf800)
 		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_reg(self, pj):
 		return self.lang.reg[self['reg']]
@@ -153,7 +153,7 @@ class hp_nanoproc_pg_ins(hp_nanoproc_ins):
 	def assy_pgadr(self, pj):
 		self.dstadr = self['pgno'] << 11
 		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_mctl(self, pj):
 		self.mctl = self['mctl']

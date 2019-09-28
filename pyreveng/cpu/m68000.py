@@ -813,7 +813,7 @@ class m68000_ins(assy.Instree_ins):
 		if o & 0x8000:
 			o -= 1 << 16
 		self.dstadr = self.hi + o - 2
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Andisp16(self, pj):
 		o = self['disp16']
@@ -840,7 +840,7 @@ class m68000_ins(assy.Instree_ins):
 			self.dstadr = self.hi + x - 0x100
 		else:
 			self.dstadr = self.hi + x
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_Dx(self, pj):
 		return "D%d" % self['Dx']
@@ -1018,19 +1018,19 @@ class m68000_ins(assy.Instree_ins):
 				o |= 0xffff0000
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj, o)
+			return assy.Arg_dst(pj.m, o)
 		if eax == 0x0200:
 			o = pj.m.bu32(self.hi)
 			self.hi += 4
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj, o)
+			return assy.Arg_dst(pj.m, o)
 		if eax == 0x0400:
 			o = self.hi + pj.m.bs16(self.hi)
 			self.hi += 2
 			self.dstadr = o
 			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(pj, o)
+			return assy.Arg_dst(pj.m, o)
 		if eax == 0x0800:
 			return self.assy_eaxt(pj, id, "PC")
 		if eax == 0x1000 and self.sz == 1:

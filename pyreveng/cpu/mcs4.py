@@ -84,10 +84,10 @@ class mcs4_ins(assy.Instree_ins):
 	pass
 
 	def assy_data(self, pj):
-		return assy.Arg_imm(pj, self['data'], 8)
+		return assy.Arg_imm(self['data'], 8)
 
 	def assy_d(self, pj):
-		return assy.Arg_imm(pj, self['d'], 4)
+		return assy.Arg_imm(self['d'], 4)
 
 	def assy_cc(self, pj):
 		self.cc = {
@@ -110,11 +110,11 @@ class mcs4_ins(assy.Instree_ins):
 
 	def assy_adr(self, pj):
 		self.dstadr = (self.lo & ~0xff) | self['adr']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_ladr(self, pj):
 		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_isz(self, pj):
 		self.cc = "Z"

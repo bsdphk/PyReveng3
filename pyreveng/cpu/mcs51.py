@@ -220,28 +220,28 @@ class MCS51_Ins(assy.Instree_ins):
 
     def assy_adir(self, pj):
         self.dstadr = self['adir']
-        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_data)
+        return assy.Arg_dst(self.lang.as_data, self.dstadr)
 
     def assy_adir2(self, pj):
         self.dstadr = self['adir2']
-        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_data)
+        return assy.Arg_dst(self.lang.as_data, self.dstadr)
 
     def assy_a11(self, pj):
         a = (self['ahi'] << 8) | self['alo']
         self.dstadr = (self.hi & 0xf800) + a
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_a16(self, pj):
         self.dstadr = (self['ahi'] << 8) | self['alo']
         self.dstadr &= self.lang.amask
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_arel(self, pj):
         a = self['arel']
         if a & 0x80:
             a -= 256
         self.dstadr = self.hi + a
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_iri(self, _pj):
         return "@R%d" % self['i']
@@ -258,7 +258,7 @@ class MCS51_Ins(assy.Instree_ins):
 
     def assy_abit(self, pj):
         b = self['abit']
-        return assy.Arg_dst(pj, b, aspace=self.lang.as_bit)
+        return assy.Arg_dst(self.lang.as_bit, b)
 
     def assy_nabit(self, pj):
         return "/" + self.assy_abit(pj)

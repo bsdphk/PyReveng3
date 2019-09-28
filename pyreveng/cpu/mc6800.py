@@ -803,18 +803,18 @@ class mc6800_ins(assy.Instree_ins):
 
     def assy_d(self, pj):
         self.dstadr = self['d']
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_e(self, pj):
         self.dstadr = (self['e1'] << 8) | self['e2']
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_i(self, pj):
-        return assy.Arg_imm(pj, self['i'], 8)
+        return assy.Arg_imm(self['i'], 8)
 
     def assy_I(self, pj):
         self.dstadr = (self['I1'] << 8) | self['I2']
-        return assy.Arg_dst(pj, self.dstadr, "#")
+        return assy.Arg_dst(pj.m, self.dstadr, "#")
 
     def assy_r(self, pj):
         a = self['r']
@@ -823,7 +823,7 @@ class mc6800_ins(assy.Instree_ins):
         self.dstadr = self.hi + a
         if self.mne != "BRA":
             self.cc = self.mne[1:]
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_x(self, pj):
         return "0x%02x+" % self['x'] + self.idx

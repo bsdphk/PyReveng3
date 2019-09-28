@@ -354,7 +354,7 @@ class i8086_ins(assy.Instree_ins):
 
     def assy_io1(self, pj):
         """ Immediate I/O 8 bit """
-        return assy.Arg_dst(pj, self['io1'], "#", aspace=self.lang.as_io)
+        return assy.Arg_dst(self.lang.as_io, self['io1'], "#")
 
     def assy_i1(self, pj):
         """ Immediate 8 bit """
@@ -363,12 +363,12 @@ class i8086_ins(assy.Instree_ins):
     def assy_i2(self, pj):
         """ Immediate 16 bit """
         self.dstadr = self['i1'] | self['i2'] << 8
-        return assy.Arg_dst(pj, self.dstadr, "#")
+        return assy.Arg_dst(pj.m, self.dstadr, "#")
 
     def assy_da(self, pj):
         """ Direct address """
         self.dstadr = self['alo'] | self['ahi'] << 8
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_Rel(self, pj):
         """ 16 bit Relative address """
@@ -376,7 +376,7 @@ class i8086_ins(assy.Instree_ins):
         if d & 0x8000:
             d -= 65536
         self.dstadr = self.hi + d
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_rel(self, pj):
         """ Relative address """
@@ -384,7 +384,7 @@ class i8086_ins(assy.Instree_ins):
         if d & 0x80:
             d -= 256
         self.dstadr = self.hi + d
-        return assy.Arg_dst(pj, self.dstadr)
+        return assy.Arg_dst(pj.m, self.dstadr)
 
     def assy_cs(self, pj):
         self.seg = "%cs:"

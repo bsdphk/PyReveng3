@@ -190,11 +190,11 @@ class mcs48_ins(assy.Instree_ins):
 
 	def assy_adr(self, pj):
 		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_a8(self, pj):
 		self.dstadr = (self.lo & ~0x0ff) | self['a8']
-		return assy.Arg_dst(pj, self.dstadr)
+		return assy.Arg_dst(pj.m, self.dstadr)
 
 	def assy_p(self, pj):
 		return "P%d" % self['p']

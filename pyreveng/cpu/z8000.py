@@ -737,8 +737,8 @@ class z8000_ins(assy.Instree_ins):
 
     def assy_Port(self, pj):
         if self['s']:
-            return assy.Arg_dst(pj, self['port'], aspace=self.lang.as_sio)
-        return assy.Arg_dst(pj, self['port'], aspace=self.lang.as_io)
+            return assy.Arg_dst(self.lang.as_sio, self['port'])
+        return assy.Arg_dst(self.lang.as_io, self['port'])
 
     def reg(self, r):
         if self.word == 2:
@@ -768,14 +768,14 @@ class z8000_ins(assy.Instree_ins):
     def assy_Rel7(self, pj):
         d = self['disp'] << 1
         self.dstadr = self.hi - d
-        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
+        return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
     def assy_Rel8(self, pj):
         d = self['disp']
         if d & 0x80:
             d -= 0x100
         self.dstadr = self.hi + d * 2
-        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
+        return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
     def assy_Rs(self, pj):
         return self.reg(self['rs'])
@@ -835,7 +835,7 @@ class z8001_ins(z8000_ins):
     def assy_Dst(self, pj):
         a1, a2 = self.seg(pj)
         self.dstadr = a2    # XXX
-        return assy.Arg_dst(pj, self.dstadr, aspace=self.lang.as_mem)
+        return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
 
 class z8001(assy.Instree_disass):
