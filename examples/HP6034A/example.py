@@ -107,7 +107,7 @@ def task(pj, cx):
 			if i == None:
 				continue
 			ins.flow_out = []
-			ins.add_flow(pj, "C", True, f.to)
+			ins.add_flow("C", True, f.to)
 			a = ins.hi
 			for j in i:
 				if j == "i":
@@ -117,7 +117,7 @@ def task(pj, cx):
 				else:
 					print("IARG:", j)
 					assert False
-			ins.add_flow(pj, ">", True, a)
+			ins.add_flow(">", True, a)
 			return
 
 	cx.flow_check.append(inline_args)

@@ -96,28 +96,28 @@ class Instree_ins(Assy):
         return
 
     def flow_R(self, pj):
-        self.add_flow(pj, "R", self.cc)
+        self.add_flow("R", self.cc)
 
     def flow_J(self, pj):
-        self.add_flow(pj, ">", True, self.dstadr)
+        self.add_flow(">", True, self.dstadr)
 
     def flow_RC(self, pj):
         if self.cc is not False:
-            self.add_flow(pj, "R", self.cc)
+            self.add_flow("R", self.cc)
         if self.cc is not True:
-            self.add_flow(pj, True, "!" + self.cc, self.hi)
+            self.add_flow(True, "!" + self.cc, self.hi)
 
     def flow_JC(self, pj):
         if self.cc is True:
-            self.add_flow(pj, ">", "?", self.dstadr)
-            self.add_flow(pj, True, "!?", self.hi)
+            self.add_flow(">", "?", self.dstadr)
+            self.add_flow(True, "!?", self.hi)
         else:
-            self.add_flow(pj, ">", self.cc, self.dstadr)
-            self.add_flow(pj, True, "!" + self.cc, self.hi)
+            self.add_flow(">", self.cc, self.dstadr)
+            self.add_flow(True, "!" + self.cc, self.hi)
 
     def flow_C(self, pj):
-        self.add_flow(pj, "C", True, self.dstadr)
-        self.add_flow(pj, True, True, self.hi)
+        self.add_flow("C", True, self.dstadr)
+        self.add_flow(True, True, self.hi)
 
     def arg(self, pj, arg):
         if arg in self.lang.verbatim:
@@ -190,7 +190,7 @@ class Instree_ins(Assy):
         self.args_done(pj)
 
         if not self.flow_out:
-            self.add_flow(pj, True)
+            self.add_flow(True)
 
     def get(self, f):
         return self.lim[-1].get(f)

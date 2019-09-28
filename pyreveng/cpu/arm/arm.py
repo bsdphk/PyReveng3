@@ -528,7 +528,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			cond = self['cond']
 			self.mne += CC[cond]
 			if self['cond'] != 14:
-				self.add_flow(pj, '>', '?', self.hi)
+				self.add_flow('>', '?', self.hi)
 
 	def assy_UN(self, pj):
 		raise assy.Invalid("UNPREDICTABLE")
@@ -591,7 +591,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 		cond = self['cond']
 		self.mne += CC[cond]
 		if self['cond'] != 14:
-			self.add_flow(pj, '>', '?', self.hi)
+			self.add_flow('>', '?', self.hi)
 
 	def assy_dst(self, pj):
 		o = self['off'] << 2

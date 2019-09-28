@@ -118,7 +118,7 @@ class Code(Leaf):
     def render(self):
         return "<Code %x-%x %s>" % (self.lo, self.hi, self.lang.name)
 
-    def add_flow(self, unused_pj, typ, cond=True, to=None, lang=None):
+    def add_flow(self, typ, cond=True, to=None, lang=None):
         '''
         Add a flow record
         '''
