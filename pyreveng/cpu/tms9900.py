@@ -519,8 +519,8 @@ class Tms9900_ins(assy.Instree_ins):
             if o != 0:
                 return "R%d+#0x%04x" % (o, v)
 
-            x = pj.find(v)
-            if len(x) > 0:
+            x = pj.m.find_lo(v)
+            if x:
                 return assy.Arg_ref(pj, x[0])
 
             try:

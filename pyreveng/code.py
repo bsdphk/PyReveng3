@@ -145,6 +145,7 @@ class Decoder():
         self.name = lang
         self.todo = []
         self.pil = pil.PIL_State(self)
+        self.busy = False
 
     def decode(self, pj, adr):
         '''
@@ -166,10 +167,10 @@ class Decoder():
         '''
         a0 = adr
         xx = None
-        if self.todo:
-            self.todo.append([pj, adr, None])
-            return
         self.todo.append([pj, adr, None])
+        if self.busy:
+            return
+        self.busy = True
         while self.todo:
             pj, adr, _from = self.todo.pop()
             x = pj.m.find_lo(adr)
@@ -186,4 +187,5 @@ class Decoder():
                 x = x[0]
             if adr == a0:
                 xx = x
+        self.busy = False
         return xx

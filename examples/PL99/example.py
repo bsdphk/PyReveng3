@@ -41,84 +41,139 @@ seven_segment.known[0x30] = "I"
 def setup():
 	cx = mc6800.mc68hc11()
 	cx.m.map(mem.stackup(("PL99.mc68hc11.bin",), nextto=__file__), 0x8000)
+	#######################################################################
+	def post_arg_func(pj, ins):
+		post_arg_funcs = {
+			0xb80c:		"WB",
+			0xb821:		"WB",
+			0xb836:		"W",
+			0xb846:		"WWW",
+			0xb86c:		"WWW",
+			0xb892:		"WWW",
+			0xb989:		"WWW",
+			0xbabc:		"WW",
+			0xbb60:		"WWW",
+			0xbca1:		"WWW",
+			0xbdeb:		"WW",
+		}
+		if ins.flow_out:
+			print(ins, ins.flow_out)
+		for f in ins.flow_out:
+			i = post_arg_funcs.get(f.to)
+			if i == None:
+				continue
+			ins.flow_out = []
+			ins.add_flow(pj, "C", True, f.to)
+			a = ins.hi
+			for j in i:
+				if j == "W":
+					d = pj.m.bu16(a)
+					data.Dataptr(pj.m, a, a + 2, d)
+					a += 2
+					if d >= 0x8000:
+						d_q(pj, d)
+				elif j == "B":
+					cbyte(pj, a)
+					# data.Data(pj, a, a + 1)
+					a += 1
+				else:
+					assert False
+			ins.add_flow(pj, ">", True, a)
+			return
+
+	cx.flow_check.append(post_arg_func)
+	#######################################################################
+
+	def bogo_flow(pj, ins):
+		for f in ins.flow_out:
+			if f.to == None:
+				pass
+			elif f.to < 0x8000 or f.to > 0xffff:
+				print("BOGO", ins)
+
+	cx.flow_check.append(bogo_flow)
+
+	#######################################################################
 	pj = job.Job(cx.m, "PL99")
 	return pj, cx
+
+class d_chain(data.Data):
+	def __init__(self, pj, a):
+		super().__init__(pj.m, a, a + 4)
+		self.num = '%c%c%c' % (
+			pj.m[self.lo],
+			pj.m[self.lo + 1],
+			pj.m[self.lo + 2],
+		)
+
+	def render(self):
+		return ".STRUCT chain { '%c%c%c', %d }" % (
+			self.aspace[self.lo],
+			self.aspace[self.lo + 1],
+			self.aspace[self.lo + 2],
+			self.aspace[self.lo + 3],
+		)
+
+class d_asf(data.Data):
+	def __init__(self, pj, a):
+		super().__init__(pj.m, a, a + 16)
+
+	def render(self):
+		s = ".STRUCT asf {"
+		t = " "
+		for i in range(0, 16, 2):
+			s += t + "%6d" % self.aspace.bu16(self.lo + i)
+			t = ", "
+		s += "}"
+		return s
+
+class d_q(data.Data):
+	"""
+	Numbers are sign + 31 bit binary q-complement fractions:
+		[Sign][31 bit fraction]
+	"""
+	def __init__(self, pj, a, lbl=True):
+		x = pj.m.find_lo(a)
+		for i in x:
+			if i.tag == ".D4":
+				return
+		super().__init__(pj.m, a, a + 4, ".D4")
+		self.val = pj.m.bu32(a)
+		self.dec = self.val
+		if self.dec & 0x80000000:
+			self.dec &= 0x7fffffff
+			self.dec *= -1
+		self.dec *= 2**-31
+		if lbl:
+			pj.m.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
+
+	def render(self):
+		if self.dec != 0.0:
+			b = 1.0/self.dec
+		else:
+			b = 0.
+		return ".D4 %12g = 1/%g" % (self.dec, b)
+
+def cbyte(pj, a):
+	c = data.Const(pj.m, a, a + 1)
+	c.val = pj.m[a]
+	c.typ = ".BYTE"
+	c.fmt = "0x%02x" % c.val
+	return c
+
+def cword(pj, a):
+	c = data.Const(pj.m, a, a + 2)
+	c.val = pj.m.bu16(a)
+	c.typ = ".WORD"
+	c.fmt = "0x%04x" % c.val
+	return c
+
 
 
 def task(pj, cx):
 	cx.register_labels(pj)
 
 	cx.vectors(pj)
-
-
-	def cbyte(pj, a):
-		c = data.Const(pj.m, a, a + 1)
-		c.val = pj.m[a]
-		c.typ = ".BYTE"
-		c.fmt = "0x%02x" % c.val
-		return c
-
-	def cword(pj, a):
-		c = data.Const(pj.m, a, a + 2)
-		c.val = pj.m.bu16(a)
-		c.typ = ".WORD"
-		c.fmt = "0x%04x" % c.val
-		return c
-
-	class d_chain(data.Data):
-		def __init__(self, pj, a):
-			super().__init__(pj.m, a, a + 4)
-			self.num = '%c%c%c' % (
-				pj.m[self.lo],
-				pj.m[self.lo + 1],
-				pj.m[self.lo + 2],
-			)
-
-		def render(self):
-			return ".STRUCT chain { '%c%c%c', %d }" % (
-				self.aspace[self.lo],
-				self.aspace[self.lo + 1],
-				self.aspace[self.lo + 2],
-				self.aspace[self.lo + 3],
-			)
-
-	class d_asf(data.Data):
-		def __init__(self, pj, a):
-			super().__init__(pj.m, a, a + 16)
-
-		def render(self):
-			s = ".STRUCT asf {"
-			t = " "
-			for i in range(0, 16, 2):
-				s += t + "%6d" % self.aspace.bu16(self.lo + i)
-				t = ", "
-			s += "}"
-			return s
-
-	class d_q(data.Data):
-		"""
-		Numbers are sign + 31 bit binary q-complement fractions:
-			[Sign][31 bit fraction]
-		"""
-		def __init__(self, pj, a, lbl=True):
-			if pj.find(a, ".D4") != None:
-				return
-			super().__init__(pj.m, a, a + 4, ".D4")
-			self.val = pj.m.bu32(a)
-			self.dec = self.val
-			if self.dec & 0x80000000:
-				self.dec &= 0x7fffffff
-				self.dec *= -1
-			self.dec *= 2**-31
-			if lbl:
-				pj.m.set_label(self.lo, "Q_%04x_%g" % (self.lo, self.dec))
-
-		def render(self):
-			if self.dec != 0.0:
-				b = 1.0/self.dec
-			else:
-				b = 0.
-			return ".D4 %12g = 1/%g" % (self.dec, b)
 
 
 	#######################################################################
@@ -225,57 +280,6 @@ def task(pj, cx):
 					t += "?"
 		pj.m.set_label(a, "MSG_" + t)
 
-	#######################################################################
-	def post_arg_func(pj, ins):
-		post_arg_funcs = {
-			0xb80c:		"WB",
-			0xb821:		"WB",
-			0xb836:		"W",
-			0xb846:		"WWW",
-			0xb86c:		"WWW",
-			0xb892:		"WWW",
-			0xb989:		"WWW",
-			0xbabc:		"WW",
-			0xbb60:		"WWW",
-			0xbca1:		"WWW",
-			0xbdeb:		"WW",
-		}
-		for f in ins.flow_out:
-			i = post_arg_funcs.get(f.to)
-			if i == None:
-				continue
-			ins.flow_out = []
-			ins.add_flow(pj, "C", True, f.to)
-			a = ins.hi
-			for j in i:
-				if j == "W":
-					d = pj.m.bu16(a)
-					data.Dataptr(pj.m, a, a + 2, d)
-					a += 2
-					if d >= 0x8000:
-						d_q(pj, d)
-				elif j == "B":
-					cbyte(pj, a)
-					# data.Data(pj, a, a + 1)
-					a += 1
-				else:
-					assert False
-			ins.add_flow(pj, ">", True, a)
-			return
-
-	cx.flow_check.append(post_arg_func)
-	#######################################################################
-
-	def bogo_flow(pj, ins):
-		for f in ins.flow_out:
-			if f.to == None:
-				pass
-			elif f.to < 0x8000 or f.to > 0xffff:
-				print("BOGO", ins)
-
-	cx.flow_check.append(bogo_flow)
-
-	#######################################################################
 
 	chains = []
 	x = data.Range(pj.m, 0x9d20, 0x9d68, "chain-tbl")

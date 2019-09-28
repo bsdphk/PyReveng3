@@ -522,9 +522,9 @@ class i8086(assy.Instree_disass):
     def has_8087(self):
         self.add_ins(i8087_desc, i8086_ins)
 
-    def disass(self, pj, adr):
-        y = pj.find(adr, self.name)
-        if y != None:
+    def x_disass(self, pj, adr):
+        y = pj.m.find_lo(adr)
+        if y:
             return False
         if (pj.m[adr] & 0xf8) == 0xd8 or (pj.m[adr + 1] & 0xf8) == 0xd8:
             #x = binutils.ask_objdump(pj, adr, "i8086", "i8086")
@@ -543,10 +543,3 @@ class i8086(assy.Instree_disass):
                 y.lcmt += x + "\n"
             return False
         return (b)
-        y = pj.find(adr, self.name)
-        if y != "":
-            y.lcmt += x + "\n"
-        if ll > 0 and y.hi - y.lo != ll:
-            print("FAIL", y.render(pj), x)
-            return False
-        return b

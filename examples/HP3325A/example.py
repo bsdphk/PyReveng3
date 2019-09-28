@@ -61,19 +61,19 @@ def task(pj, dx):
 	if True:
 		for a0 in range(4,0x20,4):
 			dx.disass(pj, a0)
-		ix0 = pj.find(0x54)
+		ix0 = pj.m.find_lo(0x54)
 		assert len(ix0) == 1
 		ix0 = ix0[0]
 		ix0.flow_out = list()
 		for a0 in range(4,0x20,4):
 			ix0.add_flow(pj, ">", to=a0)
-			i = pj.find(a0)
+			i = pj.m.find_lo(a0)
 			assert len(i) == 1
 			i = i[0]
 			assert len(i.flow_out) == 1
 			dpf = i.flow_out[0].to
 			cuts.append(( None, dpf))
-			ix1 = pj.find(dpf + 6)
+			ix1 = pj.m.find_lo(dpf + 6)
 			assert len(ix1) == 1
 			ix1 = ix1[0]
 			ix1.flow_out = list()
@@ -91,7 +91,7 @@ def task(pj, dx):
 	def jmp_table(lo, hi, span, txt = "table", src = None):
 		x = data.Range(pj.m, lo, hi, "table")
 		if src != None:
-			ins = pj.find(src)
+			ins = pj.m.find_lo(src)
 			print("JMPTABLE %x" % src, ins)
 			if len(ins) != 1:
 				ins = None

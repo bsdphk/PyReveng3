@@ -208,7 +208,7 @@ def task(pj, cx):
 			if pj.m[i.lo + 5] != 0x01:
 				continue
 			a = pj.m.bu16(i.lo + 1)
-			if len(pj.find(a)) == 0:
+			if len(pj.m.find_lo(a)) == 0:
 				print("Queued: 0x%04x" % a)
 				cx.disass(pj, a)
 				pj.m.set_label(a, "Q%04x" % a)

@@ -44,19 +44,3 @@ class Job():
 	def __init__(self, m, name="xxx"):
 		self.name = name
 		self.m = m
-		self.dolist = list()
-
-		# Banks are valid but presently unavailable memory ranges
-		# such as overlay areas in bank-switching.
-		# use as:  pj.banks.append([0x1000, 0x2000])
-		# This supresses WARNING about todo's into these banks
-		self.banks = []
-
-	def find(self, adr, tag=None):
-		x = self.m.find_lo(adr)
-		if tag is None:
-			return x
-		for i in x:
-			if i.tag == tag:
-				return i
-		return None

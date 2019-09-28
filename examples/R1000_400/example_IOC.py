@@ -115,6 +115,10 @@ def task(pj, cpu):
 
 	pj.m.set_label(0x80002028, "INLINE_PUTS")
 
+	if True:
+		for a in (0x08ad6, 0x08ada):
+			data.Const(pj.m, a, a + 4)
+
 	cpu.vectors(pj)
 
 	for obj in M200S:
@@ -127,10 +131,6 @@ def task(pj, cpu):
 	if True:
 		data.Txt(pj.m, 0x294cc, 0x294da)
 		
-	if True:
-		for a in (0x08ad6, 0x08ada):
-			data.Const(pj.m, a, a + 4)
-
 	if True:
 		for a in range(0x09080, 0x09098, 4):
 			cpu.disass(pj, a)
