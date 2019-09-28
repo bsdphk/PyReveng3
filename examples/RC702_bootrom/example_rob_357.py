@@ -48,11 +48,11 @@ def task(pj, cx):
 	data.Txt(pj.m, 0xa58c, 0xa590, label=False)
 	data.Txt(pj.m, 0xa593, 0xa593 + 0x7, label=False)
 
-	cx.disass(pj.m, 0x0000)
+	cx.disass(0x0000)
 
 	# Interrupt vector table
 	for a in range(12):
-		cx.codeptr(pj, 0xa000 + a * 2)
+		cx.codeptr(0xa000 + a * 2)
 
 	#discover.Discover(cx)
 

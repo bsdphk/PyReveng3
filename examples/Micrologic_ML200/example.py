@@ -62,7 +62,7 @@ def setup():
 
 def task(pj, cpu):
 
-	cpu.disass(pj.m, 0)
+	cpu.disass(0)
 
 	pj.m.set_label(0x6e8, "Incr_rr0()")
 	pj.m.set_label(0x6bc, "Count_Down()")

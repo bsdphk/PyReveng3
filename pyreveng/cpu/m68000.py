@@ -1450,7 +1450,7 @@ class m68000(assy.Instree_disass):
 			else:
 				if x not in vn:
 					try:
-						vi[x] = self.disass(self.m, x)
+						vi[x] = self.disass(x)
 						vn[x] = []
 						vn[x].append(a >> 2)
 					except assy.Invalid:

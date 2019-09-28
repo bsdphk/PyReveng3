@@ -94,6 +94,6 @@ class PSOS():
 			):
 				self.cpu.m.set_label(a + o,
 				    "PSOS_IO_TABLE[%d]." % n + f)
-				self.cpu.disass(self.cpu.m, a + o)
+				self.cpu.disass(a + o)
 			a += 30
 			n += 1

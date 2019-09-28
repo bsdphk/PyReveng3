@@ -496,7 +496,7 @@ def task(pj, cpu):
 
 			self.fp = 0x196b6 + self.fi * 4
 			self.fa = pj.m.bu32(self.fp)
-			cpu.disass(pj.m, self.fa)
+			cpu.disass(self.fa)
 			data.Codeptr(pj.m, self.fp, self.fp + 4, self.fa)
 			pj.m.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
 
@@ -636,7 +636,7 @@ def task(pj, cpu):
 	if True:
 		cpu.vectors(hi = 0xc0)
 
-		cpu.disass(pj.m, 0x2f38)
+		cpu.disass(0x2f38)
 
 		#######################################################
 
@@ -736,7 +736,7 @@ def task(pj, cpu):
 				y.lcmt = "adr=%d" % -x
 				dsp = hp85662a.hp85662a()
 			else:
-				y = dsp.disass(pj.m, a)
+				y = dsp.disass(a, cpu.m)
 			a = y.hi
 
 		#######################################################
@@ -753,36 +753,36 @@ def task(pj, cpu):
 		# Orphans ?
 
 		if False:
-			cpu.disass(pj.m, 0x01b88)
-			cpu.disass(pj.m, 0x01b8e)
-			cpu.disass(pj.m, 0x01b94)
-			cpu.disass(pj.m, 0x01b9a)
-			cpu.disass(pj.m, 0x01b9e)
-			cpu.disass(pj.m, 0x01ba2)
-			cpu.disass(pj.m, 0x01ba8)
-			cpu.disass(pj.m, 0x01c76)
-			cpu.disass(pj.m, 0x01c82)
-			cpu.disass(pj.m, 0x01c90)
-			cpu.disass(pj.m, 0x01cd2)
-			cpu.disass(pj.m, 0x01d14)
+			cpu.disass(0x01b88)
+			cpu.disass(0x01b8e)
+			cpu.disass(0x01b94)
+			cpu.disass(0x01b9a)
+			cpu.disass(0x01b9e)
+			cpu.disass(0x01ba2)
+			cpu.disass(0x01ba8)
+			cpu.disass(0x01c76)
+			cpu.disass(0x01c82)
+			cpu.disass(0x01c90)
+			cpu.disass(0x01cd2)
+			cpu.disass(0x01d14)
 
-			cpu.disass(pj.m, 0x01578)
-			cpu.disass(pj.m, 0x01594)
-			cpu.disass(pj.m, 0x0171a)
-			cpu.disass(pj.m, 0x01906)
-			cpu.disass(pj.m, 0x02dee)
-			cpu.disass(pj.m, 0x02df4)
-			cpu.disass(pj.m, 0x03412)
-			cpu.disass(pj.m, 0x11e74)
+			cpu.disass(0x01578)
+			cpu.disass(0x01594)
+			cpu.disass(0x0171a)
+			cpu.disass(0x01906)
+			cpu.disass(0x02dee)
+			cpu.disass(0x02df4)
+			cpu.disass(0x03412)
+			cpu.disass(0x11e74)
 
 		# from 0x2272
-		cpu.disass(pj.m, 0x2282)
+		cpu.disass(0x2282)
 
 		# filled in 0xffffabd2
-		cpu.disass(pj.m, 0x0ed98)
+		cpu.disass(0x0ed98)
 
-		cpu.disass(pj.m, 0x0df5e) # Arg to 0x802
-		cpu.disass(pj.m, 0x3292)	# 0x3284
+		cpu.disass(0x0df5e) # Arg to 0x802
+		cpu.disass(0x3292)	# 0x3284
 
 		#######################################################
 		# pat 4,244,024 pg 262 lin 3700
@@ -808,7 +808,7 @@ def task(pj, cpu):
 
 
 	else:
-		y = cpu.disass(pj.m, 0xda1e)
+		y = cpu.disass(0xda1e)
 
 		for i in y.__dict__:
 			print("\t", i, y.__dict__[i])
@@ -1320,7 +1320,7 @@ def task(pj, cpu):
 			0x02268,
 		):
 			# print("ORPHAN %x" % a)
-			y = cpu.disass(pj.m, a)
+			y = cpu.disass(a)
 			y.lcmt = "ORPHAN - "
 
 		nondisc = {
@@ -1340,7 +1340,7 @@ def task(pj, cpu):
 					l.append(b)
 			# print(l)
 			for i in l:
-				y = cpu.disass(pj.m, i)
+				y = cpu.disass(i)
 				y.lcmt = "DISCOVER - "
 			if len(l) == 0:
 				break

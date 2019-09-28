@@ -489,7 +489,7 @@ class vector(data.Data):
         super().__init__(asp, adr, adr + 4)
         self.ws = asp.bu16(adr)
         self.dstadr = asp.bu16(adr + 2)
-        cx.disass(asp, self.dstadr)
+        cx.disass(self.dstadr, asp)
 
     def render(self):
         return "WP=0x%04x,IP=%s" % (self.ws, self.aspace.adr(self.dstadr))

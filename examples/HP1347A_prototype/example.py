@@ -269,7 +269,7 @@ def task(pj, cpu):
 			t = pj.m.bu16(ta)
 			z = data.Codeptr(pj.m, ta, ta + 2, t)
 			z.lcmt += y.txt
-			cpu.disass(pj.m, t)
+			cpu.disass(t)
 			if t not in c:
 				c[t] = []
 			if y.txt not in CMDS:
@@ -300,7 +300,7 @@ def task(pj, cpu):
 			for i in range(w):
 				d = pj.m.bu16(t)
 				data.Codeptr(pj.m, t, t + 2, d)
-				cpu.disass(pj.m, d)
+				cpu.disass(d)
 				t += 2
 
 	if True:
@@ -320,7 +320,7 @@ def task(pj, cpu):
 		for a in range(0xf811, 0xf825, 2):
 			d = pj.m.bu16(a)
 			data.Codeptr(pj.m, a, a + 2, d)
-			cpu.disass(pj.m, d)
+			cpu.disass(d)
 
 	if True:
 		# HP1345 testpatterns
@@ -334,7 +334,7 @@ def task(pj, cpu):
 			a += 2
 			hp1345_render.svg(pj, a, a + l*2)
 			while l > 0:
-				gpu.disass(pj.m, a)
+				gpu.disass(a, cpu.m)
 				a += 2
 				l -= 1
 
@@ -365,15 +365,15 @@ def task(pj, cpu):
 
 	# Stuff not accessed from anywhere
 
-	cpu.disass(pj.m, 0xe5a1)
+	cpu.disass(0xe5a1)
 	pj.m.set_label(0xe5a1, "BOGO_TEST_ROM")
 	pj.m.set_block_comment(0xe5a1, "Unused ROM checksum code")
 	pj.m.set_block_comment(0xe5a1, "NB: Expects low rom at 0xc000")
 
 	pj.m.set_label(0xe5ed, "TEST_IMGRAM")
 
-	cpu.disass(pj.m, 0x1acf)
-	cpu.disass(pj.m, 0xebf0)
+	cpu.disass(0x1acf)
+	cpu.disass(0xebf0)
 
 	pj.m.set_label(0x0291, "A=GETCHAR()")
 	pj.m.set_label(0x02d0, "PUTCHAR(A)")

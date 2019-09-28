@@ -134,7 +134,7 @@ def task(pj, cpu):
 				if v not in symbols:
 					symbols[v] = "CMD_" + x[n]
 			n += 1
-			cpu.disass(pj.m, v)
+			cpu.disass(v)
 
 	jmptbl(0x7768, 0x77b6, '9876543210.-@ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 	jmptbl(0x7860, 0x787c)

@@ -160,11 +160,13 @@ class Decoder():
         '''
         raise Invalid("No decoder for " + self.lang)
 
-    def disass(self, asp, adr):
+    def disass(self, adr, asp=None):
         '''
         Decode at adr and run with it.
         Complain if it fails.
         '''
+        if asp is None:
+            asp = self.m
         a0 = adr
         xx = None
         assert isinstance(asp, mem.AddressSpace)

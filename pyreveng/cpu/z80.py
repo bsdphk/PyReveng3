@@ -273,31 +273,22 @@ class z80(assy.Instree_disass):
         super().__init__(
             "z80",
             ins_word=8,
+            endian="<",
             abits=16,
+            jmps=(
+                (0x0000, "RESET"),
+                (0x0008, "RST08"),
+                (0x0010, "RST10"),
+                (0x0018, "RST18"),
+                (0x0020, "RST20"),
+                (0x0028, "RST28"),
+                (0x0030, "RST30"),
+                (0x0038, "RST38_IRQ"),
+                (0x0066, "NMI"),
+            ),
         )
         self.add_as("io", "I/O", 8)
         self.add_ins(z80_desc, z80_ins)
         self.mask = mask
         self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",
             "(C)", "SP", "I", "2", "C", "NC", "NZ", "Z", "AF", "AF'"])
-
-    def codeptr(self, pj, adr):
-        t = pj.m.lu16(adr)
-        c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj.m, t)
-        return c
-
-    def vectors(self, pj):
-        for m, a,l in (
-            (None, 0x0000, "VEC_RESET"),
-            (None, 0x0008, "VEC_RST08"),
-            (None, 0x0010, "VEC_RST10"),
-            (None, 0x0018, "VEC_RST18"),
-            (None, 0x0020, "VEC_RST20"),
-            (None, 0x0028, "VEC_RST28"),
-            (None, 0x0030, "VEC_RST30"),
-            (None, 0x0038, "VEC_RST38_IRQ"),
-            (None, 0x0066, "VEC_NMI"),
-        ):
-            self.disass(pj.m, a)
-            pj.m.set_label(a, l)

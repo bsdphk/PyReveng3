@@ -52,15 +52,15 @@ def setup():
 	return pj, cx
 
 def task(pj, dx):
-	dx.disass(pj.m, 0)
-	dx.disass(pj.m, 0xff)
+	dx.disass(0)
+	dx.disass(0xff)
 
 	cuts = []
 
 	#######################################################################
 	if True:
 		for a0 in range(4,0x20,4):
-			dx.disass(pj.m, a0)
+			dx.disass(a0)
 		ix0 = pj.m.find_lo(0x54)
 		assert len(ix0) == 1
 		ix0 = ix0[0]
@@ -82,7 +82,7 @@ def task(pj, dx):
 			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			for a1 in range(pg, dpf, 2):
 				ix1.add_flow(">", to=a1)
-				dx.disass(pj.m, a1)
+				dx.disass(a1)
 				v = a0 << 3
 				v |= (a1 - pg) >> 1
 				pj.m.set_label(a1, "PTR_%02x" % v)
@@ -104,7 +104,7 @@ def task(pj, dx):
 		for a in range(lo, hi, span):
 			if ins != None:
 				ins.add_flow(">", to=a)
-			dx.disass(pj.m, a)
+			dx.disass(a)
 
 	if True:
 		jmp_table(0x07d0, 0x0800, 8, "table", 0x007f)

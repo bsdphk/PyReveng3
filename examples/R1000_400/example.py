@@ -62,7 +62,7 @@ class my68k20_ins(m68020.m68020_ins):
 
 	def assy_inltxt(self):
 		y = data.Txt(self.lang.m, self.lo + 2, label=False, splitnl=True, align=2)
-		self.lang.disass(self.lang.m, y.hi)
+		self.lang.disass(y.hi)
 		raise assy.Invalid("Inline text hack")
 
 class my68k20(m68020.m68020):
@@ -84,7 +84,7 @@ def inline_text(asp, ins):
 	):
 		return
 	y = data.Txt(asp, ins.hi, label=False, splitnl=True, align=2)
-	ins.lang.disass(asp, y.hi)
+	ins.lang.disass(y.hi, asp=asp)
 
 def setup():
 	m = mem_setup()
@@ -131,7 +131,7 @@ def task(pj, cpu):
 	pj.m.set_label(0x80000020, "print_CRLF()")
 	pj.m.set_label(0x8000014c, "_print_CRLF()")
 
-	cpu.disass(pj.m, 0x80000024)
+	cpu.disass(0x80000024)
 	for a in (
 		0x80000072,
 		0x80000156,
@@ -207,10 +207,10 @@ def task(pj, cpu):
 		0x80002bc4,
 		0x800040a0,
 	):
-		cpu.disass(pj.m, a)
+		cpu.disass(a)
 
 	for a in range(0x80002000, 0x80002074, 4):
-		cpu.disass(pj.m, a)
+		cpu.disass(a)
 
 	for a in range(0x8000310e, 0x80003122, 4):
 		cpu.codeptr(a)
@@ -219,7 +219,7 @@ def task(pj, cpu):
 		cpu.codeptr(a)
 
 	for a in range(0x80004000, 0x80004008, 4):
-		cpu.disass(pj.m, a)
+		cpu.disass(a)
 
 	for a in range(0x800043aa, 0x80004492, 6):
 		y = data.Const(pj.m, a, a + 4, func=pj.m.bu32, size=4)
@@ -228,7 +228,7 @@ def task(pj, cpu):
 		w >>= 4
 		w &= 0xffe
 		d = 0x800043aa + w
-		cpu.disass(pj.m, d)
+		cpu.disass(d)
 
 
 	for a in range(0x80004a7a, 0x80004a98, 4):

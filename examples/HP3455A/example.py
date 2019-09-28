@@ -122,10 +122,10 @@ symbols = {
 }
 
 def task(pj, dx):
-	dx.disass(pj.m, 0)
-	dx.disass(pj.m, 0xf7)
-	dx.disass(pj.m, 0xfd)
-	dx.disass(pj.m, 0xff)
+	dx.disass(0)
+	dx.disass(0xf7)
+	dx.disass(0xfd)
+	dx.disass(0xff)
 
 	if True:
 		for a,l in symbols.items():

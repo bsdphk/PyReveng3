@@ -159,36 +159,36 @@ def task(pj, cx):
 			cx.codeptr(0x23c + i)
 
 	if True:
-		cx.disass(pj.m, 0x037c)
-		cx.disass(pj.m, 0x038e)
-		cx.disass(pj.m, 0x03aa)
-		cx.disass(pj.m, 0x03ba)
-		cx.disass(pj.m, 0x03ca)
-		cx.disass(pj.m, 0x0406)
-		cx.disass(pj.m, 0x0428)
-		cx.disass(pj.m, 0x044a)
-		cx.disass(pj.m, 0x0458)
-		cx.disass(pj.m, 0x052e)
+		cx.disass(0x037c)
+		cx.disass(0x038e)
+		cx.disass(0x03aa)
+		cx.disass(0x03ba)
+		cx.disass(0x03ca)
+		cx.disass(0x0406)
+		cx.disass(0x0428)
+		cx.disass(0x044a)
+		cx.disass(0x0458)
+		cx.disass(0x052e)
 
 	if True:
 		# Pure guesswork
 		#for a in range(0xcee, 0xd0c, 2):
 		#	cx.codeptr(a)
-		cx.disass(pj.m, 0x0e1e)
+		cx.disass(0x0e1e)
 
 	if True:
-		cx.disass(pj.m, 0x0d18)
+		cx.disass(0x0d18)
 
 	if True:
-		cx.disass(pj.m, 0x0e50)
-		cx.disass(pj.m, 0x0e80)
+		cx.disass(0x0e50)
+		cx.disass(0x0e80)
 
 	if True:
 		for a in range(0xf1c, 0xf20):
 			data.Txt(pj.m, a, a + 1, False)
 
 	if True:
-		cx.disass(pj.m, 0x10b2)
+		cx.disass(0x10b2)
 
 	if True:
 		# Continuation addresses when more bytes arrive

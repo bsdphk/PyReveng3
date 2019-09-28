@@ -75,7 +75,7 @@ def do_one(fn, alist):
 
 	if True:
 		for i in alist:
-			dx.disass(pj.m, i)
+			dx.disass(i)
 
 	pj.m.apct = "%04o"
 	pj.m.apct = "%03x"

@@ -318,18 +318,18 @@ class m68000_switch_ins(assy.Instree_ins):
 	def range(self):
 		if self.go_lo == self.go_hi:
 			self.lang.m.set_label(self.go_lo, self.nm + "_DEFAULT")
-			self.lang.disass(self.lang.m, self.go_lo)
+			self.lang.disass(self.go_lo)
 			return
 		if self.go_lo is not None:
 			self.lang.m.set_label(self.go_lo, self.nm + "_LOW")
-			self.lang.disass(self.lang.m, self.go_lo)
+			self.lang.disass(self.go_lo)
 		if self.go_hi is not None:
 			self.lang.m.set_label(self.go_hi, self.nm + "_HIGH")
-			self.lang.disass(self.lang.m, self.go_hi)
+			self.lang.disass(self.go_hi)
 
 	def dst(self, pj, no, dst):
 		# XXX: Add flow
-		self.lang.disass(pj.m, dst)
+		self.lang.disass(dst)
 		pj.m.set_label(dst, self.nm + "_CASE_%d" % no)
 
 def m68000_switches(disass):

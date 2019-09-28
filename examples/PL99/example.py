@@ -456,17 +456,17 @@ def task(pj, cx):
 	for a in range(x.lo, x.hi, 2):
 		c = cword(pj, a)
 
-	cx.disass(pj.m, 0x9102)
-	cx.disass(pj.m, 0x95da)
-	cx.disass(pj.m, 0x9b29)
-	cx.disass(pj.m, 0x9a96)
-	cx.disass(pj.m, 0x9b44)
-	cx.disass(pj.m, 0x9b57)
-	cx.disass(pj.m, 0xdda1)
-	cx.disass(pj.m, 0xdde0)
-	cx.disass(pj.m, 0xde00)
-	cx.disass(pj.m, 0xde20)
-	cx.disass(pj.m, 0xf719)
+	cx.disass(0x9102)
+	cx.disass(0x95da)
+	cx.disass(0x9b29)
+	cx.disass(0x9a96)
+	cx.disass(0x9b44)
+	cx.disass(0x9b57)
+	cx.disass(0xdda1)
+	cx.disass(0xdde0)
+	cx.disass(0xde00)
+	cx.disass(0xde20)
+	cx.disass(0xf719)
 
 	for a in range(0x9789, 0x97a5, 4):
 		d_q(pj, a)

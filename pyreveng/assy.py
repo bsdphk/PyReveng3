@@ -262,7 +262,7 @@ class Instree_disass(code.Decoder):
             asp = self.m
         t = asp.lu16(adr)
         c = data.Codeptr(asp, adr, adr + 2, t)
-        self.disass(asp, t)
+        self.disass(t, asp=asp)
         return c
 
     def codeptr_bu16(self, adr, asp=None):
@@ -270,7 +270,7 @@ class Instree_disass(code.Decoder):
             asp = self.m
         t = asp.bu16(adr)
         c = data.Codeptr(asp, adr, adr + 2, t)
-        self.disass(asp, t)
+        self.disass(t, asp=asp)
         return c
 
     def codeptr_lu32(self, adr, asp=None):
@@ -278,7 +278,7 @@ class Instree_disass(code.Decoder):
             asp = self.m
         t = asp.lu32(adr)
         c = data.Codeptr(asp, adr, adr + 4, t)
-        self.disass(asp, t)
+        self.disass(t, asp=asp)
         return c
 
     def codeptr_bu32(self, adr, asp=None):
@@ -286,7 +286,7 @@ class Instree_disass(code.Decoder):
             asp = self.m
         t = asp.bu32(adr)
         c = data.Codeptr(asp, adr, adr + 4, t)
-        self.disass(asp, t)
+        self.disass(t, asp=asp)
         return c
 
     def vectors(self, which=None):
@@ -300,7 +300,7 @@ class Instree_disass(code.Decoder):
             for i, j in self.jmpdat:
                 if which is None or i in which or j in which:
                      self.m.set_label(i, j)
-                     self.disass(self.m, i)
+                     self.disass(i)
 
     def add_as(self, name, desc=None, bits=None, lo=None, hi=None, aspace=None):
         if bits is not None:
