@@ -1450,7 +1450,7 @@ class m68000(assy.Instree_disass):
 			else:
 				if x not in vn:
 					try:
-						vi[x] = self.disass(pj, x)
+						vi[x] = self.disass(pj.m, x)
 						vn[x] = []
 						vn[x].append(a >> 2)
 					except assy.Invalid:
@@ -1479,7 +1479,7 @@ class m68000(assy.Instree_disass):
 	def codeptr(self, pj, adr):
 		t = pj.m.bu32(adr)
 		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		self.disass(pj, t)
+		self.disass(pj.m, t)
 		return c
 
 	def dataptr(self, pj, adr):

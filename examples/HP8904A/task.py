@@ -569,7 +569,7 @@ def symb(pj, cpu):
 	]:
 		if p == pj.pg:
 			assert a >= pj.m.lo and a < pj.m.hi
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 		if p == pj.pg or p >= 4:
 			pj.m.set_label(a, n)
 
@@ -623,7 +623,7 @@ def lexer(pj):
 			self.compact = True
 			if self.f > 0 and not pj.m.get_labels(self.t):
 				pj.m.set_label(self.t, "J_" + self.pfx)
-				cpu.disass(pj, self.t)
+				cpu.disass(pj.m, self.t)
 				h = hpib.get(self.pfx)
 				if h == None:
 					h = "UNDOC!"
@@ -695,7 +695,7 @@ class MenuPage(data.Data):
 			u = pj.m.bu16(lo + 2 * i)
 			self.ptr.append(u)
 			if u >= pj.m.lo and u < pj.m.hi:
-				cpu.disass(pj, u)
+				cpu.disass(pj.m, u)
 
 	def render(self, pj):
 		s = "MENUPAGE {\n"

@@ -854,7 +854,7 @@ class z8001(assy.Instree_disass):
 
     def codeptr(self, pj, adr):
         y = data.Codeptr(pj.m, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
-        self.disass(pj, y.dst)
+        self.disass(pj.m, y.dst)
         return y
 
     def vector(self, pj, a, n):

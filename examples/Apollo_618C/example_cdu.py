@@ -68,7 +68,7 @@ def task(pj, cx):
 	cx.vectors(pj, which=("RESET", "TF0", "IE0", "TF1"))
 
 	# Random
-	# cx.disass(pj, 0x7d2)
+	# cx.disass(pj.m, 0x7d2)
 
 	for i in range(0, 0x18, 8):
 		data.Txt(pj.m, 0x0a2 + i, 0x0a2 + i + 0x08, label=False)

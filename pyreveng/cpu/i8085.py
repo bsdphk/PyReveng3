@@ -614,11 +614,11 @@ class i8085(assy.Instree_disass):
             ("RST7",    0x0038),
             ("RST7.5",    0x003c),
         ):
-            self.disass(pj, a)
+            self.disass(pj.m, a)
             pj.m.set_label(a, l)
 
     def codeptr(self, pj, adr):
         t = self.m.lu16(adr)
         c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj, t)
+        self.disass(pj.m, t)
         return c

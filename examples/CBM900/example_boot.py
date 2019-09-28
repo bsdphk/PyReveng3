@@ -236,16 +236,16 @@ def task(pj, cx):
             y = cx.codeptr(pj, a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
-        cx.disass(pj, 0x20bc)
-        cx.disass(pj, 0x3ec6)
+        cx.disass(pj.m, 0x20bc)
+        cx.disass(pj.m, 0x3ec6)
 
-        cx.disass(pj, 0x06da)
-        cx.disass(pj, 0x0214)
-        cx.disass(pj, 0x10ec)
-        cx.disass(pj, 0x11a6)
-        cx.disass(pj, 0x2028)
-        cx.disass(pj, 0x2034)
-        cx.disass(pj, 0x3bd2)
+        cx.disass(pj.m, 0x06da)
+        cx.disass(pj.m, 0x0214)
+        cx.disass(pj.m, 0x10ec)
+        cx.disass(pj.m, 0x11a6)
+        cx.disass(pj.m, 0x2028)
+        cx.disass(pj.m, 0x2034)
+        cx.disass(pj.m, 0x3bd2)
 
         for a in (
             0x01c0,
@@ -257,7 +257,7 @@ def task(pj, cx):
             0x0ef0,
         ):
             pj.m.set_line_comment(a, "CALL_RR10_%x" % a)
-            cx.disass(pj, a)
+            cx.disass(pj.m, a)
 
         for a in range(0x3e90, 0x3ea0, 4):
             y = cx.codeptr(pj, a)

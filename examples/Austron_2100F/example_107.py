@@ -160,36 +160,36 @@ def task(pj, cx):
 	# Code
 
 	# Addresses stored into 0x0010
-	cx.disass(pj, 0xd401)
-	cx.disass(pj, 0xde3a)
+	cx.disass(pj.m, 0xd401)
+	cx.disass(pj.m, 0xde3a)
 
 	# Addresses stored into 0x0033
-	cx.disass(pj, 0xdaaa)
-	cx.disass(pj, 0xdceb)
-	cx.disass(pj, 0xdd0d)
+	cx.disass(pj.m, 0xdaaa)
+	cx.disass(pj.m, 0xdceb)
+	cx.disass(pj.m, 0xdd0d)
 
 	# Addresses stored into 0x003a
-	cx.disass(pj, 0xf284)
+	cx.disass(pj.m, 0xf284)
 
 	# Addresses stored into 0x008d (Key-handlers ?)
-	cx.disass(pj, 0xe02b)
-	cx.disass(pj, 0xe05e)
-	cx.disass(pj, 0xe37e)
-	cx.disass(pj, 0xdf41)
-	cx.disass(pj, 0xf429)
-	cx.disass(pj, 0xf377)
+	cx.disass(pj.m, 0xe02b)
+	cx.disass(pj.m, 0xe05e)
+	cx.disass(pj.m, 0xe37e)
+	cx.disass(pj.m, 0xdf41)
+	cx.disass(pj.m, 0xf429)
+	cx.disass(pj.m, 0xf377)
 
 	# Addresses stored into 0x010c
-	cx.disass(pj, 0xdb26)
-	cx.disass(pj, 0xdb32)
+	cx.disass(pj.m, 0xdb26)
+	cx.disass(pj.m, 0xdb32)
 
 	# LDS-JMP-TSX calls
-	cx.disass(pj, 0xd033)
-	cx.disass(pj, 0xf44d)
+	cx.disass(pj.m, 0xd033)
+	cx.disass(pj.m, 0xf44d)
 
 	# Things discover gets wrong
-	cx.disass(pj, 0xdee2)
-	cx.disass(pj, 0xde3a)
+	cx.disass(pj.m, 0xdee2)
+	cx.disass(pj.m, 0xde3a)
 
 	while True:
 
@@ -210,7 +210,7 @@ def task(pj, cx):
 			a = pj.m.bu16(i.lo + 1)
 			if len(pj.m.find_lo(a)) == 0:
 				print("Queued: 0x%04x" % a)
-				cx.disass(pj, a)
+				cx.disass(pj.m, a)
 				pj.m.set_label(a, "Q%04x" % a)
 				stop = False
 		if stop:

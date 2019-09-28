@@ -76,16 +76,16 @@ def task(pj, cx):
 	l = []
 	for a in range(0x122, 0x200, 2):
 		l.append(pj.m.bu16(a))
-		gpu.disass(pj, a)
+		gpu.disass(pj.m, a)
 
 	for a in range(0x222, 0x2c8, 2):
 		l.append(pj.m.bu16(a))
-		gpu.disass(pj, a)
+		gpu.disass(pj.m, a)
 
 	hp1345_render.svg(pj, 0x122, 0x2c8, l=l)
 
 	for a in range(0x31e,0x400, 2):
-		gpu.disass(pj, a)
+		gpu.disass(pj.m, a)
 	hp1345_render.svg(pj, 0x31e, 0x400)
 
 if __name__ == '__main__':

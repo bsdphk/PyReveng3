@@ -267,7 +267,7 @@ class mos6500(assy.Instree_disass):
     def codeptr(self, pj, adr):
         t = pj.m.lu16(adr)
         c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj, t)
+        self.disass(pj.m, t)
         return c
 
     def vectors(self, pj):

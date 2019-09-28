@@ -100,8 +100,8 @@ def task(pj, cx):
         0xfff6,
         0xfff9,
     ):
-        #cx.disass(pj, a)
-        cx.disass(pj, a)
+        #cx.disass(pj.m, a)
+        cx.disass(pj.m, a)
         pj.m.set_line_comment(a, "MANUAL")
 
 if __name__ == '__main__':

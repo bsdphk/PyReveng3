@@ -64,10 +64,10 @@ class Flow():
         if typ is True:
             self.to = fm.hi
 
-    def propagate(self, pj):
+    def propagate(self, asp):
 
         if self.to is not None:
-            self.lang.todo.append([pj, self.to, self])
+            self.lang.todo.append([asp, self.to, self])
 
     def __repr__(self):
         s = "<Flow @0x%x " % self.fm.lo + str(self.typ)
@@ -125,13 +125,13 @@ class Code(Leaf):
         f = Flow(self, typ, cond, to, lang)
         self.flow_out.append(f)
 
-    def commit(self, pj):
+    def commit(self, asp):
         '''
         Follow the flow records to find more code
         '''
         for f in self.flow_out:
-            f.propagate(pj)
-        pj.m.insert(self)
+            f.propagate(asp)
+        asp.insert(self)
 
 #######################################################################
 
@@ -160,25 +160,25 @@ class Decoder():
         '''
         raise Invalid("No decoder for " + self.lang)
 
-    def disass(self, pj, adr):
+    def disass(self, asp, adr):
         '''
         Decode at adr and run with it.
         Complain if it fails.
         '''
         a0 = adr
         xx = None
-        self.todo.append([pj, adr, None])
+        self.todo.append([asp, adr, None])
         if self.busy:
             return
         self.busy = True
         while self.todo:
-            pj, adr, _from = self.todo.pop()
-            x = pj.m.find_lo(adr)
+            asp, adr, _from = self.todo.pop()
+            x = asp.find_lo(adr)
             if not x:
                 try:
-                    x = self.decode(pj, adr)
+                    x = self.decode(asp, adr)
                     assert isinstance(x, Code)
-                    x.commit(pj)
+                    x.commit(asp)
                 except Invalid:
                     print("Failed decode", self.name, "0x%x" % adr, _from)
                 except mem.MemError:

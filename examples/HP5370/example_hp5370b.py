@@ -65,8 +65,8 @@ def task(pj, cpu):
 		ptr(pj, a)
 
 	# XXX: Add mising flow
-	cpu.disass(pj, 0x6845)
-	cpu.disass(pj, 0x6867)
+	cpu.disass(pj.m, 0x6845)
+	cpu.disass(pj.m, 0x6867)
 
 	for i in range(0x6b23, 0x6b3b, 3):
 		utils.data24(pj, i)

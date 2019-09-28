@@ -393,7 +393,7 @@ class MCS51(assy.Instree_disass):
                 (0x023, "RI_TI"),
         ):
             if not which or a in which or b in which:
-                self.disass(pj, a)
+                self.disass(pj.m, a)
                 pj.m.set_label(a, b)
 
 class I8032(MCS51):

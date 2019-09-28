@@ -104,7 +104,7 @@ def switch(pj, cpu, lo, hi):
 	for a in range(lo, hi, 2):
 		o = pj.m.bs16(a)
 		y.fmt += "[%d] -> 0x%x\n" % (n, lo + o)
-		cpu.disass(pj, lo + o)
+		cpu.disass(pj.m, lo + o)
 		pj.m.set_label(lo + o, "CASE_%x_%d" % (lo, n))
 		n += 1
 
@@ -124,22 +124,22 @@ def task(pj, cpu):
 	for obj in M200S:
 		ep = obj.entry_point()
 		pj.m.set_label(ep, "ENTRYPOINT_%s" % str(obj))
-		cpu.disass(pj, obj.entry_point())
+		cpu.disass(pj.m, obj.entry_point())
 
-	cpu.disass(pj, 0x08ad2)
+	cpu.disass(pj.m, 0x08ad2)
 
 	if True:
 		data.Txt(pj.m, 0x294cc, 0x294da)
 		
 	if True:
 		for a in range(0x09080, 0x09098, 4):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 	if True:
 		for a in range(0x10460, 0x1061e, 6):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 	if True:
 		for a in range(0x10280, 0x10460, 4):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 
 	if True:
 		switch(pj, cpu, 0x13368, 0x1336e)
@@ -156,11 +156,11 @@ def task(pj, cpu):
 
 	if True:
 		for a in range(0x02448, 0x02454, 4):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 		for a in range(0x03b74, 0x03b84, 4):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 		for a in range(0x04276, 0x04282, 2):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 
 	if True:
 		for lo,hi in (
@@ -217,7 +217,7 @@ def task(pj, cpu):
 			for a in range(lo, hi, 2):
 				y = pj.m.bu16(a)
 				data.Const(pj.m, a, a + 2, func=pj.m.bu16, size=2, fmt="0x%x")
-				cpu.disass(pj, y)
+				cpu.disass(pj.m, y)
 				pj.m.set_label(y, "PTR_FM_%x" % a)
 			
 
@@ -310,7 +310,7 @@ def task(pj, cpu):
 			0x290da,
 			0x294b0,
 		):
-			cpu.disass(pj, a)
+			cpu.disass(pj.m, a)
 
 	if False:
 		d = discover.Discover(pj, cpu)

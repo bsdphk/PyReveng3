@@ -962,7 +962,7 @@ class mc6809(assy.Instree_disass):
 	def codeptr(self, pj, adr):
 		t = pj.m.bu16(adr)
 		c = data.Codeptr(pj.m, adr, adr + 2, t)
-		self.disass(pj, t)
+		self.disass(pj.m, t)
 		return c
 
 	def vectors(self, pj, adr=0xfff0, which=None):

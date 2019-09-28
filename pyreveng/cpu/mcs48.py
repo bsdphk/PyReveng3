@@ -230,7 +230,7 @@ class mcs48(assy.Instree_disass):
 			(0x003, "INT"),
 			(0x007, "TINT"),
 		):
-			self.disass(pj, a)
+			self.disass(pj.m, a)
 			pj.m.set_label(a, l)
 
 

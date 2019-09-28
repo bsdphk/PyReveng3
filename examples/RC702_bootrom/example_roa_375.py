@@ -50,17 +50,17 @@ def task(pj, cx):
 	data.Txt(pj.m, 0x70c8, 0x70c8 + 0x5, label=False)
 	data.Txt(pj.m, 0x73f0, 0x73f0 + 0x12, label=False)
 
-	cx.disass(pj, 0x0000)
+	cx.disass(pj.m, 0x0000)
 
 	# 0x70e5
-	cx.disass(pj, 0x0027)
+	cx.disass(pj.m, 0x0027)
 
-	cx.disass(pj, 0x0066)
+	cx.disass(pj.m, 0x0066)
 
-	cx.disass(pj, 0x70d0)
+	cx.disass(pj.m, 0x70d0)
 
-	cx.disass(pj, 0x7322)
-	cx.disass(pj, 0x7615)
+	cx.disass(pj.m, 0x7322)
+	cx.disass(pj.m, 0x7615)
 
 	# Interrupt vector table
 	for a in range(16):

@@ -92,7 +92,7 @@ class Instree_ins(Assy):
         self.cache = {}
         self.verbatim = []
 
-    def args_done(self, unused_pj):
+    def args_done(self):
         return
 
     def flow_R(self):
@@ -119,7 +119,7 @@ class Instree_ins(Assy):
         self.add_flow("C", True, self.dstadr)
         self.add_flow(True, True, self.hi)
 
-    def arg(self, pj, arg):
+    def arg(self, arg):
         if arg in self.lang.verbatim:
             self.oper.append(Arg_verbatim(arg))
             return
@@ -174,7 +174,7 @@ class Instree_ins(Assy):
         else:
             self.oper.append(x)
 
-    def parse(self, pj):
+    def parse(self):
         if self.mne[0] == "+":
             self.prefix = True
         self.oper = list()
@@ -182,12 +182,12 @@ class Instree_ins(Assy):
             i = self.im.assy
             for j in i[1].split(","):
                 try:
-                    self.arg(pj, j)
+                    self.arg(j)
                 except KeyError as e:
                     print("XXX Failure processing arg", j, "in", self.lim)
                     print("XXX", e)
 
-        self.args_done(pj)
+        self.args_done()
 
         if not self.flow_out:
             self.add_flow(True)
@@ -274,8 +274,7 @@ class Instree_disass(code.Decoder):
     def getmore_bu32(self, asp, adr, v):
         v.append(asp.bu32(adr + len(v) * 4))
 
-    def decode(self, pj, adr, l=None):
-        asp = pj.m
+    def decode(self, asp, adr, l=None):
         if l is None:
             l = []
         for x in self.it.find(asp, adr, getmore=self.getmore):
@@ -285,7 +284,7 @@ class Instree_disass(code.Decoder):
             l.append(x)
             try:
                 y = x.handler(l, self)
-                y.parse(pj)
+                y.parse()
             except Invalid as e:
                 l.pop(-1)
                 continue
@@ -293,7 +292,7 @@ class Instree_disass(code.Decoder):
                 raise
             if y.prefix:
                 try:
-                    y = self.decode(pj, adr + len(x.words) * self.scale, l)
+                    y = self.decode(asp, adr + len(x.words) * self.scale, l)
                 except Invalid as e:
                     l.pop(-1)
                     continue

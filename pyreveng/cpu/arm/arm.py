@@ -523,7 +523,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
 			raise assy.Invalid("Unaligned Instruction")
 
 
-	def args_done(self, pj):
+	def args_done(self):
 		if 'cond' in self.lim[-1].flds:
 			cond = self['cond']
 			self.mne += CC[cond]
@@ -780,7 +780,7 @@ class Arm(assy.Instree_disass):
 	def codeptr(self, pj, adr):
 		t = pj.m.lu32(adr)
 		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		self.disass(pj, t)
+		self.disass(pj.m, t)
 		return c
 
 	def vector(self, pj, adr):

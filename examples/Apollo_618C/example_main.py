@@ -47,14 +47,14 @@ def setup():
 	return pj,cx
 
 def task(pj, cx):
-	cx.disass(pj, 0xffff0)
+	cx.disass(pj.m, 0xffff0)
 
 	#######################################################################
 
 	def vect(seg, off):
 		a = (seg << 4) + off
 		# print("VECTOR %05x" % a)
-		cx.disass(pj, a)
+		cx.disass(pj.m, a)
 		pj.m.set_label(a, "VECTOR")
 
 	# Vectors initialized at 0xe21b2...
@@ -67,13 +67,13 @@ def task(pj, cx):
 	# Random guesses
 
 	if False:
-		cx.disass(pj, 0xe63cf)
-		cx.disass(pj, 0xe7bd7)
-		cx.disass(pj, 0xe7fdd)
-		cx.disass(pj, 0xe834c)
-		cx.disass(pj, 0xe9251)
-		cx.disass(pj, 0xfcd68)
-		cx.disass(pj, 0xffb56)
+		cx.disass(pj.m, 0xe63cf)
+		cx.disass(pj.m, 0xe7bd7)
+		cx.disass(pj.m, 0xe7fdd)
+		cx.disass(pj.m, 0xe834c)
+		cx.disass(pj.m, 0xe9251)
+		cx.disass(pj.m, 0xfcd68)
+		cx.disass(pj.m, 0xffb56)
 
 	#######################################################################
 
@@ -98,7 +98,7 @@ def task(pj, cx):
 			off = pj.m.lu16(i)
 			a = (seg << 4) + off
 			x = data.Codeptr(pj.m, i, i + 2, a)
-			cx.disass(pj, a)
+			cx.disass(pj.m, a)
 
 	def tbl2(a):
 		assert pj.m[a + 0] == 0x2e
@@ -148,11 +148,11 @@ def task(pj, cx):
 				continue
 			if pj.m[lo] == 0x55:
 				print("%04x, %04x" % (lo, hi))
-				cx.disass(pj, lo)
+				cx.disass(pj.m, lo)
 				more = True
 			elif pj.m[lo] == 0x00 and pj.m[lo + 1] == 0x55:
 				print("%04x, %04x" % (lo, hi))
-				cx.disass(pj, lo + 1)
+				cx.disass(pj.m, lo + 1)
 				more = True
 
 

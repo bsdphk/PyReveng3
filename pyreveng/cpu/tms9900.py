@@ -489,7 +489,7 @@ class vector(data.Data):
         super().__init__(pj.m, adr, adr + 4)
         self.ws = pj.m.bu16(adr)
         self.dstadr = pj.m.bu16(adr + 2)
-        cx.disass(pj, self.dstadr)
+        cx.disass(pj.m, self.dstadr)
 
     def render(self):
         return "WP=0x%04x,IP=%s" % (self.ws, self.aspace.adr(self.dstadr))
@@ -936,7 +936,7 @@ class Tms9900(assy.Instree_disass):
     def codeptr(self, pj, adr):
         t = pj.m.bu16(adr)
         c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj, t)
+        self.disass(pj.m, t)
         return c
 
     def vector(self, pj, adr):

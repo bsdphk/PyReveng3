@@ -80,7 +80,7 @@ class Discover():
 		for lx, hx in self.pj.m.gaps():
 			for adr in range(lx, hx):
 				try:
-					x = self.cx.decode(self.pj, adr)
+					x = self.cx.decode(self.pj.m, adr)
 				except code.Invalid:
 					continue
 				except mem.MemError:
@@ -242,6 +242,6 @@ class Discover():
 			if self.trust[i] > 0 and self.trust[i] < 10:
 				c = self.code[i]
 				c.lcmt += "<discover>\n"
-				c.commit(self.pj)
+				c.commit(self.pj.m)
 				n += 1
 		print("Committed", n)
