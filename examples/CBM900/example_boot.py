@@ -33,17 +33,17 @@ import os
 from pyreveng import job, mem, code, data, misc, listing, charset
 import pyreveng.cpu.z8000 as z8000
 
-def fc_outstr(pj, ins):
+def fc_outstr(asp, ins):
     ''' Spot string arguments to OutStr() and puts() '''
     for f in ins.flow_out:
         if f.to not in (0x3b28, 0x0900):
             continue
-        if pj.m.bu16(ins.lo - 2) != 0x91e0:
+        if asp.bu16(ins.lo - 2) != 0x91e0:
             continue
-        if pj.m.bu16(ins.lo - 8) != 0x1400:
+        if asp.bu16(ins.lo - 8) != 0x1400:
             continue
-        y = data.Txt(pj.m, pj.m.bu32(ins.lo - 6), align=1, label=False)
-        pj.m.set_line_comment(ins.lo, '"' + y.txt + '"')
+        y = data.Txt(asp, asp.bu32(ins.lo - 6), align=1, label=False)
+        asp.set_line_comment(ins.lo, '"' + y.txt + '"')
 
 def setup():
     m0 = mem.stackup(

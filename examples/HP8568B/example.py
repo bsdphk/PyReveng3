@@ -225,58 +225,58 @@ def task(pj, cpu):
 		if len(j) > 0 and j[0] != "":
 			pj.m.set_label(i, j[0])
 
-	def flow_post_arg(pj, ins):
+	def flow_post_arg(asp, ins):
 		z = post_arg.get(ins.dstadr)
 		if z == None:
 			return
 		ins.flow_out.pop(-1)
 		if len(z) <= 1:
-			a = data.Pstruct(pj.m, ins.hi, ">h", "%d", ".INFIX").hi
+			a = data.Pstruct(asp, ins.hi, ">h", "%d", ".INFIX").hi
 			ins.add_flow(">", True, a)
 			return
 		l = []
 		for i in z[1:]:
 			if i[1:] == "A6rel":
-				r = pj.m.bs16(ins.hi)
+				r = asp.bs16(ins.hi)
 				ins.hi += 2
 				if r < 0:
 					l.append("(A6-0x%x)" % -r)
 				else:
 					l.append("(A6+0x%x)" % r)
 			elif i[1:] == "abs":
-				r = pj.m.bu16(ins.hi)
+				r = asp.bu16(ins.hi)
 				if r & 0x8000:
 					r |= 0xffff0000
 				ins.hi += 2
 				l.append("0x%08x" % r)
 			elif i == "drel":
-				r = ins.hi + pj.m.bs16(ins.hi)
+				r = ins.hi + asp.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
 				y = data_double(pj, r)
 				l.append("%g" % y.data[0])
 			elif i == "brel":
-				r = ins.hi + pj.m.bs16(ins.hi)
+				r = ins.hi + asp.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
 				y = data_bcd(pj, r);
 				l.append("%x" % y.data[0])
 			elif i == "lrel":
-				r = ins.hi + pj.m.bs16(ins.hi)
+				r = ins.hi + asp.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
-				if not pj.m.find_lo(r):
-					data.Pstruct(pj.m, r, ">L", "%d", ".LONG")
-				l.append("%d" % pj.m.bu32(r))
+				if not asp.find_lo(r):
+					data.Pstruct(asp, r, ">L", "%d", ".LONG")
+				l.append("%d" % asp.bu32(r))
 			elif i == "frel":
-				r = ins.hi + pj.m.bs16(ins.hi)
+				r = ins.hi + asp.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
 				y = data_float(pj, r)
 				l.append("%g" % y.val)
 			elif i == "bcd":
-				r = pj.m.bu16(ins.hi)
-				# y = data.Pstruct(pj.m, ins.hi, ">H", "%x", ".BCD")
+				r = asp.bu16(ins.hi)
+				# y = data.Pstruct(asp, ins.hi, ">H", "%x", ".BCD")
 				l.append("%04x" % r)
 				ins.hi += 2
 			else:
@@ -297,15 +297,15 @@ def task(pj, cpu):
 		},
 	}
 
-	def flow_switch(pj, ins):
+	def flow_switch(asp, ins):
 		if ins.dstadr != 0x2f38:
 			return
 		ins.flow_out.pop(0)
 		ins.add_flow(">", "?", ins.hi)
-		pj.m.set_label(ins.hi, "break_%04x" % ins.lo)
+		asp.set_label(ins.hi, "break_%04x" % ins.lo)
 
-		y = data.Const(pj.m, ins.lo - 2, ins.lo)
-		ncase = pj.m.bu16(ins.lo - 2)
+		y = data.Const(asp, ins.lo - 2, ins.lo)
+		ncase = asp.bu16(ins.lo - 2)
 		y.typ = ".NCASE"
 		y.fmt = "%d" % ncase
 		cs = switches.get(ins.lo)
@@ -318,15 +318,15 @@ def task(pj, cpu):
 			if ct == None:
 				ct = "_%d" % i
 
-			w = data.Const(pj.m, a, a + 2)
-			z = pj.m.bs16(a)
+			w = data.Const(asp, a, a + 2)
+			z = asp.bs16(a)
 			w.typ = ".CASE"
 			w.fmt = "0x%x, %d" % (i,z)
 
 			w.fmt += ", 0x%04x" % (ins.hi + z)
 			ins.add_flow(">", "0x%x" % i, ins.hi + z)
 			if z < 0:
-				pj.m.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
+				asp.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
 
 	cpu.flow_check.append(flow_switch)
 	cpu.disass(pj, 0x2f38)

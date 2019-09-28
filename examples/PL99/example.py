@@ -42,7 +42,7 @@ def setup():
 	cx = mc6800.mc68hc11()
 	cx.m.map(mem.stackup(("PL99.mc68hc11.bin",), nextto=__file__), 0x8000)
 	#######################################################################
-	def post_arg_func(pj, ins):
+	def post_arg_func(asp, ins):
 		post_arg_funcs = {
 			0xb80c:		"WB",
 			0xb821:		"WB",
@@ -65,8 +65,8 @@ def setup():
 			a = ins.hi
 			for j in i:
 				if j == "W":
-					d = pj.m.bu16(a)
-					data.Dataptr(pj.m, a, a + 2, d)
+					d = asp.bu16(a)
+					data.Dataptr(asp, a, a + 2, d)
 					a += 2
 					if d >= 0x8000:
 						d_q(pj, d)

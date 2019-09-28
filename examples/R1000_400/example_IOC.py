@@ -29,18 +29,18 @@ import os
 from pyreveng import job, mem, listing, data, code, assy, pil, discover
 import pyreveng.cpu.m68020 as m68020
 
-def fc_puts_inline(pj, ins, flow):
-	y = data.Txt(pj.m, ins.hi, label=False, align=2)
+def fc_puts_inline(asp, ins, flow):
+	y = data.Txt(asp, ins.hi, label=False, align=2)
 	flow.to = y.hi
 
-def flow_check(pj, ins):
+def flow_check(asp, ins):
 	for i in ins.flow_out:
 		h = {
 		0x80002028: fc_puts_inline,
 		# 0x10284: fc_puts_inline,
 		}.get(i.to)
 		if h:
-			h(pj, ins, i)
+			h(asp, ins, i)
 			break
 
 mytrap_desc = '''

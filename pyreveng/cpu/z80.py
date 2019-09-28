@@ -197,8 +197,8 @@ OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
 """
 
 class z80_ins(assy.Instree_ins):
-    def __init__(self, pj, lim, lang):
-        super(z80_ins, self).__init__(pj, lim, lang)
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
         self.idx = "HL"
 
     def assy_e(self):

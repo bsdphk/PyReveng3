@@ -101,7 +101,7 @@ def task(pj, cx):
 		0x936:	"i",
 	}
 
-	def inline_args(pj, ins):
+	def inline_args(asp, ins):
 		for f in ins.flow_out:
 			i = i_args.get(f.to)
 			if i == None:
@@ -111,7 +111,7 @@ def task(pj, cx):
 			a = ins.hi
 			for j in i:
 				if j == "i":
-					d = pj.m.bu16(a)
+					d = asp.bu16(a)
 					data.Dataptr(pj.m, a, a + 2, d)
 					a += 2
 				else:

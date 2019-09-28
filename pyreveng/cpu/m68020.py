@@ -93,8 +93,6 @@ UNPK		W,decAx,decAy,data -	|1 0 0 0| Ay  |1 1 0 0 0|1| Ax  |
 #######################################################################
 
 class m68020_ins(m68010_ins):
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
 
 	def assy_BF(self):
 		t = "{"

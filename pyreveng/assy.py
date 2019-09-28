@@ -48,8 +48,8 @@ class Missing(Exception):
 #######################################################################
 
 class Assy(code.Code):
-    def __init__(self, pj, lo, hi, lang):
-        super().__init__(pj, lo, hi, lang)
+    def __init__(self, lo, hi, lang):
+        super().__init__(lo, hi, lang)
         self.mne = "???"
         self.oper = []
         self.pil = pil.PIL_Ins(self)
@@ -80,10 +80,10 @@ class Assy(code.Code):
 #######################################################################
 
 class Instree_ins(Assy):
-    def __init__(self, pj, lim, lang):
+    def __init__(self, lim, lang):
         lo = lim[0].adr
         hi = lim[-1].adr + len(lim[-1].words) * lang.scale
-        super().__init__(pj, lo, hi, lang)
+        super().__init__(lo, hi, lang)
         self.prefix = False
         self.cc = True
         self.dstadr = None
@@ -275,15 +275,16 @@ class Instree_disass(code.Decoder):
         v.append(asp.bu32(adr + len(v) * 4))
 
     def decode(self, pj, adr, l=None):
+        asp = pj.m
         if l is None:
             l = []
-        for x in self.it.find(pj.m, adr, getmore=self.getmore):
+        for x in self.it.find(asp, adr, getmore=self.getmore):
             assert x.handler is not None
             if l and not issubclass(x.handler, l[-1].handler):
                 continue
             l.append(x)
             try:
-                y = x.handler(pj, l, self)
+                y = x.handler(l, self)
                 y.parse(pj)
             except Invalid as e:
                 l.pop(-1)
@@ -305,9 +306,9 @@ class Instree_disass(code.Decoder):
             else:
                 y.pildefault()
             for i in self.flow_check:
-                i(pj, y)
+                i(asp, y)
             return y
-        raise Invalid(pj.m.adr(adr) +
+        raise Invalid(asp.adr(adr) +
             " No matching " + self.name + " instruction")
 
 

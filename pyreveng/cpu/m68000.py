@@ -716,8 +716,8 @@ cond_code = (
 #######################################################################
 
 class m68000_ins(assy.Instree_ins):
-	def __init__(self, pj, lim, lang):
-		super(m68000_ins, self).__init__(pj, lim, lang)
+	def __init__(self, lim, lang):
+		super().__init__(lim, lang)
 		if self.lo & 1:
 			raise assy.Invalid("Odd Address")
 		self.ea = {}

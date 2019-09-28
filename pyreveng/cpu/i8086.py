@@ -348,8 +348,8 @@ breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]
 ireg = ["%bx+%si", "%bx+%di", "%bp+%si", "%bp+%di", "%si", "%di", "%bp", "%bx"]
 
 class i8086_ins(assy.Instree_ins):
-    def __init__(self, pj, lim, lang):
-        super(i8086_ins, self).__init__(pj, lim, lang)
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
         self.seg = ""
 
     def assy_io1(self):

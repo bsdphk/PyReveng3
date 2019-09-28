@@ -426,8 +426,8 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
 """
 
 class mc6809_ins(assy.Instree_ins):
-	def __init__(self, pj, lim, lang):
-		super(mc6809_ins, self).__init__(pj, lim, lang)
+	def __init__(self, lim, lang):
+		super().__init__(lim, lang)
 		self.isz = "i8"
 		self.icache = {}
 		self.pfx = None

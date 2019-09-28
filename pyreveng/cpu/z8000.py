@@ -622,8 +622,8 @@ E2E	-			|1 0 0 0 1 1 1 0| x1	|0 1|x2 |x3			| n	|
 
 class z8000_ins(assy.Instree_ins):
 
-    def __init__(self, pj, lim, lang):
-        super().__init__(pj, lim, lang)
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
         self.word = 1
 
     def assy_Adr(self):

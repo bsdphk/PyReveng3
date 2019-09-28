@@ -453,8 +453,8 @@ SIM	-		|0 0 1 1 0 0 0 0| {
 """
 
 class i8085_ins(assy.Instree_ins):
-    def __init__(self, pj, lim, lang):
-        super(i8085_ins, self).__init__(pj, lim, lang)
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
         self.seg = ""
 
     def assy_cmdx(self):

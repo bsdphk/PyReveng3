@@ -168,8 +168,8 @@ switches +=	'\n'
 
 class m68000_switch_ins(assy.Instree_ins):
 
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
+	def __init__(self, lim, lang):
+		super().__init__(lim, lang)
 		if self.lo & 1:
 			raise assy.Invalid("Odd Address")
 		self.go_lo = None

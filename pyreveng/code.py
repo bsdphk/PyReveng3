@@ -108,7 +108,7 @@ class Code(Leaf):
     '''
     A single undivisible "instruction" in some language
     '''
-    def __init__(self, pj, lo, hi, lang):
+    def __init__(self, lo, hi, lang):
         assert isinstance(lang, Decoder)
         self.lang = lang
         super().__init__(lo, hi, lang.name)
@@ -147,7 +147,7 @@ class Decoder():
         self.pil = pil.PIL_State(self)
         self.busy = False
 
-    def decode(self, pj, adr):
+    def decode(self, _asp, _adr):
         '''
         Attempt to decode at adr.
 

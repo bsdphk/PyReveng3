@@ -70,7 +70,7 @@ class my68k20(m68020.m68020):
 		super().__init__(lang)
 		self.add_ins(my68k20_instructions, my68k20_ins)
 
-def inline_text(pj, ins):
+def inline_text(asp, ins):
 	if not ins.dstadr in (
 		0x8000001c,
 		0x800000e2,
@@ -83,8 +83,8 @@ def inline_text(pj, ins):
 		0x80002028,
 	):
 		return
-	y = data.Txt(pj.m, ins.hi, label=False, splitnl=True, align=2)
-	ins.lang.disass(pj, y.hi)
+	y = data.Txt(asp, ins.hi, label=False, splitnl=True, align=2)
+	# ins.lang.disass(pj, y.hi)
 
 def setup():
 	m = mem_setup()

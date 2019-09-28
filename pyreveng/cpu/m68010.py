@@ -53,8 +53,6 @@ RTD		word		0	|0 1 0 0 1 1 1 0 0 1 1 1 0 1 0 0| word				|
 #######################################################################
 
 class m68010_ins(m68000_ins):
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
 
 	def assy_Rc(self):
 		x = self.lang.cregs.get(self['Rc'])

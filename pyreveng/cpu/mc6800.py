@@ -794,9 +794,9 @@ STX     x       |EF     | x             | {
 
 
 class mc6800_ins(assy.Instree_ins):
-    def __init__(self, pj, lim, lang):
+    def __init__(self, lim, lang):
         self.idx = "X"
-        super(mc6800_ins, self).__init__(pj, lim, lang)
+        super().__init__(lim, lang)
 
     def assy_ACC(self):
         self.mne += ["A", "B"][self['A']]
