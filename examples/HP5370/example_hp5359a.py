@@ -39,9 +39,6 @@ def task(pj, cpu):
 	ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
 	print(ct)
 
-	while pj.run():
-		pass
-
 if __name__ == '__main__':
 	pj, cx = setup()
 	task(pj, cx)

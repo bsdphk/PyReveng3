@@ -284,7 +284,7 @@ class z80(assy.Instree_disass):
     def codeptr(self, pj, adr):
         t = pj.m.lu16(adr)
         c = data.Codeptr(pj.m, adr, adr + 2, t)
-        pj.todo(t, self.disass)
+        self.disass(pj, t)
         return c
 
     def vectors(self, pj):
@@ -299,5 +299,5 @@ class z80(assy.Instree_disass):
             (None, 0x0038, "VEC_RST38_IRQ"),
             (None, 0x0066, "VEC_NMI"),
         ):
-            pj.todo(a, self.disass)
+            self.disass(pj, a)
             pj.m.set_label(a, l)

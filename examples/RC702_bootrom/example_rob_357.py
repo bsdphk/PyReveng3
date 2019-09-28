@@ -48,17 +48,13 @@ def task(pj, cx):
 	data.Txt(pj.m, 0xa58c, 0xa590, label=False)
 	data.Txt(pj.m, 0xa593, 0xa593 + 0x7, label=False)
 
-	pj.todo(0x0000, cx.disass)
+	cx.disass(pj, 0x0000)
 
 	# Interrupt vector table
 	for a in range(12):
 		cx.codeptr(pj, 0xa000 + a * 2)
 
 	#discover.Discover(pj, cx)
-
-	while pj.run():
-		continue
-
 
 if __name__ == '__main__':
 	print(__file__)

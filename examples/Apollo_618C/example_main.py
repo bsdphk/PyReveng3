@@ -47,14 +47,14 @@ def setup():
 	return pj,cx
 
 def task(pj, cx):
-	pj.todo(0xffff0, cx.disass)
+	cx.disass(pj, 0xffff0)
 
 	#######################################################################
 
 	def vect(seg, off):
 		a = (seg << 4) + off
 		# print("VECTOR %05x" % a)
-		pj.todo(a, cx.disass)
+		cx.disass(pj, a)
 		pj.m.set_label(a, "VECTOR")
 
 	# Vectors initialized at 0xe21b2...
@@ -67,13 +67,13 @@ def task(pj, cx):
 	# Random guesses
 
 	if False:
-		pj.todo(0xe63cf, cx.disass)
-		pj.todo(0xe7bd7, cx.disass)
-		pj.todo(0xe7fdd, cx.disass)
-		pj.todo(0xe834c, cx.disass)
-		pj.todo(0xe9251, cx.disass)
-		pj.todo(0xfcd68, cx.disass)
-		pj.todo(0xffb56, cx.disass)
+		cx.disass(pj, 0xe63cf)
+		cx.disass(pj, 0xe7bd7)
+		cx.disass(pj, 0xe7fdd)
+		cx.disass(pj, 0xe834c)
+		cx.disass(pj, 0xe9251)
+		cx.disass(pj, 0xfcd68)
+		cx.disass(pj, 0xffb56)
 
 	#######################################################################
 
@@ -98,7 +98,7 @@ def task(pj, cx):
 			off = pj.m.lu16(i)
 			a = (seg << 4) + off
 			x = data.Codeptr(pj.m, i, i + 2, a)
-			pj.todo(a, cx.disass)
+			cx.disass(pj, a)
 
 	def tbl2(a):
 		assert pj.m[a + 0] == 0x2e
@@ -117,16 +117,11 @@ def task(pj, cx):
 			e += 2
 		tbl(s >> 4, o + s, e)
 
-	while pj.run():
-		pass
-
 	t2dict = {}
 
 	more = True
 
 	while more:
-		while pj.run():
-			pass
 		more = False
 		for i in pj.m:
 			if i.tag != "i8086":
@@ -147,19 +142,17 @@ def task(pj, cx):
 
 	more = False
 	while more:
-		while pj.run():
-			pass
 		more = False
 		for lo, hi in pj.m.gaps():
 			if lo + 1 == hi:
 				continue
 			if pj.m[lo] == 0x55:
 				print("%04x, %04x" % (lo, hi))
-				pj.todo(lo, cx.disass)
+				cx.disass(pj, lo)
 				more = True
 			elif pj.m[lo] == 0x00 and pj.m[lo + 1] == 0x55:
 				print("%04x, %04x" % (lo, hi))
-				pj.todo(lo + 1, cx.disass)
+				cx.disass(pj, lo + 1)
 				more = True
 
 

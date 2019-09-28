@@ -27,7 +27,7 @@
 '''Intel i8088/i8086
 '''
 
-from pyreveng import instree, assy, binutils, mem
+from pyreveng import instree, assy, binutils, mem, data
 
 i8086_desc="""
 #		|- - - - - - - -|- - - - - - - -|- - - - - - - -|
@@ -537,7 +537,7 @@ class i8086(assy.Instree_disass):
         # print("%05x" % adr)
         b = super(i8086, self).disass(pj, adr)
         if not b:
-            y = pj.add(adr, adr + 1, "XXX")
+            y = data.Data(pj.m, adr, adr + 1, "XXX")
             y.rendered = "FAIL_DISASS"
             if x != "":
                 y.lcmt += x + "\n"

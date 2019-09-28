@@ -39,6 +39,8 @@ HP 48 Calculator.
 
 from . import pil
 
+from . import mem
+
 from .exception import Invalid
 from .leaf import Leaf
 
@@ -65,10 +67,10 @@ class Flow():
     def propagate(self, pj):
 
         if self.to is not None:
-            pj.todo(self.to, self.lang.disass)
+            self.lang.todo.append([pj, self.to, self])
 
     def __repr__(self):
-        s = "<Flow @%x " % self.fm.lo + str(self.typ)
+        s = "<Flow @0x%x " % self.fm.lo + str(self.typ)
         if self.to is None:
             s += " -"
         else:
@@ -141,6 +143,7 @@ class Decoder():
         assert isinstance(lang, str)
         self.lang = lang
         self.name = lang
+        self.todo = []
         self.pil = pil.PIL_State(self)
 
     def decode(self, pj, adr):
@@ -161,10 +164,26 @@ class Decoder():
         Decode at adr and run with it.
         Complain if it fails.
         '''
-        y = pj.m.find_lo(adr)
-        if y:
-            return y
-        x = self.decode(pj, adr)
-        assert isinstance(x, Code)
-        x.commit(pj)
-        return x
+        a0 = adr
+        xx = None
+        if self.todo:
+            self.todo.append([pj, adr, None])
+            return
+        self.todo.append([pj, adr, None])
+        while self.todo:
+            pj, adr, _from = self.todo.pop()
+            x = pj.m.find_lo(adr)
+            if not x:
+                try:
+                    x = self.decode(pj, adr)
+                    assert isinstance(x, Code)
+                    x.commit(pj)
+                except Invalid:
+                    print("Failed decode", self.name, "0x%x" % adr, _from)
+                except mem.MemError:
+                    print("No Memory", self.name, "0x%x" % adr, _from)
+            else:
+                x = x[0]
+            if adr == a0:
+                xx = x
+        return xx

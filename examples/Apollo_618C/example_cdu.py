@@ -68,19 +68,13 @@ def task(pj, cx):
 	cx.vectors(pj, which=("RESET", "TF0", "IE0", "TF1"))
 
 	# Random
-	# pj.todo(0x7d2, cx.disass)
+	# cx.disass(pj, 0x7d2)
 
 	for i in range(0, 0x18, 8):
 		data.Txt(pj.m, 0x0a2 + i, 0x0a2 + i + 0x08, label=False)
 
 	for i in range(0, 0x18, 8):
 		data.Txt(pj.m, 0x78a + i, 0x78a + i + 0x08, label=False)
-
-	#######################################################################
-
-	while pj.run():
-		pass
-
 
 	#######################################################################
 	def cmd_func(a1, a2, n):

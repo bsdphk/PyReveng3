@@ -75,13 +75,10 @@ def do_one(fn, alist):
 
 	if True:
 		for i in alist:
-			pj.todo(i, dx.disass)
+			dx.disass(pj, i)
 
 	pj.m.apct = "%04o"
 	pj.m.apct = "%03x"
-
-	while pj.run():
-		pass
 
 	def fixit(i, a, b):
 		if i == a.lo:

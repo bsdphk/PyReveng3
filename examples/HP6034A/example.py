@@ -159,36 +159,36 @@ def task(pj, cx):
 			cx.codeptr(pj, 0x23c + i)
 
 	if True:
-		pj.todo(0x037c, cx.disass)
-		pj.todo(0x038e, cx.disass)
-		pj.todo(0x03aa, cx.disass)
-		pj.todo(0x03ba, cx.disass)
-		pj.todo(0x03ca, cx.disass)
-		pj.todo(0x0406, cx.disass)
-		pj.todo(0x0428, cx.disass)
-		pj.todo(0x044a, cx.disass)
-		pj.todo(0x0458, cx.disass)
-		pj.todo(0x052e, cx.disass)
+		cx.disass(pj, 0x037c)
+		cx.disass(pj, 0x038e)
+		cx.disass(pj, 0x03aa)
+		cx.disass(pj, 0x03ba)
+		cx.disass(pj, 0x03ca)
+		cx.disass(pj, 0x0406)
+		cx.disass(pj, 0x0428)
+		cx.disass(pj, 0x044a)
+		cx.disass(pj, 0x0458)
+		cx.disass(pj, 0x052e)
 
 	if True:
 		# Pure guesswork
 		#for a in range(0xcee, 0xd0c, 2):
 		#	cx.codeptr(pj, a)
-		pj.todo(0x0e1e, cx.disass)
+		cx.disass(pj, 0x0e1e)
 
 	if True:
-		pj.todo(0x0d18, cx.disass)
+		cx.disass(pj, 0x0d18)
 
 	if True:
-		pj.todo(0x0e50, cx.disass)
-		pj.todo(0x0e80, cx.disass)
+		cx.disass(pj, 0x0e50)
+		cx.disass(pj, 0x0e80)
 
 	if True:
 		for a in range(0xf1c, 0xf20):
 			data.Txt(pj.m, a, a + 1, False)
 
 	if True:
-		pj.todo(0x10b2, cx.disass)
+		cx.disass(pj, 0x10b2)
 
 	if True:
 		# Continuation addresses when more bytes arrive
@@ -222,9 +222,6 @@ def task(pj, cx):
 		# Failure Flash Codes
 		for a in range(0xcc, 0xd8, 2):
 			dptr(pj, a)
-
-	while pj.run():
-		pass
 
 	pj.m.set_label(0x00cc, "FAIL_LEDS")
 	pj.m.set_label(0x0140, "FAIL_1")

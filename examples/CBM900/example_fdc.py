@@ -100,11 +100,9 @@ def task(pj, cx):
         0xfff6,
         0xfff9,
     ):
-        pj.todo(a, cx.disass)
+        #cx.disass(pj, a)
+        cx.disass(pj, a)
         pj.m.set_line_comment(a, "MANUAL")
-
-    while pj.run():
-        pass
 
 if __name__ == '__main__':
     pj, cx = setup()

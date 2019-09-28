@@ -1080,7 +1080,7 @@ class m68000_ins(assy.Instree_ins):
 	def assy_vect(self, pj):
 		if self.lang.trap_returns.get(self['vect']):
 			# XXX: use flow
-			pj.todo(self.hi, self.lang.disass)
+			self.lang.disass(pj, self.hi)
 		return "#%d" % self['vect']
 
 	def assy_W(self, pj):
@@ -1480,7 +1480,7 @@ class m68000(assy.Instree_disass):
 	def codeptr(self, pj, adr):
 		t = pj.m.bu32(adr)
 		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		pj.todo(t, self.disass)
+		self.disass(pj, t)
 		return c
 
 	def dataptr(self, pj, adr):

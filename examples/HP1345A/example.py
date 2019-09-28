@@ -73,9 +73,6 @@ def task(pj, cx):
 
 	cpu.vectors(pj)
 
-	while pj.run():
-		pass
-
 	l = []
 	for a in range(0x122, 0x200, 2):
 		l.append(pj.m.bu16(a))

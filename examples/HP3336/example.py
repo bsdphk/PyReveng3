@@ -134,8 +134,8 @@ symbols = {
 
 
 def task(pj, dx):
-	pj.todo(0, dx.disass)
-	pj.todo(0xff, dx.disass)
+	dx.disass(pj, 0)
+	dx.disass(pj, 0xff)
 
 	#######################################################################
 	if True:
@@ -148,8 +148,8 @@ def task(pj, dx):
 			dpf &= 0x7ff
 			dpf |= pg
 			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
-			pj.todo(a0, dx.disass)
-			pj.todo(dpf, dx.disass)
+			dx.disass(pj, a0)
+			dx.disass(pj, dpf)
 			for a1 in range(pg, dpf, 2):
 				da = pj.m[a1] << 8
 				da |= pj.m[a1 + 1]
@@ -159,7 +159,7 @@ def task(pj, dx):
 				v |= (a1 - pg) >> 1
 				pj.m.set_label(a1, "PTR_%02x" % v)
 				pj.m.set_label(da, "FN_%02x" % v)
-				pj.todo(a1, dx.disass)
+				dx.disass(pj, a1)
 
 
 	#######################################################################
@@ -167,7 +167,7 @@ def task(pj, dx):
 		x = data.Range(pj.m, lo, hi, "table")
 		# x = pj.m.set_line_comment(lo, "table")
 		for a in range(lo, hi, span):
-			pj.todo(a, dx.disass)
+			dx.disass(pj, a)
 		# x.blockcmt = "-\n" + txt + "\n-\n"
 		return x
 
@@ -217,10 +217,6 @@ def task(pj, dx):
 	if True:
 		for a,l in symbols.items():
 			pj.m.set_label(a,l)
-
-
-	while pj.run():
-		pass
 
 if __name__ == '__main__':
 	pj, cx = setup()

@@ -1041,13 +1041,7 @@ for pg in (0,1,2,3,4):
 		lexer(pj)
 		cpu.vectors(pj)
 
-	while pj.run():
-		pass
-
 	# decompile.analyse(pj, cpu)
-
-	while pj.run():
-		pass
 
 	str_len_args(pj, 0xd8a5, 3, 2)
 	str_len_args(pj, 0x9ffe, 1, 2)

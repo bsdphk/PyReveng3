@@ -62,7 +62,7 @@ class my68k20_ins(m68020.m68020_ins):
 
 	def assy_inltxt(self, pj):
 		y = data.Txt(pj.m, self.lo + 2, label=False, splitnl=True, align=2)
-		pj.todo(y.hi, self.lang.disass)
+		self.lang.disass(pj, y.hi)
 		raise assy.Invalid("Inline text hack")
 
 class my68k20(m68020.m68020):
@@ -84,7 +84,7 @@ def inline_text(pj, ins):
 	):
 		return
 	y = data.Txt(pj.m, ins.hi, label=False, splitnl=True, align=2)
-	pj.todo(y.hi, ins.lang.disass)
+	ins.lang.disass(pj, y.hi)
 
 def setup():
 	m = mem_setup()
@@ -132,7 +132,7 @@ def task(pj, cpu):
 	pj.m.set_label(0x8000014c, "_print_CRLF()")
 
 	#cpu.vectors(pj, hi=0x28)
-	pj.todo(0x80000024, cpu.disass)
+	cpu.disass(pj, 0x80000024)
 	for a in (
 		0x80000072,
 		0x80000156,
@@ -208,10 +208,10 @@ def task(pj, cpu):
 		0x80002bc4,
 		0x800040a0,
 	):
-		pj.todo(a, cpu.disass)
+		cpu.disass(pj, a)
 
 	for a in range(0x80002000, 0x80002074, 4):
-		pj.todo(a, cpu.disass)
+		cpu.disass(pj, a)
 
 	for a in range(0x8000310e, 0x80003122, 4):
 		cpu.codeptr(pj, a)
@@ -220,7 +220,7 @@ def task(pj, cpu):
 		cpu.codeptr(pj, a)
 
 	for a in range(0x80004000, 0x80004008, 4):
-		pj.todo(a, cpu.disass)
+		cpu.disass(pj, a)
 
 	for a in range(0x800043aa, 0x80004492, 6):
 		y = data.Const(pj.m, a, a + 4, func=pj.m.bu32, size=4)
@@ -229,7 +229,7 @@ def task(pj, cpu):
 		w >>= 4
 		w &= 0xffe
 		d = 0x800043aa + w
-		pj.todo(d, cpu.disass)
+		cpu.disass(pj, d)
 
 
 	for a in range(0x80004a7a, 0x80004a98, 4):
@@ -250,15 +250,7 @@ def task(pj, cpu):
 	# See 0x800039e0
 	data.Const(pj.m, 0x80003a2a, 0x80003a2a + 0x16)
 
-	while pj.run():
-		pass
-
 	d = discover.Discover(pj, cpu)
-
-	while pj.run():
-		pass
-
-	return
 
 #######################################################################
 

@@ -362,8 +362,6 @@ def analyse(pj, cpu):
 				continue
 			if not assemble_call(pj, i.lo, k[0].hi, pj.m[k[0].lo + 1] & 0xf):
 				continue
-		while pj.run():
-			pass
 		if not again:
 			break
 

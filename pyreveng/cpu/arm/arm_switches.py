@@ -54,7 +54,7 @@ def switchblock_8(pj, adr, nswitch, lang):
 		o = pj.m[a] * 4
 		d = adr + 4 + o
 		pj.m.set_label(d, "switch_0x%x_%d" % (adr, i))
-		pj.todo(d, lang.disass)
+		lang.disass(pj, d)
 		txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
 		a += 1
 	y = data.Data(pj, adr, adr + tl, fmt=txt)
@@ -68,7 +68,7 @@ def switchblock_16(pj, adr, nswitch, lang):
 		o = pj.m.lu16(a) * 4
 		d = adr + 4 + o
 		pj.m.set_label(d, "switch_0x%x_%d" % (adr, i))
-		pj.todo(d, lang.disass)
+		lang.disass(pj, d)
 		txt += '[%d] .+0x%x (0x%x)\n' % (i, o, d)
 		a += 2
 	y = data.Data(pj, adr, adr + tl, fmt=txt)

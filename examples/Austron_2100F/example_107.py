@@ -160,40 +160,38 @@ def task(pj, cx):
 	# Code
 
 	# Addresses stored into 0x0010
-	pj.todo(0xd401, cx.disass)
-	pj.todo(0xde3a, cx.disass)
+	cx.disass(pj, 0xd401)
+	cx.disass(pj, 0xde3a)
 
 	# Addresses stored into 0x0033
-	pj.todo(0xdaaa, cx.disass)
-	pj.todo(0xdceb, cx.disass)
-	pj.todo(0xdd0d, cx.disass)
+	cx.disass(pj, 0xdaaa)
+	cx.disass(pj, 0xdceb)
+	cx.disass(pj, 0xdd0d)
 
 	# Addresses stored into 0x003a
-	pj.todo(0xf284, cx.disass)
+	cx.disass(pj, 0xf284)
 
 	# Addresses stored into 0x008d (Key-handlers ?)
-	pj.todo(0xe02b, cx.disass)
-	pj.todo(0xe05e, cx.disass)
-	pj.todo(0xe37e, cx.disass)
-	pj.todo(0xdf41, cx.disass)
-	pj.todo(0xf429, cx.disass)
-	pj.todo(0xf377, cx.disass)
+	cx.disass(pj, 0xe02b)
+	cx.disass(pj, 0xe05e)
+	cx.disass(pj, 0xe37e)
+	cx.disass(pj, 0xdf41)
+	cx.disass(pj, 0xf429)
+	cx.disass(pj, 0xf377)
 
 	# Addresses stored into 0x010c
-	pj.todo(0xdb26, cx.disass)
-	pj.todo(0xdb32, cx.disass)
+	cx.disass(pj, 0xdb26)
+	cx.disass(pj, 0xdb32)
 
 	# LDS-JMP-TSX calls
-	pj.todo(0xd033, cx.disass)
-	pj.todo(0xf44d, cx.disass)
+	cx.disass(pj, 0xd033)
+	cx.disass(pj, 0xf44d)
 
 	# Things discover gets wrong
-	pj.todo(0xdee2, cx.disass)
-	pj.todo(0xde3a, cx.disass)
+	cx.disass(pj, 0xdee2)
+	cx.disass(pj, 0xde3a)
 
 	while True:
-		while pj.run():
-			continue
 
 		# Find queue'd entry points
 		stop = True
@@ -212,7 +210,7 @@ def task(pj, cx):
 			a = pj.m.bu16(i.lo + 1)
 			if len(pj.find(a)) == 0:
 				print("Queued: 0x%04x" % a)
-				pj.todo(a, cx.disass)
+				cx.disass(pj, a)
 				pj.m.set_label(a, "Q%04x" % a)
 				stop = False
 		if stop:

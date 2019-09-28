@@ -122,10 +122,10 @@ symbols = {
 }
 
 def task(pj, dx):
-	pj.todo(0, dx.disass)
-	pj.todo(0xf7, dx.disass)
-	pj.todo(0xfd, dx.disass)
-	pj.todo(0xff, dx.disass)
+	dx.disass(pj, 0)
+	dx.disass(pj, 0xf7)
+	dx.disass(pj, 0xfd)
+	dx.disass(pj, 0xff)
 
 	if True:
 		for a,l in symbols.items():
@@ -246,8 +246,6 @@ This is called every 32 instructions during integration, hence every 64 clocks.
 up with the number of PLCs elapsed since the counter was zeroed.
 REG9 is returned in the accumulator.
 """)
-	while pj.run():
-		pass
 
 	line_comment(pj, 0x004, "Use existing settings\n")
 	line_comment(pj, 0x006, "Default Control Bits\n")

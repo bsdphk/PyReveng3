@@ -329,7 +329,7 @@ def task(pj, cpu):
 				pj.m.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
 
 	cpu.flow_check.append(flow_switch)
-	pj.todo(0x2f38, cpu.disass)
+	cpu.disass(pj, 0x2f38)
 
 	###############################################################
 
@@ -447,7 +447,7 @@ def task(pj, cpu):
 
 			self.fp = 0x196b6 + self.fi * 4
 			self.fa = pj.m.bu32(self.fp)
-			pj.todo(self.fa, cpu.disass)
+			cpu.disass(pj, self.fa)
 			data.Codeptr(pj.m, self.fp, self.fp + 4, self.fa)
 			pj.m.set_label(self.fa, "F_" + nm + "(" + self.summ() + ")")
 
@@ -750,36 +750,36 @@ def task(pj, cpu):
 		# Orphans ?
 
 		if False:
-			pj.todo(0x01b88, cpu.disass)
-			pj.todo(0x01b8e, cpu.disass)
-			pj.todo(0x01b94, cpu.disass)
-			pj.todo(0x01b9a, cpu.disass)
-			pj.todo(0x01b9e, cpu.disass)
-			pj.todo(0x01ba2, cpu.disass)
-			pj.todo(0x01ba8, cpu.disass)
-			pj.todo(0x01c76, cpu.disass)
-			pj.todo(0x01c82, cpu.disass)
-			pj.todo(0x01c90, cpu.disass)
-			pj.todo(0x01cd2, cpu.disass)
-			pj.todo(0x01d14, cpu.disass)
+			cpu.disass(pj, 0x01b88)
+			cpu.disass(pj, 0x01b8e)
+			cpu.disass(pj, 0x01b94)
+			cpu.disass(pj, 0x01b9a)
+			cpu.disass(pj, 0x01b9e)
+			cpu.disass(pj, 0x01ba2)
+			cpu.disass(pj, 0x01ba8)
+			cpu.disass(pj, 0x01c76)
+			cpu.disass(pj, 0x01c82)
+			cpu.disass(pj, 0x01c90)
+			cpu.disass(pj, 0x01cd2)
+			cpu.disass(pj, 0x01d14)
 
-			pj.todo(0x01578, cpu.disass)
-			pj.todo(0x01594, cpu.disass)
-			pj.todo(0x0171a, cpu.disass)
-			pj.todo(0x01906, cpu.disass)
-			pj.todo(0x02dee, cpu.disass)
-			pj.todo(0x02df4, cpu.disass)
-			pj.todo(0x03412, cpu.disass)
-			pj.todo(0x11e74, cpu.disass)
+			cpu.disass(pj, 0x01578)
+			cpu.disass(pj, 0x01594)
+			cpu.disass(pj, 0x0171a)
+			cpu.disass(pj, 0x01906)
+			cpu.disass(pj, 0x02dee)
+			cpu.disass(pj, 0x02df4)
+			cpu.disass(pj, 0x03412)
+			cpu.disass(pj, 0x11e74)
 
 		# from 0x2272
-		pj.todo(0x2282, cpu.disass)
+		cpu.disass(pj, 0x2282)
 
 		# filled in 0xffffabd2
-		pj.todo(0x0ed98, cpu.disass)
+		cpu.disass(pj, 0x0ed98)
 
-		pj.todo(0x0df5e, cpu.disass) # Arg to 0x802
-		pj.todo(0x3292, cpu.disass)	# 0x3284
+		cpu.disass(pj, 0x0df5e) # Arg to 0x802
+		cpu.disass(pj, 0x3292)	# 0x3284
 
 		#######################################################
 		# pat 4,244,024 pg 262 lin 3700
@@ -809,9 +809,6 @@ def task(pj, cpu):
 
 		for i in y.__dict__:
 			print("\t", i, y.__dict__[i])
-
-	while pj.run():
-		pass
 
 	for i in pj.m:
 		if i.tag != "m68000":
@@ -1342,8 +1339,6 @@ def task(pj, cpu):
 			for i in l:
 				y = cpu.disass(pj, i)
 				y.lcmt = "DISCOVER - "
-			while pj.run():
-				pass
 			if len(l) == 0:
 				break
 

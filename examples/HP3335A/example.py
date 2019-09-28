@@ -134,7 +134,7 @@ def task(pj, cpu):
 				if v not in symbols:
 					symbols[v] = "CMD_" + x[n]
 			n += 1
-			pj.todo(v, cpu.disass)
+			cpu.disass(pj, v)
 
 	jmptbl(0x7768, 0x77b6, '9876543210.-@ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 	jmptbl(0x7860, 0x787c)
@@ -176,10 +176,6 @@ def task(pj, cpu):
 	if True:
 		for a,l in symbols.items():
 			pj.m.set_label(a,l)
-
-
-	while pj.run():
-		pass
 
 if __name__ == '__main__':
 	pj, cx = setup()

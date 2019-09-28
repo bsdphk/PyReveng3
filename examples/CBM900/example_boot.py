@@ -236,16 +236,16 @@ def task(pj, cx):
             y = cx.codeptr(pj, a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
-        pj.todo(0x20bc, cx.disass)
-        pj.todo(0x3ec6, cx.disass)
+        cx.disass(pj, 0x20bc)
+        cx.disass(pj, 0x3ec6)
 
-        pj.todo(0x06da, cx.disass)
-        pj.todo(0x0214, cx.disass)
-        pj.todo(0x10ec, cx.disass)
-        pj.todo(0x11a6, cx.disass)
-        pj.todo(0x2028, cx.disass)
-        pj.todo(0x2034, cx.disass)
-        pj.todo(0x3bd2, cx.disass)
+        cx.disass(pj, 0x06da)
+        cx.disass(pj, 0x0214)
+        cx.disass(pj, 0x10ec)
+        cx.disass(pj, 0x11a6)
+        cx.disass(pj, 0x2028)
+        cx.disass(pj, 0x2034)
+        cx.disass(pj, 0x3bd2)
 
         for a in (
             0x01c0,
@@ -257,7 +257,7 @@ def task(pj, cx):
             0x0ef0,
         ):
             pj.m.set_line_comment(a, "CALL_RR10_%x" % a)
-            pj.todo(a, cx.disass)
+            cx.disass(pj, a)
 
         for a in range(0x3e90, 0x3ea0, 4):
             y = cx.codeptr(pj, a)
@@ -266,9 +266,6 @@ def task(pj, cx):
         # pj.m.set_block_comment(0x6800, "DATA SEGMENT, len=0x1016")
 
         chargen(pj, 0x45fe + 0)
-
-        while pj.run():
-            pass
 
         for a,b,c in (
             (0x01000006, 0x0100000e, 4),
@@ -297,10 +294,6 @@ def task(pj, cx):
             data.Pstruct(pj.m, a, "BB")
 
         hd6845_tab(pj)
-
-    while pj.run():
-        pass
-
 
 if __name__ == '__main__':
     pj, cx = setup()

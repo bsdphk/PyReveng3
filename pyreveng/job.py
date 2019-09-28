@@ -60,36 +60,3 @@ class Job():
 			if i.tag == tag:
 				return i
 		return None
-
-	def todo(self, adr, func):
-		assert isinstance(adr, int)
-		if adr >= self.m.lo and adr < self.m.hi:
-			self.dolist.append((adr, func))
-			return
-		for lo, hi in self.banks:
-			if adr >= lo and adr < hi:
-				return
-		print("WARNING: Ignoring todo at illegal address " +
-		    self.afmt(adr), func)
-
-	def run(self):
-		s = {}
-		rv = False
-		while self.dolist:
-			rv = True
-			adr, func = self.dolist.pop()
-			if s.get(adr) == func:
-				continue
-			s[adr] = func
-			try:
-				func(self, adr)
-				err = None
-			except code.Invalid as e:
-				err = e
-			except mem.MemError as e:
-				err = e
-			if err is None:
-				continue
-			print("Todo fail: " + self.name + " " + str(err) + "\n" +
-			    "    adr= " + self.m.adr(adr) + " func=", func)
-		return rv

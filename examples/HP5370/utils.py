@@ -305,7 +305,7 @@ def one_eprom(pj, disass, start, eprom_size):
 	for ax in range(start + 3, start + eprom_size, 3):
 		if pj.m[ax] != 0x7e:
 			break
-		pj.todo(ax, disass)
+		disass(pj, ax)
 
 def eprom(p, disass, start, end, sz):
 	lx = list()

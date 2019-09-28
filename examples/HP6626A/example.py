@@ -317,7 +317,7 @@ def task(pj, cpu):
 			if False:
 				# XXX: doesn't work for ERROR
 				print("XXX %04x" % (z-3), y.txt)
-				pj.todo(z - 3, cpu.disass)
+				cpu.disass(pj, z - 3)
 			pj.m.set_label(z, "func_" + y.txt)
 			a += 2
 
@@ -587,12 +587,6 @@ def task(pj, cpu):
 		z = pj.m.bu16(a + 3)
 		data.Dataptr(pj.m, a + 3, a + 5, z)
 		tt3_2(z)
-
-	##############
-
-
-	while pj.run():
-		pass
 
 	#############
 	# Add comment with error message

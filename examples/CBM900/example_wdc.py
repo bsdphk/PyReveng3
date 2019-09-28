@@ -48,7 +48,7 @@ def task(pj, cx):
     for a in range(0x0a, 0x21):
         t = pj.m[a]
         data.Codeptr(pj.m, a, a + 1, t)
-        pj.todo(t, cx.disass)
+        cx.disass(pj, t)
         pj.m.set_block_comment(t, "From PTR 0x%x" % a)
     for a in range(0x000, 0x800, 0x100):
         cx.disass(pj, a + 0xfe)
@@ -61,11 +61,8 @@ def task(pj, cx):
             0x70d,
             0x720,
     ):
-        pj.todo(a, cx.disass)
+        cx.disass(pj, a)
         pj.m.set_block_comment(a, "Manual")
-
-    while pj.run():
-        pass
 
 if __name__ == '__main__':
     pj, cx = setup()

@@ -454,17 +454,17 @@ def task(pj, cx):
 	for a in range(x.lo, x.hi, 2):
 		c = cword(pj, a)
 
-	pj.todo(0x9102, cx.disass)
-	pj.todo(0x95da, cx.disass)
-	pj.todo(0x9b29, cx.disass)
-	pj.todo(0x9a96, cx.disass)
-	pj.todo(0x9b44, cx.disass)
-	pj.todo(0x9b57, cx.disass)
-	pj.todo(0xdda1, cx.disass)
-	pj.todo(0xdde0, cx.disass)
-	pj.todo(0xde00, cx.disass)
-	pj.todo(0xde20, cx.disass)
-	pj.todo(0xf719, cx.disass)
+	cx.disass(pj, 0x9102)
+	cx.disass(pj, 0x95da)
+	cx.disass(pj, 0x9b29)
+	cx.disass(pj, 0x9a96)
+	cx.disass(pj, 0x9b44)
+	cx.disass(pj, 0x9b57)
+	cx.disass(pj, 0xdda1)
+	cx.disass(pj, 0xdde0)
+	cx.disass(pj, 0xde00)
+	cx.disass(pj, 0xde20)
+	cx.disass(pj, 0xf719)
 
 	for a in range(0x9789, 0x97a5, 4):
 		d_q(pj, a)
@@ -497,9 +497,6 @@ def task(pj, cx):
 	d_q(pj, 0xd4f9)
 	d_q(pj, 0xd4fd)
 	d_q(pj, 0xd501)
-
-	while pj.run():
-		pass
 
 	pj.m.set_label(0x6489, "CHAIN_PTR")
 

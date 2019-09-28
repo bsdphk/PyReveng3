@@ -65,8 +65,8 @@ def task(pj, cpu):
 		ptr(pj, a)
 
 	# XXX: Add mising flow
-	pj.todo(0x6845, cpu.disass)
-	pj.todo(0x6867, cpu.disass)
+	cpu.disass(pj, 0x6845)
+	cpu.disass(pj, 0x6867)
 
 	for i in range(0x6b23, 0x6b3b, 3):
 		utils.data24(pj, i)
@@ -92,9 +92,6 @@ def task(pj, cpu):
 	pj.m.set_label(c.dst, "HPIB_CMD_PARSE")
 
 	utils.square_tbl(pj)
-
-	while pj.run():
-		pass
 
 	utils.apply_labels(pj, "B")
 	utils.tramp(pj)

@@ -854,7 +854,7 @@ class z8001(assy.Instree_disass):
 
     def codeptr(self, pj, adr):
         y = data.Codeptr(pj.m, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
-        pj.todo(y.dst, self.disass)
+        self.disass(pj, y.dst)
         return y
 
     def vector(self, pj, a, n):
@@ -865,7 +865,6 @@ class z8001(assy.Instree_disass):
         data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
         y = self.codeptr(pj, a)
-        pj.todo(y.dst, self.disass)
         pj.m.set_label(y.dst, n + "_VEC")
         return y.dst
 

@@ -51,9 +51,6 @@ def task(pj, cpu):
 
 	utils.square_tbl(pj)
 
-	while pj.run():
-		pass
-
 	utils.apply_labels(pj, "A")
 	utils.tramp(pj)
 

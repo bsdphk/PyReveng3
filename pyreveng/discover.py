@@ -46,10 +46,6 @@ class Discover():
 		self.pj = pj
 		self.cx = cx
 
-		# Clear the backlog first
-		while pj.run():
-			continue
-
 		self.build_all()
 		self.map_flows()
 		self.map_overlap()

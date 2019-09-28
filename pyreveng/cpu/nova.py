@@ -177,7 +177,7 @@ class nova_ins(assy.Instree_ins):
             return r
         t = pj.m[r.dst]
         if t:
-            pj.todo(t, self.lang.disass)
+            self.lang.disass(pj, t)
         return r
 
 class nova(assy.Instree_disass):

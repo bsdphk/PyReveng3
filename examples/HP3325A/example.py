@@ -52,21 +52,15 @@ def setup():
 	return pj, cx
 
 def task(pj, dx):
-	pj.todo(0, dx.disass)
-	pj.todo(0xff, dx.disass)
-
-	#######################################################################
-	while pj.run():
-		pass
+	dx.disass(pj, 0)
+	dx.disass(pj, 0xff)
 
 	cuts = []
 
 	#######################################################################
 	if True:
 		for a0 in range(4,0x20,4):
-			pj.todo(a0, dx.disass)
-		while pj.run():
-			pass
+			dx.disass(pj, a0)
 		ix0 = pj.find(0x54)
 		assert len(ix0) == 1
 		ix0 = ix0[0]
@@ -88,16 +82,10 @@ def task(pj, dx):
 			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			for a1 in range(pg, dpf, 2):
 				ix1.add_flow(pj, ">", to=a1)
-				pj.todo(a1, dx.disass)
+				dx.disass(pj, a1)
 				v = a0 << 3
 				v |= (a1 - pg) >> 1
 				pj.m.set_label(a1, "PTR_%02x" % v)
-
-	#######################################################################
-
-	while pj.run():
-		pass
-
 
 	#######################################################################
 	def jmp_table(lo, hi, span, txt = "table", src = None):
@@ -116,7 +104,7 @@ def task(pj, dx):
 		for a in range(lo, hi, span):
 			if ins != None:
 				ins.add_flow(pj, ">", to=a)
-			pj.todo(a, dx.disass)
+			dx.disass(pj, a)
 
 	if True:
 		jmp_table(0x07d0, 0x0800, 8, "table", 0x007f)
@@ -128,11 +116,6 @@ def task(pj, dx):
 		jmp_table(0x1fd0, 0x2000, 8, "table", 0x1d01)
 		jmp_table(0x2fb8, 0x3000, 8, "table", 0x2f86)
 		jmp_table(0x3fd8, 0x4000, 4, "table", 0x3d17)
-
-	#######################################################################
-
-	while pj.run():
-		pass
 
 if __name__ == '__main__':
 	pj, cx = setup()
