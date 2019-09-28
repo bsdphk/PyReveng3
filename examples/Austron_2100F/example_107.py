@@ -87,7 +87,7 @@ def codet(pj, cx, lo, hi):
 	for a in range(lo, hi, 2):
 		x = pj.m.bu16(a)
 		if x >= pj.m.lo and x < pj.m.hi:
-			cx.codeptr(pj, a)
+			cx.codeptr(a)
 			pj.m.set_label(x, "L%04x" % x)
 		else:
 			w16(pj, a)
@@ -95,7 +95,7 @@ def codet(pj, cx, lo, hi):
 
 def task(pj, cx):
 
-	cx.vectors(pj)
+	cx.vectors()
 
 	##################################################################
 	# Tables

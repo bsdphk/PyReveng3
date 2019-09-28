@@ -88,7 +88,7 @@ cru_adr = {
 
 def task(pj, cx):
 
-	cx.vectors(pj, xops = 0)
+	cx.vectors(xops = 0)
 
 	def dptr(pj, a):
 		v = pj.m.bu16(a)
@@ -130,7 +130,7 @@ def task(pj, cx):
 			l.append(c.txt)
 		# print(l)
 		for a in range(0xcee, 0xd0c, 2):
-			c = cx.codeptr(pj, a)
+			c = cx.codeptr(a)
 			n = l.pop(0)
 			if n == "\\r":
 				n = "SEP"
@@ -156,7 +156,7 @@ def task(pj, cx):
 			dptr(pj, 0x230 + i)
 			dptr(pj, 0x248 + i)
 			dptr(pj, 0x254 + i)
-			cx.codeptr(pj, 0x23c + i)
+			cx.codeptr(0x23c + i)
 
 	if True:
 		cx.disass(pj.m, 0x037c)
@@ -173,7 +173,7 @@ def task(pj, cx):
 	if True:
 		# Pure guesswork
 		#for a in range(0xcee, 0xd0c, 2):
-		#	cx.codeptr(pj, a)
+		#	cx.codeptr(a)
 		cx.disass(pj.m, 0x0e1e)
 
 	if True:
@@ -193,16 +193,16 @@ def task(pj, cx):
 	if True:
 		# Continuation addresses when more bytes arrive
 		for a in range(0xf4e, 0xf54, 2):
-			cx.codeptr(pj, a)
+			cx.codeptr(a)
 
 	if True:
 		for a in range(0xf3e, 0xf42, 2):
-			cx.codeptr(pj, a)
+			cx.codeptr(a)
 
 	if True:
 		for a in range(0x468, 0x474, 2):
 			v = dptr(pj, a)
-			cx.vector(pj, v)
+			cx.vector(v)
 
 	if True:
 		for a in range(0xf5a, 0xf7a, 2):

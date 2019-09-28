@@ -44,7 +44,7 @@ def setup():
     return pj, cx
 
 def task(pj, cx):
-    cx.vectors(pj)
+    cx.vectors()
     for a in range(0x0a, 0x21):
         t = pj.m[a]
         data.Codeptr(pj.m, a, a + 1, t)

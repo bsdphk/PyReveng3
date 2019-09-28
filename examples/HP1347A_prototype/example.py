@@ -237,7 +237,7 @@ class Scrtxt(data.Data):
 def task(pj, cpu):
 	gpu = hp1345a.hp1345a()
 
-	cpu.vectors(pj, which = ("RST", "NMI", "SWI", "IRQ", "FIRQ", "SWI2"))
+	cpu.vectors(which = ("RST", "NMI", "SWI", "IRQ", "FIRQ", "SWI2"))
 
 	if True:
 		# screen texts

@@ -49,7 +49,7 @@ def setup():
 #######################################################################
 
 def task(pj, cx):
-	cpu = mcs48.i8748()
+	cpu = cx
 	gpu = hp1345a.hp1345a()
 
 	pj.m.set_label(0x00a, "reset")
@@ -71,7 +71,7 @@ def task(pj, cx):
 	pj.m.set_label(0x200, "ALIGN2")
 	pj.m.set_label(0x300, "FOCUS")
 
-	cpu.vectors(pj)
+	cpu.vectors()
 
 	l = []
 	for a in range(0x122, 0x200, 2):

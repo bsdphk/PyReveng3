@@ -49,7 +49,7 @@ def setup():
 
 def task(pj, cpu):
 
-	cpu.vectors(pj, which=("RST", "NMI", "SWI", "IRQ", "FIRQ"))
+	cpu.vectors(which=("RST", "NMI", "SWI", "IRQ", "FIRQ"))
 
 	token = {
 		1:	'?',
@@ -312,7 +312,7 @@ def task(pj, cpu):
 			a += 1
 			y = data.Txt(pj.m, a, align=1, label=False)
 			a = y.hi
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 			z = pj.m.bu16(a)
 			if False:
 				# XXX: doesn't work for ERROR
@@ -329,7 +329,7 @@ def task(pj, cpu):
 		x = pj.m.bu16(a)
 		softlbl(x, "key_%02x_%04x" % (n, x))
 		n += 1
-		cpu.codeptr(pj, a)
+		cpu.codeptr(a)
 
 	n = 1
 
@@ -337,7 +337,7 @@ def task(pj, cpu):
 		x = pj.m.bu16(a)
 		softlbl(x, "cmd_%02x_%04x" % (n,x))
 		n += 1
-		cpu.codeptr(pj, a)
+		cpu.codeptr(a)
 
 	class tt_5(data.Data):
 		def __init__(self, pj, lo):
@@ -403,7 +403,7 @@ def task(pj, cpu):
 		data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
 		z = pj.m.bu16(a + 2)
 		softlbl(z, "task_%04x" % z)
-		cpu.codeptr(pj, a + 2)
+		cpu.codeptr(a + 2)
 		data.Dataptr(pj.m, a + 4, a + 6, pj.m.bu16(a + 4))
 
 

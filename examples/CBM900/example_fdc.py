@@ -46,11 +46,11 @@ def setup():
     return pj, cx
 
 def task(pj, cx):
-    cx.vectors(pj)
+    cx.vectors()
     for i in range(7):
         data.Const(pj.m, 0xe28a + i, 0xe28a + i + 1)
     for i in range(6):
-        cx.codeptr(pj, 0xe291 + 2 * i)
+        cx.codeptr(0xe291 + 2 * i)
 
     a = 0xe7bf
     pj.m.set_label(a, "GEOMETRY")

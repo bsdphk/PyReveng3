@@ -852,24 +852,24 @@ class z8001(assy.Instree_disass):
         self.add_as("sio", "Special I/O", 16)
         self.add_ins(z8000_desc, z8001_ins)
 
-    def codeptr(self, pj, adr):
-        y = data.Codeptr(pj.m, adr, adr + 4, self.as_mem.bu32(adr) & 0x7f00ffff)
-        self.disass(pj.m, y.dst)
+    def codeptr(self, adr):
+        y = data.Codeptr(self.m, adr, adr + 4, self.m.bu32(adr) & 0x7f00ffff)
+        self.disass(self.m, y.dst)
         return y
 
-    def vector(self, pj, a, n):
-        pj.m.set_label(a, n + "_RSV")
-        data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
+    def vector(self, a, n):
+        self.m.set_label(a, n + "_RSV")
+        data.Const(self.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
-        pj.m.set_label(a, n + "_PSW")
-        data.Const(pj.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
+        self.m.set_label(a, n + "_PSW")
+        data.Const(self.m, a, a + 2, func=self.as_mem.bu16, size=2, fmt="0x%04x")
         a += 2
-        y = self.codeptr(pj, a)
-        pj.m.set_label(y.dst, n + "_VEC")
+        y = self.codeptr(a)
+        self.m.set_label(y.dst, n + "_VEC")
         return y.dst
 
-    def vectors(self, pj, adr=0,psap=0):
-        self.vector(pj, adr, "RESET")
+    def vectors(self, adr=0, psap=0):
+        self.vector(adr, "RESET")
 
     def z8010_mmu(self, adrlo):
         ''' Add Z8010 MMU symbols for SIO instructions '''

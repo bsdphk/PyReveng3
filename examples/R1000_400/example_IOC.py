@@ -119,7 +119,7 @@ def task(pj, cpu):
 		for a in (0x08ad6, 0x08ada):
 			data.Const(pj.m, a, a + 4)
 
-	cpu.vectors(pj)
+	cpu.vectors()
 
 	for obj in M200S:
 		ep = obj.entry_point()
@@ -170,41 +170,41 @@ def task(pj, cpu):
 			(0x09378, 0x09398),
 		):
 			for a in range(lo, hi, 4):
-				y = cpu.codeptr(pj, a)
+				y = cpu.codeptr(a)
 				pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x04fca, 0x04fda, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x062dc, 0x062f8, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x093c4, 0x093fc, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x09495, 0x0956d, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x09578, 0x095a4, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x095e8, 0x0969c, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x096c4, 0x096e4, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x097bc, 0x0983c, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x09850, 0x09894, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x06026, 0x06036, 4):
-			y = cpu.codeptr(pj, a)
+			y = cpu.codeptr(a)
 			pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 		for a in range(0x20004, 0x20020, 4):
 			if pj.m.bu32(a) and a != 0x20010:
-				y = cpu.codeptr(pj, a)
+				y = cpu.codeptr(a)
 				pj.m.set_label(y.dst, "PTR_FM_%x" % a)
 
 	if True:

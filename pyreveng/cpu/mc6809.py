@@ -948,32 +948,27 @@ class mc6809_ins(assy.Instree_ins):
 
 
 class mc6809(assy.Instree_disass):
-	def __init__(self, mask=0xffff, macros=False):
+	def __init__(self, macros=False):
 		super().__init__(
                     "mc6809",
                     ins_word=8,
                     abits=16,
+                    endian=">",
+                    vectors=(
+                        (0xfff0, "V??"),
+                        (0xfff2, "SWI3"),
+                        (0xfff4, "SWI2"),
+                        (0xfff6, "FIRQ"),
+                        (0xfff8, "IRQ"),
+                        (0xfffa, "SWI"),
+                        (0xfffc, "NMI"),
+                        (0xfffe, "RST"),
+                    ),
                 )
 		self.add_ins(mc6809_desc, mc6809_ins)
 		if macros:
 			self.add_ins(mc6809_macro_desc, mc6809_ins)
-		self.mask = mask
 
-	def codeptr(self, pj, adr):
-		t = pj.m.bu16(adr)
-		c = data.Codeptr(pj.m, adr, adr + 2, t)
-		self.disass(pj.m, t)
-		return c
-
-	def vectors(self, pj, adr=0xfff0, which=None):
-		for v in (
-			"V??", "SWI3", "SWI2", "FIRQ",
-			"IRQ", "SWI", "NMI", "RST"
-		):
-			if which and (adr in which or v in which):
-				c = self.codeptr(pj, adr)
-				pj.m.set_label(c.dst, "VEC" + v)
-			adr += 2
 
 if __name__ == '__main__':
 	m = mc6809()

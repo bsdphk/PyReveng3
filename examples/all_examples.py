@@ -38,6 +38,8 @@ if len(sys.argv) == 1:
 	l += glob.glob("*/example*.py")
 else:
 	for i in sys.argv[1:]:
+		if i[:2] == "./":
+			i = i[2:]
 		if os.path.isdir(i):
 			l += glob.glob(i + "/example*.py")
 		else:

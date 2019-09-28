@@ -272,7 +272,7 @@ def setup(name, binfile, direction):
 	cx.m.map(m, lo=0xfff8, hi=0x10000, offset=0x1ff8)
 	pj = job.Job(cx.m, name)
 	eprom(pj, cx.disass, 0x6000, 0x8000, 0x0400)
-	cx.vectors(pj)
+	cx.vectors()
 	return pj,cx
 
 #----------------------------------------------------------------------
@@ -358,7 +358,7 @@ def arg_range(pj, cmds, start, end):
 def cmd_dispatch(pj, cx, cmds, start):
 	a = start
 	for i in cmds:
-		c = cx.codeptr(pj, a)
+		c = cx.codeptr(a)
 		if i in cmd_desc:
 			c.lcmt = cmd_desc[i]
 		pj.m.set_label(c.dst, "CMD_%s" % i)
@@ -378,7 +378,7 @@ def key_dispatch(pj, cx, start, end):
 		# pj.m.set_label(a, "KEY_COL_%d" % col)
 		for row in range(4, 0, -1):
 			n = "KEY_C%d_R%d" % (col,row)
-			c = cx.codeptr(pj, a)
+			c = cx.codeptr(a)
 			if not pj.m.get_labels(c.dst):
 				if n in keys:
 					m = keys[n]
@@ -401,7 +401,7 @@ def dsp_dispatch(pj, cx, start, end):
 	pj.m.set_label(start, "DSP_DISPATCH")
 	a = start
 	for i in ("AVG", "STD", "MIN", "MAX", "REF", "EVT", "ALL", "ALL"):
-		c = cx.codeptr(pj, a)
+		c = cx.codeptr(a)
 		pj.m.set_label(c.dst, "DSP_" + i)
 		c.lcmt = "DSP_" + i
 		a += 2

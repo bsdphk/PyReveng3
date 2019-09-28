@@ -88,7 +88,7 @@ def task(pj, cpu):
 	for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
 		utils.float70(pj, i)
 
-	c = cpu.codeptr(pj, 0x7909)
+	c = cpu.codeptr(0x7909)
 	pj.m.set_label(c.dst, "HPIB_CMD_PARSE")
 
 	utils.square_tbl(pj)

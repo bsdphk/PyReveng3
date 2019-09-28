@@ -214,24 +214,17 @@ class mcs48(assy.Instree_disass):
                     lang,
                     ins_word=8,
                     abits=16,
+                    jmps=(
+                        (0x000, "RESET"),
+			(0x003, "INT"),
+			(0x007, "TINT"),
+                    ),
                 )
 		self.it.load_string(mcs48_desc, mcs48_ins)
 
 		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",
 			"I", "F0", "F1",))
 		self.amask_ = 0xffff
-
-	def set_adr_mask(self, a):
-		self.amask = a
-
-	def vectors(self, pj):
-		for a, l in (
-			(0x000, "RESET"),
-			(0x003, "INT"),
-			(0x007, "TINT"),
-		):
-			self.disass(pj.m, a)
-			pj.m.set_label(a, l)
 
 
 class i8748(mcs48):

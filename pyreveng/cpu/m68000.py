@@ -1435,22 +1435,22 @@ class m68000(assy.Instree_disass):
 			return "VECTOR_TRAP_%d" % (v - 32)
 		return "VECTOR_%d" % v
 
-	def vectors(self, pj, hi=0x400):
-		y = self.dataptr(pj, 0)
+	def vectors(self, hi=0x400):
+		y = self.dataptr(0)
 		y.lcmt = "Reset SP"
 		vn = {}
 		vi = {}
 		a = 0x4
 		while a < hi:
-			x = pj.m.bu32(a)
+			x = self.m.bu32(a)
 			if x in (0x0, 0xffffffff):
-				y = self.dataptr(pj, a)
-				#y = data.Const(pj, a, a + 4,
-				#    "0x%04x", pj.m.bu32, 4)
+				y = self.dataptr(a)
+				#y = data.Const(self.m, a, a + 4,
+				#    "0x%04x", self.m.bu32, 4)
 			else:
 				if x not in vn:
 					try:
-						vi[x] = self.disass(pj.m, x)
+						vi[x] = self.disass(self.m, x)
 						vn[x] = []
 						vn[x].append(a >> 2)
 					except assy.Invalid:
@@ -1458,7 +1458,7 @@ class m68000(assy.Instree_disass):
 					except mem.MemError:
 						pass
 				if x > a:
-					y = self.codeptr(pj, a)
+					y = self.codeptr(a)
 			y.lcmt = self.vector_name(a >> 2)
 			hi = min(hi, x)
 			a += 4
@@ -1471,18 +1471,12 @@ class m68000(assy.Instree_disass):
 
 			if len(vn[i]) == 1:
 				k = self.vector_name(vn[i][0])
-				pj.m.set_label(i, k)
+				self.m.set_label(i, k)
 			else:
-				pj.m.set_label(i, "VECTORS_%d" % mv)
+				self.m.set_label(i, "VECTORS_%d" % mv)
 				mv += 1
 
-	def codeptr(self, pj, adr):
-		t = pj.m.bu32(adr)
-		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		self.disass(pj.m, t)
-		return c
-
-	def dataptr(self, pj, adr):
-		return data.Dataptr(pj.m, adr, adr + 4, pj.m.bu32(adr))
+	def dataptr(self, adr):
+		return data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr))
 		
 

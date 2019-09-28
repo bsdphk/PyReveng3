@@ -207,7 +207,7 @@ def task(pj, cx):
         pj.m.set_label(0x4326, "lores_BS")
 
     if True:
-        cx.vectors(pj, 0x00000000)
+        cx.vectors(0x00000000)
     if True:
         for v, a in (
             ("VEC0", 0x0008,),
@@ -217,23 +217,23 @@ def task(pj, cx):
             ("VEC4", 0x0028,),
             ("VEC5", 0x0030,),
         ):
-            b = cx.vector(pj, a, v)
+            b = cx.vector(a, v)
 
     if True:
         for a in range(0x06b2, 0x06da, 4):
-            y = cx.codeptr(pj, a)
+            y = cx.codeptr(a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
         for a in range(0x31cc, 0x31dc, 4):
-            y = cx.codeptr(pj, a)
+            y = cx.codeptr(a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
         for a in range(0x39da, 0x3a18, 4):
-            y = cx.codeptr(pj, a)
+            y = cx.codeptr(a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
         for a in range(0x419e, 0x4202, 4):
-            y = cx.codeptr(pj, a)
+            y = cx.codeptr(a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
         cx.disass(pj.m, 0x20bc)
@@ -260,7 +260,7 @@ def task(pj, cx):
             cx.disass(pj.m, a)
 
         for a in range(0x3e90, 0x3ea0, 4):
-            y = cx.codeptr(pj, a)
+            y = cx.codeptr(a)
             pj.m.set_label(y.dst, "PTR_%x" % a)
 
         # pj.m.set_block_comment(0x6800, "DATA SEGMENT, len=0x1016")

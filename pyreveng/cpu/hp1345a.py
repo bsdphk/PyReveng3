@@ -91,6 +91,3 @@ class hp1345a(assy.Instree_disass):
 
 	def set_adr_mask(self, a):
 		self.amask = a
-
-	def vectors(self, pj):
-		return

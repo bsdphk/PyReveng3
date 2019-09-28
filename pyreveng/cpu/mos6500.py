@@ -260,18 +260,11 @@ class mos6500(assy.Instree_disass):
         super().__init__(
             "mos6500",
             ins_word=8,
+            endian="<",
             abits=16,
+            vectors=(
+                (0xfffe, "IRQ"),
+                (0xfffc, "RESET"),
+            ),
         )
         self.add_ins(mos6500_desc, mos6500_ins)
-
-    def codeptr(self, pj, adr):
-        t = pj.m.lu16(adr)
-        c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj.m, t)
-        return c
-
-    def vectors(self, pj):
-        y = self.codeptr(pj, 0xfffe)
-        pj.m.set_label(y.dst, "IRQ")
-        y = self.codeptr(pj, 0xfffc)
-        pj.m.set_label(y.dst, "RESET")

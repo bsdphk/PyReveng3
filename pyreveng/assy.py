@@ -33,7 +33,7 @@ Prefix instructions are marked with mnemonic "+" and their
 arguments are processed before the instruction.
 """
 
-from . import instree, code, pil, mem
+from . import instree, code, pil, mem, data
 
 #######################################################################
 
@@ -210,7 +210,9 @@ class Instree_disass(code.Decoder):
         ins_word=8,
         mem_word=None,
         endian=None,
-        abits=None
+        abits=None,
+        vectors=None,
+        jmps=None,
     ):
         super().__init__(name)
         if mem_word is None:
@@ -220,6 +222,8 @@ class Instree_disass(code.Decoder):
         self.mem_word = mem_word
         self.endian = endian
         self.scale = ins_word // mem_word
+        self.vectordat = vectors
+        self.jmpdat = jmps
 
         if ins_word == mem_word:
             self.getmore = self.getmore_word
@@ -235,6 +239,15 @@ class Instree_disass(code.Decoder):
             raise Exception("XXX: No getmore() [%d/%d/%s]" %
                     (ins_word, mem_word, endian))
 
+        if endian == "<" and abits == 16:
+            self.codeptr = self.codeptr_lu16
+        elif endian == ">" and abits == 16:
+            self.codeptr = self.codeptr_bu16
+        elif endian == "<" and abits == 32:
+            self.codeptr = self.codeptr_lu32
+        elif endian == ">" and abits == 32:
+            self.codeptr = self.codeptr_bu32
+
         self.flow_check = []
         self.verbatim = set()
         self.it = instree.InsTree(ins_word)
@@ -243,6 +256,51 @@ class Instree_disass(code.Decoder):
         self.aspace = {}
         if abits is not None:
             self.add_as("mem", "Memory", bits = abits)
+
+    def codeptr_lu16(self, adr, asp=None):
+        if asp is None:
+            asp = self.m
+        t = asp.lu16(adr)
+        c = data.Codeptr(asp, adr, adr + 2, t)
+        self.disass(asp, t)
+        return c
+
+    def codeptr_bu16(self, adr, asp=None):
+        if asp is None:
+            asp = self.m
+        t = asp.bu16(adr)
+        c = data.Codeptr(asp, adr, adr + 2, t)
+        self.disass(asp, t)
+        return c
+
+    def codeptr_lu32(self, adr, asp=None):
+        if asp is None:
+            asp = self.m
+        t = asp.lu32(adr)
+        c = data.Codeptr(asp, adr, adr + 4, t)
+        self.disass(asp, t)
+        return c
+
+    def codeptr_bu32(self, adr, asp=None):
+        if asp is None:
+            asp = self.m
+        t = asp.bu32(adr)
+        c = data.Codeptr(asp, adr, adr + 4, t)
+        self.disass(asp, t)
+        return c
+
+    def vectors(self, which=None):
+        if self.vectordat:
+            for i, j in self.vectordat:
+                if which is None or i in which or j in which:
+                     y = self.codeptr(i)
+                     y.lcmt = "Vector " + j
+                     self.m.set_label(y.dst, j)
+        if self.jmpdat:
+            for i, j in self.jmpdat:
+                if which is None or i in which or j in which:
+                     self.m.set_label(i, j)
+                     self.disass(self.m, i)
 
     def add_as(self, name, desc=None, bits=None, lo=None, hi=None, aspace=None):
         if bits is not None:

@@ -799,15 +799,15 @@ def hints(pj, cpu):
 		    [ 0x4024, "START_XX5_APP" ],
 		    [ 0x404f, "START_ERR_APP" ],
 		]:
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 			u = pj.m.bu16(a)
 			pj.m.set_label(u, n.lower())
 			pj.m.set_label(a, n)
 
-		cpu.codeptr(pj, 0x4004)
-		cpu.codeptr(pj, 0x4006)
+		cpu.codeptr(0x4004)
+		cpu.codeptr(0x4006)
 		for a in range(0x400e, 0x4018, 2):
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 
 		for a in range(0x4018, 0x4022, 2):
 			y = data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
@@ -818,7 +818,7 @@ def hints(pj, cpu):
 
 		# @0xc4a5, @0xc318
 		for a in range(0x404f,0x4053,2):
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 
 		for a,b in (
 			(0x4027, 0x28),
@@ -865,9 +865,9 @@ def hints(pj, cpu):
 	if pj.pg == 2:
 		Menu(pj, cpu, 0x416b, "DSEQMENU")
 		for a in range(0x4245, 0x4255, 2):
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 		for a in range(0x4330, 0x4340, 2):
-			cpu.codeptr(pj, a)
+			cpu.codeptr(a)
 		for a,b in (
 			(0x5144,20),
 			(0x5159,20),
@@ -1039,7 +1039,7 @@ for pg in (0,1,2,3,4):
 
 	if pj.pg == 4:
 		lexer(pj)
-		cpu.vectors(pj)
+		cpu.vectors()
 
 	# decompile.analyse(pj, cpu)
 

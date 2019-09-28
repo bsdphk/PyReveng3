@@ -383,7 +383,7 @@ class MCS51(assy.Instree_disass):
     def set_adr_mask(self, a):
         self.amask = a
 
-    def vectors(self, pj, which=None):
+    def vectors(self, which=None):
         for a, b in (
                 (0x000, "RESET"),
                 (0x003, "IE0"),
@@ -393,8 +393,8 @@ class MCS51(assy.Instree_disass):
                 (0x023, "RI_TI"),
         ):
             if not which or a in which or b in which:
-                self.disass(pj.m, a)
-                pj.m.set_label(a, b)
+                self.disass(self.m, a)
+                self.m.set_label(a, b)
 
 class I8032(MCS51):
     def __init__(self):

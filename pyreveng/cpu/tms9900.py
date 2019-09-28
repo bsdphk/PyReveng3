@@ -485,11 +485,11 @@ IDLE	?	|0 0 0 0 0 0 1 1 0 1 0| n	|
 """
 
 class vector(data.Data):
-    def __init__(self, pj, adr, cx):
-        super().__init__(pj.m, adr, adr + 4)
-        self.ws = pj.m.bu16(adr)
-        self.dstadr = pj.m.bu16(adr + 2)
-        cx.disass(pj.m, self.dstadr)
+    def __init__(self, asp, adr, cx):
+        super().__init__(asp, adr, adr + 4)
+        self.ws = asp.bu16(adr)
+        self.dstadr = asp.bu16(adr + 2)
+        cx.disass(asp, self.dstadr)
 
     def render(self):
         return "WP=0x%04x,IP=%s" % (self.ws, self.aspace.adr(self.dstadr))
@@ -933,27 +933,21 @@ class Tms9900(assy.Instree_disass):
         self.n_interrupt = 16
         self.il = True
 
-    def codeptr(self, pj, adr):
-        t = pj.m.bu16(adr)
-        c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj.m, t)
-        return c
+    def vector(self, adr):
+        return vector(self.m, adr, self)
 
-    def vector(self, pj, adr):
-        return vector(pj, adr, self)
-
-    def vectors(self, pj, adr=0x0, xops=1):
-        def vect(pj, a, lbl):
-            c = vector(pj, a, self)
-            pj.m.set_label(c.dstadr, lbl)
+    def vectors(self, adr=0x0, xops=1):
+        def vect(a, lbl):
+            c = vector(self.m, a, self)
+            self.m.set_label(c.dstadr, lbl)
             return c
 
-        vect(pj, adr, "RESET")
+        vect(adr, "RESET")
         for i in range(1, self.n_interrupt):
-            if pj.m.bu16(i * 4) != 0:
-                vect(pj, i * 4, "INT%d" % i)
+            if self.m.bu16(i * 4) != 0:
+                vect(i * 4, "INT%d" % i)
         for i in range(xops):
-            vect(pj, 0x40 + i * 4, "XOP%d" % i)
+            vect(0x40 + i * 4, "XOP%d" % i)
 
 class Tms9981(Tms9900):
     def __init__(self):

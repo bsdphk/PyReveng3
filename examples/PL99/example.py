@@ -171,7 +171,7 @@ def cword(pj, a):
 def task(pj, cx):
 	cx.register_labels(pj)
 
-	cx.vectors(pj)
+	cx.vectors()
 
 
 	#######################################################################
@@ -299,7 +299,7 @@ def task(pj, cx):
 	pj.m.set_label(x.lo, "ON_KEY_TBL")
 	n = 0x80
 	for a in range(x.lo, x.hi, 2):
-		x = cx.codeptr(pj, a)
+		x = cx.codeptr(a)
 		pj.m.set_label(x.dst, "ON_KEY_0x%02x" % n)
 		n += 1
 
@@ -308,7 +308,7 @@ def task(pj, cx):
 	pj.m.set_label(x.lo, "CMDTBL")
 	for a in range(x.lo, x.hi, 3):
 		y = data.Txt(pj.m, a, a+1, label=False)
-		z = cx.codeptr(pj, a + 1)
+		z = cx.codeptr(a + 1)
 		if y.txt == " ":
 			pj.m.set_label(z.dst, "CMD_SP")
 		else:
@@ -320,7 +320,7 @@ def task(pj, cx):
 	d = dict()
 	n = 0
 	for a in range(x.lo, x.hi, 2):
-		y = cx.codeptr(pj, a)
+		y = cx.codeptr( a)
 		if not y.dst in d:
 			d[y.dst] = []
 		d[y.dst].append(n)
@@ -479,7 +479,7 @@ def task(pj, cx):
 	#	data.Dataptr(pj.m, i, i + 2, pj.m.bu16(i))
 
 	for i in range(0xe363, 0xe369, 2):
-		x = cx.codeptr(pj, i)
+		x = cx.codeptr(i)
 
 	x = data.Range(pj.m, 0xb963, 0xb975, "tbl")
 	for i in range(x.lo, x.hi):

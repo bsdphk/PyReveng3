@@ -925,22 +925,16 @@ class mc6800(assy.Instree_disass):
         super().__init__(
             "mc6800",
             ins_word=8,
+            endian=">",
             abits=16,
+            vectors=(
+                (0xfff8, "IRQ"),
+                (0xfffa, "SWI"),
+                (0xfffc, "NMI"),
+                (0xfffe, "RST"),
+            ),
         )
         self.add_ins(mc6800_desc, mc6800_ins)
-
-    def codeptr(self, pj, adr):
-        t = pj.m.bu16(adr)
-        c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj.m, t)
-        return c
-
-    def vectors(self, pj, adr=0xfff8):
-        for v in ("IRQ", "SWI", "NMI", "RST"):
-            c = self.codeptr(pj, adr)
-            pj.m.set_label(c.dst, "VEC" + v)
-            adr += 2
-
 
 mc68hc11_desc = """
 IDIV    -           |02     |
@@ -1075,7 +1069,7 @@ class mc68hc11(mc6800):
         pj.m.set_label(adr + 0x3D, "INIT")
         pj.m.set_label(adr + 0x3F, "CONFIG")
 
-    def vectors(self, pj, adr=0xffd6):
+    def vectors(self, adr=0xffd6):
         for v in (
           "SCI",
           "SPI",  "PAI", "PAO",  "TO",
@@ -1083,6 +1077,6 @@ class mc68hc11(mc6800):
           "OC1",  "IC3", "IC2",  "IC1",
           "RTI",  "IRQ", "XIRQ", "SWI",
           "ILL",  "COP", "CME",  "RESET"):
-            c = self.codeptr(pj, adr)
-            pj.m.set_label(c.dst, "VEC" + v)
+            c = self.codeptr(adr)
+            self.m.set_label(c.dst, "VEC" + v)
             adr += 2

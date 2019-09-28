@@ -131,7 +131,6 @@ def task(pj, cpu):
 	pj.m.set_label(0x80000020, "print_CRLF()")
 	pj.m.set_label(0x8000014c, "_print_CRLF()")
 
-	#cpu.vectors(pj, hi=0x28)
 	cpu.disass(pj.m, 0x80000024)
 	for a in (
 		0x80000072,
@@ -214,10 +213,10 @@ def task(pj, cpu):
 		cpu.disass(pj.m, a)
 
 	for a in range(0x8000310e, 0x80003122, 4):
-		cpu.codeptr(pj, a)
+		cpu.codeptr(a)
 
 	for a in range(0x800038ce, 0x800038ee, 4):
-		cpu.codeptr(pj, a)
+		cpu.codeptr(a)
 
 	for a in range(0x80004000, 0x80004008, 4):
 		cpu.disass(pj.m, a)

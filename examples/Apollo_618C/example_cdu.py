@@ -65,7 +65,7 @@ def task(pj, cx):
 
 	cx.set_adr_mask(0xfff)
 
-	cx.vectors(pj, which=("RESET", "TF0", "IE0", "TF1"))
+	cx.vectors(which=("RESET", "TF0", "IE0", "TF1"))
 
 	# Random
 	# cx.disass(pj.m, 0x7d2)
