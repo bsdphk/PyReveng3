@@ -30,7 +30,7 @@ See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
 import os
-from pyreveng import job, mem, code, data, misc, listing, charset
+from pyreveng import job, mem, code, data, listing, charset
 
 def mem_setup():
     m = mem.Stackup(

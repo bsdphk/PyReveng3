@@ -30,7 +30,7 @@ See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
 import os
-from pyreveng import job, mem, data, code, misc, listing
+from pyreveng import job, mem, data, code, listing
 import pyreveng.cpu.mos6500 as mos6500
 
 def mem_setup():

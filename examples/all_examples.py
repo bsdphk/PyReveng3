@@ -65,11 +65,8 @@ def one_example(dir, example):
     else:
         nm, ms = y.example()
         for i,j in enumerate(ms):
-            print(i, j)
-            if i:
-                fn = "_output/" + nm + ".%d" % i
-            else:
-                fn = "_output/" + nm
+            fn = "_output/" + nm + ".%02d" % i
+            print(i, j, fn)
             listing.Listing(j, ncol = 8, fn = fn + ".asm", pil=False)
             listing.Listing(j, ncol = 8, fn = fn + ".pil", pil=True)
     sys.stdout.flush()
@@ -81,5 +78,5 @@ def all_examples():
         print(j[0], k)
         one_example(j[0], k)
 
-cProfile.run("all_examples()", sort=1)
-#all_examples()
+#cProfile.run("all_examples()", sort=1)
+all_examples()

@@ -186,7 +186,7 @@ class Decoder():
                 except Invalid:
                     print("Failed decode", self.name, "0x%x" % adr, _from)
                 except mem.MemError:
-                    print("No Memory", self.name, "0x%x" % adr, _from)
+                    print("No Memory", self.name, asp.adr(adr), _from)
             else:
                 x = z[0]
             if adr == a0 and x:

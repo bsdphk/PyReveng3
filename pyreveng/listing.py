@@ -185,6 +185,7 @@ class Listing():
             self.fmt_xxx(lo, hi)
 
     def gap1(self, s, r, lo, a):
+        print("GAP1", a, "S %x" % s, "R %x" % r, "LO %x" % lo)
         if a is None:
             self.format(s, lo, [".UNDEF\t0x%x" % (lo - s),], None, True)
         elif lo - r >= self.blanks:
@@ -300,4 +301,4 @@ class Listing():
 def Example(func, **kwargs):
     nm, ms = func()
     for n, m in enumerate(ms):
-        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), **kwargs)
+        Listing(m, fn="/tmp/_%s.%02d.asm" % (nm, n), **kwargs)

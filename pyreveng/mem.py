@@ -227,9 +227,13 @@ class MemMapper(AddressSpace):
         else:
             self.bits = mem.bits
 
-    def xlat1(self, adr, _fail=True):
-        low, _high, offset, mem = self.mapping[0]
-        return mem, (adr - low) + offset
+    def xlat1(self, adr, fail=True):
+        low, high, offset, mem = self.mapping[0]
+        if low <= adr < high:
+            return mem, (adr - low) + offset
+        if fail:
+            raise MemError(adr, "Unmapped memory @0x%x" % adr)
+        return self, adr
 
     def xlatn(self, adr, fail=True):
         for i, j in enumerate(self.mapping):

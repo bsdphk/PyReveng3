@@ -28,14 +28,14 @@
 '''
 
 import os
-from pyreveng import job, mem, listing, code, discover, data, misc
+from pyreveng import job, mem, listing, code, discover, data
 import pyreveng.cpu.z80 as z80
 
 def setup():
 	cx = z80.z80()
 	m = mem.Stackup(files=("EPROM_ROB_357.bin",), nextto=__file__)
 	cx.m.map(m, 0, 0x12)
-	cx.m.map(m, 0xa000, offset=0x12)
+	cx.m.map(m, lo=0xa000, hi=0xa59a, offset=0x12)
 	pj = job.Job(cx.m, "RC702_bootrom_rob_357")
 	return pj, cx
 
@@ -47,8 +47,6 @@ def task(pj, cx):
 	data.Txt(pj.m, 0xa588, 0xa58c, label=False)
 	data.Txt(pj.m, 0xa58c, 0xa590, label=False)
 	data.Txt(pj.m, 0xa593, 0xa593 + 0x7, label=False)
-
-	misc.fill_all_blanks(cx.m, vals={0xff,})
 
 	cx.disass(0x0000)
 
