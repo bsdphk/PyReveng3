@@ -34,7 +34,7 @@ from pyreveng import job, mem, data, code, misc, listing
 import pyreveng.cpu.mos6500 as mos6500
 
 def mem_setup():
-    return mem.stackup(
+    return mem.Stackup(
         ("EPROM_Z8000_Fl.Cont._S41_6-20-85.bin",),
         prefix=os.path.dirname(__file__)
     )

@@ -48,6 +48,9 @@ class Leaf():
         s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
         return s + ">"
 
+    def __lt__(self, other):
+        return self.lo < other.lo
+
     def render(self):
         return self.rendered
 

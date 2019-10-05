@@ -307,7 +307,7 @@ class Instree_disass(code.Decoder):
             lo = 0
             hi = 1 << bits
         if aspace is None:
-            aspace = mem.MemMapper(lo, hi, desc)
+            aspace = mem.MemMapper(lo, hi, name=desc)
         self.aspace[name] = aspace
         if name == "mem":
             self.m = aspace

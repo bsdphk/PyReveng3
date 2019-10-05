@@ -25,13 +25,20 @@
 # SUCH DAMAGE.
 #
 
-from pyreveng import data
+from pyreveng import data, mem
 
 '''DOMUS Relocatable Files
 
 Documentation:
     RCSL-42-I-833 DOMAC Domus Macro Assembler User's Guide
 '''
+
+RELOC = {
+    1: " ",
+    2: "'",
+    3: '"',
+    7: '*',
+}
 
 def b40(x):
     ''' See RCSL-42-I-833 appendix D '''
@@ -42,6 +49,22 @@ def b40(x):
             t += c[i % 40]
             i //= 40
     return '"' + t[::-1] + '"'
+
+class DomusMem(mem.WordMem):
+
+    def __init__(self, lo, hi, reloc, **kwargs):
+        super().__init__(lo, hi, bits=16, attr=3)
+        self.reloc = reloc
+        self.apct += RELOC[self.reloc]
+
+    def afmt(self, adr):
+        return "%04x" % adr + RELOC[self.reloc]
+        
+    def dfmt(self, adr):
+        try:
+            return "%04x" % self[adr] + RELOC[self.get_attr(adr)]
+        except mem.MemError:
+            return "---- "
 
 class RelocRecord():
 
@@ -73,8 +96,8 @@ class RelocRecord():
     def reloc(self, n):
         v = self.words[6 + n]
         r = self.words[2 + n // 5]
-        r >>= 1 + 3 * (n % 5)
-        return r, v
+        r >>= 1 + 3 * (4 - n % 5)
+        return r & 7, v
 
     def from_asp(self, asp, lo, wfunc=None, render=True):
         ''' Read record from address-space '''
@@ -141,3 +164,38 @@ class RelocFile():
         if not self.recs or self.recs[-1].words[0] != 6:
             return None
         return self.recs[-1].reloc(0)
+
+    def load(self, cpu):
+        ''' Load object into cpu address space '''
+        OFF = {
+            1: 0x0000,
+            2: 0x3000,
+            7: 0x9000
+        }
+        OFF[3] = OFF[2] << 1
+        lo = [1<<16] * 8
+        hi = [0] * 8
+        for i in self.recs:
+            if i.words[0] != 2 or len(i.words) < 8:
+                continue
+            x, y = i.reloc(0)
+            lo[x] = min(lo[x], y)
+            hi[x] = max(hi[x], y + len(i.words) - 7)
+        for i in (0, 4, 5, 6):
+            assert lo[i] > hi[i]
+        lo[2] = min(lo[2], lo[3] >> 1)
+        hi[2] = max(hi[2], hi[3] >> 1)
+        for i in (1, 2, 7):
+            if lo[i] < hi[i]:
+                mn = DomusMem(0, hi[i] - lo[i], i)
+                cpu.m.map(mn, OFF[i] + lo[i])
+        for i in self.recs:
+            if i.words[0] != 2:
+                continue
+            ar, adr = i.reloc(0)
+            adr += OFF[ar]
+            for j in range(1, len(i.words) - 6):
+                x, y = i.reloc(j)
+                cpu.m[adr] = y + OFF[x]
+                cpu.m.set_attr(adr, x)
+                adr += 1

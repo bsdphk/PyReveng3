@@ -88,7 +88,7 @@ class mycpu(m68000.m68000):
 		self.add_ins(s, myins)
 
 def mem_setup():
-	return mem.stackup(
+	return mem.Stackup(
 		(
 			( "85680-80115.BIN", "85680-80116.BIN" ),
 			( "85680-80113.BIN", "85680-80114.BIN" ),

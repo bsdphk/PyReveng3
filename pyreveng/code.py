@@ -168,6 +168,7 @@ class Decoder():
         if asp is None:
             asp = self.m
         a0 = adr
+        x = None
         xx = None
         assert isinstance(asp, mem.AddressSpace)
         self.todo.append([asp, adr, None])
@@ -176,8 +177,8 @@ class Decoder():
         self.busy = True
         while self.todo:
             asp, adr, _from = self.todo.pop()
-            x = asp.find_lo(adr)
-            if not x:
+            z = list(filter(lambda j: isinstance(j, Code) and j.lang == self, asp.find_lo(adr)))
+            if not z:
                 try:
                     x = self.decode(asp, adr)
                     assert isinstance(x, Code)
@@ -187,8 +188,8 @@ class Decoder():
                 except mem.MemError:
                     print("No Memory", self.name, "0x%x" % adr, _from)
             else:
-                x = x[0]
-            if adr == a0:
+                x = z[0]
+            if adr == a0 and x:
                 xx = x
         self.busy = False
         return xx

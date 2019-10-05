@@ -837,7 +837,6 @@ class z8001_ins(z8000_ins):
         self.dstadr = a2    # XXX
         return assy.Arg_dst(self.lang.as_mem, self.dstadr)
 
-
 class z8001(assy.Instree_disass):
 
     def __init__(self):
@@ -846,7 +845,7 @@ class z8001(assy.Instree_disass):
             ins_word=16,
             mem_word=8,
             endian=">",
-            abits=7+16,
+            abits=7+8+16,
         )
         self.add_as("io", "I/O", 16)
         self.add_as("sio", "Special I/O", 16)

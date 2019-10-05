@@ -119,11 +119,11 @@ class hp_nanoproc_ins(assy.Instree_ins):
 		self.dstadr = self.hi + 2
 
 class hp_nanoproc(assy.Instree_disass):
-	def __init__(self):
+	def __init__(self, abits=11):
 		super(hp_nanoproc, self).__init__(
                     "HP nanoprocessor",
                     ins_word=8,
-                    abits=16,
+                    abits=abits,
                 )
 		self.add_ins(hp_nanoproc_desc, hp_nanoproc_ins)
 
@@ -174,7 +174,7 @@ class hp_nanoproc_pg_ins(hp_nanoproc_ins):
 
 class hp_nanoproc_pg(hp_nanoproc):
 	def __init__(self):
-		super().__init__()
+		super().__init__(abits=14)
 		self.add_ins(hp_nanoproc_pg_desc, hp_nanoproc_pg_ins)
 
 if __name__ == "__main__":

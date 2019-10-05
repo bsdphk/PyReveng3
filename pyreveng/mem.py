@@ -66,18 +66,21 @@ class AddressSpace():
     address-spaces and memory types.
     '''
 
-    def __init__(self, lo, hi, name=""):
+    def __init__(self, lo, hi, name="", ncol=None):
         assert lo <= hi
         self.lo = lo
         self.hi = hi
         self.name = name
+        if ncol is None:
+            ncol = 4
+        self.ncol = ncol
         self.labels = dict()
         self.block_comments = dict()
         self.line_comments = dict()
-        self.set_apct()
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
+        self.hex_format()
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (
@@ -96,7 +99,22 @@ class AddressSpace():
         for i in self.t:
             yield i
 
+    def hex_format(self, pos=None):
+        ''' Render stuff in hex '''
+        if pos is None:
+            pos = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+        self.afmtpct = "%%0%dx" % pos
+        self.apct = "0x%%0%dx" % pos
+
+    def octal_format(self, pos=None):
+        ''' Render stuff in octal '''
+        if pos is None:
+            pos = max(len("%o" % self.lo), len("%o" % (self.hi - 1)))
+        self.afmtpct = "%%0%do" % pos
+        self.apct = "0%%0%do" % pos
+
     def set_apct(self, pct=None):
+        assert False
         if pct is None:
             al = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
             pct = "0x%%0%dx" % al
@@ -108,6 +126,22 @@ class AddressSpace():
         if lbl:
             return lbl[0]
         return "0x%x" % dst
+
+    def afmt(self, adr, sym=False):
+        ''' Format address '''
+        if sym:
+            lbl = self.labels.get(adr)
+            if lbl:
+                return lbl[0]
+        return self.afmtpct % adr
+
+    def dfmt(self, adr):
+        ''' Format data word at address '''
+        raise MemError(adr, "Undefined")
+
+    def tfmt(self, adr):
+        ''' Split data word at address into characters '''
+        raise MemError(adr, "Undefined")
 
     def gaps(self):
         ll = self.lo
@@ -164,8 +198,8 @@ class AddressSpace():
 
 class MemMapper(AddressSpace):
 
-    def __init__(self, lo, hi, name="Memory", **kwargs):
-        super().__init__(lo, hi, name=name, **kwargs)
+    def __init__(self, lo, hi, **kwargs):
+        super().__init__(lo, hi, **kwargs)
         self.mapping = []
         self.seglist = []
         self.bits = 0
@@ -183,8 +217,8 @@ class MemMapper(AddressSpace):
         self.seglist.append([lo, hi, offset, mem])
         self.mapping.append([lo, hi, offset, mem])
 
-        hi = max(self.mapping, key=lambda x:x[1])[1]
-        lo = min(self.mapping, key=lambda x:x[0])[0]
+        hi = max(self.mapping, key=lambda x: x[1])[1]
+        lo = min(self.mapping, key=lambda x: x[0])[0]
         al = max(len("%x" % lo), len("%x" % (hi - 1)))
         self.apct = "0x%%0%dx" % al
 
@@ -205,7 +239,7 @@ class MemMapper(AddressSpace):
                 self.mapping.insert(0, j)
                 return mem, (adr - low) + offset
         if fail:
-            raise MemError(adr, "Unmapped memory")
+            raise MemError(adr, "Unmapped memory @0x%x" % adr)
         return self, adr
 
     def __getitem__(self, adr):
@@ -219,6 +253,26 @@ class MemMapper(AddressSpace):
     def segments(self):
         for low, high, _offset, mem in sorted(self.seglist):
             yield mem, low, high
+
+    def get_attr(self, adr):
+        ms, sa = self.xlat(adr)
+        return ms.get_attr(sa)
+
+    def set_attr(self, adr, aval):
+        ms, sa = self.xlat(adr)
+        return ms.set_attr(sa, aval)
+
+    def _afmt(self, adr):
+        ms, sa = self.xlat(adr)
+        return ms.afmt(adr)
+
+    def dfmt(self, adr):
+        ms, sa = self.xlat(adr)
+        return ms.dfmt(sa)
+
+    def tfmt(self, adr):
+        ms, sa = self.xlat(adr)
+        return ms.tfmt(sa)
 
     def u8(self, adr):
         ms, sa = self.xlat(adr)
@@ -310,14 +364,16 @@ class WordMem(AddressSpace):
     Largest supported word-width is 64 bits and 8 attributes.
     """
 
-    def __init__(self, lo, hi, bits=8, attr=0, **kwargs):
+    def __init__(self, lo, hi, bits=8, attr=0, ncol=None, **kwargs):
         assert lo < hi
         assert bits > 0
         assert bits <= 64
         assert attr >= 0
         assert attr <= 7
 
-        super().__init__(lo, hi, **kwargs)
+        if ncol is None and bits != 8:
+            ncol = 1
+        super().__init__(lo, hi, ncol=ncol, **kwargs)
 
         self.bits = bits
         self.fmt = "%" + "0%dx" % ((bits + 3) // 4)
@@ -367,6 +423,12 @@ class WordMem(AddressSpace):
     def wr(self, adr, dat):
         self[adr] = dat
 
+    def dfmt(self, adr):
+        try:
+            return self.fmt % self[adr]
+        except MemError:
+            return self.undef
+
     def get_attr(self, adr):
         """Get attributes"""
         b = self._off(adr)
@@ -386,7 +448,22 @@ class WordMem(AddressSpace):
         b = self._off(adr)
         self.a[b] &= ~x
 
-    def do_ascii(self, w):
+    def tfmt(self, adr):
+        l = []
+        b = self.bits
+        try:
+            w = self[adr]
+        except MemError:
+            w = None
+        while b >= 8:
+            b -= 8
+            if w is None:
+                l.append(None)
+            else:
+                l.append((w >> b) & 0xff)
+        return l
+
+    def _do_ascii(self, w):
         """Return an ASCII representation of a value"""
         s = " |"
         b = self.bits - 8
@@ -416,10 +493,8 @@ class ByteMem(WordMem):
     right one.
     """
 
-    def __init__(self, lo, hi, ncol=4, charcol=True, **kwargs):
+    def __init__(self, lo, hi, **kwargs):
         super().__init__(lo, hi, bits=8, **kwargs)
-        self.ncol = ncol
-        self.ascii = charcol
 
     def __repr__(self):
         return "<ByteMem 0x%x-0x%x, %d attr %s>" % (
@@ -428,6 +503,12 @@ class ByteMem(WordMem):
     def bytearray(self, lo, bcnt):
         i = self._off(lo)
         return bytearray(self.m[i:i+bcnt])
+
+    def tfmt(self, adr):
+        try:
+            return (self[adr],)
+        except MemError:
+            return (None,)
 
     def u8(self, a):
         """Unsigned 8-bit byte"""
@@ -548,7 +629,7 @@ class ByteMem(WordMem):
         else:
             self.load_data(first, step, d[lo:])
 
-def stackup(files, lo=0, prefix="", nextto=None):
+class Stackup(ByteMem):
     """
     Convenience function to stack a set of eproms into ByteMem.
     'files' indicate the layout desired, and each element can be
@@ -567,36 +648,36 @@ def stackup(files, lo=0, prefix="", nextto=None):
         examples/HP8568A
 
     """
-    if nextto is not None:
-        prefix = os.path.dirname(nextto)
-    ll = []
-    hi = lo
-    for r in files:
-        ll.append([])
-        if isinstance(r, str):
-            b = open(os.path.join(prefix, r), "rb").read()
-            hi += len(b)
-            ll[-1].append(b)
-        else:
-            for i in r:
-                b = open(os.path.join(prefix, i), "rb").read()
+
+    def __init__(self, files, lo=0, prefix="", nextto=None):
+        if nextto is not None:
+            prefix = os.path.dirname(nextto)
+        ll = []
+        hi = lo
+        for r in files:
+            ll.append([])
+            if isinstance(r, str):
+                b = open(os.path.join(prefix, r), "rb").read()
                 hi += len(b)
                 ll[-1].append(b)
-    mr = ByteMem(lo, hi)
-    p = lo
-    for r in ll:
-        stride = len(r)
-        ln = len(r[0])
-        o = stride
-        for i in r:
-            o -= 1
-            pp = p + o
-            for j in i:
-                mr[pp] = j
-                pp += stride
-        p += stride * ln
-    return mr
-
+            else:
+                for i in r:
+                    b = open(os.path.join(prefix, i), "rb").read()
+                    hi += len(b)
+                    ll[-1].append(b)
+        super().__init__(lo, hi)
+        p = lo
+        for r in ll:
+            stride = len(r)
+            ln = len(r[0])
+            o = stride
+            for i in r:
+                o -= 1
+                pp = p + o
+                for j in i:
+                    self[pp] = j
+                    pp += stride
+            p += stride * ln
 
 def do_test():
     mem = WordMem(0x0000, 0x1000, bits=64, attr=3)

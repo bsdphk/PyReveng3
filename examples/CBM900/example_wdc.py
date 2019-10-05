@@ -34,7 +34,7 @@ from pyreveng import job, mem, data, misc, listing
 import pyreveng.cpu.mcs48 as mcs48
 
 def mem_setup():
-    return mem.stackup(("MCU_WDC_U10.bin",), nextto=__file__)
+    return mem.Stackup(("MCU_WDC_U10.bin",), nextto=__file__)
 
 def setup():
     cx = mcs48.mcs48()

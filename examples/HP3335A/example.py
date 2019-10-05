@@ -32,7 +32,7 @@ from pyreveng import job, mem, listing, data, code, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():
-	return mem.stackup(
+	return mem.Stackup(
 		(
 			"A13U2.bin",
 			"A13U3.bin",

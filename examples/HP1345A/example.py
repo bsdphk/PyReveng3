@@ -38,7 +38,7 @@ fw="01347-80010.bin"
 #######################################################################
 
 def mem_setup():
-        return mem.stackup((fw,), nextto=__file__)
+        return mem.Stackup((fw,), nextto=__file__)
 
 def setup():
 	cpu = mcs48.i8748()

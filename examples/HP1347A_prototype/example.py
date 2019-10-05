@@ -167,11 +167,11 @@ class our_ins(mc6809.mc6809_ins):
 def setup():
 	cpu = mc6809.mc6809()
 	cpu.m.map(
-	    mem.stackup(("hp1347a_proto.low.rom",), nextto=__file__),
+	    mem.Stackup(("hp1347a_proto.low.rom",), nextto=__file__),
 	    0x0000,
 	)
 	cpu.m.map(
-	    mem.stackup(("hp1347a_proto.high.rom",), nextto=__file__),
+	    mem.Stackup(("hp1347a_proto.high.rom",), nextto=__file__),
 	    0xe000,
 	)
 

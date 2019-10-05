@@ -40,7 +40,7 @@ seven_segment.known[0x30] = "I"
 
 def setup():
 	cx = mc6800.mc68hc11()
-	cx.m.map(mem.stackup(("PL99.mc68hc11.bin",), nextto=__file__), 0x8000)
+	cx.m.map(mem.Stackup(("PL99.mc68hc11.bin",), nextto=__file__), 0x8000)
 	#######################################################################
 	def post_arg_func(asp, ins):
 		post_arg_funcs = {

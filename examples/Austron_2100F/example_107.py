@@ -33,7 +33,7 @@ import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():
 	dn = os.path.dirname(__file__) + "/"
-	m = mem.stackup(
+	m = mem.Stackup(
 	    (
 		("Rev107f2.BIN",),
 		("Rev107f1.BIN",),

@@ -40,7 +40,7 @@ def mem_setup():
 def setup():
 
 	dx = hp_nanoproc.hp_nanoproc_pg()
-	dx.m.map(mem.stackup(("hp3336.bin",), nextto=__file__), 0)
+	dx.m.map(mem.Stackup(("hp3336.bin",), nextto=__file__), 0)
 
 	pj = job.Job(dx.m, "HP3336")
 	return pj, dx

@@ -111,7 +111,7 @@ class nova_ins(assy.Instree_ins):
         if r:
             self.mne += r
 
-    def assy_skip(self, unused__pj):
+    def assy_skip(self):
         r = (None, "SKP", "SZC", "SNC",
              "SZR", "SNR", "SEZ", "SEN")[self["skip"]]
         if r:
@@ -170,14 +170,14 @@ class nova_ins(assy.Instree_ins):
         return assy.Arg_dst(self.lang.m, t)
 
     def assy_db(self):
-        r = self.assy_da(pj)
+        r = self.assy_da()
         if not isinstance(r, assy.Arg_dst):
             return r
         if not self['i']:
             return r
-        t = pj.m[r.dst]
+        t = self.lang.m[r.dst]
         if t:
-            self.lang.disass(pj, t)
+            self.lang.disass(t)
         return r
 
 class nova(assy.Instree_disass):
@@ -185,6 +185,7 @@ class nova(assy.Instree_disass):
         super().__init__(
             "nova",
             ins_word=16,
-            abits=15,
+            abits=16,
         )
+        self.m.ncol = 1
         self.add_ins(nova_instructions, nova_ins)

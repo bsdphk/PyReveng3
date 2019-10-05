@@ -179,7 +179,7 @@ def switch(cx, a, n):
         cx.m.set_label(z.dst, "CASE_0x%x_0x%02x" % (a, y.data[0]))
 
 def example():
-    m0 = mem.stackup(
+    m0 = mem.Stackup(
         files=(
             ("EPROM_C_900_boot-L_V_1.0.bin", "EPROM_C_900_boot-H_V_1.0.bin"),
         ),

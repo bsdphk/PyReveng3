@@ -581,14 +581,16 @@ class mc6809_ins(assy.Instree_ins):
 		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
 		if self.mne[-1] == "S":
 			r[6] = "U"
-		if self.mne[-1] == "U":
+		elif self.mne[-1] == "U":
 			r[6] = "S"
 		for i in r:
 			if x & 1:
 				l.append(i)
 			x >>= 1
 		if self.mne[:3] == "PSH":
-			l = reversed(l)
+			l = list(reversed(l))
+		elif "PC" in l:
+			self.add_flow('>', True, None)
 		return ",".join(l)
 
 
@@ -708,7 +710,7 @@ class mc6809_ins(assy.Instree_ins):
 		if m is None:
 			m = self.pil_adr()
 			self.icache["M"] = m
-		assert not m is None
+		assert m is not None
 		return m
 
 	def pilmacro_V(self):

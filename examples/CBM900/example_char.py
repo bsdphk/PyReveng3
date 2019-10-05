@@ -33,7 +33,7 @@ import os
 from pyreveng import job, mem, code, data, misc, listing, charset
 
 def mem_setup():
-    m = mem.stackup(
+    m = mem.Stackup(
         files=(
             ("EPROM_380217-01_R.B_PC_CHAR._U2.bin",)
         ),

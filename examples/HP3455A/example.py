@@ -35,7 +35,7 @@ import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 def setup():
 
 	dx = hp_nanoproc.hp_nanoproc_pg()
-	dx.m.map(mem.stackup(("1818-2270B.bin",), nextto=__file__), 0)
+	dx.m.map(mem.Stackup(("1818-2270B.bin",), nextto=__file__), 0)
 
 	pj = job.Job(dx.m, "HP3455A")
 	return pj, dx
@@ -278,7 +278,7 @@ REG9 is returned in the accumulator.
 	line_comment(pj, 0x1A5, "LNRS on\n")
 	line_comment(pj, 0x1A8, "Loop is broken by interrupt\n")
 	line_comment(pj, 0x1B4, "Result so far is positive\n")
-	line_comment(pj, 0x1B4, "Result so far is negative\n")
+	#line_comment(pj, 0x1B4, "Result so far is negative\n")
 
 if __name__ == '__main__':
 	pj, cx = setup()

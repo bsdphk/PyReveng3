@@ -81,5 +81,5 @@ def all_examples():
         print(j[0], k)
         one_example(j[0], k)
 
-#cProfile.run("all_examples()", sort=1)
-all_examples()
+cProfile.run("all_examples()", sort=1)
+#all_examples()

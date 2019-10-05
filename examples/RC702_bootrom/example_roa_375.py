@@ -35,7 +35,7 @@ NAME = "RC702_bootrom_roa_375"
 def example():
     '''A pretty vanilla example'''
     cpu = z80.z80()
-    eprom = mem.stackup(files=("EPROM_ROA_375.bin",), nextto=__file__)
+    eprom = mem.Stackup(files=("EPROM_ROA_375.bin",), nextto=__file__)
     cpu.m.map(eprom, 0, 0x69)
     cpu.m.map(eprom, 0x7000, offset=0x69)
 

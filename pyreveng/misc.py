@@ -66,12 +66,26 @@ def fill_gaps(aspace):
 	if ngaps:
 		print("%d GAPs containing %d bytes" % (ngaps, gaps))
 
-def fill_blanks(aspace, lo, hi, func=None, width=1, minsize=64, all_vals=False):
+def fill_blanks(
+    aspace,
+    lo=None,
+    hi=None,
+    func=None,
+    width=1,
+    minsize=64,
+    all_vals=False,
+    vals=None,
+):
 	'''
 		Find stretches `minsize` or more of `width` words
-		of all zeros or all ones and turn them into a .BLANK
-		If `all_vals` stretches of any word will be converted.
+		of all zeros and turn them into a .BLANK.
+		Instead of zeroes, matching values can be set in `vals` 
+		and if `all_vals` stretches of any value will be converted.
 	'''
+	if lo is None:
+		lo = aspace.lo
+	if hi is None:
+		hi = aspace.hi
 	while lo & (width - 1):
 		lo = lo + 1
 	while hi & (width - 1):
@@ -89,7 +103,11 @@ def fill_blanks(aspace, lo, hi, func=None, width=1, minsize=64, all_vals=False):
 		except mem.MemError:
 			a += width
 			continue
-		if not all_vals and c and ~c:
+		if vals is not None:
+			if c not in vals:
+				a += width
+				continue
+		elif not all_vals and c:
 			a += width
 			continue
 		b = a + width

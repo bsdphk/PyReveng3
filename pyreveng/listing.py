@@ -24,261 +24,280 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from . import mem, misc, data
+import random
 
-class Render_mem():
-    def __init__(self, aspace, fmt="x", ascii=True, ncol=None):
+from . import mem, data
 
-        self.ascii = ascii
+def tabto(s, n):
+    ln = len(s.expandtabs())
+    if ln < n:
+        s += "\t" * ((7 + n - ln) // 8)
+    return s
 
-        i = "%" + fmt
-        j = i % (aspace.hi - 1)
-        self.apct = "%" + "0%d" % len(j) + fmt
+def tolines(s):
+    s = s.split('\n')
+    while s and not s[0]:
+        s.pop(0)
+    while s and not s[-1]:
+        s.pop(-1)
+    return s
 
-        j = i % (1 << aspace.bits - 1)
-        self.dpct = "%" + "0%d" % len(j) + fmt
-        self.undef = "-" * len(j)
-        self.space = " " * len(j)
-        self.aspace = " " * (aspace.bits//8)
+class Listing():
+    def __init__(
+        self,
+        asp,
+        fn=None,
+        fo=None,
+        lo=None,
+        hi=None,
+        ncol=None,
+        pil=False,
+    ):
+        self.asp = asp
 
-        if ncol is not None:
-            self.ncol = ncol
-        elif aspace.bits == 8:
-            self.ncol = 4
-        else:
-            self.ncol = 1
-
-    def render_word(self, aspace, lo, hi):
-        s = ""
-        t = ""
-        s += self.apct % lo + " "
-        for i in range(min(self.ncol, hi - lo)):
-            try:
-                v = aspace[lo + i]
-            except mem.MemError:
-                v = None
-
-            if v is None:
-                s += " " + self.undef
-            else:
-                s += " " + self.dpct % v
-
-            if self.ascii:
-                b = aspace.bits - 8
-                while b >= 0:
-                    if v is None:
-                        t += " "
-                    else:
-                        x = (v >> b) & 0xff
-                        if x > 32 and x < 127:
-                            t += "%c" % x
-                        else:
-                            t += " "
-                    b -= 8
-        while i + 1 < self.ncol:
-            s += " " + self.space
-            t += self.aspace
-            i += 1
-        if self.ascii:
-            s += "  |" + t + "|"
-        return s
-
-    def render(self, aspace, lo, hi, nlin):
-        """
-        Render 'ncol' words per line
-        """
-        l = list()
-        while lo < hi and nlin > 0:
-            s = ""
-            t = ""
-            s += self.render_word(aspace, lo, hi)
-            l.append((lo, s))
-            lo += self.ncol
-            nlin -= 1
-        return l
-
-class Seg_Listing():
-    def __init__(self, aspace, fo, seg, low, high, ascii=True, pil=True, ncol=None, fmt="x"):
-        self.aspace = aspace
-        self.fmt = fmt
-        self.ncol = ncol
-        self.ascii = ascii
+        if lo is None:
+            lo = asp.lo
+        if hi is None:
+            hi = asp.hi
+        self.lo = lo
+        self.hi = hi
         self.pil = pil
-        self.pil_col = 132
 
-        self.labels = sorted([adr for adr in aspace.labels if low <= adr < high])
-        self.lcmt = sorted([adr for adr in aspace.line_comments if low <= adr < high])
-        self.bcmt = sorted([adr for adr in aspace.block_comments if low <= adr < high])
-        self.render_mem = Render_mem(seg, fmt, ascii, ncol).render
-        self.line_comment_col = aspace.line_comment_col
-        self.line_comment_prefix = aspace.line_comment_prefix
-
-        self.nxxx = 0
-        self.cxxx = 0
+        assert not fo or not fn
+        if not fo:
+            print("Listing", asp, "to", fn, asp.afmt(self.lo) + "-" + asp.afmt(self.hi))
+            fo = open(fn, "w")
         self.fo = fo
 
-        misc.fill_gaps(self.aspace)
-        misc.fill_all_blanks(self.aspace, all_vals=True, minsize=ncol * 2)
-        a0 = low
-        for i in self.aspace:
-            if i.hi < low:
-                continue
-            if i.lo >= high:
+        self.in_seg = None
+        if ncol is None:
+            ncol = self.asp.ncol
+        self.ncol = ncol
+        self.blanks = ncol * 2
+
+        self.x_label = None
+        for _n in range(10):
+            for _mem, i, j in self.asp.segments():
+                try:
+                    t = int(random.uniform(i, j))
+                    self.x_label = len((self.fmt_adr(t, t + self.ncol) + "\t").expandtabs())
+                    break
+                except mem.MemError:
+                    continue
+            if self.x_label is not None:
                 break
-            if i.lo > a0:
-                self.fill_xxx(a0, i.lo)
-                a0 = i.lo
+        self.x_leaf = self.x_label + 8
+        self.x_lcmt = self.x_leaf + 32
+        self.x_pil = self.x_lcmt + 40
+        t = tabto("", self.x_label) + "|LABEL"
+        t = tabto(t, self.x_leaf) + "|LEAF"
+        t = tabto(t, self.x_lcmt) + "|LCMT"
+        if self.pil:
+            t = tabto(t, self.x_pil) + "|PIL"
+        # fo.write(t + '\n')
 
-            rx = i.render()
-            if isinstance(i, data.Range):
-                self.fo.write("%s-%s [%s]\n" % (aspace.apct % i.lo, aspace.apct % i.hi, rx))
+        self.plan = []
+        self.plan += [[lo, 0, self.plan_seg_start] for _asp, lo, _hi in asp.segments()]
+        self.plan += [[adr, 1, self.plan_bcmt] for adr in asp.block_comments if self.inside(adr)]
+        self.plan += [[adr, 2, self.plan_label] for adr in asp.labels if self.inside(adr)]
+        self.plan += [[adr, 3, self.plan_lcmt] for adr in asp.line_comments if self.inside(adr)]
+        self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
+        self.plan += [[hi, 6, self.plan_seg_stop] for _asp, _lo, hi in asp.segments()]
+
+        self.start = False
+        last = 0
+        self.lcmts = []
+        for i in sorted(self.plan):
+            a = self.asp.afmt(i[0])
+            if i[0] < last:
+                print("OVERLAP", "%x" % last, "%x" % i[0], i)
                 continue
-            if rx is None:
-                alo = aspace.apct % i.lo
-                ahi = aspace.apct % i.hi
-                self.fo.write("%s-%s [%s]\n" % (alo, ahi, i.tag))
-            elif i.lo < a0:
-                print("OVERLAP i.lo %x a0 %x" % (i.lo, a0), i)
-                continue
+            while i[0] > last:
+                last = self.gap(last, i[0])
+            last = i[0]
+            r = i[2](i[0], a, i[3:])
+            if r is False:
+                break
+            if r is not None:
+                last = r
+
+    def fmt_adr(self, lo, hi):
+        t = self.asp.afmt(lo) + " "
+        s = []
+        for _k in range(self.ncol):
+            if lo < hi:
+                x = self.asp.dfmt(lo)
+                t += " " + x
+                y = self.asp.tfmt(lo)
+                s += y
             else:
-                self.render_chunk(
-                    i.lo, i.hi, rx=rx, lcmt=i.lcmt, pil=i.pil, compact=i.compact)
-                a0 = i.hi
-
-        if a0 < high:
-            self.fill_xxx(a0, high)
-
-        print("%d XXXs containing %d bytes" % (self.nxxx, self.cxxx))
-
-    def fill_xxx(self, lo, hi):
-        ''' Add a .XXX entry, respecting bcmt, lcmt and labels '''
-        while lo < hi:
-            a1 = hi
-            a2 = a1
-            if self.bcmt:
-                a2 = min(a2, self.bcmt[0])
-            if self.labels:
-                a2 = min(a2, self.labels[0])
-            if self.lcmt:
-                a2 = min(a2, self.lcmt[0])
-            if lo % self.ncol:
-                a1 = min(a1, lo + self.ncol - lo % self.ncol)
-            if a2 == lo:
-                a1 = min(a1, lo + self.ncol)
+                t += " " + " " * len(x)
+                s += [None] * len(y)
+            lo += 1
+        t += "  |"
+        for j in s:
+            if j is None or not 0x20 < j < 0x7f:
+                t += ' '
             else:
-                a1 = min(a1, a2)
-            self.nxxx += 1
-            self.cxxx += a1 - lo
-            self.render_chunk(lo, a1, rx = ".XXX")
-            lo = a1
+                t += '%c' % j
+        return t + "|"
 
-    def render_chunk(
-        self,
-        lo,
-        hi,
-        rx=".XXX",
-        lcmt="",
-        pil=None,
-        compact=False
-    ):
-        rx = rx.strip().split("\n")
-        lx = lcmt.split("\n")
-        px = []
-        if self.pil and pil is not None:
-            px = pil.render().split("\n")
+    def format(self, lo, hi, leaf, pil, compact=True):
+        lines = len(leaf)
+        if compact is None:
+            lines = lines
+        elif not compact:
+            lines = max(lines, ((self.ncol - 1) + hi - lo) // self.ncol)
+        if pil:
+            lines = max(lines, len(pil))
+        assert lines > 0
 
-        sc = set()
-        while self.bcmt and self.bcmt[0] < hi:
-            sc.add(self.bcmt.pop(0))
-        while self.labels and self.labels[0] < hi:
-            sc.add(self.labels.pop(0))
-        while self.lcmt and self.lcmt[0] < hi:
-            sc.add(self.lcmt.pop(0))
-        if compact is not None:
-            for a in sorted(sc):
-                if a != lo:
-                    self.render_subchunk(lo, a, False, compact, rx, px, lx)
-                lo = a
-        self.render_subchunk(lo, hi, True, compact, rx, px, lx)
+        for _i in range(lines):
+            if lo < hi:
+                j = min(lo + self.ncol, hi)
+                t = self.fmt_adr(lo, min(j, hi))
+                lo = j
+            else:
+                t = ''
+            if leaf:
+                t = tabto(t, self.x_leaf) + leaf.pop(0).rstrip()
+            if self.lcmts:
+                t = tabto(t, self.x_lcmt) + "; " + self.lcmts.pop(0)
+            if pil:
+                t = tabto(t, self.x_pil) + "| " + pil.pop(0)
+            self.fo.write(t + '\n')
+            self.fo.flush()
+        return hi
 
-    def render_subchunk(self, lo, hi, last, compact, rx, px, lx):
-        cmt = self.aspace.get_block_comments(lo)
-        if cmt is not None:
-            w = self.line_comment_col - len(self.line_comment_prefix)
-            self.fo.write(self.line_comment_prefix + "-" * w + "\n")
-            self.fo.write(self.line_comment_prefix)
-            self.fo.write(cmt.replace("\n",
-                "\n" + self.line_comment_prefix))
-            self.fo.write("-" * w + "\n")
+    def fmt_xxx(self, lo, hi):
+        self.format(lo, hi, [".XXX",], None, False)
 
-        alx = self.aspace.get_line_comment(lo)
-        if alx:
-            lx =  alx.split("\n") + lx
+    def gap3(self, lo, hi):
+        self.format(lo, hi, [".BLANK\t" + self.asp.dfmt(lo) + "[0x%x]" % (hi - lo),], None, True)
 
-        if last and (compact or compact is None):
-            m = max(len(rx), len(px), len(lx), 1)
+    def gap2(self, lo, hi):
+        r = lo % self.ncol
+        if r:
+            i = min(lo + self.ncol - r, hi)
+            self.fmt_xxx(lo, i)
+            lo = i
+        if lo != hi:
+            self.fmt_xxx(lo, hi)
+
+    def gap1(self, s, r, lo, a):
+        if a is None:
+            self.format(s, lo, [".UNDEF\t0x%x" % (lo - s),], None, True)
+        elif lo - r >= self.blanks:
+            if s != r:
+                self.gap2(s, r)
+            self.gap3(r, lo)
         else:
-            m = 9e9
+            self.gap2(s, lo)
 
-        hx = self.render_mem(self.aspace, lo, hi, m)
-        hl = len(hx[0][1] + "\t")
-        shx = "\t" * (hl // 8)
+    def gap(self, lo, hi):
+        self.purge_lcmt()
+        if not self.in_seg:
+            return hi
+        try:
+            c = self.asp[lo]
+            a = c * 0
+        except mem.MemError:
+            c = None
+            a = None
+        s = lo
+        r = lo
+        while lo < hi:
+            try:
+                d = self.asp[lo]
+                b = d * 0
+            except mem.MemError:
+                d = None
+                b = None
+            if a != b:
+                self.gap1(s, r, lo, a)
+                a = b
+                s = lo
+                r = lo
+                c = d
+            elif c != d:
+                if lo - r >= self.blanks:
+                    self.gap1(s, r, lo, a)
+                    s = lo
+                r = lo
+                c = d
+            lo += 1
+        if s != hi:
+            self.gap1(s, r, lo, a)
+        return hi
 
-        lbl = self.aspace.get_labels(lo)
-        if lbl:
-            s = set()
-            for x in lbl:
-                if x not in s:
-                    s.add(x)
-                    self.fo.write("%s\t%s:\n" % (shx, x))
-        while True:
-            hy = hx.pop(0)[1] if hx else ""
-            if not last and not hy:
-                break
-            ry = rx.pop(0).rstrip() if rx else ""
-            py = px.pop(0).rstrip() if px else ""
-            ly = lx.pop(0).rstrip() if lx else ""
-            if not hy and not ry and not py and not ly:
-                break
-            if compact and not ry and not py and not ly:
-                break
-            if hy:
-                t = hy + "\t\t"
+    def purge_lcmt(self):
+        while self.lcmts:
+            cmt = self.lcmts.pop(0)
+            self.fo.write(tabto("", self.x_lcmt) + "; " + cmt + '\n')
+
+    def inside(self, adr):
+        return self.lo <= adr < self.hi
+
+    def plan_bcmt(self, adr, afmt, *_args):
+        self.purge_lcmt()
+        self.fo.write(afmt + " ; " + "-" * 86 + "\n")
+        for ln in tolines(self.asp.block_comments[adr]):
+            ln = ln.rstrip()
+            self.fo.write(afmt + " ; " + ln + "\n")
+        self.fo.write(afmt + " ; " + "-" * 86 + "\n")
+
+    def plan_label(self, adr, afmt, *_args):
+        self.purge_lcmt()
+        s = set()
+        for lbl in self.asp.get_labels(adr):
+            if lbl in s:
+                print("Duplicate label", afmt, lbl)
             else:
-                t = shx + "\t\t"
+                self.fo.write(tabto(afmt, self.x_label) + lbl.strip() + ":" + "\n")
+                s.add(lbl)
 
-            t += ry + "\t"
-            l = len(t.expandtabs())
-            if l < 32:
-                t += "\t" * ((32 - l) // 8)
+    def plan_lcmt(self, adr, _afmt, *_args):
+        self.purge_lcmt()
+        for i in self.asp.get_line_comment(adr).split('\n'):
+            self.lcmts.append(i.rstrip())
 
-            if ly:
-                t += "\t"
-                l = len(t.expandtabs()) 
-                if l < self.aspace.line_comment_col:
-                    t += "\t" * ((self.aspace.line_comment_col - l) // 8)
-                t += self.line_comment_prefix + ly
+    def plan_seg_start(self, _adr, _afmt, *_args):
+        if self.in_seg is False:
+            self.fo.write('\n')
+            self.fo.write('-' * 80 + '\n')
+            self.fo.write('\n')
+        self.in_seg = True
 
-            if self.pil and py:
-                t += "\t"
-                l = len(t.expandtabs()) 
-                if l < self.pil_col:
-                    t += "\t" * ((self.pil_col - l) // 8)
-                t += "| " + py + "\t"
+    def plan_seg_stop(self, _adr, _afmt, *_args):
+        self.in_seg = False
 
-            self.fo.write(t.rstrip() + "\n")
+    def plan_leaf(self, _adr, _afmt, *args):
+        leaf = args[0][0]
 
-def Listing(aspace, fn, **kwargs):
-    print("Listing into", fn)
-    fo = open(fn, "w")
-    sep = ""
-    for seg, low, high in aspace.segments():
-        fo.write(sep)
-        Seg_Listing(aspace, fo, seg, low, high, **kwargs)
-        sep = "\n" + "-" * 80 + "\n\n"
-        fo.flush()
+        if isinstance(leaf, data.Range):
+            self.fo.write(self.asp.afmt(leaf.lo) + "-")
+            self.fo.write(self.asp.afmt(leaf.hi) + "\t" + leaf.render() + "\n")
+            return leaf.lo
 
-def Example(func, ncol=8):
+        if leaf.lcmt:
+            self.purge_lcmt()
+            for i in tolines(leaf.lcmt):
+                self.lcmts.append(i.rstrip())
+
+        if self.pil and leaf.pil:
+            pil = tolines(leaf.pil.render())
+        else:
+            pil = None
+
+        return self.format(
+            leaf.lo,
+            leaf.hi,
+            tolines(leaf.render()),
+            pil,
+            leaf.compact,
+        )
+
+def Example(func, **kwargs):
     nm, ms = func()
     for n, m in enumerate(ms):
-        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), ncol=ncol)
+        Listing(m, fn="/tmp/_%s.%d.asm" % (nm, n), **kwargs)
