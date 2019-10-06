@@ -98,9 +98,9 @@ class Listing():
 
         self.plan = []
         self.plan += [[lo, 0, self.plan_seg_start] for _asp, lo, _hi in asp.segments()]
-        self.plan += [[adr, 1, self.plan_bcmt] for adr in asp.block_comments if self.inside(adr)]
-        self.plan += [[adr, 2, self.plan_label] for adr in asp.labels if self.inside(adr)]
-        self.plan += [[adr, 3, self.plan_lcmt] for adr in asp.line_comments if self.inside(adr)]
+        self.plan += [[adr, 1, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
+        self.plan += [[adr, 2, self.plan_label] for adr, _l in asp.get_all_labels() if self.inside(adr)]
+        self.plan += [[adr, 3, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
         self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
         self.plan += [[hi, 6, self.plan_seg_stop] for _asp, _lo, hi in asp.segments()]
 
@@ -110,7 +110,7 @@ class Listing():
         for i in sorted(self.plan):
             a = self.asp.afmt(i[0])
             if i[0] < last:
-                print("OVERLAP", "%x" % last, "%x" % i[0], i)
+                print("OVERLAP", self.asp.afmt(last), a, i)
                 continue
             while i[0] > last:
                 last = self.gap(last, i[0])
@@ -185,7 +185,6 @@ class Listing():
             self.fmt_xxx(lo, hi)
 
     def gap1(self, s, r, lo, a):
-        print("GAP1", a, "S %x" % s, "R %x" % r, "LO %x" % lo)
         if a is None:
             self.format(s, lo, [".UNDEF\t0x%x" % (lo - s),], None, True)
         elif lo - r >= self.blanks:
@@ -242,9 +241,9 @@ class Listing():
     def plan_bcmt(self, adr, afmt, *_args):
         self.purge_lcmt()
         self.fo.write(afmt + " ; " + "-" * 86 + "\n")
-        for ln in tolines(self.asp.block_comments[adr]):
-            ln = ln.rstrip()
-            self.fo.write(afmt + " ; " + ln + "\n")
+        for i in self.asp.get_block_comments(adr):
+            for ln in tolines(i):
+                self.fo.write(afmt + " ; " + ln.rstrip() + "\n")
         self.fo.write(afmt + " ; " + "-" * 86 + "\n")
 
     def plan_label(self, adr, afmt, *_args):
@@ -259,8 +258,9 @@ class Listing():
 
     def plan_lcmt(self, adr, _afmt, *_args):
         self.purge_lcmt()
-        for i in self.asp.get_line_comment(adr).split('\n'):
-            self.lcmts.append(i.rstrip())
+        for i in self.asp.get_line_comments(adr):
+            for j in tolines(i):
+                self.lcmts.append(i.rstrip())
 
     def plan_seg_start(self, _adr, _afmt, *_args):
         if self.in_seg is False:

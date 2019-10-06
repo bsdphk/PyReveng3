@@ -74,9 +74,9 @@ class AddressSpace():
         if ncol is None:
             ncol = 4
         self.ncol = ncol
-        self.labels = dict()
-        self.block_comments = dict()
-        self.line_comments = dict()
+        self.lbl_d = dict()
+        self.bcmt_d = dict()
+        self.lcmt_d = dict()
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
@@ -122,7 +122,7 @@ class AddressSpace():
 
     def adr(self, dst):
         ''' Render an address '''
-        lbl = self.labels.get(dst)
+        lbl = self.lbl_d.get(dst)
         if lbl:
             return lbl[0]
         return "0x%x" % dst
@@ -130,7 +130,7 @@ class AddressSpace():
     def afmt(self, adr, sym=False):
         ''' Format address '''
         if sym:
-            lbl = self.labels.get(adr)
+            lbl = self.lbl_d.get(adr)
             if lbl:
                 return lbl[0]
         return self.afmtpct % adr
@@ -162,26 +162,45 @@ class AddressSpace():
             raise MemError(adr, "Address too high")
         return adr - self.lo
 
+
     def set_label(self, adr, lbl):
         assert isinstance(lbl, str)
-        self.labels.setdefault(adr, []).append(lbl)
+        self.lbl_d.setdefault(adr, []).append(lbl)
 
     def get_labels(self, adr):
-        return self.labels.get(adr)
+        i = self.lbl_d.get(adr)
+        if i:
+            yield from i
+
+    def get_all_labels(self):
+        yield from self.lbl_d.items()
+
 
     def set_line_comment(self, adr, lcmt):
         assert isinstance(lcmt, str)
-        self.line_comments[adr] = lcmt
+        self.lcmt_d.setdefault(adr, []).append(lcmt)
 
-    def get_line_comment(self, adr):
-        return self.line_comments.get(adr)
+    def get_line_comments(self, adr):
+        i = self.lcmt_d.get(adr)
+        if i:
+            yield from i
 
-    def set_block_comment(self, adr, cmt):
-        self.block_comments.setdefault(adr, '')
-        self.block_comments[adr] += cmt + '\n'
+    def get_all_line_comments(self):
+        yield from self.lcmt_d.items()
+
+
+    def set_block_comment(self, adr, bcmt):
+        assert isinstance(bcmt, str)
+        self.bcmt_d.setdefault(adr, []).append(bcmt)
 
     def get_block_comments(self, adr):
-        return self.block_comments.get(adr)
+        i = self.bcmt_d.get(adr)
+        if i:
+            yield from i
+
+    def get_all_block_comments(self):
+        yield from self.bcmt_d.items()
+
 
     def bytearray(self, _lo, _bcnt):
         assert False
@@ -203,144 +222,226 @@ class MemMapper(AddressSpace):
         self.mapping = []
         self.seglist = []
         self.bits = 0
-        self.xlat = self.xlat1
+        self.xlat = self.xlat0
 
     def __repr__(self):
         return "<MemMapper %s 0x%x-0x%x>" % (self.name, self.lo, self.hi)
 
-    def map(self, mem, lo, hi=None, offset=None):
+    def map(self, mem, lo, hi=None, offset=None, shared=False):
         if offset is None:
             offset = 0
         if hi is None:
             hi = lo + mem.hi - offset
         assert hi > lo
-        self.seglist.append([lo, hi, offset, mem])
-        self.mapping.append([lo, hi, offset, mem])
+        self.seglist.append([lo, hi, offset, mem, shared])
+        self.mapping.append([lo, hi, offset, mem, shared])
 
         hi = max(self.mapping, key=lambda x: x[1])[1]
         lo = min(self.mapping, key=lambda x: x[0])[0]
         al = max(len("%x" % lo), len("%x" % (hi - 1)))
         self.apct = "0x%%0%dx" % al
 
+        if len(self.mapping) == 1:
+            self.xlat = self.xlat1
         if len(self.mapping) > 1:
             self.xlat = self.xlatn
         else:
             self.bits = mem.bits
 
+    def xlat0(self, adr, fail=True):
+        return self, adr, False
+
     def xlat1(self, adr, fail=True):
-        low, high, offset, mem = self.mapping[0]
+        low, high, offset, mem, shared = self.mapping[0]
         if low <= adr < high:
-            return mem, (adr - low) + offset
+            return mem, (adr - low) + offset, shared
         if fail:
             raise MemError(adr, "Unmapped memory @0x%x" % adr)
-        return self, adr
+        return self, adr, False
 
     def xlatn(self, adr, fail=True):
         for i, j in enumerate(self.mapping):
-            low, high, offset, mem = j
+            low, high, offset, mem, shared = j
             if low <= adr < high:
                 self.mapping.pop(i)
                 self.mapping.insert(0, j)
-                return mem, (adr - low) + offset
+                return mem, (adr - low) + offset, shared
         if fail:
             raise MemError(adr, "Unmapped memory @0x%x" % adr)
-        return self, adr
+        return self, adr, False
+
+    def __iter__(self):
+        for i in self.t:
+            yield i
+        for _low, _high, _offset, mem, shared in self.seglist:
+            if shared:
+                for i in mem.t:
+                    yield i
 
     def __getitem__(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms[sa]
 
     def __setitem__(self, adr, dat):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         ms[sa] = dat
 
+    def find_lo(self, adr):
+        ms, sa, sh = self.xlat(adr, False)
+        if sh:
+            r = ms.t.find_lo(adr)
+        else:
+            r = self.t.find_lo(adr)
+        return r
+
+    def find_hi(self, adr):
+        ms, sa, sh = self.xlat(adr, False)
+        if sh:
+            return ms.t.find_hi(adr)
+        return self.t.find_hi(adr)
+
+
+    def set_something(self, what, adr, *args):
+        ms, sa, sh = self.xlat(adr, False)
+        if sh:
+            getattr(ms, what)(sa, *args)
+        else:
+            getattr(super(), what)(adr, *args)
+
+    def get_something(self, what, adr, *args):
+        ms, sa, sh = self.xlat(adr, False)
+        if sh:
+            yield from getattr(ms, what)(sa, *args)
+        else:
+            yield from getattr(super(), what)(adr, *args)
+
+    def get_all_somethings(self, what):
+        yield from getattr(super(), what)()
+        for low, _high, offset, mem, shared in self.seglist:
+            if not shared:
+                continue
+            for a, b in getattr(mem, what)():
+                na = (a - offset) + low
+                yield na, b
+
+
+    def set_label(self, *args):
+        self.set_something("set_label", *args)
+
+    def get_labels(self, *args):
+        yield from self.get_something("get_labels", *args)
+
+    def get_all_labels(self):
+        yield from self.get_all_somethings("get_all_labels")
+
+
+    def set_line_comment(self, *args):
+        self.set_something("set_line_comment", *args)
+
+    def get_line_comments(self, *args):
+        yield from self.get_something("get_line_comments", *args)
+
+    def get_all_line_comments(self):
+        yield from self.get_all_somethings("get_all_line_comments")
+
+
+    def set_block_comment(self, *args):
+        self.set_something("set_block_comment", *args)
+
+    def get_block_comments(self, *args):
+        yield from self.get_something("get_block_comments", *args)
+
+    def get_all_block_comments(self):
+        yield from self.get_all_somethings("get_all_block_comments")
+
+
     def segments(self):
-        for low, high, _offset, mem in sorted(self.seglist):
+        for low, high, _offset, mem, _shared in sorted(self.seglist):
             yield mem, low, high
 
     def get_attr(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.get_attr(sa)
 
     def set_attr(self, adr, aval):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.set_attr(sa, aval)
 
     def _afmt(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.afmt(adr)
 
     def dfmt(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.dfmt(sa)
 
     def tfmt(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.tfmt(sa)
 
     def u8(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.u8(sa)
 
     def lu16(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.lu16(sa)
 
     def bu16(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bu16(sa)
 
     def lu32(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.lu32(sa)
 
     def bu32(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bu32(sa)
 
     def lu64(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.lu64(sa)
 
     def bu64(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bu64(sa)
 
     def s8(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.s8(sa)
 
     def ls16(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.ls16(sa)
 
     def bs16(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bs16(sa)
 
     def ls32(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.ls32(sa)
 
     def bs32(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bs32(sa)
 
     def ls64(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.ls64(sa)
 
     def bs64(self, adr):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bs64(sa)
 
     def bytearray(self, adr, ln):
-        ms, sa = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr)
         return ms.bytearray(sa, ln)
 
     def gaps(self):
         for glo, ghi in super().gaps():
-            for slo, shi, _offset, _mem in self.mapping:
+            for slo, shi, _offset, _mem, _shared in sorted(self.seglist):
                 if ghi <= slo or glo >= shi:
                     continue
                 glo = max(glo, slo)
@@ -348,11 +449,14 @@ class MemMapper(AddressSpace):
                 yield glo, ghi
 
     def insert(self, item):
-        super().insert(item)
-        ms, sa = self.xlat(item.lo, False)
-        ll = leaf.Link(sa, item.hi - (item.lo - sa), item)
-        if ms != self:
-            ms.insert(ll)
+        ms, sa, sh = self.xlat(item.lo, False)
+        if sh:
+            ms.insert(item)
+        else:
+            super().insert(item)
+            if ms != self:
+                ll = leaf.Link(sa, item.hi - (item.lo - sa), item)
+                ms.insert(ll)
 
 class WordMem(AddressSpace):
 

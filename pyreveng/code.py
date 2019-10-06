@@ -111,6 +111,7 @@ class Code(Leaf):
     def __init__(self, lo, hi, lang):
         assert isinstance(lang, Decoder)
         self.lang = lang
+        self.lang2 = lang.lang
         super().__init__(lo, hi, lang.name)
         self.flow_in = []
         self.flow_out = []
@@ -141,7 +142,7 @@ class Decoder():
     '''
     def __init__(self, lang):
         assert isinstance(lang, str)
-        self.lang = lang
+        self.lang = self
         self.name = lang
         self.todo = []
         self.pil = pil.PIL_State(self)
@@ -160,6 +161,29 @@ class Decoder():
         '''
         raise Invalid("No decoder for " + self.lang)
 
+    def run_todo(self, a0):
+        self.lang.busy = True
+        x = None
+        xx = None
+        while self.todo:
+            asp, adr, _from = self.todo.pop()
+            z = list(filter(lambda j: isinstance(j, Code) and isinstance(j, Code) and self.lang in (j.lang, j.lang2), asp.find_lo(adr)))
+            if not z:
+                try:
+                    x = self.decode(asp, adr)
+                    assert isinstance(x, Code)
+                    x.commit(asp)
+                except Invalid:
+                    print("Failed decode", self.name, asp.afmt(adr), _from)
+                except mem.MemError:
+                    print("No Memory", self.name, asp.adr(adr), _from)
+            else:
+                x = z[0]
+            if adr == a0 and x:
+                xx = x
+        self.lang.busy = False
+        return xx
+
     def disass(self, adr, asp=None):
         '''
         Decode at adr and run with it.
@@ -167,29 +191,12 @@ class Decoder():
         '''
         if asp is None:
             asp = self.m
+        assert self.m is None or asp == self.m, (asp, self.m, self)
         a0 = adr
         x = None
-        xx = None
         assert isinstance(asp, mem.AddressSpace)
         self.todo.append([asp, adr, None])
-        if self.busy:
+        if self.lang.busy:
             return
-        self.busy = True
-        while self.todo:
-            asp, adr, _from = self.todo.pop()
-            z = list(filter(lambda j: isinstance(j, Code) and j.lang == self, asp.find_lo(adr)))
-            if not z:
-                try:
-                    x = self.decode(asp, adr)
-                    assert isinstance(x, Code)
-                    x.commit(asp)
-                except Invalid:
-                    print("Failed decode", self.name, "0x%x" % adr, _from)
-                except mem.MemError:
-                    print("No Memory", self.name, asp.adr(adr), _from)
-            else:
-                x = z[0]
-            if adr == a0 and x:
-                xx = x
-        self.busy = False
+        xx = self.run_todo(a0)
         return xx

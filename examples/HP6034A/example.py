@@ -138,8 +138,7 @@ def task(pj, cx):
 				n = "SIGN"
 			elif n == "C":
 				n = "CP"
-			if not pj.m.get_labels(c.dst):
-				pj.m.set_label(c.dst, "CMD_" + n)
+			pj.m.set_label(c.dst, "CMD_" + n)
 
 	if True:
 		for a in range(0x0d0c, 0x0d0f):

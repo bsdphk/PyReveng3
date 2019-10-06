@@ -379,18 +379,18 @@ def key_dispatch(pj, cx, start, end):
 		for row in range(4, 0, -1):
 			n = "KEY_C%d_R%d" % (col,row)
 			c = cx.codeptr(a)
-			if not pj.m.get_labels(c.dst):
+			if not list(pj.m.get_labels(c.dst)):
 				if n in keys:
 					m = keys[n]
 				else:
 					print("Unknown Key %s" % n)
 					m = n
 				pj.m.set_label(c.dst, m)
-			l = pj.m.get_labels(c.dst)
+			l = list(pj.m.get_labels(c.dst))
 			if l[:4] == "CMD_" and l[4:] in cmd_desc:
 				c.lcmt = n + " = " + cmd_desc[l[4:]]
 			else:
-				c.lcmt = n + " = " + str(pj.m.get_labels(c.dst))
+				c.lcmt = n + " = " + str(list(pj.m.get_labels(c.dst)))
 			a += 2
 	x = data.Range(pj.m, start, a, "KEY_DISPATCH")
 	pj.m.set_label(start, "KEY_DISPATCH")
@@ -483,10 +483,10 @@ def tramp(pj):
 		did = 0
 		for i in l:
 			da = i.flow_out[0].to
-			lx = pj.m.get_labels(i.lo)
-			ly = pj.m.get_labels(da)
-			if lx != None:
-				if ly != None:
+			lx = list(pj.m.get_labels(i.lo))
+			ly = list(pj.m.get_labels(da))
+			if lx:
+				if ly:
 					print("LX", lx)
 					print("LY", ly)
 					# assert str(lx) == str(ly)
@@ -495,7 +495,7 @@ def tramp(pj):
 					for j in lx:
 						pj.m.set_label(da, j)
 					did += 1
-			elif ly != None:
+			elif ly:
 				#print(pj.afmt(i.lo), "<-", pj.afmt(da), ly)
 				for j in ly:
 					pj.m.set_label(i.lo, j)

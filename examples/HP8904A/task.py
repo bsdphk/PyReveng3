@@ -621,7 +621,7 @@ def lexer(pj):
 			if self.f > 0 and self.pfx in hpib:
 				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
-			if self.f > 0 and not pj.m.get_labels(self.t):
+			if self.f > 0:
 				pj.m.set_label(self.t, "J_" + self.pfx)
 				cpu.disass(self.t)
 				h = hpib.get(self.pfx)

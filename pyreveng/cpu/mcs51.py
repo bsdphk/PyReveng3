@@ -297,14 +297,14 @@ class BitSpace(mem.AddressSpace):
         self.dspace = dspace
 
     def adr(self, dst):
-        lbls = self.labels.get(dst)
+        lbls = list(self.get_labels(dst))
         if lbls:
             return lbls[0]
         adr = dst & ~7
         bit = dst & 7
         if adr < 0x80:
             adr = 0x20 + (adr >> 3)
-        lbls = self.dspace.get_labels(adr)
+        lbls = list(self.dspace.get_labels(adr))
         if lbls:
             return lbls[0] + ".%d" % bit
         return "0x%02x.%d" % (adr, bit)

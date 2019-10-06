@@ -76,7 +76,7 @@ class Discover():
 		print("Known instructions:", len(self.code))
 
 		n = 0
-		for lx, hx in self.cx.m.gaps():
+		for lx, hx in sorted(self.cx.m.gaps()):
 			for adr in range(lx, hx):
 				try:
 					x = self.cx.decode(self.cx.m, adr)
@@ -88,9 +88,9 @@ class Discover():
 					continue
 				assert x is not None
 				for a in range(x.lo + 1, x.hi):
-					if self.cx.m.get_labels(a):
+					if list(self.cx.m.get_labels(a)):
 						break
-					if self.cx.m.get_block_comments(a):
+					if list(self.cx.m.get_block_comments(a)):
 						break
 				else:
 					self.code[adr] = x

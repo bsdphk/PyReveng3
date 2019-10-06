@@ -237,8 +237,7 @@ def example():
         print(s)
 
     def softlbl(a,n):
-        if not cx.m.get_labels(a):
-            cx.m.set_label(a, n)
+        cx.m.set_label(a, n)
     data.Const(cx.m, 0x8000, 0x8002)
 
     cx.m.set_label(0xd472, "chan_ptr")

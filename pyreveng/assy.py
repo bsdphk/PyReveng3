@@ -395,7 +395,7 @@ class Arg_dst(Arg):
     def __str__(self):
         if self.dst is None:
             return self.pfx + "0x?" + self.sfx
-        l = self.asp.get_labels(self.dst)
+        l = list(self.asp.get_labels(self.dst))
         if l:
             return self.pfx + "%s" % l[0] + self.sfx
         return self.pfx + self.asp.adr(self.dst) + self.sfx
