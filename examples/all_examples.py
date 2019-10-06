@@ -60,15 +60,27 @@ def one_example(dir, example):
         pj, cx = y.setup()
         y.task(pj, cx)
         fn = "_output/" + pj.name
-        listing.Listing(pj.m, ncol = 8, fn = fn + ".asm", pil=False)
-        listing.Listing(pj.m, ncol = 8, fn = fn + ".pil", pil=True)
+        for a, b in ((".asm", False), (".pil", True)):
+            listing.Listing(
+                pj.m,
+                ncol = 8,
+                fn = fn + a,
+                pil=b,
+                hide_undone=True,
+            )
     else:
         nm, ms = y.example()
         for i,j in enumerate(ms):
             fn = "_output/" + nm + ".%02d" % i
             print(i, j, fn)
-            listing.Listing(j, ncol = 8, fn = fn + ".asm", pil=False)
-            listing.Listing(j, ncol = 8, fn = fn + ".pil", pil=True)
+            for a, b in ((".asm", False), (".pil", True)):
+                listing.Listing(
+                    j,
+                    ncol = 8,
+                    fn = fn + a,
+                    pil=b,
+                    hide_undone=True,
+                )
     sys.stdout.flush()
 
 def all_examples():

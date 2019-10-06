@@ -52,6 +52,7 @@ class Listing():
         hi=None,
         ncol=None,
         pil=False,
+        hide_undone=False,
     ):
         self.asp = asp
 
@@ -62,6 +63,7 @@ class Listing():
         self.lo = lo
         self.hi = hi
         self.pil = pil
+        self.hide_undone = hide_undone
 
         assert not fo or not fn
         if not fo:
@@ -169,20 +171,17 @@ class Listing():
             self.fo.flush()
         return hi
 
-    def fmt_xxx(self, lo, hi):
-        self.format(lo, hi, [".XXX",], None, False)
-
-    def gap3(self, lo, hi):
-        self.format(lo, hi, [".BLANK\t" + self.asp.dfmt(lo) + "[0x%x]" % (hi - lo),], None, True)
-
     def gap2(self, lo, hi):
-        r = lo % self.ncol
-        if r:
-            i = min(lo + self.ncol - r, hi)
-            self.fmt_xxx(lo, i)
-            lo = i
-        if lo != hi:
-            self.fmt_xxx(lo, hi)
+        if self.hide_undone:
+            self.format(lo, hi, [".XXX[0x%x]" % (hi - lo),], None, True)
+        else:
+            r = lo % self.ncol
+            if r:
+                i = min(lo + self.ncol - r, hi)
+                self.format(lo, i, [".XXX",], None, False)
+                lo = i
+            if lo != hi:
+                self.format(lo, hi, [".XXX",], None, False)
 
     def gap1(self, s, r, lo, a):
         if a is None:
@@ -190,7 +189,7 @@ class Listing():
         elif lo - r >= self.blanks:
             if s != r:
                 self.gap2(s, r)
-            self.gap3(r, lo)
+            self.format(r, lo, [".BLANK\t" + self.asp.dfmt(r) + "[0x%x]" % (lo - r),], None, True)
         else:
             self.gap2(s, lo)
 
