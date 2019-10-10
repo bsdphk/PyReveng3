@@ -99,12 +99,12 @@ class Listing():
         # fo.write(t + '\n')
 
         self.plan = []
-        self.plan += [[lo, 0, self.plan_seg_start] for _asp, lo, _hi in asp.segments()]
+        self.plan += [[lo, 0, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()]
+        self.plan += [[hi, 0, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()]
         self.plan += [[adr, 1, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
         self.plan += [[adr, 2, self.plan_label] for adr, _l in asp.get_all_labels() if self.inside(adr)]
         self.plan += [[adr, 3, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
         self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
-        self.plan += [[hi, 6, self.plan_seg_stop] for _asp, _lo, hi in asp.segments()]
 
         self.start = False
         last = 0
@@ -261,15 +261,15 @@ class Listing():
             for j in tolines(i):
                 self.lcmts.append(i.rstrip())
 
-    def plan_seg_start(self, _adr, _afmt, *_args):
-        if self.in_seg is False:
-            self.fo.write('\n')
-            self.fo.write('-' * 80 + '\n')
-            self.fo.write('\n')
-        self.in_seg = True
-
-    def plan_seg_stop(self, _adr, _afmt, *_args):
-        self.in_seg = False
+    def plan_seg(self, _adr, _afmt, *args):
+        if args[0][0]:
+            if self.in_seg is False:
+                self.fo.write('\n')
+                self.fo.write('-' * 80 + '\n')
+                self.fo.write('\n')
+            self.in_seg = True
+        else:
+            self.in_seg = False
 
     def plan_leaf(self, _adr, _afmt, *args):
         leaf = args[0][0]
