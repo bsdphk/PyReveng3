@@ -66,7 +66,7 @@ def task(pj, dx):
 		ix0 = ix0[0]
 		ix0.flow_out = list()
 		for a0 in range(4,0x20,4):
-			ix0.add_flow(">", to=a0)
+			ix0 += code.Jump(to=a0)
 			i = pj.m.find_lo(a0)
 			assert len(i) == 1
 			i = i[0]
@@ -81,7 +81,7 @@ def task(pj, dx):
 			print("DISP_%d %x" % (a0 >> 2, dpf))
 			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
 			for a1 in range(pg, dpf, 2):
-				ix1.add_flow(">", to=a1)
+				ix1 += code.Jump(to=a1)
 				dx.disass(a1)
 				v = a0 << 3
 				v |= (a1 - pg) >> 1
@@ -103,7 +103,7 @@ def task(pj, dx):
 			ins = None
 		for a in range(lo, hi, span):
 			if ins != None:
-				ins.add_flow(">", to=a)
+				ins += code.Jump(to=a)
 			dx.disass(a)
 
 	if True:

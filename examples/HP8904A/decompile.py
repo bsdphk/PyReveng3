@@ -35,7 +35,7 @@ class Call(code.Code):
 		self.args = list(reversed(args))
 		self.compact = True
 		pj.insert(self)
-		self.add_flow("C", True, dst, lang)
+		self += code.Call(to=dst, lang=lang)
 
 	def render(self, pj):
 		s = "CALL\t" + pj.render_adr(self.dst) + "("
@@ -280,8 +280,7 @@ class switch(object):
 			u = self.pj.m.bu16(a)
 			if u != d:
 				self.pj.m.set_label(u, "case_%d" % i)
-			self.i.add_flow(">JC", "%d" % i,
-			    u, self.i.lang)
+			self.i += code.Jump(cond="%d" % i, to=u, lang=self.i.lang)
 			self.i.lang.disass(self.pj, u)
 			a += 2
 		return True

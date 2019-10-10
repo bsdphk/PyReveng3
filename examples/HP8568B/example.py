@@ -232,7 +232,7 @@ def task(pj, cpu):
 		ins.flow_out.pop(-1)
 		if len(z) <= 1:
 			a = data.Pstruct(asp, ins.hi, ">h", "%d", ".INFIX").hi
-			ins.add_flow(">", True, a)
+			ins += code.Jump(to=a)
 			return
 		l = []
 		for i in z[1:]:
@@ -282,7 +282,7 @@ def task(pj, cpu):
 			else:
 				l.append(i)
 		ins.oper.append(assy.Arg_verbatim("(" + ",".join(l) + ")"))
-		ins.add_flow(True, True, ins.hi)
+		ins += code.Flow()
 
 	cpu.flow_check.append(flow_post_arg)
 
@@ -301,7 +301,7 @@ def task(pj, cpu):
 		if ins.dstadr != 0x2f38:
 			return
 		ins.flow_out.pop(0)
-		ins.add_flow(">", "?", ins.hi)
+		ins += code.Flow(cond="?")
 		asp.set_label(ins.hi, "break_%04x" % ins.lo)
 
 		y = data.Const(asp, ins.lo - 2, ins.lo)
@@ -324,7 +324,7 @@ def task(pj, cpu):
 			w.fmt = "0x%x, %d" % (i,z)
 
 			w.fmt += ", 0x%04x" % (ins.hi + z)
-			ins.add_flow(">", "0x%x" % i, ins.hi + z)
+			ins += code.Jump(cond="0x%x" % i, to=ins.hi + z)
 			if z < 0:
 				asp.set_label(ins.hi + z, ".case_%04x_%s" % (ins.lo, ct))
 

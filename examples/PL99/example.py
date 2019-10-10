@@ -61,7 +61,7 @@ def setup():
 			if i == None:
 				continue
 			ins.flow_out = []
-			ins.add_flow("C", True, f.to)
+			ins += code.Call(to=f.to)
 			a = ins.hi
 			for j in i:
 				if j == "W":
@@ -76,8 +76,7 @@ def setup():
 					a += 1
 				else:
 					assert False
-			ins.add_flow(">", True, a)
-			return
+			ins += code.Jump(to=a)
 
 	cx.flow_check.append(post_arg_func)
 	#######################################################################
