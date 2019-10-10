@@ -96,28 +96,28 @@ class Instree_ins(Assy):
         return
 
     def flow_R(self):
-        self.add_flow("R", self.cc)
+        self += code.Return(cond=self.cc)
 
     def flow_J(self):
-        self.add_flow(">", True, self.dstadr)
+        self += code.Jump(to=self.dstadr)
 
     def flow_RC(self):
         if self.cc is not False:
-            self.add_flow("R", self.cc)
+            self += code.Return(cond=self.cc)
         if self.cc is not True:
-            self.add_flow(True, "!" + self.cc, self.hi)
+            self += code.Flow(cond="!" + self.cc)
 
     def flow_JC(self):
         if self.cc is True:
-            self.add_flow(">", "?", self.dstadr)
-            self.add_flow(True, "!?", self.hi)
+            self += code.Jump(cond="?", to=self.dstadr)
+            self += code.Flow(cond="!?")
         else:
-            self.add_flow(">", self.cc, self.dstadr)
-            self.add_flow(True, "!" + self.cc, self.hi)
+            self += code.Jump(cond=self.cc, to=self.dstadr)
+            self += code.Flow(cond="!" + self.cc)
 
     def flow_C(self):
-        self.add_flow("C", True, self.dstadr)
-        self.add_flow(True, True, self.hi)
+        self += code.Call(to=self.dstadr)
+        self += code.Flow()
 
     def arg(self, arg):
         if arg in self.lang.verbatim:
@@ -190,7 +190,7 @@ class Instree_ins(Assy):
         self.args_done()
 
         if not self.flow_out:
-            self.add_flow(True)
+            self += code.Flow()
 
     def get(self, f):
         return self.lim[-1].get(f)

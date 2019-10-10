@@ -27,7 +27,7 @@
 '''Motorola MC6809
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy, code, data, mem
 
 mc6809_desc = """
 
@@ -590,7 +590,7 @@ class mc6809_ins(assy.Instree_ins):
 		if self.mne[:3] == "PSH":
 			l = list(reversed(l))
 		elif "PC" in l:
-			self.add_flow('>', True, None)
+			self += code.Jump()
 		return ",".join(l)
 
 

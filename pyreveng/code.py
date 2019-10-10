@@ -51,18 +51,22 @@ class Flow():
     Flows connect code leaves together and captures where
     execution can go next and under what condition.
     '''
-    def __init__(self, fm, typ, cond=True, to=None, lang=None):
-        if lang is None:
-            lang = fm.lang
-        self.fm = fm
+    def __init__(self, typ=True, cond=True, to=None, lang=None):
+        self.fm = None
         self.lang = lang
         self.typ = typ
         self.cond = cond
         self.to = to
         self.dst = None
 
-        if typ is True:
+    def come_from(self, fm):
+        self.fm = fm
+
+        if self.typ is True:
             self.to = fm.hi
+
+        if self.lang is None:
+            self.lang = fm.lang
 
     def propagate(self, asp):
 
@@ -90,6 +94,21 @@ class Flow():
             s += " 0x%x" % self.to
         leaf.lcmt += s + "\n"
 
+class Jump(Flow):
+    ''' Transfer of control with no return/link address '''
+    def __init__(self, **kwargs):
+        super().__init__(typ='>', **kwargs)
+
+class Call(Flow):
+    ''' Transfer of control with return/link address '''
+    def __init__(self, **kwargs):
+        super().__init__(typ='C', **kwargs)
+
+class Return(Flow):
+    ''' Transfer of control to canonical link address '''
+    def __init__(self, **kwargs):
+        super().__init__(typ='R', **kwargs)
+
 
 #######################################################################
 
@@ -116,15 +135,15 @@ class Code(Leaf):
         self.flow_in = []
         self.flow_out = []
 
+    def __iadd__(self, obj):
+        ''' Add a flow record '''
+        assert isinstance(obj, Flow), obj
+        obj.come_from(self)
+        self.flow_out.append(obj)
+        return self
+
     def render(self):
         return "<Code %x-%x %s>" % (self.lo, self.hi, self.lang.name)
-
-    def add_flow(self, typ, cond=True, to=None, lang=None):
-        '''
-        Add a flow record
-        '''
-        f = Flow(self, typ, cond, to, lang)
-        self.flow_out.append(f)
 
     def commit(self, asp):
         '''

@@ -27,7 +27,7 @@
 '''Motorola M68000
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy, code, data, mem
 
 m68000_desc = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -1079,7 +1079,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def assy_vect(self):
 		if self.lang.trap_returns.get(self['vect']):
-			self.add_flow(">", True, self.hi)
+			self += code.Flow()
 		return "#%d" % self['vect']
 
 	def assy_W(self):
