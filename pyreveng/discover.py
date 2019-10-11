@@ -80,6 +80,8 @@ class Discover():
 			for adr in range(lx, hx):
 				try:
 					x = self.cx.decode(self.cx.m, adr)
+				except code.Undefined:
+					continue
 				except code.Invalid:
 					continue
 				except mem.MemError:
