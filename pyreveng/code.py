@@ -37,14 +37,9 @@ instance the CHIP-8 'language' on RCA1802 CPUs or the RPN code of a
 HP 48 Calculator.
 '''
 
-from . import pil
+from pyreveng import data, leaf, mem, pil
 
-from . import mem
-
-from pyreveng import data
-
-from .exception import Invalid
-from .leaf import Leaf
+from pyreveng.exception import Invalid, Undefined
 
 #######################################################################
 
@@ -125,7 +120,7 @@ def lcmt_flows(asp):
 
 #######################################################################
 
-class Code(Leaf):
+class Code(leaf.Leaf):
     '''
     A single undivisible "instruction" in some language
     '''

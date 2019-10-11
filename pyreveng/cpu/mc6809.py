@@ -425,6 +425,19 @@ CLRD	-	|0 1 0 0 1 1 1 1|0 1 0 1 1 1 1 1| {
 
 """
 
+for i in (
+    "01", "02", "05", "0B",
+    "14", "15", "18", "1B",
+    "38", "3E",
+    "41", "42", "45", "4B", "4E",
+    "51", "52", "55", "5B", "5E",
+    "61", "62", "65", "6B",
+    "71", "72", "75", "7B",
+    "87", "8F",
+    "C7", "CD", "CF",
+):
+	mc6809_desc += "UNDEF\t-\t|\t" + i + "\t|\n"
+
 class mc6809_ins(assy.Instree_ins):
 	def __init__(self, lim, lang):
 		super().__init__(lim, lang)
@@ -468,6 +481,7 @@ class mc6809_ins(assy.Instree_ins):
 		r = "XYUS"[(a>>5)&3]
 		i = (a >> 4) & 1
 		m = a & 0xf
+
 		if not X:
 			if i:
 				return("%s-%d" % (r, 16-m))
@@ -500,9 +514,12 @@ class mc6809_ins(assy.Instree_ins):
 			s = r + "%+d" % self.off
 		elif m == 0xb:
 			s = r + "+D"
+		elif m == 0xc:
+			self.off = self.lang.m.s8(self.hi - 1)
+			s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
 		elif m == 0xd:
 			self.off = self.lang.m.bs16(self.hi - 2)
-			s = "0x%x" % ((0x10000 + self.hi + self.off & 0xffff))
+			s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
 		elif m == 0xf:
 			self.off = self.lang.m.bs16(self.hi - 2)
 			s = "0x%x" % self.off
@@ -684,7 +701,7 @@ class mc6809_ins(assy.Instree_ins):
 			], "%0")
 		elif m == 12 or m == 13:
 			if self.off is None:
-				print("??? No .off", self, self.mne, self.oper)
+				print("??? No .off", self, self.render())
 			adr = self.add_il([
 				["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
 			], "%0")

@@ -29,5 +29,7 @@ Exceptions
 """
 
 class Invalid(Exception):
-	pass
+    pass
 
+class Undefined(Exception):
+    pass

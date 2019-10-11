@@ -38,6 +38,7 @@ from . import instree, code, pil, mem, data
 #######################################################################
 
 Invalid = code.Invalid
+Undefined = code.Undefined
 
 class Wrong(Exception):
     pass
@@ -126,6 +127,9 @@ class Instree_ins(Assy):
 
         if arg == "-":
             return
+
+        if arg == ">U":
+            raise Undefined()
 
         if arg == "?":
             for i in self.lim:
@@ -343,6 +347,9 @@ class Instree_disass(code.Decoder):
             try:
                 y = x.handler(l, self)
                 y.parse()
+            except Undefined as e:
+                raise Invalid(asp.adr(adr) +
+                    " Undefined " + self.name + " instruction")
             except Invalid as e:
                 l.pop(-1)
                 continue
@@ -351,6 +358,9 @@ class Instree_disass(code.Decoder):
             if y.prefix:
                 try:
                     y = self.decode(asp, adr + len(x.words) * self.scale, l)
+                except Undefined as e:
+                    raise Invalid(asp.adr(adr) +
+                        " Undefined " + self.name + " instruction")
                 except Invalid as e:
                     l.pop(-1)
                     continue
