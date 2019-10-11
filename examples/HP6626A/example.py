@@ -360,7 +360,7 @@ def example():
         while True:
             ll = list(l)
             if cx.m[a] == 0:
-                if not cx.m.find_lo(a):
+                if not cx.m.occupied(a):
                     data.Const(cx.m, a, a + 1)
                 break
             t = cx.m[a]
@@ -381,8 +381,8 @@ def example():
                 tt5(x, f, ll, ex)
             else:
                 #print("%04x" % a, ll, "%04x" % ex)
-                y = cx.m.find_lo(ex)
-                y[0].lcmt += " ".join(ll) + "\n"
+                for y in cx.m.find(ex):
+                    y.lcmt += " ".join(ll) + "\n"
                 #print(y)
 
             a += 4

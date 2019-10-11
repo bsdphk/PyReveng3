@@ -41,8 +41,8 @@ def setup():
 	return pj, dx
 
 def line_comment(pj, adr, cmt):
-	i = pj.m.find_lo(adr)
-	if i == None:
+	i = list(pj.m.find(adr))
+	if not i:
 		return
 	assert len(i) == 1
 	i = i[0]

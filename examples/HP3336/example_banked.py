@@ -97,13 +97,13 @@ def pagejumps(cx):
     '''You are not supposed to understand this'''
     for a in range(0x004, 0x020, 4):
         y = cx[0].disass(a)
-        y = cx[0].m.find_lo(a)[0]
+        y = list(cx[0].m.find(a))[0]
         print("PGJ %x" % a, y)
         fnn = "DISP_%d" % (a // 4)
         cx[y.dst_pg].m.set_label(y.dst_off, fnn)
         for b in range(0, y.dst_off, 2):
             z = cx[y.dst_pg].disass(b)
-            z = cx[y.dst_pg].m.find_lo(b)[0]
+            z = list(cx[y.dst_pg].m.find(b))[0]
             cx[y.dst_pg].m.set_label(z.dstadr, "FN%d_%d" % (y.dst_pg, b // 2))
 
 #########################################################################

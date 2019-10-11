@@ -130,8 +130,7 @@ class d_q(data.Data):
 		[Sign][31 bit fraction]
 	"""
 	def __init__(self, pj, a, lbl=True):
-		x = pj.m.find_lo(a)
-		for i in x:
+		for i in pj.m.find(lo=a):
 			if i.tag == ".D4":
 				return
 		super().__init__(pj.m, a, a + 4, ".D4")

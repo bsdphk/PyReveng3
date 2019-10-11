@@ -519,7 +519,7 @@ class Tms9900_ins(assy.Instree_ins):
             if o != 0:
                 return "R%d+#0x%04x" % (o, v)
 
-            x = self.lang.m.find_lo(v)
+            x = list(self.lang.m.find(v))
             if x:
                 return assy.Arg_ref(self.lang.m, x[0])
 
@@ -551,7 +551,7 @@ class Tms9900_ins(assy.Instree_ins):
     def assy_blwp1(self):
         a = self['ptr']
         self.cache['blwp1'] = self.lang.m.bu16(a)
-        if not self.lang.m.find_lo(a):
+        if not self.lang.m.occupied(a):
             data.Pstruct(self.lang.m, a, ">HH", ".BLWP\t0x%04x, 0x%04x")
         return "WP=0x%04x" % self.lang.m.bu16(a)
 

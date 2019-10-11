@@ -212,8 +212,10 @@ class AddressSpace():
     def find(self, *args, **kwargs):
         yield from self.t.find(*args, **kwargs)
 
-    def find_lo(self, adr):
-        return self.t.find_lo(adr)
+    def occupied(self, *args, **kwargs):
+        for i in self.t.find(*args, **kwargs):
+            return True
+        return False
 
     def find_hi(self, adr):
         return self.t.find_hi(adr)
@@ -288,14 +290,6 @@ class MemMapper(AddressSpace):
     def __setitem__(self, adr, dat):
         ms, sa, _sh = self.xlat(adr)
         ms[sa] = dat
-
-    def find_lo(self, adr):
-        ms, sa, sh = self.xlat(adr, False)
-        if sh:
-            r = ms.t.find_lo(adr)
-        else:
-            r = self.t.find_lo(adr)
-        return r
 
     def find_hi(self, adr):
         ms, sa, sh = self.xlat(adr, False)

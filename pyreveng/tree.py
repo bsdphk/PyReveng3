@@ -119,21 +119,6 @@ class Tree():
             self.more.find_range(lo, hi, lst)
         return lst
 
-    def find_lo(self, lo, lst=None):
-        """
-        Return list of objects with given .lo
-        """
-        if lst is None:
-            lst = []
-        if lo < self.mid and self.less is not None:
-            self.less.find_lo(lo, lst)
-        for i in self.cuts:
-            if lo == i.lo:
-                lst.append(i)
-        if lo >= self.mid and self.more is not None:
-            self.more.find_lo(lo, lst)
-        return lst
-
     def find_hi(self, hi, lst=None):
         """
         Return list of objects with given .hi

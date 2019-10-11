@@ -265,7 +265,7 @@ def task(pj, cpu):
 				r = ins.hi + asp.bs16(ins.hi)
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
-				if not asp.find_lo(r):
+				if not asp.occupied(r):
 					data.Pstruct(asp, r, ">L", "%d", ".LONG")
 				l.append("%d" % asp.bu32(r))
 			elif i == "frel":
