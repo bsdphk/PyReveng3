@@ -186,7 +186,7 @@ class Decoder():
         xx = None
         while self.todo:
             asp, adr, _from = self.todo.pop()
-            z = list(filter(lambda j: isinstance(j, Code) and isinstance(j, Code) and self.lang in (j.lang, j.lang2), asp.find_lo(adr)))
+            z = list(filter(lambda j: isinstance(j, Code) and self.lang in (j.lang, j.lang2), asp.find_lo(adr)))
             if not z:
                 try:
                     x = self.decode(asp, adr)
