@@ -191,6 +191,7 @@ def task(pj, cx):
 	cx.disass(0xdee2)
 	cx.disass(0xde3a)
 
+	done = set()
 	while True:
 
 		# Find queue'd entry points
@@ -208,11 +209,12 @@ def task(pj, cx):
 			if pj.m[i.lo + 5] != 0x01:
 				continue
 			a = pj.m.bu16(i.lo + 1)
-			if not pj.m.occupied(a):
+			if a not in done:
 				print("Queued: 0x%04x" % a)
 				cx.disass(a)
 				pj.m.set_label(a, "Q%04x" % a)
 				stop = False
+				done.add(a)
 		if stop:
 			break
 

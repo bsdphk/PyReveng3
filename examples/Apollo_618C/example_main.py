@@ -32,10 +32,7 @@ from pyreveng import job, mem, data, listing, code
 import pyreveng.cpu.i8086 as i8086
 
 def mem_setup():
-	m = mem.ByteMem(0, 0x20000)
-	fn = os.path.join(os.path.dirname(__file__),
-	    "618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin")
-	m.load_binfile(0, 1, fn)
+	m = mem.Stackup(("618TCA_R_U2_C_U15_PN_138_0193_V4_4.bin",), nextto=__file__)
 	return m
 
 def setup():
