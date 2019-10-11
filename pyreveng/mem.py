@@ -209,6 +209,9 @@ class AddressSpace():
         leaf.aspace = self
         return self.t.insert(leaf)
 
+    def find(self, *args, **kwargs):
+        yield from self.t.find(*args, **kwargs)
+
     def find_lo(self, adr):
         return self.t.find_lo(adr)
 

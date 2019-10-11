@@ -53,19 +53,11 @@ def setup():
 
 def task(pj, cx):
 
-	if False:
-		pj.a.address_space("xrom", m)
-		pj.a.address_space("xdata", mem.address_space(0, 0x10000))
-		pj.a.address_space("idata", mem.address_space(0, 0x100))
-
-		for i in pj.a:
-			print(i, pj.a[i])
-		exit(0)
-
-
 	cx.set_adr_mask(0xfff)
 
 	cx.vectors(which=("RESET", "TF0", "IE0", "TF1"))
+
+	cx.disass(0x600)
 
 	# Random
 	# cx.disass(0x7d2)

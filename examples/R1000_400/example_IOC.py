@@ -31,7 +31,7 @@ import pyreveng.cpu.m68020 as m68020
 
 def fc_puts_inline(asp, ins, flow):
 	y = data.Txt(asp, ins.hi, label=False, align=2)
-	flow.to = y.hi
+	ins.flow_out[-1].to = y.hi
 
 def flow_check(asp, ins):
 	for i in ins.flow_out:
@@ -116,8 +116,8 @@ def task(pj, cpu):
 	pj.m.set_label(0x80002028, "INLINE_PUTS")
 
 	if True:
-		for a in (0x08ad6, 0x08ada):
-			data.Const(pj.m, a, a + 4)
+		for a in (0x08ad6,):
+			data.Const(pj.m, a, a + 2)
 
 	cpu.vectors()
 

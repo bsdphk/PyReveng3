@@ -41,6 +41,8 @@ from . import pil
 
 from . import mem
 
+from pyreveng import data
+
 from .exception import Invalid
 from .leaf import Leaf
 
@@ -180,24 +182,40 @@ class Decoder():
         '''
         raise Invalid("No decoder for " + self.lang)
 
+    def decode_one(self, asp, adr, src):
+        for i in asp.find(lo=adr):
+            if isinstance(i, data.Range):
+                continue
+            if isinstance(i, Code):
+                return i
+            print("Would overlap", self.name, asp.afmt(adr), i, src)
+            return None
+        try:
+            x = self.decode(asp, adr)
+        except Invalid:
+            print("Failed decode", self.name, asp.afmt(adr), src)
+            return None
+        except mem.MemError:
+            print("No Memory", self.name, asp.adr(adr), src)
+            return None
+        assert isinstance(x, Code)
+        for i in asp.find(lo=x.lo, hi=x.hi):
+            if isinstance(i, data.Range):
+                continue
+            if isinstance(i, Code):
+                return i
+            print("Would overlap", self.name, asp.afmt(adr), i, src)
+            return None
+        x.commit(asp)
+        return x
+
     def run_todo(self, a0):
         self.lang.busy = True
         x = None
         xx = None
         while self.todo:
-            asp, adr, _from = self.todo.pop()
-            z = list(filter(lambda j: isinstance(j, Code) and self.lang in (j.lang, j.lang2), asp.find_lo(adr)))
-            if not z:
-                try:
-                    x = self.decode(asp, adr)
-                    assert isinstance(x, Code)
-                    x.commit(asp)
-                except Invalid:
-                    print("Failed decode", self.name, asp.afmt(adr), _from)
-                except mem.MemError:
-                    print("No Memory", self.name, asp.adr(adr), _from)
-            else:
-                x = z[0]
+            asp, adr, src = self.todo.pop()
+            x = self.decode_one(asp, adr, src)
             if adr == a0 and x:
                 xx = x
         self.lang.busy = False
