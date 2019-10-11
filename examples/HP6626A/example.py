@@ -591,7 +591,7 @@ def example():
             continue
         if i.dstadr != 0x91d7:
             continue
-        j = cx.m.find_hi(i.lo)
+        j = list(cx.m.find(hi=i.lo))
         if len(j) != 1:
             continue
         j=j[0]

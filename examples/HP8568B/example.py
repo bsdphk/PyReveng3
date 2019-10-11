@@ -817,7 +817,7 @@ def task(pj, cpu):
 		if i.tag != "m68000":
 			continue
 		if i.dstadr in (0x940c, 0xed54):
-			y = pj.m.find_hi(i.lo)
+			y = list(pj.m.find(hi=i.lo))
 			if len(y) != 1:
 				continue
 			y = y[0]
@@ -832,7 +832,7 @@ def task(pj, cpu):
 			y.oper[0].txt = "#KEY_" + keynos[k]
 
 		if i.dstadr in (0xe4e8,):
-			y = pj.m.find_hi(i.lo)
+			y = list(pj.m.find(hi=i.lo))
 			if len(y) != 1:
 				continue
 			y = y[0]
@@ -841,7 +841,7 @@ def task(pj, cpu):
 			z = data.Txt(pj.m, y.dstadr, pfx=1, align=2)
 			y.lcmt = "'" + z.txt + "'"
 		if i.dstadr in (0xe718, 0x3456, 0x6ce0):
-			y = pj.m.find_hi(i.lo)
+			y = list(pj.m.find(hi=i.lo))
 			if len(y) != 1:
 				continue
 			y = y[0]
@@ -851,7 +851,7 @@ def task(pj, cpu):
 			z = data.Txt(pj.m, a, pfx=1, align=2)
 			y.lcmt = "'" + z.txt + "'"
 			if i.dstadr == 0xe718:
-				w = pj.m.find_hi(y.lo)
+				w = list(pj.m.find(hi=y.lo))
 				if len(w) != 1:
 					continue
 				w = w[0]

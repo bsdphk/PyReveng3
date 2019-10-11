@@ -217,9 +217,6 @@ class AddressSpace():
             return True
         return False
 
-    def find_hi(self, adr):
-        return self.t.find_hi(adr)
-
 class MemMapper(AddressSpace):
 
     def __init__(self, lo, hi, **kwargs):
@@ -290,13 +287,6 @@ class MemMapper(AddressSpace):
     def __setitem__(self, adr, dat):
         ms, sa, _sh = self.xlat(adr)
         ms[sa] = dat
-
-    def find_hi(self, adr):
-        ms, sa, sh = self.xlat(adr, False)
-        if sh:
-            return ms.t.find_hi(adr)
-        return self.t.find_hi(adr)
-
 
     def set_something(self, what, adr, *args):
         ms, sa, sh = self.xlat(adr, False)

@@ -88,7 +88,7 @@ def do_one(fn, alist):
 		a.lcmt += b + "\n"
 
 	for i,j in orig_src.items():
-		x = pj.t.find_range(i, i + 1)
+		x = list(pj.t.find(i))
 		if len(x[1]) > 0:
 			fixit(i, x[1][0], j)
 		elif len(x[0]) > 0:

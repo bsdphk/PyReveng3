@@ -140,11 +140,8 @@ if False:
 			for i, j in self.bank.items():
 				j.map(mem, lo, hi, **kwargs)
 
-		def gmapped(self, lo, hi=None):
-			if hi is None:
-				hi = lo + 1
-			x = self.allmap.find_range(lo, hi)
-			return len(x[0])
+		def gmapped(self, *args, **kwargs):
+                        return self.allmap.occupied(*args, **kwargs)
 
 		def page(self, n):
 			self.cpu.m = self.bank[n]

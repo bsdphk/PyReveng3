@@ -91,49 +91,6 @@ class Tree():
         if hi >= self.mid and self.more is not None:
             yield from self.more.find(lo, hi)
 
-    def find_range(self, lo, hi, lst=None):
-        """
-        Return four lists of objects:
-            Objects which the range is inside
-            Objects identical to the range
-            Objects inside than the range
-            Objects which are both inside and outside the range
-        """
-        assert lo < hi
-        if lst is None:
-            lst = [[], [], [], []]
-        if lo < self.mid and self.less is not None:
-            self.less.find_range(lo, hi, lst)
-        for i in self.cuts:
-            if i.hi <= lo or i.lo >= hi:
-                continue
-            if lo == i.lo and hi == i.hi:
-                lst[1].append(i)
-            elif lo >= i.lo and hi <= i.hi:
-                lst[0].append(i)
-            elif lo <= i.lo and hi >= i.hi:
-                lst[2].append(i)
-            else:
-                lst[3].append(i)
-        if hi > self.mid and self.more is not None:
-            self.more.find_range(lo, hi, lst)
-        return lst
-
-    def find_hi(self, hi, lst=None):
-        """
-        Return list of objects with given .hi
-        """
-        if lst is None:
-            lst = []
-        if hi <= self.mid and self.less is not None:
-            self.less.find_hi(hi, lst)
-        for i in self.cuts:
-            if hi == i.hi:
-                lst.append(i)
-        if hi > self.mid and self.more is not None:
-            self.more.find_hi(hi, lst)
-        return lst
-
     def __iter__(self):
         """
         Iterate in order of .lo and narrow before wider.
