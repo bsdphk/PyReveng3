@@ -43,8 +43,7 @@ XXX: Need resolution of who controls rendering...
 import os.path
 import ctypes
 
-from . import tree
-from . import leaf
+from pyreveng import tree, leaf, data
 
 DEFINED = (1 << 7)
 
@@ -122,7 +121,7 @@ class AddressSpace():
 
     def adr(self, dst):
         ''' Render an address '''
-        lbl = self.lbl_d.get(dst)
+        lbl = list(self.get_labels(dst))
         if lbl:
             return lbl[0]
         return "0x%x" % dst
@@ -130,7 +129,7 @@ class AddressSpace():
     def afmt(self, adr, sym=False):
         ''' Format address '''
         if sym:
-            lbl = self.lbl_d.get(adr)
+            lbl = list(self.get_labels(dst))
             if lbl:
                 return lbl[0]
         return self.afmtpct % adr
@@ -145,7 +144,7 @@ class AddressSpace():
 
     def gaps(self):
         ll = self.lo
-        for i in self.t:
+        for i in sorted(self):
             if i.lo > ll:
                 yield ll, i.lo
             ll = i.hi
@@ -161,7 +160,6 @@ class AddressSpace():
         if adr >= self.hi:
             raise MemError(adr, "Address too high")
         return adr - self.lo
-
 
     def set_label(self, adr, lbl):
         assert isinstance(lbl, str)
@@ -213,8 +211,9 @@ class AddressSpace():
         yield from self.t.find(*args, **kwargs)
 
     def occupied(self, *args, **kwargs):
-        for i in self.t.find(*args, **kwargs):
-            return True
+        for i in self.find(*args, **kwargs):
+            if not isinstance(i, data.Range):
+                return True
         return False
 
 class MemMapper(AddressSpace):
@@ -228,6 +227,28 @@ class MemMapper(AddressSpace):
 
     def __repr__(self):
         return "<MemMapper %s 0x%x-0x%x>" % (self.name, self.lo, self.hi)
+
+    class Link(leaf.Leaf):
+
+        def __init__(self, lo, hi, link):
+            super().__init__(lo, hi, "LinkLeaf")
+            self.link = link
+
+        def render(self):
+            self.compact = self.link.compact
+            return self.link.render()
+
+    class Alien(leaf.Leaf):
+        def __init__(self, lo, hi, them):
+            super().__init__(lo, hi, "Alien")
+            self.them = them
+
+        def render(self):
+            t = "ALIEN"
+            t += " %s" % self.them.aspace.afmt(self.them.lo)
+            t += "-%s" % self.them.aspace.afmt(self.them.hi)
+            t += " " + self.them.render()
+            return t
 
     def map(self, mem, lo, hi=None, offset=None, shared=False):
         if offset is None:
@@ -272,13 +293,26 @@ class MemMapper(AddressSpace):
             raise MemError(adr, "Unmapped memory @0x%x" % adr)
         return self, adr, False
 
+    def dealienate(self, item, low, offset):
+        j = item
+        while isinstance(j, self.Link):
+            j = j.link
+        if j.lo != item.lo + low - offset:
+            return self.Alien(item.lo + low - offset, item.hi + low - offset, item)
+        return j
+
     def __iter__(self):
         for i in self.t:
+            assert not isinstance(i, self.Link), i
             yield i
-        for _low, _high, _offset, mem, shared in self.seglist:
-            if shared:
-                for i in mem.t:
-                    yield i
+        for low, high, offset, mem, shared in self.seglist:
+            for i in mem.t:
+                ll = i.lo + low - offset
+                hh = i.hi + low - offset
+                if low <= ll < high and low <= hh <= high:
+                    j = self.dealienate(i, low, offset)
+                    assert not isinstance(j, self.Link), j
+                    yield j
 
     def __getitem__(self, adr):
         ms, sa, _sh = self.xlat(adr)
@@ -288,29 +322,46 @@ class MemMapper(AddressSpace):
         ms, sa, _sh = self.xlat(adr)
         ms[sa] = dat
 
+    def find(self, lo=None, hi=None, **kwargs):
+        if hi is None:
+            hi = lo + 1
+        if lo is None:
+            lo = hi - 1
+        #print("FS", "%x" % lo, "%x" % hi)
+        yield from super().find(lo=lo, hi=hi, **kwargs)
+        for low, high, offset, mem, shared in self.seglist:
+            #print(" fs", "%x" % low, "%x" % high, "%x" % offset)
+            if low <= hi or lo <= high:
+                ll = max(lo, low) + offset - low
+                hh = min(hi, high) + offset - low
+                #print("  fs", "%x" % ll, "%x" % hh)
+                for j in mem.find(lo=ll , hi=hh, **kwargs):
+                    #print("   fs", j)
+                    x = self.dealienate(j, low, offset)
+                    #print("    fs", x)
+                    yield x
+
     def set_something(self, what, adr, *args):
         ms, sa, sh = self.xlat(adr, False)
-        if sh:
-            getattr(ms, what)(sa, *args)
-        else:
+        if ms == self:
             getattr(super(), what)(adr, *args)
+        else:
+            getattr(ms, what)(sa, *args)
 
     def get_something(self, what, adr, *args):
         ms, sa, sh = self.xlat(adr, False)
-        if sh:
-            yield from getattr(ms, what)(sa, *args)
-        else:
+        if ms == self:
             yield from getattr(super(), what)(adr, *args)
+        else:
+            yield from getattr(ms, what)(sa, *args)
 
     def get_all_somethings(self, what):
         yield from getattr(super(), what)()
-        for low, _high, offset, mem, shared in self.seglist:
-            if not shared:
-                continue
+        for low, high, offset, mem, shared in self.seglist:
             for a, b in getattr(mem, what)():
-                na = (a - offset) + low
-                yield na, b
-
+                aa = a + low - offset
+                if low <= aa < high:
+                    yield aa, b
 
     def set_label(self, *args):
         self.set_something("set_label", *args)
@@ -359,7 +410,9 @@ class MemMapper(AddressSpace):
         return ms.afmt(adr)
 
     def dfmt(self, adr):
-        ms, sa, _sh = self.xlat(adr)
+        ms, sa, _sh = self.xlat(adr, False)
+        if ms == self:
+            return super().dfmt(sa)
         return ms.dfmt(sa)
 
     def tfmt(self, adr):
@@ -437,13 +490,12 @@ class MemMapper(AddressSpace):
 
     def insert(self, item):
         ms, sa, sh = self.xlat(item.lo, False)
-        if sh:
-            ms.insert(item)
+        if ms != self:
+            item.aspace = self
+            ll = self.Link(sa, item.hi - (item.lo - sa), item)
+            ms.insert(ll)
         else:
             super().insert(item)
-            if ms != self:
-                ll = leaf.Link(sa, item.hi - (item.lo - sa), item)
-                ms.insert(ll)
 
 class WordMem(AddressSpace):
 

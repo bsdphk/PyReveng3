@@ -146,9 +146,10 @@ class Code(leaf.Leaf):
         '''
         Follow the flow records to find more code
         '''
+        # print("C", self, asp)
+        asp.insert(self)
         for f in self.flow_out:
             f.propagate(asp)
-        asp.insert(self)
 
 #######################################################################
 

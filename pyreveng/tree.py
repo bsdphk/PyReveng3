@@ -83,12 +83,13 @@ class Tree():
             hi = lo + 1
         if lo is None:
             lo = hi - 1
-        if hi <= self.mid and self.less is not None:
+        #print("FF %x-%x" % (lo, hi), self, self.less, len(self.cuts), self.more)
+        if lo <= self.mid and self.less is not None:
             yield from self.less.find(lo, hi)
         for i in self.cuts:
             if i.lo < hi and lo < i.hi:
                 yield i
-        if lo >= self.mid and self.more is not None:
+        if hi >= self.mid and self.more is not None:
             yield from self.more.find(lo, hi)
 
     def __iter__(self):

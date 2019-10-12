@@ -70,8 +70,11 @@ def one_example(dir, example):
             )
     else:
         nm, ms = y.example()
-        for i,j in enumerate(ms):
-            fn = "_output/" + nm + ".%02d" % i
+        for i, j in enumerate(ms):
+            if len(ms) == 1:
+                fn = "_output/" + nm
+            else:
+                fn = "_output/" + nm + ".%02d" % i
             print(i, j, fn)
             for a, b in ((".asm", False), (".pil", True)):
                 listing.Listing(

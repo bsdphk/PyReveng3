@@ -76,8 +76,8 @@ class Pstruct(Data):
 	''' Uses python struct.* to untangle data '''
 	def __init__(self, asp, lo, spec, fmt=None, typ=".PSTRUCT"):
 		bcnt = struct.calcsize(spec)
-		super().__init__(asp, lo, lo + bcnt, "const")
 		self.data = struct.unpack(spec, asp.bytearray(lo, bcnt))
+		super().__init__(asp, lo, lo + bcnt, "const")
 		self.spec = spec
 		self.fmt = fmt
 		self.typ = typ

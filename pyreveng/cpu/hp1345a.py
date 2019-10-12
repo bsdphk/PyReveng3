@@ -41,53 +41,53 @@ _CHR	a,t,>R		|0 1 0| s | r |e| t		|
 """
 
 class hp1345_ins(assy.Instree_ins):
-	pass
 
-	def assy_adr(self):
-		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(self.dstadr)
+    def assy_adr(self):
+        self.dstadr = (self['ahi'] << 8) | self['alo']
+        return assy.Arg_dst(self.dstadr)
 
-	def assy_arg8(self):
-		self.dstadr = (self.lo & ~0x0ff) | self['a8']
-		return assy.Arg_dst(self.dstadr)
+    def assy_arg8(self):
+        self.dstadr = (self.lo & ~0x0ff) | self['a8']
+        return assy.Arg_dst(self.dstadr)
 
-	def assy_c(self):
-		return "#%d" % self['c']
+    def assy_c(self):
+        return "#%d" % self['c']
 
-	def assy_t(self):
-		a = self['t']
-		if a < 32 or a > 126:
-			return "#0x%02x" % a
-		else:
-			return "'%c'" % a
+    def assy_t(self):
+        a = self['t']
+        if a < 32 or a > 126:
+            return "#0x%02x" % a
+        else:
+            return "'%c'" % a
 
-	def assy_a(self):
-		if not self['e']:
-			return "-"
-		s = ["1x", "1.5x", "2x", "2.5x"][self['s']]
-		s += "@%d" % (self['r'] * 90)
-		return s
+    def assy_a(self):
+        if not self['e']:
+            return "-"
+        s = ["1x", "1.5x", "2x", "2.5x"][self['s']]
+        s += "@%d" % (self['r'] * 90)
+        return s
 
-	def assy_p(self):
-		return ["OFF", "ON"][self['p']]
+    def assy_p(self):
+        return ["OFF", "ON"][self['p']]
 
-	def assy_im(self):
-		return "#0x%02x" % self['im']
+    def assy_im(self):
+        return "#0x%02x" % self['im']
 
-	def assy_i(self):
-		return ("Blank", "Dim", "Half", "Full")[self['i']]
+    def assy_i(self):
+        return ("Blank", "Dim", "Half", "Full")[self['i']]
 
-	def assy_l(self):
-		return ("Solid", "Ends", "Long", "Short")[self['l']]
+    def assy_l(self):
+        return ("Solid", "Ends", "Long", "Short")[self['l']]
 
-	def assy_s(self):
-		return ("slow", "low", "med", "high")[self['s']]
+    def assy_s(self):
+        return ("slow", "low", "med", "high")[self['s']]
 
 class hp1345a(assy.Instree_disass):
-	def __init__(self, lang="hp1345a"):
-		super(hp1345a, self).__init__(lang, 16, 8, ">")
-		self.add_ins(hp1345a_desc, hp1345_ins)
-		self.amask_ = 0xfff
-
-	def set_adr_mask(self, a):
-		self.amask = a
+    def __init__(self, lang="hp1345a"):
+        super().__init__(
+            lang,
+            16,
+            8,
+            ">"
+        )
+        self.add_ins(hp1345a_desc, hp1345_ins)

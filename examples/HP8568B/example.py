@@ -266,6 +266,7 @@ def task(pj, cpu):
 				ins.hi += 2
 				ins.lcmt += " @0x%x\n" % r
 				if not asp.occupied(r):
+					print("LL", "%x" % r)
 					data.Pstruct(asp, r, ">L", "%d", ".LONG")
 				l.append("%d" % asp.bu32(r))
 			elif i == "frel":
@@ -659,7 +660,8 @@ def task(pj, cpu):
 			for a in range(b, e, 4):
 				x = pj.m.bu32(a)
 				data.Dataptr(pj.m, a, a + 4, x)
-				data.Txt(pj.m, x, pfx=1, align=2)
+				if not pj.m.occupied(x):
+					data.Txt(pj.m, x, pfx=1, align=2)
 
 		data.Txt(pj.m, 0x15dfc, pfx=1, align=2)
 
@@ -705,8 +707,9 @@ def task(pj, cpu):
 			0x128ca,
 			0x15da0,
 		):
-			y = data_bcd(pj, a)
-			pj.m.set_label(a, "BCD_%x" % y.data[0])
+			if not pj.m.occupied(a):
+				y = data_bcd(pj, a)
+				pj.m.set_label(a, "BCD_%x" % y.data[0])
 
 
 		#######################################################
@@ -857,8 +860,10 @@ def task(pj, cpu):
 				w = w[0]
 				if w.mne != "PEA.L":
 					continue
-				z = data.Txt(pj.m, w.dstadr, pfx=1, align=2)
-				w.lcmt = "'" + z.txt + "'"
+				z = list(pj.m.find(w.dstadr))
+				if not z:
+					z = [data.Txt(pj.m, w.dstadr, pfx=1, align=2)]
+				w.lcmt = "'" + z[0].txt + "'"
 
 	y = data.Const(pj.m, 0x693a, 0x693c, "%d", pj.m.bu16, 2)
 

@@ -599,26 +599,26 @@ class i8085(assy.Instree_disass):
             "PSW",
         ))
 
-    def vectors(self, pj):
+    def vectors(self):
         for l,a in (
-            ("RESET",     0x0000),
-            ("TRAP",     0x0024),
-            ("RST1",    0x0008),
-            ("RST2",    0x0010),
-            ("RST3",    0x0018),
-            ("RST4",    0x0020),
-            ("RST5",    0x0028),
-            ("RST5.5",    0x002c),
-            ("RST6",    0x0030),
-            ("RST6.5",    0x0034),
-            ("RST7",    0x0038),
-            ("RST7.5",    0x003c),
+            ("RESET",  0x0000),
+            ("TRAP",   0x0024),
+            ("RST1",   0x0008),
+            ("RST2",   0x0010),
+            ("RST3",   0x0018),
+            ("RST4",   0x0020),
+            ("RST5",   0x0028),
+            ("RST5.5", 0x002c),
+            ("RST6",   0x0030),
+            ("RST6.5", 0x0034),
+            ("RST7",   0x0038),
+            ("RST7.5", 0x003c),
         ):
-            self.disass(pj.m, a)
-            pj.m.set_label(a, l)
+            self.disass(a)
+            self.m.set_label(a, l)
 
-    def codeptr(self, pj, adr):
+    def codeptr(self, adr):
         t = self.m.lu16(adr)
-        c = data.Codeptr(pj.m, adr, adr + 2, t)
-        self.disass(pj.m, t)
+        c = data.Codeptr(self.m, adr, adr + 2, t)
+        self.disass(t)
         return c

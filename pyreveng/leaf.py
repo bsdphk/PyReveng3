@@ -49,20 +49,13 @@ class Leaf():
         return s + ">"
 
     def __lt__(self, other):
-        return self.lo < other.lo
+        if self.lo != other.lo:
+            return self.lo < other.lo
+        if self.hi != other.hi:
+            return self.hi > other.hi
 
     def render(self):
         return self.rendered
 
     def arg_render(self):
         return ""
-
-class Link(Leaf):
-
-    def __init__(self, lo, hi, link):
-        super().__init__(lo, hi, "LinkLeaf")
-        self.link = link
-
-    def render(self):
-        self.compact = self.link.compact
-        return self.link.render()

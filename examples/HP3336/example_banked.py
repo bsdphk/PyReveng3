@@ -84,8 +84,6 @@ JMPTABLES = [
 
 def jmptables(cx):
     for pg, lo, hi, wid, fm, to, desc in JMPTABLES:
-        if lo == 0x7e0:
-            data.Range(cx[pg].m, lo, hi, "Jump table")
         for a in range(lo, hi, wid):
             cx[pg].disass(a)
         cx[pg].m.set_block_comment(

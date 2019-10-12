@@ -102,18 +102,26 @@ class Listing():
         self.plan += [[lo, 0, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()]
         self.plan += [[hi, 0, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()]
         self.plan += [[adr, 1, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
-        self.plan += [[adr, 2, self.plan_label] for adr, _l in asp.get_all_labels() if self.inside(adr)]
+        self.plan += [[adr, 2, self.plan_label, l] for adr, l in asp.get_all_labels() if self.inside(adr)]
         self.plan += [[adr, 3, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
-        self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
+        self.plan += [[leaf.lo, 4, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo) and isinstance(leaf, data.Range)]
+        self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo) and not isinstance(leaf, data.Range)]
 
         self.start = False
         last = 0
         self.lcmts = []
+        prev = None
         for i in sorted(self.plan):
             a = self.asp.afmt(i[0])
+            # print("P", a, i[2].__doc__, i[3:])
             if i[0] < last:
-                print("OVERLAP", self.asp.afmt(last), a, i)
+                print("OVERLAP")
+                print(" last ", self.asp.afmt(last))
+                print(" prev ", prev[2].__doc__, prev[3:])
+                print(" this ", a)
+                print(" what ", i[2].__doc__, i[3:])
                 continue
+            prev = i
             while i[0] > last:
                 last = self.gap(last, i[0])
             last = i[0]
@@ -122,6 +130,7 @@ class Listing():
                 break
             if r is not None:
                 last = r
+        fo.flush()
 
     def fmt_adr(self, lo, hi):
         t = self.asp.afmt(lo) + " "
@@ -238,6 +247,7 @@ class Listing():
         return self.lo <= adr < self.hi
 
     def plan_bcmt(self, adr, afmt, *_args):
+        '''P:Bcmt'''
         self.purge_lcmt()
         self.fo.write(afmt + " ; " + "-" * 86 + "\n")
         for i in self.asp.get_block_comments(adr):
@@ -246,22 +256,25 @@ class Listing():
         self.fo.write(afmt + " ; " + "-" * 86 + "\n")
 
     def plan_label(self, adr, afmt, *_args):
+        '''P:Label'''
         self.purge_lcmt()
-        s = set()
+        s = {}
         for lbl in self.asp.get_labels(adr):
             if lbl in s:
-                print("Duplicate label", afmt, lbl)
+                print("Duplicate label", afmt, lbl, s[adr])
             else:
                 self.fo.write(tabto(afmt, self.x_label) + lbl.strip() + ":" + "\n")
-                s.add(lbl)
+                s[adr] = lbl
 
     def plan_lcmt(self, adr, _afmt, *_args):
+        '''P:Lcmt'''
         self.purge_lcmt()
         for i in self.asp.get_line_comments(adr):
             for j in tolines(i):
                 self.lcmts.append(i.rstrip())
 
     def plan_seg(self, _adr, _afmt, *args):
+        '''P::Seg'''
         if args[0][0]:
             if self.in_seg is False:
                 self.fo.write('\n')
@@ -272,6 +285,7 @@ class Listing():
             self.in_seg = False
 
     def plan_leaf(self, _adr, _afmt, *args):
+        '''P::Leaf'''
         leaf = args[0][0]
 
         if isinstance(leaf, data.Range):
@@ -289,6 +303,7 @@ class Listing():
         else:
             pil = None
 
+        # print("\t", leaf.__dict__)
         return self.format(
             leaf.lo,
             leaf.hi,

@@ -187,7 +187,7 @@ def example():
     )
 
     cx = z8000.z8001()
-    cx.m.map(m0, 0x00000000)
+    cx.m.map(m0, 0x00000000, 0x00007816)
     cx.m.map(m0, 0x01000000, 0x01001016, 0x00006800)
     cx.flow_check.append(fc_outstr)
     cx.z8010_mmu(0xf8)

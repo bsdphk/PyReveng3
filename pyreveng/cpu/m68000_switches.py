@@ -200,7 +200,7 @@ class m68000_switch_ins(assy.Instree_ins):
 			raise assy.Invalid("BARE switch with prefix")
 
 		a = self.hi
-		top = 128
+		top = 512		# XXX Safety, may be too small
 		n = 0
 		while True:
 			d = self.lang.m.bs16(self.hi + n * 2)
@@ -287,7 +287,6 @@ class m68000_switch_ins(assy.Instree_ins):
 				if x is not None:
 					self.high = x
 				self.go_hi = getjmp()
-
 
 		if self.low is None and self.high is not None:
 			self.low = 0

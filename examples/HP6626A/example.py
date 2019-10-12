@@ -33,7 +33,7 @@ import pyreveng.cpu.mc6809 as mc6809
 
 NAME = "HP6626"
 
-LABELS = {
+SYMBOLS = {
     0x002b: "display_chan",
     0x0085: "n_chan",
     0x0086: "model_desc_ptr",
@@ -163,7 +163,7 @@ def example():
     cx = mc6809.mc6809()
     cx.m.map(m, 0x8000, offset=0x8000)
 
-    for i, j in LABELS.items():
+    for i, j in SYMBOLS.items():
         cx.m.set_label(i, j)
 
     cx.vectors(which=("RST", "NMI", "SWI", "IRQ", "FIRQ"))
@@ -236,8 +236,9 @@ def example():
         s += " %-10s" % kbd_tbl[i][1]
         print(s)
 
-    def softlbl(a,n):
+    def softlbl(a, n):
         cx.m.set_label(a, n)
+
     data.Const(cx.m, 0x8000, 0x8002)
 
     cx.m.set_label(0xd472, "chan_ptr")

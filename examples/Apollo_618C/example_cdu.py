@@ -55,7 +55,7 @@ def task(pj, cx):
 
 	cx.set_adr_mask(0xfff)
 
-	cx.vectors(which=("RESET", "TF0", "IE0", "TF1"))
+	cx.vectors(which=("RESET", "IE0", "TF1"))
 
 	cx.disass(0x600)
 
