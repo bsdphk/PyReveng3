@@ -26,7 +26,7 @@
 
 import random
 
-from . import mem, data
+from . import mem, data, leaf
 
 def tabto(s, n):
     ln = len(s.expandtabs())
@@ -118,8 +118,14 @@ class Listing():
                 print("OVERLAP")
                 print(" last ", self.asp.afmt(last))
                 print(" prev ", prev[2].__doc__, prev[3:])
+                if len(prev) > 3 and isinstance(prev[3], leaf.Leaf):
+                    print("\t", prev[3].render())
                 print(" this ", a)
                 print(" what ", i[2].__doc__, i[3:])
+                if len(i) > 3 and isinstance(i[3], leaf.Leaf):
+                    print("\t", i[3].render())
+                if len(i) > 3 and len(prev) > 3:
+                    print(" same", i[3] == i[3])
                 continue
             prev = i
             while i[0] > last:

@@ -422,8 +422,6 @@ SUB	Rd,Rn,Rm		|0 0 0 1 1 0 1|rm   |rn   |rd	|
 SUB	SP,SP,Imm		|1 0 1 1 0 0 0 0 1|imm7		|
 # 719
 SUB	Rd,SP,Rm,Shift		|1 1 1 0 1 0 1 1 1 0 1|s|1 1 0 1|0|imm3	|rd	|im2|typ|rm	|
-# 721
-SVC	Imm8			|1 1 0 1 1 1 1 1|imm8		|
 # 725
 SXTAB	Rd,Rn,Rm,Rot		|1 1 1 1 1 0 1 0 0 1 0 0|rn	|1 1 1 1|rd	|1|0|rot|rm	|
 # 727
@@ -514,6 +512,8 @@ UXTB	Rd,Rm			|1 0 1 1 0 0 1 0 1 1|rm   |rd	|
 UXB16	Rd,Rm			|1 1 1 1 1 0 1 0 0 0 1 1 1 1 1 1|1 1 1 1|rd	|1 0|rot|rm	|
 # 817
 UXTH	Rd,Rm			|1 0 1 1 0 0 1 0 1 0|rm   |rd	|
+# 821
+SVC	?			|1 1 0 1 1 1 1 1| imm8		|
 # <vector stuff>
 # 955
 VMRS	Rt,FPSCR		|cond	|1 1 1 0 1 1 1 1 0 0 0 1|rt	|1 0 1 0 0 0 0 1 0 0 0 0|

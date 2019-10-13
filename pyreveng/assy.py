@@ -353,7 +353,9 @@ class Instree_disass(code.Decoder):
             except Invalid as e:
                 l.pop(-1)
                 continue
-            except KeyError as e:
+            except:
+                print(x)
+                print(x.handler)
                 raise
             if y.prefix:
                 try:

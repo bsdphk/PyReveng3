@@ -29,7 +29,7 @@
 Disassembler for ARM processors
 """
 
-from pyreveng import assy, data
+from pyreveng import assy, data, code
 from pyreveng.cpu.arm import arm_base
 
 arm_desc = """
@@ -141,6 +141,9 @@ CMP		Rn,Rm,Rs 	|cond	|0 0|0|1 0 1 0|1|rn	|0 0 0 0|rs	|0|typ|1|rm	|
 EOR		S,Rd,Rn,imm12	|cond	|0 0|1|0 0 0 1|s|rn	|rd	|imm12			|
 EOR		S,Rd,Rn,Rm,sh	|cond	|0 0|0|0 0 0 1|s|rn	|rd	|imm5	  |typ|0|rm	|
 EOR		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 0 0 1|s|rn	|rd	|rs	|0|typ|1|rm	|
+
+# p393-394
+LDC		?		|cond	|1 1 0|p|u|d|w|1|rn	|crd	|cop	|imm8		|
 
 # p399-400
 LDM		Rnw,wreglist	|cond	|1 0|0 0 1 0|w|1|rn	|reglist			|
@@ -438,6 +441,9 @@ SUB		S,Rd,Rn,Rm,Rs	|cond	|0 0|0|0 0 1 0|s|rn	|rd	|rs	|0|typ|1|rm	|
 #SUB		?		|cond	|0 0|1|0 0 1 0|s|1 1 0 1|rd	|imm12			|
 #SUB		?		|cond	|0 0|0|0 0 1 0|s|1 1 0 1|rd	|imm5	  |typ|0|rm	|
 
+# A8-721
+SVC		?		|cond	|1 1 1 1| imm24						|
+
 # p723-724
 SWP		UN		|cond	|0 0 0 1 0|x|0 0|1 1 1 1|rt	|0 0 0 0|1 0 0 1|rt2	|
 SWP		UN		|cond	|0 0 0 1 0|x|0 0|rn	|1 1 1 1|0 0 0 0|1 0 0 1|rt2	|
@@ -517,335 +523,337 @@ REG = arm_base.REG
 
 class Arm_ins(arm_base.Arm_Base_ins):
 
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
-		if self.lo & 3:
-			raise assy.Invalid("Unaligned Instruction")
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        if self.lo & 3:
+            raise assy.Invalid("Unaligned Instruction")
 
 
-	def args_done(self):
-		if 'cond' in self.lim[-1].flds:
-			cond = self['cond']
-			self.mne += CC[cond]
-			if self['cond'] != 14:
-				self += code.Flow(cond="?")
+    def args_done(self):
+        if 'cond' in self.lim[-1].flds:
+            cond = self['cond']
+            self.mne += CC[cond]
+            if self['cond'] != 14:
+                self += code.Flow(cond="?")
 
-	def assy_UN(self):
-		raise assy.Invalid("UNPREDICTABLE")
+    def assy_UN(self):
+        raise assy.Invalid("UNPREDICTABLE")
 
-	def assy_COP(self):
-		return ([
-			assy.Arg_verbatim("%d" % self['cop']),
-			assy.Arg_verbatim("%d" % self['opc1']),
-			self.assy_Rt(pj),
-			assy.Arg_verbatim("CR%d" % self['crn']),
-			assy.Arg_verbatim("CR%d" % self['crm']),
-			assy.Arg_verbatim("{%d}" % self['opc2']),
-		])
+    def assy_COP(self):
+        return ([
+            assy.Arg_verbatim("%d" % self['cop']),
+            assy.Arg_verbatim("%d" % self['opc1']),
+            self.assy_Rt(),
+            assy.Arg_verbatim("CR%d" % self['crn']),
+            assy.Arg_verbatim("CR%d" % self['crm']),
+            assy.Arg_verbatim("{%d}" % self['opc2']),
+        ])
 
-	def assy_amode(self):
-		self.mne += {
-			0: "DA",
-			1: "",		# IA
-			2: "DB",
-			3: "IB",
-		}[self['p'] * 2 + self['u']]
-		
+    def assy_amode(self):
+        self.mne += {
+            0: "DA",
+            1: "",        # IA
+            2: "DB",
+            3: "IB",
+        }[self['p'] * 2 + self['u']]
+        
 
-	def assy_cpsr(self):
-		t = "CPSR_"
-		if self['msk'] & 8:
-			t += "f"
-		if self['msk'] & 4:
-			t += "s"
-		if self['msk'] & 2:
-			t += "x"
-		if self['msk'] & 1:
-			t += "c"
-		return assy.Arg_verbatim(t)
+    def assy_cpsr(self):
+        t = "CPSR_"
+        if self['msk'] & 8:
+            t += "f"
+        if self['msk'] & 4:
+            t += "s"
+        if self['msk'] & 2:
+            t += "x"
+        if self['msk'] & 1:
+            t += "c"
+        return assy.Arg_verbatim(t)
 
-	def imm12_rotate(self):
-		v = self['imm12']
-		if not (v & 0xf00):
-			return v
-		r = v >> 8
-		b = v & 0xff
-		b |= b << 32
-		b = b >> (r * 2)
-		return b & 0xffffffff
+    def imm12_rotate(self):
+        v = self['imm12']
+        if not (v & 0xf00):
+            return v
+        r = v >> 8
+        b = v & 0xff
+        b |= b << 32
+        b = b >> (r * 2)
+        return b & 0xffffffff
 
-	def assy_adr_plus(self):
-		v = self.imm12_rotate()
-		return assy.Arg_dst(self.lang.m, self.hi + 4 + v, "")
+    def assy_adr_plus(self):
+        v = self.imm12_rotate()
+        return assy.Arg_dst(self.lang.m, self.hi + 4 + v, "")
 
-	def assy_adr_minus(self):
-		v = self.imm12_rotate()
-		return assy.Arg_dst(self.lang.m, self.hi + 4 - v, "")
-	
-	def assy_S(self):
-		if self['s']:
-			self.mne += "S"
+    def assy_adr_minus(self):
+        v = self.imm12_rotate()
+        return assy.Arg_dst(self.lang.m, self.hi + 4 - v, "")
+    
+    def assy_S(self):
+        if self['s']:
+            self.mne += "S"
 
-	def assy_C(self):
-		return
-		cond = self['cond']
-		self.mne += CC[cond]
-		if self['cond'] != 14:
-			self += code.Flow(cond="?")
+    def assy_C(self):
+        return
+        cond = self['cond']
+        self.mne += CC[cond]
+        if self['cond'] != 14:
+            self += code.Flow(cond="?")
 
-	def assy_dst(self):
-		o = self['off'] << 2
-		if o & (1<<25):
-			o |= 0xfc000000
-		self.dstadr = 4 + (self.hi + o) & 0xffffffff
-		if self.mne.find("L") != -1:
-			pj.m.set_block_comment(self.dstadr, "from %x" % self.lo)
-		return assy.Arg_dst(self.lang.m, self.dstadr, "")
+    def assy_dst(self):
+        o = self['off'] << 2
+        if o & (1<<25):
+            o |= 0xfc000000
+        self.dstadr = 4 + (self.hi + o) & 0xffffffff
+        if self.mne.find("L") != -1:
+            self.lang.m.set_block_comment(self.dstadr, "from %x" % self.lo)
+        return assy.Arg_dst(self.lang.m, self.dstadr, "")
 
-	def assy_imm5(self):
-		return assy.Arg_verbatim("#0x%x" % self['imm5'])
+    def assy_imm5(self):
+        return assy.Arg_verbatim("#0x%x" % self['imm5'])
 
-	def assy_imm12(self):
-		v = self['imm12']
-		s = v >> 8
-		v = v & 0xff
-		# return "#0x%x,%d" % (v, s)
-		v = v << (32 - 2 * s)
-		v |= v >> 32
-		v &= 0xffffffff
-		return "#0x%x" % v
+    def assy_imm12(self):
+        v = self['imm12']
+        s = v >> 8
+        v = v & 0xff
+        # return "#0x%x,%d" % (v, s)
+        v = v << (32 - 2 * s)
+        v |= v >> 32
+        v &= 0xffffffff
+        return "#0x%x" % v
 
-	def assy_vrn(self):
-		return assy.Arg_verbatim("[%s]" % REG[self['rn']])
+    def assy_vrn(self):
+        return assy.Arg_verbatim("[%s]" % REG[self['rn']])
 
-	def assy_a_rnrm(self):
-		rn = REG[self['rn']]
-		rm = REG[self['rm']]
-		if not self['u']:
-			rm = "-" + rm
-		p = self.lim[-1].flds.get('p')
-		w = self.lim[-1].flds.get('w')
+    def assy_a_rnrm(self):
+        rn = REG[self['rn']]
+        rm = REG[self['rm']]
+        if not self['u']:
+            rm = "-" + rm
+        p = self.lim[-1].flds.get('p')
+        w = self.lim[-1].flds.get('w')
 
-		if not p:
-			if not w:
-				return "[%s]," % rn + rm
-			raise assy.Invalid("a_imm4 mode wrong (!p,w)")
+        if not p:
+            if not w:
+                return "[%s]," % rn + rm
+            raise assy.Invalid("a_imm4 mode wrong (!p,w)")
 
-		if w:
-			return "[%s," % rn + rm + "]!"
+        if w:
+            return "[%s," % rn + rm + "]!"
 
-		return "[%s," % rn + rm + "]"
+        return "[%s," % rn + rm + "]"
 
 
-	def assy_a_imm4(self):
-		imm32 = (self['imm4h'] << 4) | self['imm4l']
-		if self['u']:
-			imm = "#0x%x" % imm32
-		else:
-			imm = "#-0x%x" % imm32
-		p = self.lim[-1].flds.get('p')
-		w = self.lim[-1].flds.get('w')
-		rn = REG[self['rn']]
+    def assy_a_imm4(self):
+        imm32 = (self['imm4h'] << 4) | self['imm4l']
+        if self['u']:
+            imm = "#0x%x" % imm32
+        else:
+            imm = "#-0x%x" % imm32
+        p = self.lim[-1].flds.get('p')
+        w = self.lim[-1].flds.get('w')
+        rn = REG[self['rn']]
 
-		if not p:
-			if not w:
-				return "[%s]," % rn + imm
-			raise assy.Invalid("a_imm4 mode wrong (!p,w)")
+        if not p:
+            if not w:
+                return "[%s]," % rn + imm
+            raise assy.Invalid("a_imm4 mode wrong (!p,w)")
 
-		if w:
-			return "[%s," % rn + imm + "]!"
+        if w:
+            return "[%s," % rn + imm + "]!"
 
-		if True or self['rn'] != 15 or OBJDUMP_COMPAT:
-			if imm32:
-				return "[%s," % rn + imm + "]"
-			return "[%s]" % rn
+        if True or self['rn'] != 15 or OBJDUMP_COMPAT:
+            if imm32:
+                return "[%s," % rn + imm + "]"
+            return "[%s]" % rn
 
-		if self['u']:
-			t = self.hi + 4 + imm32
-		else:
-			t = self.hi + 4 - imm32
-		try:
-			v = pj.m.lu32(t)
-			data.Const(pj.m, t, t + 4, func=pj.m.lu32, size=4)
-			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
-			return "#0x%x" % v
-		except:
-			self.lcmt += "[%s,%s]\n" % (rn, imm)
-			return "[#0x%x]" % t
+        if self['u']:
+            t = self.hi + 4 + imm32
+        else:
+            t = self.hi + 4 - imm32
+        try:
+            v = self.lang.m.lu32(t)
+            if not self.lang.m.occupied(t):
+                data.Const(self.lang.m, t, t + 4, func=self.lang.m.lu32, size=4)
+            self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
+            return "#0x%x" % v
+        except:
+            self.lcmt += "[%s,%s]\n" % (rn, imm)
+            return "[#0x%x]" % t
 
-	def assy_a_imm5(self):
-		''' Addressing mode Rn/U/P/W/imm5 '''
-		shf = self.assy_sh(pj)
-		if shf is None:
-			shf = ""
-		else:
-			shf = "," + shf
-		rn = REG[self['rn']]
-		rm = REG[self['rm']]
-		if not self['u']:
-			rm = "-" + rm
-		p = self.lim[-1].flds.get('p')
-		w = self.lim[-1].flds.get('w')
-		if p:
-			if w:
-				return "[%s,%s%s]!" % (rn, rm, shf)
-			return "[%s,%s%s]" % (rn, rm, shf)
-		else:
-			if not w:
-				return "[%s],%s%s" % (rn, rm, shf)
-			raise assy.Invalid("a_imm5 mode wrong (!p,w)")
+    def assy_a_imm5(self):
+        ''' Addressing mode Rn/U/P/W/imm5 '''
+        shf = self.assy_sh()
+        if shf is None:
+            shf = ""
+        else:
+            shf = "," + shf
+        rn = REG[self['rn']]
+        rm = REG[self['rm']]
+        if not self['u']:
+            rm = "-" + rm
+        p = self.lim[-1].flds.get('p')
+        w = self.lim[-1].flds.get('w')
+        if p:
+            if w:
+                return "[%s,%s%s]!" % (rn, rm, shf)
+            return "[%s,%s%s]" % (rn, rm, shf)
+        else:
+            if not w:
+                return "[%s],%s%s" % (rn, rm, shf)
+            raise assy.Invalid("a_imm5 mode wrong (!p,w)")
 
-	def assy_a_rn(self):
-		''' Addressing mode Rn/U/P/W '''
-		imm32 = self['imm12']
-		rn = REG[self['rn']]
-		if self['u']:
-			imm = "#0x%x" % imm32
-		else:
-			imm = "#-0x%x" % imm32
+    def assy_a_rn(self):
+        ''' Addressing mode Rn/U/P/W '''
+        imm32 = self['imm12']
+        rn = REG[self['rn']]
+        if self['u']:
+            imm = "#0x%x" % imm32
+        else:
+            imm = "#-0x%x" % imm32
 
-		p = self.lim[-1].flds.get('p')
-		w = self.lim[-1].flds.get('w')
+        p = self.lim[-1].flds.get('p')
+        w = self.lim[-1].flds.get('w')
 
-		if not p:
-			if not w:
-				#return [assy.Arg_verbatim("[%s]" % rn), assy.Arg_dst(self.lang.m, imm)]
-				return "[%s]," % rn + imm
-			raise assy.Invalid("a_rn mode wrong (!p,w)")
+        if not p:
+            if not w:
+                #return [assy.Arg_verbatim("[%s]" % rn), assy.Arg_dst(self.lang.m, imm)]
+                return "[%s]," % rn + imm
+            raise assy.Invalid("a_rn mode wrong (!p,w)")
 
-		if w:
-			return "[%s," % rn + imm + "]!"
+        if w:
+            return "[%s," % rn + imm + "]!"
 
-		if self['rn'] != 15 or OBJDUMP_COMPAT:
-			if imm32:
-				return "[%s," % rn + imm + "]"
-			return "[%s]" % rn
+        if self['rn'] != 15 or OBJDUMP_COMPAT:
+            if imm32:
+                return "[%s," % rn + imm + "]"
+            return "[%s]" % rn
 
-		if self['u']:
-			t = self.hi + 4 + imm32
-		else:
-			t = self.hi + 4 - imm32
-		try:
-			v = pj.m.lu32(t)
-			data.Const(pj.m, t, t + 4, func=pj.m.lu32, size=4)
-			self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
-			return assy.Arg_dst(self.lang.m, v, pfx="#")
-			return "#0x%x" % v
-		except:
-			self.lcmt += "[%s,%s]\n" % (rn, imm)
-			return "[#0x%x]" % t
+        if self['u']:
+            t = self.hi + 4 + imm32
+        else:
+            t = self.hi + 4 - imm32
+        try:
+            v = self.lang.m.lu32(t)
+            if not self.lang.m.occupied(t):
+                data.Const(self.lang.m, t, t + 4, func=self.lang.m.lu32, size=4)
+            self.lcmt += "[%s,%s] = [#0x%x]\n" % (rn, imm, t)
+            return assy.Arg_dst(self.lang.m, v, pfx="#")
+            return "#0x%x" % v
+        except:
+            self.lcmt += "[%s,%s]\n" % (rn, imm)
+            return "[#0x%x]" % t
 
-	def assy_w(self):
-		if (self['w']):
-			return assy.Arg_verbatim("!")
-		
-	def assy_Rs(self):
-		typ = self['typ']
-		rs = self['rs']
-		return assy.Arg_verbatim("%s,%s" % (
-			["lsl", "lsr", "asr", "ror"][typ], REG[rs]
-		))
-		
-	def assy_Rnw(self):
-		if self['w']:
-			return REG[self['rn']] + "!"
-		return REG[self['rn']]
+    def assy_w(self):
+        if (self['w']):
+            return assy.Arg_verbatim("!")
+        
+    def assy_Rs(self):
+        typ = self['typ']
+        rs = self['rs']
+        return assy.Arg_verbatim("%s,%s" % (
+            ["lsl", "lsr", "asr", "ror"][typ], REG[rs]
+        ))
+        
+    def assy_Rnw(self):
+        if self['w']:
+            return REG[self['rn']] + "!"
+        return REG[self['rn']]
 
-	def assy_Ra(self):
-		return REG[self['ra']]
+    def assy_Ra(self):
+        return REG[self['ra']]
 
-	def assy_Rm(self):
-		return REG[self['rm']]
+    def assy_Rm(self):
+        return REG[self['rm']]
 
-	def assy_reglist2(self):
-		return self.assy_reglist(pj) + "^"
+    def assy_reglist2(self):
+        return self.assy_reglist() + "^"
 
-	def assy_reglist3(self):
-		return self.assy_reglist(pj)[:-1] + "," + REG[15] + "}^"
+    def assy_reglist3(self):
+        return self.assy_reglist()[:-1] + "," + REG[15] + "}^"
 
 
 class Arm(assy.Instree_disass):
-	def __init__(self):
-		super().__init__(
-			"arm",
-			32,
-			8,
-			"<",
-			abits=32,
-		)
-		self.add_ins(arm_desc, Arm_ins)
-		self.verbatim.add("CPSR")
-		self.verbatim.add("SPSR")
+    def __init__(self):
+        super().__init__(
+            "arm",
+            32,
+            8,
+            "<",
+            abits=32,
+        )
+        self.add_ins(arm_desc, Arm_ins)
+        self.verbatim.add("CPSR")
+        self.verbatim.add("SPSR")
 
-	def codeptr(self, pj, adr):
-		t = pj.m.lu32(adr)
-		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		self.disass(pj.m, t)
-		return c
+    def codeptr(self, adr):
+        t = self.m.lu32(adr)
+        c = data.Codeptr(self.m, adr, adr + 4, t)
+        self.disass(self.m, t)
+        return c
 
-	def vector(self, pj, adr):
-		return vector(pj, adr, self)
+    def vector(self, adr):
+        return vector(adr, self)
 
-	def vectors(self, pj, adr=0x0, xops=1):
-		return
+    def vectors(self, adr=0x0, xops=1):
+        return
 
 if __name__ == "__main__":
-	h = Arm()
-	dom = {}
+    h = Arm()
+    dom = {}
 
-	def dl(l):
-		t = ""
-		for i in range(0, len(l), 2):
-			t += " %08x" % l[i]
-		t += "\n"
-		for i in range(0, len(l), 2):
-			t += " %08x" % l[i + 1]
-		t += "\n"
-		return t
+    def dl(l):
+        t = ""
+        for i in range(0, len(l), 2):
+            t += " %08x" % l[i]
+        t += "\n"
+        for i in range(0, len(l), 2):
+            t += " %08x" % l[i + 1]
+        t += "\n"
+        return t
 
-	for a, aa in h.it:
-		for b, bb in h.it:
-			if aa == bb:
-				continue
-			i = 0
-			while i < len(a) and i < len(b):
-				if b[0] & a[0] != b[0]:
-					i += 2
-					continue
-				if b[0] & a[1] != b[1]:
-					i += 2
-					continue
-				if aa not in dom:
-					dom[aa] = []
-				dom[aa].append(bb)
-				i += 2
+    for a, aa in h.it:
+        for b, bb in h.it:
+            if aa == bb:
+                continue
+            i = 0
+            while i < len(a) and i < len(b):
+                if b[0] & a[0] != b[0]:
+                    i += 2
+                    continue
+                if b[0] & a[1] != b[1]:
+                    i += 2
+                    continue
+                if aa not in dom:
+                    dom[aa] = []
+                dom[aa].append(bb)
+                i += 2
 
-	for a, b in dom.items():
-		print("B", a)
-		for i in b:
-			print("  ", i)
-		i = 0
-		a.elide = set()
-		while i < len(b):
-			j = 0
-			while j < len(b):
-				if j != i and b[i] in dom and b[j] in dom[b[i]]:
-					print(a)
-					print(".",b[i])
-					print("..", b[j])
-					a.elide.add(b[j])
-				j += 1
-			i += 1
-		print("A", a)
-		print(a.elide)
-		for i in b:
-			print("  ", i)
+    for a, b in dom.items():
+        print("B", a)
+        for i in b:
+            print("  ", i)
+        i = 0
+        a.elide = set()
+        while i < len(b):
+            j = 0
+            while j < len(b):
+                if j != i and b[i] in dom and b[j] in dom[b[i]]:
+                    print(a)
+                    print(".",b[i])
+                    print("..", b[j])
+                    a.elide.add(b[j])
+                j += 1
+            i += 1
+        print("A", a)
+        print(a.elide)
+        for i in b:
+            print("  ", i)
 
-	fo = open("/tmp/_.dot", "w")
-	fo.write("digraph {\n")
-	for a, b in dom.items():
-		for i in b:
-			if i not in a.elide:
-				fo.write('"%s" -> "%s"\n' % ("_".join(i.assy), "_".join(a.assy)))
-	
-	fo.write("}\n")
+    fo = open("/tmp/_.dot", "w")
+    fo.write("digraph {\n")
+    for a, b in dom.items():
+        for i in b:
+            if i not in a.elide:
+                fo.write('"%s" -> "%s"\n' % ("_".join(i.assy), "_".join(a.assy)))
+    
+    fo.write("}\n")
