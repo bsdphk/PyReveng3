@@ -145,8 +145,8 @@ FOPS = {
 }
 
 class m68881_ins(m68000_ins):
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
+	def __init__(self, lim, lang):
+		super().__init__(lim, lang)
 		if self['cid'] != 1:
 			raise assy.Invalid("FP cid != 1")
 
@@ -164,10 +164,10 @@ class m68881_ins(m68000_ins):
 	def assy_Fy(self):
 		return "F%d" % self['Fy']
 
-	def assy_X(self, pk):
+	def assy_X(self):
 		self.mne += ".X"
 
-	def assy_fmt(self, pk):
+	def assy_fmt(self):
 		self.mne += "." + "LSXPWDB?"[self['fmt']]
 
 def m68881(cpu):

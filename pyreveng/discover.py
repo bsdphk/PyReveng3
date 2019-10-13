@@ -77,7 +77,6 @@ class Discover():
 
         n = 0
         for lx, hx in sorted(self.cx.m.gaps()):
-            print("GAP", "%x" % lx, "%x" % hx, self.cx.m)
             for adr in range(lx, hx):
                 try:
                     x = self.cx.decode(self.cx.m, adr)
