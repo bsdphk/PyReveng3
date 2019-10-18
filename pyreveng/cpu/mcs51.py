@@ -261,7 +261,8 @@ class MCS51_Ins(assy.Instree_ins):
         return assy.Arg_dst(self.lang.as_bit, b)
 
     def assy_nabit(self):
-        return "/" + self.assy_abit(pj)
+        b = self['abit']
+        return assy.Arg_dst(self.lang.as_bit, b, pfx="/")
 
     def pilmacro_ABIT(self):
         b = self['abit']
