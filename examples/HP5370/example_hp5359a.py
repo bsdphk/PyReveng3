@@ -27,7 +27,8 @@
 '''HP5359 Time Synthesizer
 '''
 
-from pyreveng import listing, seven_segment
+from pyreveng import listing
+from pyreveng.toolchest import seven_segment
 import utils
 
 NAME = "HP5359A"

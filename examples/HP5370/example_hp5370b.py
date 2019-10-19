@@ -27,7 +27,8 @@
 '''HP5370B Time Interval Counter
 '''
 
-from pyreveng import listing, data, seven_segment
+from pyreveng import listing, data
+from pyreveng.toolchest import seven_segment
 import utils
 
 NAME = "HP5370B"

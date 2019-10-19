@@ -27,7 +27,8 @@
 '''HP3335 Synthesizer/Level Generator
 '''
 
-from pyreveng import mem, listing, data, seven_segment
+from pyreveng import mem, listing, data
+from pyreveng.toolchest import seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 NAME = "HP3335A"

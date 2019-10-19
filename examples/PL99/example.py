@@ -27,7 +27,8 @@
 '''Ray Jefferson PL99 Handheld Loran-C receiver
 '''
 
-from pyreveng import mem, data, seven_segment, code, listing
+from pyreveng import mem, data, code, listing
+from pyreveng.toolchest import seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 FILENAME = "PL99.mc68hc11.bin"
