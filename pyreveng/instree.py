@@ -62,7 +62,7 @@ class UsageTrouble(Exception):
 class SyntaxTrouble(Exception):
 	def __init__(self, last, msg):
 		j = " ".join(last.split())
-		super(SyntaxTrouble, self).__init__(
+		super().__init__(
 		    "\nAfter '%s':\n    %s" % (j, msg))
 
 def bcount(i):

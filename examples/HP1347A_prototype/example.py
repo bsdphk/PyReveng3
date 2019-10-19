@@ -263,7 +263,7 @@ class Scrtxt(data.Data):
         ll = l[0].replace(" ", "_")
         asp.set_label(lo, "SCRTXT_" + ll)
 
-        super(Scrtxt, self).__init__(asp, lo, hi, "scrtxt")
+        super().__init__(asp, lo, hi, "scrtxt")
         self.fmt = f
         self.compact = True
 

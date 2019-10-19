@@ -30,7 +30,7 @@ import pyreveng.cpu.mc6809 as mc6809
 
 class Call(code.Code):
 	def __init__(self, pj, lo, hi, lang, dst, args):
-		super(Call, self).__init__(pj, lo, hi, lang)
+		super().__init__(pj, lo, hi, lang)
 		self.dst = dst
 		self.args = list(reversed(args))
 		self.compact = True
@@ -153,7 +153,7 @@ class arg_E(assy.Arg_dst):
 
 class mc6809a(mc6809.mc6809):
 	def __init__(self):
-		super(mc6809a, self).__init__(macros=True)
+		super().__init__(macros=True)
 		self.args["E"] = arg_E
 
 #######################################################################

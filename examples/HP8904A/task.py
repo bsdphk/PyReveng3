@@ -617,7 +617,7 @@ def lexer(pj):
 			self.pfx = pfx + "%c" % pj.m[lo]
 			if self.f > 0:
 				hi += 1
-			super(lex, self).__init__(pj, lo, hi, "lex")
+			super().__init__(pj, lo, hi, "lex")
 			if self.f > 0 and self.pfx in hpib:
 				self.lcmt += hpib[self.pfx] + "\n"
 			self.compact = True
@@ -670,7 +670,7 @@ def lexer(pj):
 
 class Num(data.Data):
 	def __init__(self, pj, lo):
-		super(Num, self).__init__(pj, lo, lo + 3, "Num")
+		super().__init__(pj, lo, lo + 3, "Num")
 		a = pj.m[lo] << 16
 		a += pj.m[lo + 1] << 8
 		a += pj.m[lo + 2]
@@ -682,7 +682,7 @@ class Num(data.Data):
 
 class MenuPage(data.Data):
 	def __init__(self, pj, cpu, lo):
-		super(MenuPage, self).__init__(pj, lo, lo + 10, "MenuPage")
+		super().__init__(pj, lo, lo + 10, "MenuPage")
 		t = pj.m.bu16(lo)
 		y1 = data.Txt(pj, t, t + 40, label=False)
 		y1.compact = True

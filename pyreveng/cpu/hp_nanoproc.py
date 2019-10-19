@@ -120,7 +120,7 @@ class hp_nanoproc_ins(assy.Instree_ins):
 
 class hp_nanoproc(assy.Instree_disass):
 	def __init__(self, abits=11):
-		super(hp_nanoproc, self).__init__(
+		super().__init__(
                     "HP nanoprocessor",
                     ins_word=8,
                     abits=abits,

@@ -337,7 +337,7 @@ def example():
     class tt_5(data.Data):
         def __init__(self, asp, lo):
             hi = lo + 4
-            super(tt_5, self).__init__(asp, lo, hi, "tt_5")
+            super().__init__(asp, lo, hi, "tt_5")
 
         def render(self):
             s = ".TT5\t"

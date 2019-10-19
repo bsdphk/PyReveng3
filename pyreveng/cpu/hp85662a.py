@@ -131,7 +131,7 @@ class hp85662a_ins(assy.Instree_ins):
 
 class hp85662a(assy.Instree_disass):
 	def __init__(self, lang="hp85662a"):
-		super(hp85662a, self).__init__(lang, 16, 8, ">")
+		super().__init__(lang, 16, 8, ">")
 
 		self.itc = instree.InsTree(16)
 		self.itc.load_string(hp85662a_instructions, hp85662a_ins)
