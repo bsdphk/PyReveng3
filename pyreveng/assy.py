@@ -253,7 +253,7 @@ class Instree_disass(code.Decoder):
             self.codeptr = self.codeptr_bu32
 
         self.flow_check = []
-        self.verbatim = set()
+        self.verbatim = ()
         self.it = instree.InsTree(ins_word)
         self.m = None
 

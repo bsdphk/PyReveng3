@@ -233,7 +233,6 @@ class MCS51_Ins(assy.Instree_ins):
 
     def assy_a16(self):
         self.dstadr = (self['ahi'] << 8) | self['alo']
-        self.dstadr &= self.lang.amask
         return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_arel(self):
@@ -322,8 +321,7 @@ class MCS51(assy.Instree_disass):
         self.add_as("bit", aspace=BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
 
         self.it.load_string(MCS51_DESC, MCS51_Ins)
-        self.amask = 0xffff
-        self.verbatim |= set(("A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC"))
+        self.verbatim += ("A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
         self.define_bits(
             0x80,
             "P0",
@@ -380,9 +378,6 @@ class MCS51(assy.Instree_disass):
             for i in b:
                 self.as_bit.set_label(a, n + "." + i)
                 a += 1
-
-    def set_adr_mask(self, a):
-        self.amask = a
 
     def vectors(self, which=None):
         for a, b in (

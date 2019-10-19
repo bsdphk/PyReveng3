@@ -688,158 +688,158 @@ YIELD	-			|1 1 1 1 0 0 1 1 1 0 1 0 1 1 1 1|1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1|
 
 class Arm_Thumb_ins(arm_base.Arm_Base_ins):
 
-	def __init__(self, pj, lim, lang):
-		super().__init__(pj, lim, lang)
-		if self.lo & 1:
-			raise assy.Invalid("Unaligned Instruction")
+    def __init__(self, pj, lim, lang):
+        super().__init__(pj, lim, lang)
+        if self.lo & 1:
+            raise assy.Invalid("Unaligned Instruction")
 
-	def assy_Cc(self):
-		self.mne += arm_base.CC[self['cc']]
+    def assy_Cc(self):
+        self.mne += arm_base.CC[self['cc']]
 
-	def assy_Dst8(self):
-		imm32 = self['imm8'] << 1
-		if imm32 & 0x100:
-			imm32 |= 0xfffffe00
-		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_Dst8(self):
+        imm32 = self['imm8'] << 1
+        if imm32 & 0x100:
+            imm32 |= 0xfffffe00
+        self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dimm8(self):
-		imm32 = self['imm11'] << 2
-		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_Dimm8(self):
+        imm32 = self['imm11'] << 2
+        self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dst11(self):
-		imm32 = self['imm11'] << 1
-		if imm32 & 0x1000:
-			imm32 |= 0xffffe000
-		self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_Dst11(self):
+        imm32 = self['imm11'] << 1
+        if imm32 & 0x1000:
+            imm32 |= 0xffffe000
+        self.dstadr = (self.hi + 2 + imm32) & 0xffffffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Dst1011(self):
-		i1 = not (self['j'] ^ self['s'])
-		i2 = not (self['k'] ^ self['s'])
+    def assy_Dst1011(self):
+        i1 = not (self['j'] ^ self['s'])
+        i2 = not (self['k'] ^ self['s'])
 
-		imm32 = self['s'] * 0xff
-		imm32 <<= 1
-		imm32 |= i1
-		imm32 <<= 1
-		imm32 |= i2
-		imm32 <<= 10
-		imm32 |= self['imm10']
-		imm32 <<= 11
-		imm32 |= self['imm11']
-		imm32 <<= 1
-		self.dstadr = (self.hi + imm32) & 0xffffffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+        imm32 = self['s'] * 0xff
+        imm32 <<= 1
+        imm32 |= i1
+        imm32 <<= 1
+        imm32 |= i2
+        imm32 <<= 10
+        imm32 |= self['imm10']
+        imm32 <<= 11
+        imm32 |= self['imm11']
+        imm32 <<= 1
+        self.dstadr = (self.hi + imm32) & 0xffffffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Rel8(self):
-		self.dstadr = (self.hi + 2 + (self['imm8'] << 2)) & 0xffffffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_Rel8(self):
+        self.dstadr = (self.hi + 2 + (self['imm8'] << 2)) & 0xffffffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_Imm3(self):
-		return "#0x%x" % self['imm3']
+    def assy_Imm3(self):
+        return "#0x%x" % self['imm3']
 
-	def assy_Imm8(self):
-		return "#0x%x" % self['imm8']
+    def assy_Imm8(self):
+        return "#0x%x" % self['imm8']
 
-	def assy_ReglistP(self):
-		return self.assy_wreglist(pj, r=(self['p'] << 15) | self['reglist'])
+    def assy_ReglistP(self):
+        return self.assy_wreglist(pj, r=(self['p'] << 15) | self['reglist'])
 
-	def assy_ReglistM(self):
-		return self.assy_reglist(pj, r=(self['m'] << 14) | self['reglist'])
+    def assy_ReglistM(self):
+        return self.assy_reglist(pj, r=(self['m'] << 14) | self['reglist'])
 
-	def assy_Sh5(self):
-		return self.assy_sh(pj, typ=0)
+    def assy_Sh5(self):
+        return self.assy_sh(pj, typ=0)
 
-	def assy_Sp8(self):
-		return "[R13+0x%x]" % (self['imm8'] << 2)
+    def assy_Sp8(self):
+        return "[R13+0x%x]" % (self['imm8'] << 2)
 
-	def assy_Rn5(self):
-		return "[%s+0x%x]" % (arm_base.REG[self['rn']], self['imm5'] << 2)
+    def assy_Rn5(self):
+        return "[%s+0x%x]" % (arm_base.REG[self['rn']], self['imm5'] << 2)
 
-	def assy_Rnm(self):
-		return "[%s+%s]" % (arm_base.REG[self['rn']], arm_base.REG[self['rm']])
+    def assy_Rnm(self):
+        return "[%s+%s]" % (arm_base.REG[self['rn']], arm_base.REG[self['rm']])
 
-	def assy_Rdn(self):
-		return arm_base.REG[self['rdn']]
+    def assy_Rdn(self):
+        return arm_base.REG[self['rdn']]
 
 
 class Arm_Thumb(assy.Instree_disass):
-	def __init__(self):
-		super().__init__("arm_thumb", 16, 8, "<")
-		self.add_ins(thumb_desc, Arm_Thumb_ins)
-		self.add_ins(thumb_t1_desc, Arm_Thumb_ins)
-		self.add_ins(thumb_t2_desc, Arm_Thumb_ins)
+    def __init__(self):
+        super().__init__("arm_thumb", 16, 8, "<")
+        self.add_ins(thumb_desc, Arm_Thumb_ins)
+        self.add_ins(thumb_t1_desc, Arm_Thumb_ins)
+        self.add_ins(thumb_t2_desc, Arm_Thumb_ins)
 
-	def codeptr(self, pj, adr):
-		t = pj.m.lu32(adr)
-		c = data.Codeptr(pj.m, adr, adr + 4, t)
-		self.disass(pj.m, t)
-		return c
+    def codeptr(self, pj, adr):
+        t = pj.m.lu32(adr)
+        c = data.Codeptr(pj.m, adr, adr + 4, t)
+        self.disass(pj.m, t)
+        return c
 
-	def vector(self, pj, adr):
-		return
+    def vector(self, pj, adr):
+        return
 
-	def vectors(self, pj, adr=0x0, xops=1):
-		return
+    def vectors(self, pj, adr=0x0, xops=1):
+        return
 
 if __name__ == "__main__":
-	h = Arm_Thumb()
-	dom = {}
+    h = Arm_Thumb()
+    dom = {}
 
-	def dl(l):
-		t = ""
-		for i in range(0, len(l), 2):
-			t += " %08x" % l[i]
-		t += "\n"
-		for i in range(0, len(l), 2):
-			t += " %08x" % l[i + 1]
-		t += "\n"
-		return t
+    def dl(l):
+        t = ""
+        for i in range(0, len(l), 2):
+            t += " %08x" % l[i]
+        t += "\n"
+        for i in range(0, len(l), 2):
+            t += " %08x" % l[i + 1]
+        t += "\n"
+        return t
 
-	for a, aa in h.it:
-		for b, bb in h.it:
-			if aa == bb:
-				continue
-			i = 0
-			while i < len(a) and i < len(b):
-				if b[0] & a[0] != b[0]:
-					i += 2
-					continue
-				if b[0] & a[1] != b[1]:
-					i += 2
-					continue
-				if aa not in dom:
-					dom[aa] = []
-				dom[aa].append(bb)
-				i += 2
+    for a, aa in h.it:
+        for b, bb in h.it:
+            if aa == bb:
+                continue
+            i = 0
+            while i < len(a) and i < len(b):
+                if b[0] & a[0] != b[0]:
+                    i += 2
+                    continue
+                if b[0] & a[1] != b[1]:
+                    i += 2
+                    continue
+                if aa not in dom:
+                    dom[aa] = []
+                dom[aa].append(bb)
+                i += 2
 
-	for a, b in dom.items():
-		print("B", a)
-		for i in b:
-			print("  ", i)
-		i = 0
-		a.elide = set()
-		while i < len(b):
-			j = 0
-			while j < len(b):
-				if j != i and b[i] in dom and b[j] in dom[b[i]]:
-					print(a)
-					print(".",b[i])
-					print("..", b[j])
-					a.elide.add(b[j])
-				j += 1
-			i += 1
-		print("A", a)
-		print(a.elide)
-		for i in b:
-			print("  ", i)
+    for a, b in dom.items():
+        print("B", a)
+        for i in b:
+            print("  ", i)
+        i = 0
+        a.elide = set()
+        while i < len(b):
+            j = 0
+            while j < len(b):
+                if j != i and b[i] in dom and b[j] in dom[b[i]]:
+                    print(a)
+                    print(".", b[i])
+                    print("..", b[j])
+                    a.elide.add(b[j])
+                j += 1
+            i += 1
+        print("A", a)
+        print(a.elide)
+        for i in b:
+            print("  ", i)
 
-	fo = open("/tmp/_.dot", "w")
-	fo.write("digraph {\n")
-	for a, b in dom.items():
-		for i in b:
-			if i not in a.elide:
-				fo.write('"%s" -> "%s"\n' % ("_".join(i.assy), "_".join(a.assy)))
-	
-	fo.write("}\n")
+    fo = open("/tmp/_.dot", "w")
+    fo.write("digraph {\n")
+    for a, b in dom.items():
+        for i in b:
+            if i not in a.elide:
+                fo.write('"%s" -> "%s"\n' % ("_".join(i.assy), "_".join(a.assy)))
+
+    fo.write("}\n")

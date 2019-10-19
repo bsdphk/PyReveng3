@@ -53,22 +53,22 @@ RTD		word		0	|0 1 0 0 1 1 1 0 0 1 1 1 0 1 0 0| word				|
 
 class m68010_ins(m68000.m68000_ins):
 
-	def assy_Rc(self):
-		x = self.lang.cregs.get(self['Rc'])
-		if x is None:
-			return "RC_%03x" % self['Rc']
-		self.lcmt += x[1]
-		return x[0]
+    def assy_Rc(self):
+        x = self.lang.cregs.get(self['Rc'])
+        if x is None:
+            return "RC_%03x" % self['Rc']
+        self.lcmt += x[1]
+        return x[0]
 
 
 
 class m68010(m68000.m68000):
-	def __init__(self, lang="m68010"):
-		super().__init__(lang)
-		self.add_ins(m68010_desc, m68010_ins)
-		self.cregs = {
-			0x000: ("SFC", "Source Function Code"),
-			0x001: ("DFC", "Destination Function Code"),
-			0x800: ("USP", "User Stack Pointer"),
-			0x801: ("VBR", "Vector Base Register"),
-		}
+    def __init__(self, lang="m68010"):
+        super().__init__(lang)
+        self.add_ins(m68010_desc, m68010_ins)
+        self.cregs = {
+            0x000: ("SFC", "Source Function Code"),
+            0x001: ("DFC", "Destination Function Code"),
+            0x800: ("USP", "User Stack Pointer"),
+            0x801: ("VBR", "Vector Base Register"),
+        }

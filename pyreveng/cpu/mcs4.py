@@ -31,7 +31,7 @@
 
 from pyreveng import assy
 
-mcs4_desc="""
+mcs4_desc = """
 NOP	-		|0 0 0 0|0 0 0 0|
 JCN	cc,adr,>JC	|0 0 0 1| cc    | adr		|
 FIM	rr,data		|0 0 1 0| rr  |0| data		|
@@ -81,50 +81,49 @@ DCL	-		|1 1 1 1|1 1 0 1|
 """
 
 class mcs4_ins(assy.Instree_ins):
-	pass
 
-	def assy_data(self):
-		return assy.Arg_imm(self['data'], 8)
+    def assy_data(self):
+        return assy.Arg_imm(self['data'], 8)
 
-	def assy_d(self):
-		return assy.Arg_imm(self['d'], 4)
+    def assy_d(self):
+        return assy.Arg_imm(self['d'], 4)
 
-	def assy_cc(self):
-		self.cc = {
-			0x1: "JNT",
-			0x2: "JC",
-			0x4: "JZ",
-			0x9: "JT",
-			0xa: "JNC",
-			0xc: "JNZ",
-		}.get(self['cc'])
-		if self.cc is None:
-			self.cc = "CC#0x%x" % self['cc']
-		return self.cc
+    def assy_cc(self):
+        self.cc = {
+            0x1: "JNT",
+            0x2: "JC",
+            0x4: "JZ",
+            0x9: "JT",
+            0xa: "JNC",
+            0xc: "JNZ",
+        }.get(self['cc'])
+        if self.cc is None:
+            self.cc = "CC#0x%x" % self['cc']
+        return self.cc
 
-	def assy_r(self):
-		return "r%d" % self['r']
+    def assy_r(self):
+        return "r%d" % self['r']
 
-	def assy_rr(self):
-		return "rr%d" % (self['rr'] << 1)
+    def assy_rr(self):
+        return "rr%d" % (self['rr'] << 1)
 
-	def assy_adr(self):
-		self.dstadr = (self.lo & ~0xff) | self['adr']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_adr(self):
+        self.dstadr = (self.lo & ~0xff) | self['adr']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_ladr(self):
-		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_ladr(self):
+        self.dstadr = (self['ahi'] << 8) | self['alo']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_isz(self):
-		self.cc = "Z"
+    def assy_isz(self):
+        self.cc = "Z"
 
 class mcs4(assy.Instree_disass):
-	def __init__(self):
-		super().__init__(
-                    "mcs4",
-                    ins_word=8,
-                    abits=12,
-                )
-		self.it.load_string(mcs4_desc, mcs4_ins)
-		self.verbatim.add("(rr0)")
+    def __init__(self):
+        super().__init__(
+            "mcs4",
+            ins_word=8,
+            abits=12,
+        )
+        self.it.load_string(mcs4_desc, mcs4_ins)
+        self.verbatim += ("(rr0)",)

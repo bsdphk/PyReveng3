@@ -186,54 +186,50 @@ XRL	A,im		|1 1 0 1|0 0 1 1| im		|
 """
 
 class mcs48_ins(assy.Instree_ins):
-	pass
 
-	def assy_adr(self):
-		self.dstadr = (self['ahi'] << 8) | self['alo']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_adr(self):
+        self.dstadr = (self['ahi'] << 8) | self['alo']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_a8(self):
-		self.dstadr = (self.lo & ~0x0ff) | self['a8']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_a8(self):
+        self.dstadr = (self.lo & ~0x0ff) | self['a8']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_b(self):
-		self.mne += "%d" % self['b']
+    def assy_b(self):
+        self.mne += "%d" % self['b']
 
-	def assy_p(self):
-		return "P%d" % self['p']
+    def assy_p(self):
+        return "P%d" % self['p']
 
-	def assy_ar(self):
-		return "@R%d" % self['r']
+    def assy_ar(self):
+        return "@R%d" % self['r']
 
-	def assy_r(self):
-		return "R%d" % self['r']
+    def assy_r(self):
+        return "R%d" % self['r']
 
-	def assy_im(self):
-		return "#0x%02x" % self['im']
+    def assy_im(self):
+        return "#0x%02x" % self['im']
 
 class mcs48(assy.Instree_disass):
-	def __init__(self, lang="mcs48"):
-		super().__init__(
-                    lang,
-                    ins_word=8,
-                    abits=16,
-                    jmps=(
-                        (0x000, "RESET"),
-			(0x003, "INT"),
-			(0x007, "TINT"),
-                    ),
-                )
-		self.it.load_string(mcs48_desc, mcs48_ins)
+    def __init__(self, lang="mcs48"):
+        super().__init__(
+            lang,
+            ins_word=8,
+            abits=16,
+            jmps=(
+                (0x000, "RESET"),
+                (0x003, "INT"),
+                (0x007, "TINT"),
+            ),
+        )
+        self.it.load_string(mcs48_desc, mcs48_ins)
 
-		self.verbatim |= set(
-                        ("TCNTI", "BUS", "T", "A", "C", "@A",
-			"I", "F0", "F1", "PSW", "TCNT", "TCNTI", "P0", "RB0",
-                        "RB1",)
-                )
-		self.amask_ = 0xffff
-
+        self.verbatim += (
+            "TCNTI", "BUS", "T", "A", "C", "@A", "I", "F0", "F1", "PSW",
+            "TCNT", "TCNTI", "P0", "RB0", "RB1",
+        )
 
 class i8748(mcs48):
-	'''
-	i8748 chip
-	'''
+    '''
+    i8748 chip
+    '''

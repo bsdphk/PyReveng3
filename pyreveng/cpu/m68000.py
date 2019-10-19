@@ -1406,7 +1406,7 @@ class m68000(assy.Instree_disass):
                 )
 		self.it.load_string(m68000_desc, m68000_ins)
 		self.il = None
-		self.verbatim |= set(["CCR", "SR", "USP"])
+		self.verbatim += ("CCR", "SR", "USP")
 		self.ea_fullext = False
 		self.ea_scale = False
 		self.trap_returns = {}

@@ -84,91 +84,91 @@ Fops		fop,fmt,ea,Fy	1f7d	|1 1 1 1| cid |0 0 0| ea	|0|1|0| fmt | Fy  | fop		|
 '''
 
 FOPS = {
-	# NB: M68000PRM.pdf suffers badly from copy&paste with many ins having 0x0c
-	0x00:	"FMOVE",
-	0x01:	"FINT",
-	0x02:	"FSINH",
-	0x03:	"FINTRZ",
-	0x04:	"FSQRT",
-	# 0x05
-	0x06:	"FLOGNP1",
-	# 0x07
-	0x08:	"FETOXM1",
-	0x09:	"FTANH",
-	0x0a:	"FATAN",
-	0x0c:	"FASIN",
-	0x0d:	"FATANH",
-	0x0e:	"FSIN",
-	0x0f:	"FTAN",
-	0x10:	"FETOX",
-	0x11:	"FTWOTOX",
-	0x12:	"FTENTOX",
-	# 0x13
-	0x14:	"FLOGN",
-	0x15:	"FLOG10",
-	0x16:	"FLOG2",
-	# 0x17
-	0x18:	"FABS",
-	0x19:	"FCOSH",
-	0x1a:	"FNEG",
-	# 0x1b
-	0x1c:	"FACOS",
-	0x1d:	"FCOS",
-	0x1e:	"FGETEXP",
-	0x1f:	"FGETMAN",
-	0x20:	"FDIV",
-	0x21:	"FMOD",
-	0x22:	"FADD",
-	0x23:	"FMUL",
-	0x24:	"FSGLDIV",
-	0x25:	"FREM",
-	0x26:	"FSCALE",
-	0x27:	"FSGLMUL",
-	0x28:	"FSUB",
-	# 0x29
-	# 0x2a
-	# 0x2b
-	# 0x2c
-	0x2d:	"FMOD",
-	# 0x2e
-	# 0x2f
-	# 0x30-31 XXX FSINCOS
-	0x38:	"FCMP",
-	0x3a:	"FTST",
+    # NB: M68000PRM.pdf suffers badly from copy&paste with many ins having 0x0c
+    0x00:    "FMOVE",
+    0x01:    "FINT",
+    0x02:    "FSINH",
+    0x03:    "FINTRZ",
+    0x04:    "FSQRT",
+    # 0x05
+    0x06:    "FLOGNP1",
+    # 0x07
+    0x08:    "FETOXM1",
+    0x09:    "FTANH",
+    0x0a:    "FATAN",
+    0x0c:    "FASIN",
+    0x0d:    "FATANH",
+    0x0e:    "FSIN",
+    0x0f:    "FTAN",
+    0x10:    "FETOX",
+    0x11:    "FTWOTOX",
+    0x12:    "FTENTOX",
+    # 0x13
+    0x14:    "FLOGN",
+    0x15:    "FLOG10",
+    0x16:    "FLOG2",
+    # 0x17
+    0x18:    "FABS",
+    0x19:    "FCOSH",
+    0x1a:    "FNEG",
+    # 0x1b
+    0x1c:    "FACOS",
+    0x1d:    "FCOS",
+    0x1e:    "FGETEXP",
+    0x1f:    "FGETMAN",
+    0x20:    "FDIV",
+    0x21:    "FMOD",
+    0x22:    "FADD",
+    0x23:    "FMUL",
+    0x24:    "FSGLDIV",
+    0x25:    "FREM",
+    0x26:    "FSCALE",
+    0x27:    "FSGLMUL",
+    0x28:    "FSUB",
+    # 0x29
+    # 0x2a
+    # 0x2b
+    # 0x2c
+    0x2d:    "FMOD",
+    # 0x2e
+    # 0x2f
+    # 0x30-31 XXX FSINCOS
+    0x38:    "FCMP",
+    0x3a:    "FTST",
 
-	#0x58:	"FSABS",	# M68040
-	#0x5c:	"FDABS",	# M68040
+    #0x58:    "FSABS",    # M68040
+    #0x5c:    "FDABS",    # M68040
 
-	#0x60:	"FSDIV",	# M68040
-	#0x62:	"FSADD",	# M68040
-	#0x64:	"FDDIV",	# M68040
+    #0x60:    "FSDIV",    # M68040
+    #0x62:    "FSADD",    # M68040
+    #0x64:    "FDDIV",    # M68040
 }
 
 class m68881_ins(m68000.m68000_ins):
-	def __init__(self, lim, lang):
-		super().__init__(lim, lang)
-		if self['cid'] != 1:
-			raise assy.Invalid("FP cid != 1")
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        if self['cid'] != 1:
+            raise assy.Invalid("FP cid != 1")
 
-	def assy_fop(self):
-		op = FOPS.get(self['fop'])
-		if op is not None:
-			self.mne = op
-		self.sz = 4
-		self.isz = "i32"
-		self.imsk = 0xffffffff
+    def assy_fop(self):
+        op = FOPS.get(self['fop'])
+        if op is not None:
+            self.mne = op
+        self.sz = 4
+        self.isz = "i32"
+        self.imsk = 0xffffffff
 
-	def assy_Fx(self):
-		return "F%d" % self['Fx']
+    def assy_Fx(self):
+        return "F%d" % self['Fx']
 
-	def assy_Fy(self):
-		return "F%d" % self['Fy']
+    def assy_Fy(self):
+        return "F%d" % self['Fy']
 
-	def assy_X(self):
-		self.mne += ".X"
+    def assy_X(self):
+        self.mne += ".X"
 
-	def assy_fmt(self):
-		self.mne += "." + "LSXPWDB?"[self['fmt']]
+    def assy_fmt(self):
+        self.mne += "." + "LSXPWDB?"[self['fmt']]
 
 def m68881(cpu):
-	cpu.add_ins(m68881_desc, m68881_ins)
+    cpu.add_ins(m68881_desc, m68881_ins)

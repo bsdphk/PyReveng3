@@ -87,18 +87,18 @@ COMP	-			|0 1 1|x x|1 1 1|1 0|0 0 0 0 1 0|
 '''
 
 DEVNAMES = {
-	0x08: "TTYI",
-	0x09: "TTYO",
-	0x0a: "PTR",
-	0x0b: "PTP",
-	0x0c: "RTC",
-	0x0f: "LPT",
-	0x18: "MT",
-	0x2a: "AMX",
-	0x31: "FD0",
-	0x34: "FD1",
-	0x3b: "DKP",
-	0x3f: "CPU",
+    0x08: "TTYI",
+    0x09: "TTYO",
+    0x0a: "PTR",
+    0x0b: "PTP",
+    0x0c: "RTC",
+    0x0f: "LPT",
+    0x18: "MT",
+    0x2a: "AMX",
+    0x31: "FD0",
+    0x34: "FD1",
+    0x3b: "DKP",
+    0x3f: "CPU",
 }
 
 class nova_ins(assy.Instree_ins):

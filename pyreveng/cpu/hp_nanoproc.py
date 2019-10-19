@@ -36,7 +36,7 @@ from pyreveng import assy
 # Lower-case means we guessed
 # Uppercase came from 09411 listing
 
-hp_nanoproc_desc="""
+hp_nanoproc_desc = """
 INB	-		|0 0 0 0|0 0 0 0|		Increment A
 DEB	-		|0 0 0 0|0 0 0 1|		Decrement A
 IND	-		|0 0 0 0|0 0 1 0|		Increment BCD
@@ -86,97 +86,96 @@ STR	reg,imm		|1 1 0 1| reg   | imm		|
 """
 
 class hp_nanoproc_ins(assy.Instree_ins):
-	pass
 
-	def assy_imm(self):
-		return "#0x%x" % self['imm']
+    def assy_imm(self):
+        return "#0x%x" % self['imm']
 
-	def assy_adrl(self):
-		self.dstadr = (self.lo & 0xf800)
-		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_adrl(self):
+        self.dstadr = (self.lo & 0xf800)
+        self.dstadr |= (self['ahi']<<8) | self['alo']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_reg(self):
-		return self.lang.reg[self['reg']]
+    def assy_reg(self):
+        return self.lang.reg[self['reg']]
 
-	def assy_bno(self):
-		return self.lang.bno[self['bno']]
+    def assy_bno(self):
+        return self.lang.bno[self['bno']]
 
-	def assy_dctl(self):
-		return self.lang.dctl[self['dctl']]
+    def assy_dctl(self):
+        return self.lang.dctl[self['dctl']]
 
-	def assy_dev(self):
-		return self.lang.dev[self['dev']]
+    def assy_dev(self):
+        return self.lang.dev[self['dev']]
 
-	def assy_iA(self):
-		return "(0x%x+A)" % (self.lo & 0xf800)
+    def assy_iA(self):
+        return "(0x%x+A)" % (self.lo & 0xf800)
 
-	def assy_dA(self):
-		return "(0x%x-A)" % (0x800 + self.lo & 0xf800)
+    def assy_dA(self):
+        return "(0x%x-A)" % (0x800 + self.lo & 0xf800)
 
-	def assy_S(self):
-		self.cc = self.mne[1:]
-		self.dstadr = self.hi + 2
+    def assy_S(self):
+        self.cc = self.mne[1:]
+        self.dstadr = self.hi + 2
 
 class hp_nanoproc(assy.Instree_disass):
-	def __init__(self, abits=11):
-		super().__init__(
-                    "HP nanoprocessor",
-                    ins_word=8,
-                    abits=abits,
-                )
-		self.add_ins(hp_nanoproc_desc, hp_nanoproc_ins)
+    def __init__(self, abits=11):
+        super().__init__(
+            "HP nanoprocessor",
+            ins_word=8,
+            abits=abits,
+        )
+        self.add_ins(hp_nanoproc_desc, hp_nanoproc_ins)
 
-		self.reg = list()
-		self.dev = list()
-		self.dctl = list()
-		self.bno = list()
-		for i in range(16):
-			self.reg.append("REG%d" % i)
-			self.dev.append("DEV%d" % i)
-			self.dctl.append("DCTL%d" % i)
-			self.bno.append("BIT%d" % i)
+        self.reg = list()
+        self.dev = list()
+        self.dctl = list()
+        self.bno = list()
+        for i in range(16):
+            self.reg.append("REG%d" % i)
+            self.dev.append("DEV%d" % i)
+            self.dctl.append("DCTL%d" % i)
+            self.bno.append("BIT%d" % i)
 
 #######################################################################
 # This is a subclass which implements the bank-switching circuitry
 # used in the HP3325A and HP3336
 
-hp_nanoproc_pg_desc="""
+hp_nanoproc_pg_desc = """
 LJMP pgadr,>J |1 1 0 0 1 0 0 0|0 0 1 1 0| pgno|1 0 0 0|0| ahi | alo           |
 LRET >R	      |0 1 1 0 1 1 1 1|0 1 0 1 1 0 0 0|1 0 1 1 1 0 0 0|
 MCTL  mctl    |1 1 0 0 1 0 0 0| mctl          |
 """
 
 class hp_nanoproc_pg_ins(hp_nanoproc_ins):
-	pass
+    pass
 
-	def assy_pgadr(self):
-		self.dstadr = self['pgno'] << 11
-		self.dstadr |= (self['ahi']<<8) | self['alo']
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_pgadr(self):
+        self.dstadr = self['pgno'] << 11
+        self.dstadr |= (self['ahi']<<8) | self['alo']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_mctl(self):
-		self.mctl = self['mctl']
-		l = list()
-		if self.mctl & 0x10:
-			l.append("RMA")
-		if self.mctl & 0x20:
-			l.append("RMB")
-		if self.mctl & 0x40:
-			l.append("IN")
-		if self.mctl & 0x80:
-			l.append("UP")
-		pg = self.lo >> 11
-		npg = self.mctl & 7
-		if pg != npg:
-			l.append("%x" % npg)
-		return "+".join(l)
+    def assy_mctl(self):
+        self.mctl = self['mctl']
+        l = list()
+        if self.mctl & 0x10:
+            l.append("RMA")
+        if self.mctl & 0x20:
+            l.append("RMB")
+        if self.mctl & 0x40:
+            l.append("IN")
+        if self.mctl & 0x80:
+            l.append("UP")
+        pg = self.lo >> 11
+        npg = self.mctl & 7
+        if pg != npg:
+            l.append("%x" % npg)
+        return "+".join(l)
 
 class hp_nanoproc_pg(hp_nanoproc):
-	def __init__(self):
-		super().__init__(abits=14)
-		self.add_ins(hp_nanoproc_pg_desc, hp_nanoproc_pg_ins)
+    def __init__(self):
+        super().__init__(abits=14)
+        self.add_ins(hp_nanoproc_pg_desc, hp_nanoproc_pg_ins)
 
 if __name__ == "__main__":
-	h = hp_nanoproc()
-	h.it.print()
+    h = hp_nanoproc()
+    h.it.print()

@@ -26,7 +26,7 @@
 
 import random
 
-from . import mem, data, leaf
+from pyreveng import mem, data, leaf
 
 def tabto(s, n):
     ln = len(s.expandtabs())

@@ -51,7 +51,7 @@ class SVG_Charset():
             if i not in DEFAULTS:
                 raise Exception("Unknown arg %s" % i)
             self.__setattr__(i, j)
-        self.char = [ None ] * self.rows * self.cols
+        self.char = [None] * self.rows * self.cols
 
     def set_char(self, x, y, b):
         self.char[x * self.rows + y] = b
@@ -95,7 +95,7 @@ class SVG_Charset():
             else:
                 gx = x0 + self.char_w - 1
                 gi = -1
-		  
+
             m = 1 << (self.char_w - 1)
             while m:
                 if j & m:

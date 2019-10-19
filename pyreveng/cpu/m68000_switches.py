@@ -46,7 +46,7 @@ high1b =	' 6E		| 00		|'	# BGT     L_range
 high1b +=	' jj				|'
 
 for i in (high1a, high1b):
-	switches += high0 + i + '\n'
+    switches += high0 + i + '\n'
 
 #######################################################################
 
@@ -71,8 +71,8 @@ low2c =		'0 1 0 1| al  |0|1 0|0 0 0| dr0 |'	# ADDQ.L  #lowest,D7
 low2d =		''
 
 for i in (low1a, low1b):
-	for j in (low2a, low2b, low2c, low2d):
-		switches += low0 + i + j + '\n'
+    for j in (low2a, low2b, low2c, low2d):
+        switches += low0 + i + j + '\n'
 
 #######################################################################
 
@@ -110,8 +110,8 @@ high1d +=	' jj				|'
 
 
 for j in (high0a, high0b):
-	for i in (high1a, high1b, high1c, high1d):
-		switches += j + i + '\n'
+    for i in (high1a, high1b, high1c, high1d):
+        switches += j + i + '\n'
 
 #######################################################################
 
@@ -139,8 +139,8 @@ low2c =		'0 1 0 1| al  |0|0 1|0 0 0| dr0 |'	# ADDQ.W  #lowest,D7
 low2d =		''
 
 for i in (low1a, low1b, low1c, low1d):
-	for j in (low2a, low2b, low2c, low2d):
-		switches += low0 + i + j + '\n'
+    for j in (low2a, low2b, low2c, low2d):
+        switches += low0 + i + j + '\n'
 
 #######################################################################
 
@@ -186,7 +186,7 @@ class m68000_switch_ins(assy.Instree_ins):
         if self.sz not in ('W', None):
             raise assy.Invalid("Inconsitent width in SWITCH")
         self.sz = 'W'
-            
+
     def assy_L(self):
         if self.sz not in ('L', None):
             raise assy.Invalid("Inconsitent width in SWITCH")
@@ -305,7 +305,7 @@ class m68000_switch_ins(assy.Instree_ins):
         self.range()
         self += code.Jump()
         # raise assy.Invalid()
-        
+
     def wordtable(self):
         self.lang.m.set_label(self.hi, self.nm + '_TAB')
         hh = self.hi
@@ -342,4 +342,3 @@ if __name__ == "__main__":
     IT = instree.InsTree(16)
     IT.load_string(switches)
     IT.dump()
-    

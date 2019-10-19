@@ -32,7 +32,7 @@ Page references to "8085 Instruction Set.pdf"
 
 from pyreveng import assy, data
 
-i8085_desc="""
+i8085_desc = """
 # pg2			|- - - - - - - -|- - - - - - - -|- - - - - - - -|
 MOV	r1,r2		|0 1| ddd | sss | {
 	RD = i8 RS
@@ -457,21 +457,6 @@ class i8085_ins(assy.Instree_ins):
         super().__init__(lim, lang)
         self.seg = ""
 
-    def assy_cmdx(self):
-        c = self['cmd']
-        l = c & 0x0f
-        if c & 0xd0 == 0x00:
-            s = "REG=0x%x" % l
-            r = I7220_REGS.get(l)
-            if c & 0x20:
-                s += " M"
-            if r is not None:
-                s += " - " + r
-            return s
-        if c & 0xf0 == 0x10:
-            return "CMD=0x%x - " % l + I7220_CMDS[l]
-        return "0x%02x" % c
-
     def assy_r2(self):
         r = self['sss']
         if r == 6:
@@ -591,13 +576,13 @@ class i8085(assy.Instree_disass):
             abits=16,
         )
         self.add_ins(i8085_desc, i8085_ins)
-        self.verbatim |= set ((
+        self.verbatim += (
             "(HL)",
             "BC",
             "DE",
             "SP",
             "PSW",
-        ))
+        )
 
     def vectors(self):
         for l,a in (

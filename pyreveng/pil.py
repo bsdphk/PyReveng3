@@ -439,7 +439,7 @@ if False:
     #######################################################################
     # XXX Stuff below probably belongs in separate source file(s)
 
-    from . import assy
+    from pyreveng import assy
 
     #######################################################################
 

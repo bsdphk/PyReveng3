@@ -37,31 +37,31 @@ DIR = "/critter/Doc/TestAndMeasurement/HP8904A/FW/"
 NPG = 6
 
 SYMBOLS = (
-	(0, 0x0100, "SERVICE_SWITCH"),
-	(0, 0x0200, "NSMIC"),
-	(0, 0x0300, "LCD_CTL"),
-	(0, 0x0301, "LCD_DATA"),
-	(0, 0x0400, "HPIB_0"),
-	(0, 0x0401, "HPIB_1"),
-	(0, 0x0402, "HPIB_2"),
-	(0, 0x0403, "HPIB_3"),
-	(0, 0x0404, "HPIB_4"),
-	(0, 0x0405, "HPIB_5"),
-	(0, 0x0406, "HPIB_6"),
-	(0, 0x0407, "HPIB_7"),
-	(0, 0x0600, "IO_600"),
-	(0, 0x0900, "LEDS"),
-	(0, 0x0a00, "KBD_SCAN"),
-	(0, 0x0b00, "HOPLATCH"),
-	(0, 0x0c00, "OUTPUT_1"),
-	(0, 0x0d00, "OUTPUT_2"),
-	(0, 0x0e00, "OUTPUT_3"),
-	(0, 0x0f00, "OUTPUT_4"),
-	(0, 0x1000, "PTM_0"),
-	(0, 0x1001, "PTM_1"),
-	(0, 0x1002, "PTM_TIMER1"),
-	(0, 0x1003, "PTM_TIMER2"),
-	(0, 0x1004, "PTM_TIMER3"),
+    (0, 0x0100, "SERVICE_SWITCH"),
+    (0, 0x0200, "NSMIC"),
+    (0, 0x0300, "LCD_CTL"),
+    (0, 0x0301, "LCD_DATA"),
+    (0, 0x0400, "HPIB_0"),
+    (0, 0x0401, "HPIB_1"),
+    (0, 0x0402, "HPIB_2"),
+    (0, 0x0403, "HPIB_3"),
+    (0, 0x0404, "HPIB_4"),
+    (0, 0x0405, "HPIB_5"),
+    (0, 0x0406, "HPIB_6"),
+    (0, 0x0407, "HPIB_7"),
+    (0, 0x0600, "IO_600"),
+    (0, 0x0900, "LEDS"),
+    (0, 0x0a00, "KBD_SCAN"),
+    (0, 0x0b00, "HOPLATCH"),
+    (0, 0x0c00, "OUTPUT_1"),
+    (0, 0x0d00, "OUTPUT_2"),
+    (0, 0x0e00, "OUTPUT_3"),
+    (0, 0x0f00, "OUTPUT_4"),
+    (0, 0x1000, "PTM_0"),
+    (0, 0x1001, "PTM_1"),
+    (0, 0x1002, "PTM_TIMER1"),
+    (0, 0x1003, "PTM_TIMER2"),
+    (0, 0x1004, "PTM_TIMER3"),
 
         (0, 0x8dba, "SETUP_MENU(Y, U)"),
         (0, 0x8efe, "MENU_EXIT()"),
@@ -179,8 +179,8 @@ def example():
     cx = banked.BankedCPU(NPG, mycpu)
     for i in range(NPG):
         cx[i].m.map(m3, 0x0000, 0x4000, shared=True)
-        cx[i].m.map(m1, 0x4000, 0x8000, offset = i * 0x4000)
-        cx[i].m.map(m1, 0x8000, 0x10000, shared=True, offset = 6 * 0x4000)
+        cx[i].m.map(m1, 0x4000, 0x8000, offset=i * 0x4000)
+        cx[i].m.map(m1, 0x8000, 0x10000, shared=True, offset=6 * 0x4000)
         rv.append(cx[i].m)
 
         romsum(cx[i], 0x4000, 0x8000)
@@ -194,81 +194,81 @@ def example():
 
     for p, a, t in SYMBOLS:
         cx[p].m.set_label(a, t)
-       
+
     cx[0].vectors()
 
     for a, b in (
-        (0x9280, 0x92c4),
-        (0xa9d2, 0xa9dc),
-        (0xaab7, 0xaac3),
-        (0xb0cd, 0xb0dd),
-	(0xb1d0, 0xb238),
-	(0xb31a, 0xb328),
-	(0xb5ae, 0xb5ba),
-	(0xc443, 0xc463),
-	(0xd78e, 0xd79a),
-	(0xe433, 0xe43f),
+            (0x9280, 0x92c4),
+            (0xa9d2, 0xa9dc),
+            (0xaab7, 0xaac3),
+            (0xb0cd, 0xb0dd),
+            (0xb1d0, 0xb238),
+            (0xb31a, 0xb328),
+            (0xb5ae, 0xb5ba),
+            (0xc443, 0xc463),
+            (0xd78e, 0xd79a),
+            (0xe433, 0xe43f),
     ):
         for i in range(a, b, 2):
             cx[0].codeptr(i)
 
     for a, b in (
-        (0xee5b, 0xee91),
-        (0xef1f, 0xef41),
+            (0xee5b, 0xee91),
+            (0xef1f, 0xef41),
     ):
         for i in range(a, b, 2):
             y = data.Dataptr(cx[0].m, i, i + 2, cx[0].m.bu16(i))
             data.Txt(cx[0].m, y.dst, pfx=1, label=False)
 
     for a, b in (
-        (0, 0x45ba,),
-        (0, 0x4d99,),
-        (0, 0x58c7,),
-        (0, 0x5b01,),
-        (0, 0x6aef,),
-        (0, 0x6fe9,),
+            (0, 0x45ba,),
+            (0, 0x4d99,),
+            (0, 0x58c7,),
+            (0, 0x5b01,),
+            (0, 0x6aef,),
+            (0, 0x6fe9,),
 
-        (1, 0x4607,),
-        (1, 0x4f71,),
-        (1, 0x5033,),
-        (1, 0x50ab,),
-        (1, 0x54ea,),
-        (1, 0x56a1,),
-        (1, 0x57b3,),
-        (1, 0x627e,),
+            (1, 0x4607,),
+            (1, 0x4f71,),
+            (1, 0x5033,),
+            (1, 0x50ab,),
+            (1, 0x54ea,),
+            (1, 0x56a1,),
+            (1, 0x57b3,),
+            (1, 0x627e,),
 
-        # Common page
-        (0, 0x8000,),
-        (0, 0x8de1,),
-        (0, 0x8f6a,),
-        (0, 0xa1ac,),
-        (0, 0xa23b,),
-        (0, 0xa421,),
-        (0, 0xa45b,),
-        (0, 0xa5c9,),
-        (0, 0xa69d,),
-        (0, 0xa6cf,),
-        (0, 0xa705,),
-        (0, 0xa732,),
-        (0, 0xa758,),
-        (0, 0xc601,),
-        (0, 0xca79,),
-        (0, 0xcb68,),
-        (0, 0xcc32,),
-        (0, 0xcd13,),
-        (0, 0xce0c,),
-        (0, 0xce56,),
-        (0, 0xcebd,),
-        (0, 0xd1d1,),
-        (0, 0xd6f8,),
-        (0, 0xdafe,),
-        (0, 0xf07f,),
-        (0, 0xf1a3,),
-        (0, 0xf42c,),
-        (0, 0xfa0d,),
+            # Common page
+            (0, 0x8000,),
+            (0, 0x8de1,),
+            (0, 0x8f6a,),
+            (0, 0xa1ac,),
+            (0, 0xa23b,),
+            (0, 0xa421,),
+            (0, 0xa45b,),
+            (0, 0xa5c9,),
+            (0, 0xa69d,),
+            (0, 0xa6cf,),
+            (0, 0xa705,),
+            (0, 0xa732,),
+            (0, 0xa758,),
+            (0, 0xc601,),
+            (0, 0xca79,),
+            (0, 0xcb68,),
+            (0, 0xcc32,),
+            (0, 0xcd13,),
+            (0, 0xce0c,),
+            (0, 0xce56,),
+            (0, 0xcebd,),
+            (0, 0xd1d1,),
+            (0, 0xd6f8,),
+            (0, 0xdafe,),
+            (0, 0xf07f,),
+            (0, 0xf1a3,),
+            (0, 0xf42c,),
+            (0, 0xfa0d,),
     ):
         cx[a].disass(b)
-        cx[a].m.set_line_comment(b, "%x:%x MANUAL" % (a,b))
+        cx[a].m.set_line_comment(b, "%x:%x MANUAL" % (a, b))
 
     pg0(cx[0])
     pg1(cx[1])
@@ -287,4 +287,3 @@ def example():
 
 if __name__ == '__main__':
     listing.Example(example, ncol=8, pil=False)
-

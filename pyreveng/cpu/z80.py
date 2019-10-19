@@ -290,5 +290,8 @@ class z80(assy.Instree_disass):
         self.add_as("io", "I/O", 8)
         self.add_ins(z80_desc, z80_ins)
         self.mask = mask
-        self.verbatim |= set(["A", "DE", "(DE)", "(BC)", "(SP)",
-            "(C)", "SP", "I", "2", "C", "NC", "NZ", "Z", "AF", "AF'"])
+        self.verbatim += (
+            "A", "DE", "(DE)", "(BC)", "(SP)", "(C)", "SP", "AF", "AF'",
+            "I", "2",
+            "C", "NC", "NZ", "Z",
+        )

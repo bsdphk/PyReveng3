@@ -93,33 +93,33 @@ UNPK		W,decAx,decAy,data -	|1 0 0 0| Ay  |1 1 0 0 0|1| Ax  |
 
 class m68020_ins(m68010.m68010_ins):
 
-	def assy_BF(self):
-		t = "{"
-		if self['o']:
-			t += "D%d" % self['off']
-		else:
-			t += "%d" % self['off']
-		t += ":"
-		if self['w']:
-			t += "D%d" % self['wid']
-		else:
-			t += "%d" % self['wid']
-		return t + "}"
+    def assy_BF(self):
+        t = "{"
+        if self['o']:
+            t += "D%d" % self['off']
+        else:
+            t += "%d" % self['off']
+        t += ":"
+        if self['w']:
+            t += "D%d" % self['wid']
+        else:
+            t += "%d" % self['wid']
+        return t + "}"
 
 
 class m68020(m68010.m68010):
-	def __init__(self, lang="m68020"):
-		super().__init__(lang)
-		self.it.load_string(m68020_desc, m68020_ins)
-		self.ea_fullext = True
-		self.ea_scale = True
-		self.cregs.update({
-			0x002: ("CACR", "Cache Control Register"),
-			0x802: ("CAAR", "Cache Address Register"),
-			0x803: ("MSP", "Master Stack Pointer"),
-			0x804: ("ISP", "Interrupt Stack Pointer"),
-		})
+    def __init__(self, lang="m68020"):
+        super().__init__(lang)
+        self.it.load_string(m68020_desc, m68020_ins)
+        self.ea_fullext = True
+        self.ea_scale = True
+        self.cregs.update({
+            0x002: ("CACR", "Cache Control Register"),
+            0x802: ("CAAR", "Cache Address Register"),
+            0x803: ("MSP", "Master Stack Pointer"),
+            0x804: ("ISP", "Interrupt Stack Pointer"),
+        })
 
 if __name__ == '__main__':
-	m = m68020()
-	m.it.dump()
+    m = m68020()
+    m.it.dump()
