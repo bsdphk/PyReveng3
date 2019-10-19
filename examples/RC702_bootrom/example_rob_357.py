@@ -27,38 +27,34 @@
 '''Regnecentralen Piccolo - RC702 boot EPROM
 '''
 
-import os
-from pyreveng import job, mem, listing, code, discover, data
+from pyreveng import mem, listing, data
 import pyreveng.cpu.z80 as z80
 
-def setup():
-	cx = z80.z80()
-	m = mem.Stackup(files=("EPROM_ROB_357.bin",), nextto=__file__)
-	cx.m.map(m, 0, 0x12)
-	cx.m.map(m, lo=0xa000, hi=0xa59a, offset=0x12)
-	pj = job.Job(cx.m, "RC702_bootrom_rob_357")
-	return pj, cx
+NAME = "RC702_bootrom_rob_357"
 
-def task(pj, cx):
-	data.Txt(pj.m, 0xa533, label=False)
-	data.Txt(pj.m, 0xa546, label=False)
-	data.Txt(pj.m, 0xa571, label=False)
-	data.Txt(pj.m, 0xa574, label=False)
-	data.Txt(pj.m, 0xa588, 0xa58c, label=False)
-	data.Txt(pj.m, 0xa58c, 0xa590, label=False)
-	data.Txt(pj.m, 0xa593, 0xa593 + 0x7, label=False)
+FILENAME = "EPROM_ROB_357.bin"
 
-	cx.disass(0x0000)
+def example():
+    cx = z80.z80()
+    m = mem.Stackup(files=(FILENAME,), nextto=__file__)
+    cx.m.map(m, 0, 0x12)
+    cx.m.map(m, lo=0xa000, hi=0xa59a, offset=0x12)
 
-	# Interrupt vector table
-	for a in range(12):
-		cx.codeptr(0xa000 + a * 2)
+    data.Txt(cx.m, 0xa533, label=False)
+    data.Txt(cx.m, 0xa546, label=False)
+    data.Txt(cx.m, 0xa571, label=False)
+    data.Txt(cx.m, 0xa574, label=False)
+    data.Txt(cx.m, 0xa588, 0xa58c, label=False)
+    data.Txt(cx.m, 0xa58c, 0xa590, label=False)
+    data.Txt(cx.m, 0xa593, 0xa593 + 0x7, label=False)
 
-	#discover.Discover(cx)
+    cx.disass(0x0000)
+
+    # Interrupt vector table
+    for a in range(12):
+        cx.codeptr(0xa000 + a * 2)
+
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	print(__file__)
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj, ncol = 4)
-
+    listing.Example(example)

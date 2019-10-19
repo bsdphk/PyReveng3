@@ -57,10 +57,14 @@ def one_example(dir, example):
     y = importlib.import_module(dir + "." + example)
     sys.path.pop(-1)
     if not hasattr(y, "example"):
+        print("OLD STYLE", dir, example, "=" * 80)
         pj, cx = y.setup()
         y.task(pj, cx)
         fn = "_output/" + pj.name
-        for a, b in ((".asm", False), (".pil", True)):
+        for a, b in (
+            (".asm", False),
+            # (".pil", True)
+        ):
             listing.Listing(
                 pj.m,
                 ncol = 8,
@@ -76,7 +80,10 @@ def one_example(dir, example):
             else:
                 fn = "_output/" + nm + ".%02d" % i
             print(i, j, fn)
-            for a, b in ((".asm", False), (".pil", True)):
+            for a, b in (
+                (".asm", False),
+                # (".pil", True)
+            ):
                 listing.Listing(
                     j,
                     ncol = 8,
