@@ -30,7 +30,7 @@
 from pyreveng import mem, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
-import common
+import hp3336_common as common
 
 NAME = "HP3336"
 

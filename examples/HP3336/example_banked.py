@@ -31,7 +31,7 @@ from pyreveng import mem, listing, assy
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 import pyreveng.cpu.banked as banked
 
-import common
+import hp3336_common as common
 
 NAME = "HP3336_BANKED"
 FILENAME = "hp3336.bin"
