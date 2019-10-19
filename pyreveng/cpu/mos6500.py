@@ -27,7 +27,7 @@
 '''MOS Technology 6500 Family
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy
 
 mos6500_desc = '''
 ADC	Imm	| 69		|

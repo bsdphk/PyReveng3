@@ -28,7 +28,7 @@
 '''Zilog Z8000
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy, data
 
 z8000_desc = '''
 # Z8000 instruction list

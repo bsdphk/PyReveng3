@@ -28,7 +28,7 @@
 '''Zilog Z80
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy
 
 z80_desc = """
 LD	rd,rs		|0 1| rd  | rs  |

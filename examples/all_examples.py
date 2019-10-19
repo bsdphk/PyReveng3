@@ -56,41 +56,24 @@ def one_example(dir, example):
     sys.path.append(dir)
     y = importlib.import_module(dir + "." + example)
     sys.path.pop(-1)
-    if not hasattr(y, "example"):
-        print("OLD STYLE", dir, example, "=" * 80)
-        pj, cx = y.setup()
-        y.task(pj, cx)
-        fn = "_output/" + pj.name
+    nm, ms = y.example()
+    for i, j in enumerate(ms):
+        if len(ms) == 1:
+            fn = "_output/" + nm
+        else:
+            fn = "_output/" + nm + ".%02d" % i
+        print(i, j, fn)
         for a, b in (
             (".asm", False),
             # (".pil", True)
         ):
             listing.Listing(
-                pj.m,
+                j,
                 ncol = 8,
                 fn = fn + a,
                 pil=b,
                 hide_undone=True,
             )
-    else:
-        nm, ms = y.example()
-        for i, j in enumerate(ms):
-            if len(ms) == 1:
-                fn = "_output/" + nm
-            else:
-                fn = "_output/" + nm + ".%02d" % i
-            print(i, j, fn)
-            for a, b in (
-                (".asm", False),
-                # (".pil", True)
-            ):
-                listing.Listing(
-                    j,
-                    ncol = 8,
-                    fn = fn + a,
-                    pil=b,
-                    hide_undone=True,
-                )
     sys.stdout.flush()
 
 def all_examples():

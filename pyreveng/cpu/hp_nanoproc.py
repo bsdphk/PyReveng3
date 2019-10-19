@@ -31,7 +31,7 @@ This disassembler is prepared for bank-switching, in that it
 assumes that the upper (0xf800) address bits are preserved.
 '''
 
-from pyreveng import assy, mem
+from pyreveng import assy
 
 # Lower-case means we guessed
 # Uppercase came from 09411 listing

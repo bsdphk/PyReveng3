@@ -28,18 +28,17 @@
 '''
 
 from pyreveng import listing, seven_segment
-from . import utils
+import utils
 
-def setup():
-	return utils.setup("HP5359A", "HP5359A.ROM", 1)
+NAME = "HP5359A"
 
-def task(pj, cpu):
-	seven_segment.table(pj.m, 0x7fbf, 0x7fda, verbose=False)
+FILENAME = "HP5359A.ROM"
 
-	ct = utils.cmd_tbl(pj, 0x6225, 0x6287)
-	print(ct)
+def example():
+    cx = utils.setup(FILENAME, 1)
+    seven_segment.table(cx.m, 0x7fbf, 0x7fda, verbose=False)
+    utils.cmd_tbl(cx, 0x6225, 0x6287)
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj)
+    listing.Example(example)

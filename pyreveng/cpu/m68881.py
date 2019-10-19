@@ -29,8 +29,8 @@
 Page numbers with '*' reference MC68881/68882 USER's MANUAL (MC68881UM/AD Rev2)
 '''
 
-from pyreveng import assy, data, mem
-from pyreveng.cpu.m68000 import *
+from pyreveng import assy
+from pyreveng.cpu import m68000
 
 m68881_desc = '''
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -144,7 +144,7 @@ FOPS = {
 	#0x64:	"FDDIV",	# M68040
 }
 
-class m68881_ins(m68000_ins):
+class m68881_ins(m68000.m68000_ins):
 	def __init__(self, lim, lang):
 		super().__init__(lim, lang)
 		if self['cid'] != 1:

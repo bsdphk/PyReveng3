@@ -27,69 +27,66 @@
 '''HP1345 - Built-in Diagnostic processor
 '''
 
-from pyreveng import job, mem, listing
+from pyreveng import mem, listing
 import pyreveng.cpu.mcs48 as mcs48
 import pyreveng.cpu.hp1345a as hp1345a
 import pyreveng.cpu.hp1345_render as hp1345_render
 
-fw="01347-80010.bin"
+NAME = "HP1345A"
+
+FILENAME = "01347-80010.bin"
+
+SYMBOLS = {
+    0x00a: "reset",
+    0x010: "int",
+    0x014: "tint",
+    0x017: "RESET_TIMER",
+    0x01d: "R1d",
+    0x032: "MEMTST",
+    0x048: "048",
+    0x06e: "06e",
+    0x0a1: "Ra1",
+    0x0ac: "0ac",
+    0x0c2: "0c2",
+    0x0d2: "0d2",
+    0x0d6: "0d6",
+    0x0de: "0de",
+    0x0ea: "0ea",
+    0x100: "ALIGN",
+    0x200: "ALIGN2",
+    0x300: "FOCUS",
+}
 
 #######################################################################
 
-def mem_setup():
-        return mem.Stackup((fw,), nextto=__file__)
+def example():
+    m = mem.Stackup((FILENAME,), nextto=__file__)
+    cx = mcs48.i8748()
+    cx.m.map(m, 0)
 
-def setup():
-	cpu = mcs48.i8748()
-	cpu.m.map(mem_setup(), 0)
-	pj = job.Job(cpu.m, "HP1345A")
-	return pj,cpu
+    for a, b in SYMBOLS.items():
+        cx.m.set_label(a, b)
 
-#######################################################################
+    gpu = hp1345a.hp1345a()
 
-def task(pj, cx):
-	cpu = cx
-	gpu = hp1345a.hp1345a()
+    cx.vectors()
 
-	pj.m.set_label(0x00a, "reset")
-	pj.m.set_label(0x010, "int")
-	pj.m.set_label(0x014, "tint")
-	pj.m.set_label(0x017, "RESET_TIMER")
-	pj.m.set_label(0x01d, "R1d")
-	pj.m.set_label(0x032, "MEMTST")
-	pj.m.set_label(0x048, "048")
-	pj.m.set_label(0x06e, "06e")
-	pj.m.set_label(0x0a1, "Ra1")
-	pj.m.set_label(0x0ac, "0ac")
-	pj.m.set_label(0x0c2, "0c2")
-	pj.m.set_label(0x0d2, "0d2")
-	pj.m.set_label(0x0d6, "0d6")
-	pj.m.set_label(0x0de, "0de")
-	pj.m.set_label(0x0ea, "0ea")
-	pj.m.set_label(0x100, "ALIGN")
-	pj.m.set_label(0x200, "ALIGN2")
-	pj.m.set_label(0x300, "FOCUS")
+    l = []
+    for a in range(0x122, 0x200, 2):
+        l.append(cx.m.bu16(a))
+        gpu.disass(a, cx.m)
 
-	cpu.vectors()
+    for a in range(0x222, 0x2c8, 2):
+        l.append(cx.m.bu16(a))
+        gpu.disass(a, cx.m)
 
-	l = []
-	for a in range(0x122, 0x200, 2):
-		l.append(pj.m.bu16(a))
-		gpu.disass(a, cpu.m)
+    hp1345_render.svg(cx.m, 0x122, 0x2c8, l=l)
 
-	for a in range(0x222, 0x2c8, 2):
-		l.append(pj.m.bu16(a))
-		gpu.disass(a, cpu.m)
+    for a in range(0x31e, 0x400, 2):
+        gpu.disass(a, cx.m)
+    hp1345_render.svg(cx.m, 0x31e, 0x400)
 
-	hp1345_render.svg(pj, 0x122, 0x2c8, l=l)
-
-	for a in range(0x31e,0x400, 2):
-		gpu.disass(a, cpu.m)
-	hp1345_render.svg(pj, 0x31e, 0x400)
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	print(__file__)
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj, ncol=2)
-
+    listing.Example(example)

@@ -28,80 +28,76 @@
 '''
 
 import os
-from pyreveng import job, mem, listing
+from pyreveng import mem, listing
 import pyreveng.cpu.mcs4 as mcs4
 
-def mem_setup():
-	m = mem.ByteMem(0x0, 0x900)
-	def hexfile(bn, a0):
-		fn = os.path.join(os.path.dirname(__file__), bn)
-		fi = open(fn)
-		for i in fi:
-			j = i.split()
-			if len(j) == 0:
-				continue
-			if j[0][0] == "#":
-				continue
-			a = int(j[0], 16)
-			b = int(j[1], 16)
-			m.wr(a0 + a, b)
-		fi.close()
+NAME = "Micrologic_ML200"
 
-	hexfile("P8316.hex", 0)
-	hexfile("P1702.hex", 0x800)
-	return m
+SYMBOLS = {
+    0x6e8: "Incr_rr0()",
+    0x6bc: "Count_Down()",
+    0x7df: "Update_Display()",
+}
+
+def example():
+    m = mem.ByteMem(0x0, 0x900)
+    def hexfile(bn, a0):
+        fn = os.path.join(os.path.dirname(__file__), bn)
+        fi = open(fn)
+        for i in fi:
+            j = i.split()
+            if len(j) == 0:
+                continue
+            if j[0][0] == "#":
+                continue
+            a = int(j[0], 16)
+            b = int(j[1], 16)
+            m.wr(a0 + a, b)
+        fi.close()
+
+    hexfile("P8316.hex", 0)
+    hexfile("P1702.hex", 0x800)
+
+    cx = mcs4.mcs4()
+    cx.m.map(m, 0)
+
+    for a, b in SYMBOLS.items():
+        cx.m.set_label(a, b)
+
+    cx.disass(0)
 
 
-def setup():
+    if False:
+        cmt = """-
+        This is the RESET "countdown" routine
 
-	cpu = mcs4.mcs4()
-	cpu.m.map(mem_setup(), 0)
+        Displays:
+          .9.9.9.9 9.9
+          .8.8.8.8 8.8
+          ...
+          .0.0.0.0 0.0
 
-	pj = job.Job(cpu.m, "Micrologic_ML200")
-	return pj, cpu
+        It calls 0x5ca a lot, presumably to let the analog stuff settle ?
+        """
 
-def task(pj, cpu):
+    if False:
+        cmt = """
+        The display is driven by two chains of 3 three P4003 10-bit shift
+        registers, which again drives 7447 7-segment drivers.
+        On entry r2 contains 0x20 or 0x40, depending on which clock-pulse
+        line should be driven.
+        A total of 30 pulses are sent:
+            6 x 1  Decimal points, left to right
+            6 x 4  BCD to 7447, LSD to MSD order.
+        """
 
-	cpu.disass(0)
+    if False:
+        cmt = """
+            0x66a-0x676
+            are 3-byte constants
+        """
 
-	pj.m.set_label(0x6e8, "Incr_rr0()")
-	pj.m.set_label(0x6bc, "Count_Down()")
-
-	if False:
-		cmt = """-
-		This is the RESET "countdown" routine
-
-		Displays:
-		  .9.9.9.9 9.9
-		  .8.8.8.8 8.8
-		  ...
-		  .0.0.0.0 0.0
-
-		It calls 0x5ca a lot, presumably to let the analog stuff settle ?
-		"""
-
-	pj.m.set_label(0x7df, "Update_Display()")
-
-	if False:
-		cmt = """
-		The display is driven by two chains of 3 three P4003 10-bit shift
-		registers, which again drives 7447 7-segment drivers.
-		On entry r2 contains 0x20 or 0x40, depending on which clock-pulse
-		line should be driven.
-		A total of 30 pulses are sent:
-			6 x 1  Decimal points, left to right
-			6 x 4  BCD to 7447, LSD to MSD order.
-		"""
-
-	if False:
-		cmt = """
-			0x66a-0x676
-			are 3-byte constants
-		"""
-
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj, ncol = 2)
-
+    listing.Example(example)

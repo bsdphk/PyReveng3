@@ -29,7 +29,7 @@
 "Worlds First Micro Processor"
 '''
 
-from pyreveng import assy, mem
+from pyreveng import assy
 
 mcs4_desc="""
 NOP	-		|0 0 0 0|0 0 0 0|

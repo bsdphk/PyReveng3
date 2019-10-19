@@ -31,7 +31,7 @@
 '''Texas Instruments TMS9990
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy, data
 
 tms9900_desc = """
 
@@ -948,6 +948,9 @@ class Tms9900(assy.Instree_disass):
                 vect(i * 4, "INT%d" % i)
         for i in range(xops):
             vect(0x40 + i * 4, "XOP%d" % i)
+
+    def dataptr(self, a):
+        return data.Dataptr(self.m, a, a + 2, self.m.bu16(a))
 
 class Tms9981(Tms9900):
     def __init__(self):

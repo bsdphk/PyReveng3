@@ -29,30 +29,32 @@
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
-from pyreveng import job, mem, data, listing
+from pyreveng import mem, data, listing
 import pyreveng.cpu.mcs48 as mcs48
 
-def mem_setup():
-    return mem.Stackup(("MCU_WDC_U10.bin",), nextto=__file__)
+NAME = "CBM900_WDC"
 
-def setup():
+FILENAME = "MCU_WDC_U10.bin"
+
+def example():
+    m = mem.Stackup((FILENAME,), nextto=__file__)
     cx = mcs48.mcs48()
-    m = mem_setup()
     cx.m.map(m, 0)
-    pj = job.Job(cx.m, "CBM900_WDC")
-    return pj, cx
 
-def task(pj, cx):
     cx.vectors()
+
     for a in range(0x0a, 0x21):
-        t = pj.m[a]
-        data.Codeptr(pj.m, a, a + 1, t)
+        t = cx.m[a]
+        data.Codeptr(cx.m, a, a + 1, t)
         cx.disass(t)
-        pj.m.set_block_comment(t, "From PTR 0x%x" % a)
+        cx.m.set_block_comment(t, "From PTR 0x%x" % a)
+
+
     for a in range(0x000, 0x800, 0x100):
         cx.disass(a + 0xfe)
-    data.Txt(pj.m, 0x5ae, 0x5dc, label=False)
-    data.Txt(pj.m, 0x5dc, 0x5f4, label=False)
+
+    data.Txt(cx.m, 0x5ae, 0x5dc, label=False)
+    data.Txt(cx.m, 0x5dc, 0x5f4, label=False)
 
     for a in (
             0x695,
@@ -61,9 +63,8 @@ def task(pj, cx):
             0x720,
     ):
         cx.disass(a)
-        pj.m.set_block_comment(a, "Manual")
+        cx.m.set_block_comment(a, "Manual")
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-    pj, cx = setup()
-    task(pj, cx)
-    listing.Listing(pj, ncol=2)
+    listing.Example(example)

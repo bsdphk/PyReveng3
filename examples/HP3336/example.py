@@ -27,113 +27,100 @@
 '''HP3336 Synthesizer/Level Generator
 '''
 
-import os
-from pyreveng import job, mem, listing, data
+from pyreveng import mem, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 import common
 
-def mem_setup():
-	m = mem.byte_mem(0x0000, 0x4000)
-	fn = os.path.join(os.path.dirname(__file__), "hp3336.bin")
-	m.load_binfile(0, 1, fn)
-	return m
+NAME = "HP3336"
 
-def setup():
+FILENAME = "hp3336.bin"
 
-	dx = hp_nanoproc.hp_nanoproc_pg()
-	dx.m.map(mem.Stackup(("hp3336.bin",), nextto=__file__), 0)
+def example():
+    m = mem.Stackup((FILENAME,), nextto=__file__)
 
-	pj = job.Job(dx.m, "HP3336")
-	return pj, dx
+    cx = hp_nanoproc.hp_nanoproc_pg()
+    cx.m.map(m, 0)
 
-def task(pj, dx):
-	dx.disass(0)
-	dx.disass(0xff)
+    for a, b in common.SYMBOLS.items():
+        cx.m.set_label(a, b)
 
-	#######################################################################
-	if True:
-		for a0 in range(4,0x20,4):
-			assert pj.m[a0] == 0xc8
-			pg = (pj.m[a0 + 1] & 0x07) << 11
-			assert pg == a0 << 9
-			dpf = pj.m[a0 + 2] << 8
-			dpf |= pj.m[a0 + 3]
-			dpf &= 0x7ff
-			dpf |= pg
-			pj.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
-			dx.disass(a0)
-			dx.disass(dpf)
-			for a1 in range(pg, dpf, 2):
-				da = pj.m[a1] << 8
-				da |= pj.m[a1 + 1]
-				da &= 0x7ff
-				da |= pg
-				v = a0 << 3
-				v |= (a1 - pg) >> 1
-				pj.m.set_label(a1, "PTR_%02x" % v)
-				pj.m.set_label(da, "FN_%02x" % v)
-				dx.disass(a1)
+    cx.disass(0)
+    cx.disass(0xff)
 
+    #######################################################################
+    if True:
+        for a0 in range(4, 0x20, 4):
+            assert cx.m[a0] == 0xc8
+            pg = (cx.m[a0 + 1] & 0x07) << 11
+            assert pg == a0 << 9
+            dpf = cx.m[a0 + 2] << 8
+            dpf |= cx.m[a0 + 3]
+            dpf &= 0x7ff
+            dpf |= pg
+            cx.m.set_label(dpf, "DISP_%d" % (a0 >> 2))
+            cx.disass(a0)
+            cx.disass(dpf)
+            for a1 in range(pg, dpf, 2):
+                da = cx.m[a1] << 8
+                da |= cx.m[a1 + 1]
+                da &= 0x7ff
+                da |= pg
+                v = a0 << 3
+                v |= (a1 - pg) >> 1
+                cx.m.set_label(a1, "PTR_%02x" % v)
+                cx.m.set_label(da, "FN_%02x" % v)
+                cx.disass(a1)
 
-	#######################################################################
-	def jmp_table(lo, hi, span, txt = "table"):
-		x = data.Range(pj.m, lo, hi, "table")
-		# x = pj.m.set_line_comment(lo, "table")
-		for a in range(lo, hi, span):
-			dx.disass(a)
-		# x.blockcmt = "-\n" + txt + "\n-\n"
-		return x
+    #######################################################################
+    def jmp_table(lo, hi, span, txt="table"):
+        cx.m.set_block_comment(lo, txt)
+        for a in range(lo, hi, span):
+            cx.disass(a)
 
-	#######################################################################
-	if True:
-		# Comes from 0x0d01
-		# returns to 0xd02
-		jmp_table(0x0f80, 0x0fa8, 4, "LED Segment Table")
+    #######################################################################
+    if True:
+        # Comes from 0x0d01
+        # returns to 0xd02
+        jmp_table(0x0f80, 0x0fa8, 4, "LED Segment Table")
 
-	#######################################################################
-	if True:
-		# Comes from 0xab2
-		# does not return
-		jmp_table(0x0fa8, 0x0fc0, 2)
+    #######################################################################
+    if True:
+        # Comes from 0xab2
+        # does not return
+        jmp_table(0x0fa8, 0x0fc0, 2)
 
-	#######################################################################
-	if True:
-		# Comes from 0xb3b
-		# returns to 0xb3c
-		jmp_table(0x0fc0, 0x0fe0, 4)
+    #######################################################################
+    if True:
+        # Comes from 0xb3b
+        # returns to 0xb3c
+        jmp_table(0x0fc0, 0x0fe0, 4)
 
-	#######################################################################
-	if True:
-		# Comes from 0xb62
-		# returns to 0xb63
-		jmp_table(0x0fe0, 0x1000, 4)
+    #######################################################################
+    if True:
+        # Comes from 0xb62
+        # returns to 0xb63
+        jmp_table(0x0fe0, 0x1000, 4)
 
-	#######################################################################
-	if True:
-		# Comes from 0x1aa0
-		# returns to 1aa1
-		jmp_table(0x1840, 0x1878, 8)
+    #######################################################################
+    if True:
+        # Comes from 0x1aa0
+        # returns to 1aa1
+        jmp_table(0x1840, 0x1878, 8)
 
-	#######################################################################
-	if True:
-		# Comes from 0x29f9
-		# returns to 29fa
-		x = jmp_table(0x2fb8, 0x3000, 8)
+    #######################################################################
+    if True:
+        # Comes from 0x29f9
+        # returns to 29fa
+        jmp_table(0x2fb8, 0x3000, 8)
 
-	#######################################################################
-	if True:
-		# Comes from 0x3c37
-		# does RET
-		x = jmp_table(0x3fd8, 0x4000, 4)
+    #######################################################################
+    if True:
+        # Comes from 0x3c37
+        # does RET
+        jmp_table(0x3fd8, 0x4000, 4)
 
-	#######################################################################
-	if True:
-		for a,l in common.SYMBOLS.items():
-			pj.m.set_label(a,l)
+    return NAME, (m,)
 
 if __name__ == '__main__':
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj)
-
+    listing.Example(example)

@@ -1,5 +1,5 @@
 
-from pyreveng import job, leaf, mem, data, seven_segment, code, listing, discover, tree, assy
+from pyreveng import mem
 
 class BankedMem(mem.MemMapper):
     def __init__(self, lo, hi, bank):

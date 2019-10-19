@@ -27,8 +27,7 @@
 '''Motorola M68010
 '''
 
-from pyreveng import assy
-from pyreveng.cpu.m68000 import *
+from pyreveng.cpu import m68000
 
 m68010_desc = """
 # 476/6-22
@@ -52,7 +51,7 @@ RTD		word		0	|0 1 0 0 1 1 1 0 0 1 1 1 0 1 0 0| word				|
 
 #######################################################################
 
-class m68010_ins(m68000_ins):
+class m68010_ins(m68000.m68000_ins):
 
 	def assy_Rc(self):
 		x = self.lang.cregs.get(self['Rc'])
@@ -63,7 +62,7 @@ class m68010_ins(m68000_ins):
 
 
 
-class m68010(m68000):
+class m68010(m68000.m68000):
 	def __init__(self, lang="m68010"):
 		super().__init__(lang)
 		self.add_ins(m68010_desc, m68010_ins)

@@ -28,33 +28,41 @@
 '''
 
 from pyreveng import listing, seven_segment
-from . import utils
+import utils
 
-def setup():
-	return utils.setup("HP5370A", "HP5370A.ROM", -1)
+NAME = "HP5370A"
 
-def task(pj, cpu):
+FILENAME = "HP5370A.ROM"
 
-	seven_segment.table(pj.m, 0x7e29, 0x7e39, verbose=False)
+SYMBOLS = {
+    0x66ea: "ERR5_UNDEF_KEY",
+}
 
-	ct = utils.cmd_tbl(pj, 0x7c5d, 0x7c91)
-	cta = utils.arg_range(pj, ct, 0x7d65, 0x7d81)
-	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
+def example():
+    cx = utils.setup(FILENAME, -1)
 
-	pj.m.set_label(0x66ea, "ERR5_UNDEF_KEY")
-	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
+    for a, b in SYMBOLS.items():
+        cx.m.set_label(a, b)
 
-	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
+    seven_segment.table(cx.m, 0x7e29, 0x7e39, verbose=False)
 
-	for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
-		utils.float70(pj, i)
+    ct = utils.cmd_tbl(cx, 0x7c5d, 0x7c91)
+    cta = utils.arg_range(cx, ct, 0x7d65, 0x7d81)
+    utils.cmd_dispatch(cx, cta, 0x644c)
 
-	utils.square_tbl(pj)
+    utils.key_dispatch(cx, 0x640c, 0x644c)
 
-	utils.apply_labels(pj, "A")
-	utils.tramp(pj)
+    utils.dsp_dispatch(cx, 0x6848, 0x6858)
+
+    for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
+        utils.float70(cx.m, i)
+
+    utils.square_tbl(cx.m)
+
+    utils.apply_labels(cx, "A")
+    utils.tramp(cx)
+
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj)
+    listing.Example(example)

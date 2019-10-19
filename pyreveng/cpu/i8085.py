@@ -30,7 +30,7 @@
 Page references to "8085 Instruction Set.pdf"
 '''
 
-from pyreveng import instree, assy, data, mem
+from pyreveng import assy, data
 
 i8085_desc="""
 # pg2			|- - - - - - - -|- - - - - - - -|- - - - - - - -|

@@ -28,76 +28,81 @@
 '''
 
 from pyreveng import listing, data, seven_segment
-from . import utils
+import utils
 
-def setup():
-	return utils.setup("HP5370B", "HP5370B.ROM", -1)
+NAME = "HP5370B"
+
+FILENAME = "HP5370B.ROM"
+
+SYMBOLS = {
+    0x7ead: "ROM_LOCS",
+    0x7eed: "RAM_TEST_VALS",
+    0x66ea: "ERR5_UNDEF_KEY",
+}
+
+def example():
+    cx = utils.setup(FILENAME, -1)
+
+    for a, b in SYMBOLS.items():
+        cx.m.set_label(a, b)
+
+    ct = utils.cmd_tbl(cx, 0x7c64, 0x7c98)
+    cta = utils.arg_range(cx, ct, 0x7d6c, 0x7d88)
+
+    def cbyte(asp, a):
+        c = data.Const(asp, a, a + 1)
+        c.val = asp[a]
+        c.typ = ".BYTE"
+        c.fmt = "0x%02x" % c.val
+
+    cx.dataptr(0x6403)
+    cx.dataptr(0x6405)
+    cx.dataptr(0x6407)
+
+    for a in range(0x7eed, 0x7ef9):
+        cbyte(cx.m, a)
+
+    c = cx.dataptr(0x7915)
+    cx.m.set_label(c.lo, "@7SEGCODES")
+    cx.m.set_label(c.dst, "7SEGCODES")
+    c = seven_segment.table(cx.m, c.dst, c.dst + 0x10, verbose=False)
 
 
-def task(pj, cpu):
-	ct = utils.cmd_tbl(pj, 0x7c64, 0x7c98)
-	cta = utils.arg_range(pj, ct, 0x7d6c, 0x7d88)
+    for a in range(0x7ead, 0x7ebf, 2):
+        cx.dataptr(a)
 
-	def ptr(pj, a):
-		return data.Dataptr(pj.m, a, a + 2, pj.m.bu16(a))
+    # XXX: Add mising flow
+    cx.disass(0x6845)
+    cx.disass(0x6867)
 
-	def cbyte(pj, a):
-		c = data.Const(pj.m, a, a + 1)
-		c.val = pj.m[a]
-		c.typ = ".BYTE"
-		c.fmt = "0x%02x" % c.val
+    for i in range(0x6b23, 0x6b3b, 3):
+        utils.data24(cx.m, i)
 
-	ptr(pj, 0x6403)
-	ptr(pj, 0x6405)
-	ptr(pj, 0x6407)
+    for a in range(0x77d7, 0x77f7, 4):
+        data.Txt(cx.m, a, a + 4)
 
-	pj.m.set_label(0x7eed, "RAM_TEST_VALS")
-	for a in range(0x7eed, 0x7ef9):
-		cbyte(pj,a)
+    data.Txt(cx.m, 0x78f3, 0x78f7)
+    data.Txt(cx.m, 0x78f7, 0x78fd)
+    data.Txt(cx.m, 0x78fd, 0x78ff)
 
-	c = ptr(pj, 0x7915)
-	pj.m.set_label(c.lo, "@7SEGCODES")
-	pj.m.set_label(c.dst, "7SEGCODES")
-	c = seven_segment.table(pj.m, c.dst, c.dst + 0x10, verbose=False)
+    utils.cmd_dispatch(cx, cta, 0x644c)
 
-	pj.m.set_label(0x7ead, "ROM_LOCS")
-	for a in range(0x7ead, 0x7ebf, 2):
-		ptr(pj, a)
+    utils.key_dispatch(cx, 0x640c, 0x644c)
 
-	# XXX: Add mising flow
-	cpu.disass(0x6845)
-	cpu.disass(0x6867)
+    utils.dsp_dispatch(cx, 0x6848, 0x6858)
 
-	for i in range(0x6b23, 0x6b3b, 3):
-		utils.data24(pj, i)
+    for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
+        utils.float70(cx.m, i)
 
-	for a in range(0x77d7, 0x77f7, 4):
-		data.Txt(pj.m, a, a + 4)
+    c = cx.codeptr(0x7909)
+    cx.m.set_label(c.dst, "HPIB_CMD_PARSE")
 
-	data.Txt(pj.m, 0x78f3, 0x78f7)
-	data.Txt(pj.m, 0x78f7, 0x78fd)
-	data.Txt(pj.m, 0x78fd, 0x78ff)
+    utils.square_tbl(cx.m)
 
-	utils.cmd_dispatch(pj, cpu, cta, 0x644c)
+    utils.apply_labels(cx, "B")
+    utils.tramp(cx)
 
-	pj.m.set_label(0x66ea, "ERR5_UNDEF_KEY")
-	utils.key_dispatch(pj, cpu, 0x640c, 0x644c)
-
-	utils.dsp_dispatch(pj, cpu, 0x6848, 0x6858)
-
-	for i in (0x614c, 0x619c, 0x61a3, 0x69dd, 0x69e4):
-		utils.float70(pj, i)
-
-	c = cpu.codeptr(0x7909)
-	pj.m.set_label(c.dst, "HPIB_CMD_PARSE")
-
-	utils.square_tbl(pj)
-
-	utils.apply_labels(pj, "B")
-	utils.tramp(pj)
+    return NAME, (cx.m,)
 
 if __name__ == '__main__':
-	pj, cx = setup()
-	task(pj, cx)
-	listing.Listing(pj)
-
+    listing.Example(example)

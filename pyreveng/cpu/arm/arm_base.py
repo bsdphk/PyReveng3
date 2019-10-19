@@ -30,7 +30,7 @@ Disassembler for ARM processors
 
 Common/fundamental stuff
 """
-from pyreveng import assy, data
+from pyreveng import assy
 
 OBJDUMP_COMPAT = False
 

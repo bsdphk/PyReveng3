@@ -27,7 +27,7 @@
 '''Intel MCS-48 - 8035/39/40/48/49/50
 '''
 
-from pyreveng import assy, mem
+from pyreveng import assy
 
 mcs48_desc = """
 # 4-8
@@ -196,6 +196,9 @@ class mcs48_ins(assy.Instree_ins):
 		self.dstadr = (self.lo & ~0x0ff) | self['a8']
 		return assy.Arg_dst(self.lang.m, self.dstadr)
 
+	def assy_b(self):
+		self.mne += "%d" % self['b']
+
 	def assy_p(self):
 		return "P%d" % self['p']
 
@@ -222,8 +225,11 @@ class mcs48(assy.Instree_disass):
                 )
 		self.it.load_string(mcs48_desc, mcs48_ins)
 
-		self.verbatim |= set (("TCNTI", "BUS", "T", "A", "@A",
-			"I", "F0", "F1",))
+		self.verbatim |= set(
+                        ("TCNTI", "BUS", "T", "A", "C", "@A",
+			"I", "F0", "F1", "PSW", "TCNT", "TCNTI", "P0", "RB0",
+                        "RB1",)
+                )
 		self.amask_ = 0xffff
 
 

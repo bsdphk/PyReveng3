@@ -27,7 +27,7 @@
 '''Intel i8088/i8086
 '''
 
-from pyreveng import instree, assy, mem, data
+from pyreveng import assy
 
 i8086_desc="""
 #		|- - - - - - - -|- - - - - - - -|- - - - - - - -|
@@ -335,13 +335,6 @@ def fixup_mod_reg_rm(ins):
 
 i8086_desc = fixup_mod_reg_rm(i8086_desc)
 i8087_desc = fixup_mod_reg_rm(i8087_desc)
-if __name__ == "__main__":
-    print(i8086_desc)
-    print(i8087_desc)
-    it = instree.InsTree(8)
-    it.load_string(i8086_desc)
-    it.load_string(i8087_desc)
-    it.dump()
 
 wreg = ["%ax", "%cx", "%dx", "%bx", "%sp", "%bp", "%si", "%di"]
 breg = ["%al", "%cl", "%dl", "%bl", "%ah", "%ch", "%dh", "%bh"]

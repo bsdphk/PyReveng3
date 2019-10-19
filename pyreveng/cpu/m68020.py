@@ -27,8 +27,7 @@
 '''Motorola M68020
 '''
 
-from pyreveng import assy
-from pyreveng.cpu.m68010 import *
+from pyreveng.cpu import m68010
 
 m68020_desc = """
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
@@ -92,7 +91,7 @@ UNPK		W,decAx,decAy,data -	|1 0 0 0| Ay  |1 1 0 0 0|1| Ax  |
 
 #######################################################################
 
-class m68020_ins(m68010_ins):
+class m68020_ins(m68010.m68010_ins):
 
 	def assy_BF(self):
 		t = "{"
@@ -108,7 +107,7 @@ class m68020_ins(m68010_ins):
 		return t + "}"
 
 
-class m68020(m68010):
+class m68020(m68010.m68010):
 	def __init__(self, lang="m68020"):
 		super().__init__(lang)
 		self.it.load_string(m68020_desc, m68020_ins)

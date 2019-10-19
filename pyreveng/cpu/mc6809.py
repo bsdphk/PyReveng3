@@ -27,7 +27,7 @@
 '''Motorola MC6809
 '''
 
-from pyreveng import assy, code, data, mem
+from pyreveng import assy, code
 
 mc6809_desc = """
 

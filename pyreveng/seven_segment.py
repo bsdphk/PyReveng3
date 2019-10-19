@@ -28,7 +28,7 @@
 # Render 7-segment decoding tables
 #
 
-from . import job, mem, data
+from pyreveng import mem, data
 
 # Default driver layout (A, B, C, D, E ,F, G, RDP, LDP)
 default_drive = (1, 2, 4, 8, 16, 32, 64, 128, 0)

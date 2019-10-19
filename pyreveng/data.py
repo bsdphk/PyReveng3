@@ -30,7 +30,7 @@ Data of various sorts
 
 import struct
 
-from . import job, leaf
+from . import leaf
 
 
 #######################################################################

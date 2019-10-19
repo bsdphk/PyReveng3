@@ -27,7 +27,7 @@
 '''Motorola MC6800/MC68HC11
 '''
 
-from pyreveng import assy, data, mem
+from pyreveng import assy, data
 
 mc6800_desc = """
 NOP     -       |01     | {
@@ -936,6 +936,9 @@ class mc6800(assy.Instree_disass):
         )
         self.add_ins(mc6800_desc, mc6800_ins)
 
+    def dataptr(self, a):
+        return data.Dataptr(self.m, a, a + 2, self.m.bu16(a))
+
 mc68hc11_desc = """
 IDIV    -           |02     |
 FDIV    -           |03     |
@@ -1005,69 +1008,72 @@ class mc68hc11(mc6800):
         super().__init__()
         self.it.load_string(mc68hc11_desc, mc6800_ins)
 
-    def register_labels(self, pj, adr=0x1000):
-        pj.m.set_label(adr + 0x00, "PORTA")
-        pj.m.set_label(adr + 0x02, "PIOC")
-        pj.m.set_label(adr + 0x03, "PORTC")
-        pj.m.set_label(adr + 0x04, "PORTB")
-        pj.m.set_label(adr + 0x05, "PORTCL")
-        pj.m.set_label(adr + 0x07, "DDRC")
-        pj.m.set_label(adr + 0x08, "PORTD")
-        pj.m.set_label(adr + 0x09, "DDRD")
-        pj.m.set_label(adr + 0x0A, "PORTE")
-        pj.m.set_label(adr + 0x0B, "CFORC")
-        pj.m.set_label(adr + 0x0C, "OC1M")
-        pj.m.set_label(adr + 0x0D, "OC1D")
-        pj.m.set_label(adr + 0x0E, "TCNTH")
-        pj.m.set_label(adr + 0x0F, "TCNTL")
+    def register_labels(self, adr=0x1000):
+        for a, b in (
+            (0x00, "PORTA"),
+            (0x02, "PIOC"),
+            (0x03, "PORTC"),
+            (0x04, "PORTB"),
+            (0x05, "PORTCL"),
+            (0x07, "DDRC"),
+            (0x08, "PORTD"),
+            (0x09, "DDRD"),
+            (0x0A, "PORTE"),
+            (0x0B, "CFORC"),
+            (0x0C, "OC1M"),
+            (0x0D, "OC1D"),
+            (0x0E, "TCNTH"),
+            (0x0F, "TCNTL"),
 
-        pj.m.set_label(adr + 0x10, "TIC1H")
-        pj.m.set_label(adr + 0x11, "TIC1L")
-        pj.m.set_label(adr + 0x12, "TIC2H")
-        pj.m.set_label(adr + 0x13, "TIC2L")
-        pj.m.set_label(adr + 0x14, "TIC3H")
-        pj.m.set_label(adr + 0x15, "TIC4L")
-        pj.m.set_label(adr + 0x16, "TOC1H")
-        pj.m.set_label(adr + 0x17, "TOC1L")
-        pj.m.set_label(adr + 0x18, "TOC2H")
-        pj.m.set_label(adr + 0x19, "TOC2L")
-        pj.m.set_label(adr + 0x1A, "TOC3H")
-        pj.m.set_label(adr + 0x1B, "TOC3L")
-        pj.m.set_label(adr + 0x1C, "TOC4H")
-        pj.m.set_label(adr + 0x1D, "TOC4L")
-        pj.m.set_label(adr + 0x1E, "TI4_O5H")
-        pj.m.set_label(adr + 0x1F, "TI4_O5L")
+            (0x10, "TIC1H"),
+            (0x11, "TIC1L"),
+            (0x12, "TIC2H"),
+            (0x13, "TIC2L"),
+            (0x14, "TIC3H"),
+            (0x15, "TIC4L"),
+            (0x16, "TOC1H"),
+            (0x17, "TOC1L"),
+            (0x18, "TOC2H"),
+            (0x19, "TOC2L"),
+            (0x1A, "TOC3H"),
+            (0x1B, "TOC3L"),
+            (0x1C, "TOC4H"),
+            (0x1D, "TOC4L"),
+            (0x1E, "TI4_O5H"),
+            (0x1F, "TI4_O5L"),
 
-        pj.m.set_label(adr + 0x20, "TCTL1")
-        pj.m.set_label(adr + 0x21, "TCTL2")
-        pj.m.set_label(adr + 0x22, "TMSK1")
-        pj.m.set_label(adr + 0x23, "TFLG1")
-        pj.m.set_label(adr + 0x24, "TMSK2")
-        pj.m.set_label(adr + 0x25, "TFLG2")
-        pj.m.set_label(adr + 0x26, "PACTL")
-        pj.m.set_label(adr + 0x27, "PACNT")
-        pj.m.set_label(adr + 0x28, "SPCR")
-        pj.m.set_label(adr + 0x29, "SPSR")
-        pj.m.set_label(adr + 0x2A, "SPDR")
-        pj.m.set_label(adr + 0x2B, "BAUD")
-        pj.m.set_label(adr + 0x2C, "SCCR1")
-        pj.m.set_label(adr + 0x2D, "SCCR2")
-        pj.m.set_label(adr + 0x2E, "SCSR")
-        pj.m.set_label(adr + 0x2F, "SCDR")
+            (0x20, "TCTL1"),
+            (0x21, "TCTL2"),
+            (0x22, "TMSK1"),
+            (0x23, "TFLG1"),
+            (0x24, "TMSK2"),
+            (0x25, "TFLG2"),
+            (0x26, "PACTL"),
+            (0x27, "PACNT"),
+            (0x28, "SPCR"),
+            (0x29, "SPSR"),
+            (0x2A, "SPDR"),
+            (0x2B, "BAUD"),
+            (0x2C, "SCCR1"),
+            (0x2D, "SCCR2"),
+            (0x2E, "SCSR"),
+            (0x2F, "SCDR"),
 
-        pj.m.set_label(adr + 0x30, "ADCTL")
-        pj.m.set_label(adr + 0x31, "ADR1")
-        pj.m.set_label(adr + 0x32, "ADR2")
-        pj.m.set_label(adr + 0x33, "ADR3")
-        pj.m.set_label(adr + 0x34, "ADR4")
-        pj.m.set_label(adr + 0x35, "BPROT")
-        pj.m.set_label(adr + 0x36, "EPROG")
-        pj.m.set_label(adr + 0x39, "OPTION")
-        pj.m.set_label(adr + 0x3A, "COPRST")
-        pj.m.set_label(adr + 0x3B, "PPROG")
-        pj.m.set_label(adr + 0x3C, "HPRIO")
-        pj.m.set_label(adr + 0x3D, "INIT")
-        pj.m.set_label(adr + 0x3F, "CONFIG")
+            (0x30, "ADCTL"),
+            (0x31, "ADR1"),
+            (0x32, "ADR2"),
+            (0x33, "ADR3"),
+            (0x34, "ADR4"),
+            (0x35, "BPROT"),
+            (0x36, "EPROG"),
+            (0x39, "OPTION"),
+            (0x3A, "COPRST"),
+            (0x3B, "PPROG"),
+            (0x3C, "HPRIO"),
+            (0x3D, "INIT"),
+            (0x3F, "CONFIG"),
+        ):
+            self.m.set_label(adr + a, b)
 
     def vectors(self, adr=0xffd6):
         for v in (

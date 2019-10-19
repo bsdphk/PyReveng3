@@ -29,24 +29,15 @@
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
-import os
-from pyreveng import job, mem, code, listing, charset
+from pyreveng import mem, listing, charset
 
-def mem_setup():
-    m = mem.Stackup(
-        files=(
-            ("EPROM_380217-01_R.B_PC_CHAR._U2.bin",)
-        ),
-        prefix=os.path.dirname(os.path.abspath(__file__)) + "/"
-    )
-    return m
+NAME = "CBM900_CHAR"
 
-def setup():
-    pj = job.Job(mem_setup(), "CBM900_CHAR")
-    cx = None
-    return pj, cx
+FILENAME = "EPROM_380217-01_R.B_PC_CHAR._U2.bin"
 
-def task(pj, cx):
+def example():
+    m = mem.Stackup(files=((FILENAME,)), nextto=__file__,)
+
     s = charset.SVG_Charset(
         "/tmp/cbm900_lowres.svg",
         cols=16,
@@ -58,13 +49,11 @@ def task(pj, cx):
     for i in range(256):
         l = []
         for j in range(13):
-            l.append(pj.m[i * 16 + j])
+            l.append(m[i * 16 + j])
         s.set_char(i // 16, i % 16, l)
     s.render()
+    return NAME, (m,)
 
 
 if __name__ == '__main__':
-    pj, cx = setup()
-    task(pj, cx)
-    code.lcmt_flows(pj.m)
-    listing.Listing(pj, ncol=8)
+    listing.Example(example)
