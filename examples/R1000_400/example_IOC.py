@@ -26,7 +26,7 @@
 #
 
 import os
-from pyreveng import job, mem, listing, data, code, assy, pil, discover
+from pyreveng import job, mem, listing, data, code, discover
 import pyreveng.cpu.m68020 as m68020
 
 def fc_puts_inline(asp, ins, flow):

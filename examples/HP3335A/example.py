@@ -27,8 +27,7 @@
 '''HP3335 Synthesizer/Level Generator
 '''
 
-import os
-from pyreveng import job, mem, listing, data, code, seven_segment
+from pyreveng import job, mem, listing, data, seven_segment
 import pyreveng.cpu.mc6800 as mc6800
 
 def mem_setup():

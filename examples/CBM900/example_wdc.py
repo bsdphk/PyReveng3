@@ -29,7 +29,6 @@
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
-import os
 from pyreveng import job, mem, data, listing
 import pyreveng.cpu.mcs48 as mcs48
 

@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, code, listing, data
+from pyreveng import job, mem, listing, data
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 import common

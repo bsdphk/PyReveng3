@@ -58,8 +58,7 @@ See also:
 #	$0xe1		Plotter-ID (last char in plotter_table)
 #
 
-import os
-from pyreveng import job, mem, listing, data, code, assy, discover
+from pyreveng import job, mem, listing, data
 import pyreveng.cpu.mc6809 as mc6809
 import pyreveng.cpu.hp1345a as hp1345a
 import pyreveng.cpu.hp1345_render as hp1345_render

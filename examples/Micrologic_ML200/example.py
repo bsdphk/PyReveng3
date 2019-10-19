@@ -28,7 +28,7 @@
 '''
 
 import os
-from pyreveng import job, mem, listing, code
+from pyreveng import job, mem, listing
 import pyreveng.cpu.mcs4 as mcs4
 
 def mem_setup():

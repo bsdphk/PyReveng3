@@ -30,8 +30,7 @@
 # P3.3 tied to P3.4 T0->INT1
 # P3.2 INT0 probably from main CPU
 
-import os
-from pyreveng import job, mem, data, listing, code, charset
+from pyreveng import mem, data, listing, charset
 import pyreveng.cpu.mcs51 as mcs51
 
 FILENAME = "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin"

@@ -56,7 +56,7 @@
 
 
 import os
-from pyreveng import job, mem, listing, data, code, assy, pil
+from pyreveng import job, mem, listing, data, code, assy
 import pyreveng.cpu.m68000 as m68000
 import pyreveng.cpu.hp85662a as hp85662a
 

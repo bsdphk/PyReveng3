@@ -27,8 +27,7 @@
 '''HP1345 - Built-in Diagnostic processor
 '''
 
-import os
-from pyreveng import job, mem, listing, data, code, assy
+from pyreveng import job, mem, listing
 import pyreveng.cpu.mcs48 as mcs48
 import pyreveng.cpu.hp1345a as hp1345a
 import pyreveng.cpu.hp1345_render as hp1345_render

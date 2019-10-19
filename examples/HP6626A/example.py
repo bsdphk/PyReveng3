@@ -27,8 +27,7 @@
 '''HP6626A Multiple Output Linear System DC Power Supply
 '''
 
-import os
-from pyreveng import job, mem, listing, data, code, assy, discover
+from pyreveng import mem, listing, data
 import pyreveng.cpu.mc6809 as mc6809
 
 NAME = "HP6626"

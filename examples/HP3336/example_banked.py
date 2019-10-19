@@ -27,7 +27,7 @@
 '''HP3336 Synthesizer/Level Generator
 '''
 
-from pyreveng import mem, listing, assy, data
+from pyreveng import mem, listing, assy
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 import pyreveng.cpu.banked as banked
 

@@ -28,8 +28,7 @@
 '''HP3455 Digital Voltmeter
 '''
 
-import os
-from pyreveng import job, mem, code, listing
+from pyreveng import job, mem, listing
 import pyreveng.cpu.hp_nanoproc as hp_nanoproc
 
 def setup():

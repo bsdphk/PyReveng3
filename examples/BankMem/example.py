@@ -27,7 +27,7 @@
 '''Artificial banked memory example
 '''
 
-from pyreveng import mem, listing, assy, data, code, discover
+from pyreveng import mem, listing, data
 import pyreveng.cpu.mc6809 as mc6809
 import pyreveng.cpu.banked as banked
 

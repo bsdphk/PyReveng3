@@ -27,8 +27,7 @@
 '''Austron 2100F Loran-C Frequency Receiver
 '''
 
-import os
-from pyreveng import job, mem, listing, code, discover, data
+from pyreveng import mem, listing, discover, data
 import pyreveng.cpu.mc6800 as mc6800
 
 NAME = "Austron2100F_107"
