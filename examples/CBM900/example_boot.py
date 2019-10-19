@@ -122,7 +122,7 @@ def fc_outstr(asp, ins):
         asp.set_line_comment(ins.lo, '"' + y.txt + '"')
 
 
-def chargen(asp, a):
+def chargendata(asp, a):
     asp.set_label(0x45fe, "CHARGEN")
     s = chargen.SVG_Charset(
         "/tmp/cbm900_hires.svg",
@@ -260,7 +260,7 @@ def example():
             y = cx.codeptr(a)
             cx.m.set_label(y.dst, "PTR_%x" % a)
 
-        chargen(cx.m, 0x45fe + 0)
+        chargendata(cx.m, 0x45fe + 0)
 
         for a, b, c in (
                 (0x01000006, 0x0100000e, 4),
