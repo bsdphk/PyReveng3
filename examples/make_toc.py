@@ -40,6 +40,9 @@ class cpu():
         self.examples = []
         CPUS[name] = self
 
+    def __lt__(self, other):
+        self.name < other.name
+
     def add_example(self, example):
         self.examples.append(example)
 
@@ -81,7 +84,9 @@ for i in glob.glob("../pyreveng/cpu/*.py"):
 
 for j in glob.glob("*/example*.py"):
     a, b = os.path.splitext(j)
+    sys.path.append(os.path.dirname(a))
     y = importlib.import_module(a.replace('/', '.'))
+    sys.path.pop(-1)
     e = example(j, y.__doc__)
 
     for i in open(j):

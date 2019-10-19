@@ -26,7 +26,7 @@
 #
 
 '''
-Recognize Switch/case constructs
+Recognize M680x0 Switch/case constructs
 '''
 
 from pyreveng import assy, data, code

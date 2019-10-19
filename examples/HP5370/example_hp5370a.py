@@ -28,6 +28,7 @@
 '''
 
 from pyreveng import listing
+import pyreveng.cpu.mc6800 as mc6800
 from pyreveng.toolchest import seven_segment
 import utils
 

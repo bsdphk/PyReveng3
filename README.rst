@@ -9,9 +9,25 @@ is a linear array of bytes", makes them useless for historic computers.
 PyReveng3 approaches all such issues with as much generality as possible,
 to handle any weird computer architecture I have ever encountered.
 
+Presently this generality extends to:
+
+* Any wordsize up to 64bit is supported
+
+* Up to seven binary attributes per location
+
+* Mapped memory (Ex: `R1000_400/example.py`)
+
+* Banked memory (Ex: `HP2226/example_banked.py`)
+
+* Multiple execution units in same address-space
+
+* Memory shared across address-spaces of execution units
+
+* Non-hardware languages (like CHIP-8, MUSIL, Smalltalk)
+
 Another important idea has been to make it easy to add a new
 disassembler, without having to deal with a lot of binary arithmetic,
-by taking in the instruction descriptions as they are typically
+by entering the instruction descriptions as they are typically
 found in manuals::
 
     PUSH    r2      |0 1 0 1 0| reg |
@@ -23,28 +39,38 @@ found in manuals::
     XCHG    W,a,r2  |1 0 0 1 0| reg |
     NOP     -       |1 0 0 1 0 0 0 0|
 
-Disassemblers are not just for CPUs, they can also be used to
-analyze interpreted code instructions, graphical primitives
-and much more.
+It is important to stress here, that disassemblers are not just for
+CPUs, they can also be used to analyze interpreted code instructions
+(like CHIP-8), graphical primitives and other "strange languages".
 
 The fundamental strategy is to build data structures representing the
 analysis, available for further programatic spelunking, rather than
 just a textual representation where the structure is flattened.
 
+A good, but complex example, of this is the `HP8568B/example.py`,
+where the original language was "Wheelgol"
+(http://www.hp9825.com/html/hybrid_microprocessor.html) with a
+calling convention quite different from modern languages.
+
 Of course, dumping the textual representation in the shape of a
 listing is one of the most typical "further programatic spelunkings"
 one can do, but it is not limited to only that.
+
+The `listing.py` module produces something akin to an assembler
+listing, supporting annotations in the form of block comments,
+line-comments, labels and ranges, and full control over formatting
+of both addresses and data.
 
 The project contains a number of examples which I have deemed both
 sufficiently obsolete, obscure and out-dated to be covered by the
 "fair use" doctrine, if you disagree please let me know.
 
-Should you have access to the original source code for any of the
-examples, I would love to receive a copy, even if I cannot publish
-it.
+Should you happen to have access to the original source code for
+any of the examples, I would love to receive a copy, even if I
+cannot publish it.
 
-Disassemblers and examples
---------------------------
+Disassemblers and examples using them
+-------------------------------------
 
 * HP1345A Vector Graphics Processor
 
@@ -64,6 +90,8 @@ Disassemblers and examples
     HP3325 Synthesizer/Function Generator
   * ```HP3336/example.py```
     HP3336 Synthesizer/Level Generator
+  * ```HP3336/example_banked.py```
+    HP3336 Synthesizer/Level Generator
   * ```HP3455A/example.py```
     HP3455 Digital Voltmeter
 
@@ -81,6 +109,10 @@ Disassemblers and examples
   * ```HP8568B/example.py```
     HP8568A Spectrum Analyzer
 
+* Recognize M680x0 Switch/case constructs
+
+(No in-project examples)
+
 * Motorola M68010
 
 (No in-project examples)
@@ -89,9 +121,7 @@ Disassemblers and examples
 
   * ```R1000_400/example.py```
     Rational R1000/400 - IOC EEPROM
-  * ```R1000_400/example_FS_0.py```
   * ```R1000_400/example_IOC.py```
-  * ```R1000_400/example_RECOVERY.py```
 
 * Motorola MC68881/882 Floating Point Coprocessor
 
@@ -103,15 +133,25 @@ Disassemblers and examples
     Austron 2100F Loran-C Frequency Receiver
   * ```HP3335A/example.py```
     HP3335 Synthesizer/Level Generator
+  * ```HP5370/example_hp5359a.py```
+    HP5359 Time Synthesizer
+  * ```HP5370/example_hp5370a.py```
+    HP5370A Time Interval Counter
+  * ```HP5370/example_hp5370b.py```
+    HP5370B Time Interval Counter
   * ```PL99/example.py```
     Ray Jefferson PL99 Handheld Loran-C receiver
 
 * Motorola MC6809
 
+  * ```BankMem/example.py```
+    Artificial banked memory example
   * ```HP1347A_prototype/example.py```
     HP1347 - Prototype
   * ```HP6626A/example.py```
     HP6626A Multiple Output Linear System DC Power Supply
+  * ```HP8904A/example_banked.py```
+    HP8904 Synthesizer/Level Generator
 
 * Intel 4004/MCS-4
 
@@ -156,7 +196,3 @@ Disassemblers and examples
   * ```CBM900/example_boot.py```
     Commodore CBM900 - Boot EPROM
 
-
-Enjoy,
-
-Poul-Henning
