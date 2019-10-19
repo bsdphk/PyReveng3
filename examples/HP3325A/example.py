@@ -86,7 +86,7 @@ def example():
 
     #######################################################################
     def jmp_table(lo, hi, span, txt="table", src=None):
-        x = data.Range(cx.m, lo, hi, "table")
+        x = cx.m.add_range(lo, hi, "table")
         if src != None:
             ins = list(cx.m.find(src))
             print("JMPTABLE %x" % src, ins)

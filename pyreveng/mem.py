@@ -58,6 +58,19 @@ class MemError(Exception):
     def __str__(self):
         return repr(self.value)
 
+class Range():
+    ''' A range grouping '''
+    def __init__(self, lo, hi, txt):
+        self.lo = lo
+        self.hi = hi
+        self.txt = txt
+
+    def __repr__(self):
+        return "<range 0x%x-0x%x %s>" % (self.lo, self.hi, self.txt)
+
+    def __lt__(self, other):
+        return self.lo < other.lo
+
 class AddressSpace():
 
     '''
@@ -76,6 +89,7 @@ class AddressSpace():
         self.lbl_d = dict()
         self.bcmt_d = dict()
         self.lcmt_d = dict()
+        self.rangelist = []
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
@@ -173,7 +187,6 @@ class AddressSpace():
     def get_all_labels(self):
         yield from self.lbl_d.items()
 
-
     def set_line_comment(self, adr, lcmt):
         assert isinstance(lcmt, str)
         self.lcmt_d.setdefault(adr, []).append(lcmt)
@@ -185,7 +198,6 @@ class AddressSpace():
 
     def get_all_line_comments(self):
         yield from self.lcmt_d.items()
-
 
     def set_block_comment(self, adr, bcmt):
         assert isinstance(bcmt, str)
@@ -199,6 +211,13 @@ class AddressSpace():
     def get_all_block_comments(self):
         yield from self.bcmt_d.items()
 
+    def add_range(self, lo, hi, txt):
+        r = Range(lo, hi, txt)
+        self.rangelist.append(r)
+        return r
+
+    def ranges(self):
+        yield from self.rangelist
 
     def bytearray(self, _lo, _bcnt):
         assert False
@@ -212,8 +231,7 @@ class AddressSpace():
 
     def occupied(self, *args, **kwargs):
         for i in self.find(*args, **kwargs):
-            if not isinstance(i, data.Range):
-                return True
+            return True
         return False
 
 class MemMapper(AddressSpace):
@@ -392,6 +410,10 @@ class MemMapper(AddressSpace):
     def get_all_block_comments(self):
         yield from self.get_all_somethings("get_all_block_comments")
 
+    def add_range(self, lo, hi, txt):
+        ms, sa, _sh = self.xlat(lo, False)
+        ms.add_range(sa, sa + hi - lo, txt)
+        return super().add_range(lo, hi, txt)
 
     def segments(self):
         for low, high, _offset, mem, _shared in sorted(self.seglist):

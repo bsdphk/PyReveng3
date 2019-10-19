@@ -244,7 +244,7 @@ hp5370_lbls = [
 
 #----------------------------------------------------------------------
 
-def apply_labels(pj, type):
+def apply_labels(cx, type):
     if type == "A":
         i = 0
     elif type == "B":
@@ -253,9 +253,9 @@ def apply_labels(pj, type):
         raise "Wrong Type"
     for j in hp5370_lbls:
         if j[i] != None:
-            pj.m.set_label(j[i], j[2])
+            cx.m.set_label(j[i], j[2])
         else:
-            print("No address", pj.m.adr(j[1-i]), j[2])
+            print("No address", cx.m.adr(j[1-i]), j[2])
 
 
 #----------------------------------------------------------------------
@@ -290,7 +290,7 @@ def one_eprom(cx, start, eprom_size):
         print("NB: Bad Eprom checksum @%x" % start)
         j = "BAD"
 
-    c = data.Range(cx.m, start, start + eprom_size, "EPROM")
+    c = cx.m.add_range(start, start + eprom_size, "EPROM")
 
     c = data.Data(cx.m, start, start + 2, "u16")
     c.rendered = ".WORD 0x%04x" % cx.m.bu16(start)
@@ -316,7 +316,7 @@ def eprom(cx, start, end, sz):
     lx.append(end & 0xff)
 
 def cmd_tbl(cx, start, end):
-    x = data.Range(cx.m, start, end, "CMD_TABLE")
+    x = cx.m.add_range(start, end, "CMD_TABLE")
     cx.m.set_label(start, "CMD_TABLE")
     l = list()
     for a in range(start, end, 2):
@@ -324,17 +324,17 @@ def cmd_tbl(cx, start, end):
         l.append(x.txt)
     return l
 
-def arg_range(pj, cmds, start, end):
-    x = data.Range(pj.m, start, end, "ARG_RANGE")
-    pj.m.set_label(start, "ARG_RANGE")
+def arg_range(cx, cmds, start, end):
+    x = cx.m.add_range(start, end, "ARG_RANGE")
+    cx.m.set_label(start, "ARG_RANGE")
     l = list()
     n = 0
     for a in range(start, end, 2):
         c = cmds[n]
         n += 1
-        lo = pj.m[a]
-        hi = pj.m[a + 1]
-        x = data.Data(pj.m, a, a + 2, "byte")
+        lo = cx.m[a]
+        hi = cx.m[a + 1]
+        x = data.Data(cx.m, a, a + 2, "byte")
         x.rendered = ".BYTE\t0x%02x, 0x%02x" % (lo, hi)
         x.lcmt = c + "[%d" % lo + "-%d]" % hi
         for j in range(lo, hi + 1):
@@ -351,7 +351,7 @@ def cmd_dispatch(cx, cmds, start):
             c.lcmt = CMD_DESC[i]
         cx.m.set_label(c.dst, "CMD_%s" % i)
         a += 2
-    x = data.Range(cx.m, start, a, "CMD_DISPATCH")
+    x = cx.m.add_range(start, a, "CMD_DISPATCH")
     cx.m.set_label(start, "CMD_DISPATCH")
 
 def key_dispatch(cx, start, end):
@@ -363,7 +363,7 @@ def key_dispatch(cx, start, end):
     assert end == start + 64
     a = start
     for col in range(8, 0, -1):
-        # pj.m.set_label(a, "KEY_COL_%d" % col)
+        # cx.m.set_label(a, "KEY_COL_%d" % col)
         for row in range(4, 0, -1):
             n = "KEY_C%d_R%d" % (col, row)
             c = cx.codeptr(a)
@@ -380,12 +380,12 @@ def key_dispatch(cx, start, end):
             else:
                 c.lcmt = n + " = " + str(list(cx.m.get_labels(c.dst)))
             a += 2
-    x = data.Range(cx.m, start, a, "KEY_DISPATCH")
+    x = cx.m.add_range(start, a, "KEY_DISPATCH")
     cx.m.set_label(start, "KEY_DISPATCH")
 
 def dsp_dispatch(cx, start, end):
     assert start + 16 == end
-    x = data.Range(cx.m, start, end, "DSP_DISPATCH")
+    x = cx.m.add_range(start, end, "DSP_DISPATCH")
     cx.m.set_label(start, "DSP_DISPATCH")
     a = start
     for i in ("AVG", "STD", "MIN", "MAX", "REF", "EVT", "ALL", "ALL"):

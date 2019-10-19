@@ -180,8 +180,6 @@ class Decoder():
 
     def decode_one(self, asp, adr, src):
         for i in asp.find(lo=adr):
-            if isinstance(i, data.Range):
-                continue
             if isinstance(i, Code):
                 return i
             print("Would overlap", self.name, asp.afmt(adr), i, src)
@@ -196,8 +194,6 @@ class Decoder():
             return None
         assert isinstance(x, Code)
         for i in asp.find(lo=x.lo, hi=x.hi):
-            if isinstance(i, data.Range):
-                continue
             if isinstance(i, Code):
                 return i
             print("Would overlap", self.name, asp.afmt(adr), i, src)

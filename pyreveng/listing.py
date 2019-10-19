@@ -99,13 +99,14 @@ class Listing():
         # fo.write(t + '\n')
 
         self.plan = []
-        self.plan += [[lo, 0, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()]
-        self.plan += [[hi, 0, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()]
-        self.plan += [[adr, 1, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
-        self.plan += [[adr, 2, self.plan_label, l] for adr, l in asp.get_all_labels() if self.inside(adr)]
-        self.plan += [[adr, 3, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
-        self.plan += [[leaf.lo, 4, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo) and isinstance(leaf, data.Range)]
-        self.plan += [[leaf.lo, 5, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo) and not isinstance(leaf, data.Range)]
+        self.plan += [[lo, 10, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()]
+        self.plan += [[hi, 10, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()]
+        self.plan += [[r.lo, 20, self.plan_range, 0, r] for r in asp.ranges()]
+        self.plan += [[r.hi, 20, self.plan_range, 1, r] for r in asp.ranges()]
+        self.plan += [[adr, 30, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
+        self.plan += [[adr, 40, self.plan_label, l] for adr, l in asp.get_all_labels() if self.inside(adr)]
+        self.plan += [[adr, 50, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
+        self.plan += [[leaf.lo, 60, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
 
         self.start = False
         last = 0
@@ -290,14 +291,21 @@ class Listing():
         else:
             self.in_seg = False
 
+    def plan_range(self, _adr, _afmt, *args):
+        '''P:Range'''
+        if not args[0][0]:
+            r = args[0][1]
+            self.fo.write(
+                "%s-%s\t%s\n" % (
+                    self.asp.afmt(r.lo),
+                    self.asp.afmt(r.hi),
+                    r.txt,
+                )
+            )
+
     def plan_leaf(self, _adr, _afmt, *args):
         '''P::Leaf'''
         leaf = args[0][0]
-
-        if isinstance(leaf, data.Range):
-            self.fo.write(self.asp.afmt(leaf.lo) + "-")
-            self.fo.write(self.asp.afmt(leaf.hi) + "\t" + leaf.render() + "\n")
-            return leaf.lo
 
         if leaf.lcmt:
             self.purge_lcmt()

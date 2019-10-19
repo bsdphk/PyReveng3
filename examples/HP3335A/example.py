@@ -85,7 +85,7 @@ def example():
         cx.m.set_label(a, l)
 
     def rom(lo, hi):
-        data.Range(cx.m, lo, hi, "ROM")
+        cx.m.add_range(lo, hi, "ROM")
         s = 0
         for a in range(lo, hi):
             s += cx.m[a]
@@ -106,7 +106,7 @@ def example():
     cx.vectors()
 
     def jmptbl(lo, hi, x=None):
-        c = data.Range(cx.m, lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))
+        c = cx.m.add_range(lo, hi, "jmptbl (%04x-%04x)" % (lo, hi))
         # c.rendered = c.tag
         n = 0
         for a in range(lo, hi, 2):

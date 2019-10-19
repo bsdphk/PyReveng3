@@ -155,7 +155,7 @@ def table(asp, lo, hi, drive=None, inv=False, verbose=False):
     if drive is None:
         drive = default_drive
     assert len(drive) == 9
-    data.Range(asp, lo, hi, "7segtable")
+    asp.add_range(lo, hi, "7segtable")
     t = []
     for a in range(lo, hi):
         t.append(digit(asp, a, drive, inv, verbose).resolv)
