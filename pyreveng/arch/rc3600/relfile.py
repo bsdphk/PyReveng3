@@ -25,13 +25,13 @@
 # SUCH DAMAGE.
 #
 
-from pyreveng import data, mem
-
 '''DOMUS Relocatable Files
 
 Documentation:
     RCSL-42-I-833 DOMAC Domus Macro Assembler User's Guide
 '''
+
+from pyreveng import data, mem
 
 RELOC = {
     1: " ",
@@ -59,7 +59,7 @@ class DomusMem(mem.WordMem):
 
     def afmt(self, adr):
         return "%04x" % adr + RELOC[self.reloc]
-        
+
     def dfmt(self, adr):
         try:
             return "%04x" % self[adr] + RELOC[self.get_attr(adr)]

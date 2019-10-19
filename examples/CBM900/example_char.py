@@ -29,7 +29,8 @@
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
-from pyreveng import mem, listing, charset
+from pyreveng import mem, listing
+import pyreveng.toolchest.chargen as chargen
 
 NAME = "CBM900_CHAR"
 
@@ -38,7 +39,7 @@ FILENAME = "EPROM_380217-01_R.B_PC_CHAR._U2.bin"
 def example():
     m = mem.Stackup(files=((FILENAME,)), nextto=__file__,)
 
-    s = charset.SVG_Charset(
+    s = chargen.SVG_Charset(
         "/tmp/cbm900_lowres.svg",
         cols=16,
         char_w=7,

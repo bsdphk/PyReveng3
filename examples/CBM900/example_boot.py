@@ -29,8 +29,9 @@
 See also: https://datamuseum.dk/wiki/Commodore/CBM900
 '''
 
-from pyreveng import mem, data, listing, charset
+from pyreveng import mem, data, listing
 import pyreveng.cpu.z8000 as z8000
+import pyreveng.toolchest.chargen as chargen
 
 NAME = "CBM900_BOOT"
 
@@ -123,7 +124,7 @@ def fc_outstr(asp, ins):
 
 def chargen(asp, a):
     asp.set_label(0x45fe, "CHARGEN")
-    s = charset.SVG_Charset(
+    s = chargen.SVG_Charset(
         "/tmp/cbm900_hires.svg",
         cols=8,
         char_w=14,

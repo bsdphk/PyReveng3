@@ -30,8 +30,9 @@
 # P3.3 tied to P3.4 T0->INT1
 # P3.2 INT0 probably from main CPU
 
-from pyreveng import mem, data, listing, charset
+from pyreveng import mem, data, listing
 import pyreveng.cpu.mcs51 as mcs51
+import pyreveng.toolchest.chargen as chargen
 
 FILENAME = "618TCA_CDU_U20_U12_PN_138_0192_V_2_2_C_U5.bin"
 
@@ -151,7 +152,7 @@ def example():
     x.rendered = "*CHARGEN*"
     x.compact = True
 
-    cs = charset.SVG_Charset(
+    cs = chargen.SVG_Charset(
         fn="/tmp/" + NAME + "_charset.svg",
         char_w = 5,
         char_h = 7,
