@@ -234,6 +234,9 @@ def example():
     # See 0x800039e0
     data.Const(cx.m, 0x80003a2a, 0x80003a2a + 0x16)
 
+    y = data.Pstruct(cx.m, 0x80007e84, ">L")
+    y.lcmt = "Machine Number"
+
     d = discover.Discover(cx)
 
     return NAME, (cx.m,)
