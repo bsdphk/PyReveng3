@@ -28,7 +28,7 @@
 '''Zilog Z80
 '''
 
-from pyreveng import assy
+from pyreveng import assy, data
 
 z80_desc = """
 LD	rd,rs		|0 1| rd  | rs  |
@@ -167,7 +167,7 @@ JR	C,e,>JC		|0 0 1 1 1 0 0 0| e		|
 JR	NC,e,>JC	|0 0 1 1 0 0 0 0| e		|
 JR	Z,e,>JC		|0 0 1 0 1 0 0 0| e		|
 JR	NZ,e,>JC	|0 0 1 0 0 0 0 0| e		|
-JP	iHL,>J		|1 1 1 0 1 0 0 1|
+JP	idx,>J		|1 1 1 0 1 0 0 1|
 DJNZ	e,>JC		|0 0 0 1 0 0 0 0| e		|
 
 CALL	nn,>C		|1 1 0 0 1 1 0 1| n1		| n2		|
@@ -189,9 +189,9 @@ OUT	io,A		|1 1 0 1 0 0 1 1| io		|
 OUT	(C),rs		|1 1 1 0 1 1 0 1|0 1|  rs |0 0 1|
 
 OUTI	-		|1 1 1 0 1 1 0 1|1 0 1 0 0 0 1 1|
-OUTIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 1 1|
+OTIR	-		|1 1 1 0 1 1 0 1|1 0 1 1 0 0 1 1|
 OUTD	-		|1 1 1 0 1 1 0 1|1 0 1 0 1 0 1 1|
-OUTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
+OTDR	-		|1 1 1 0 1 1 0 1|1 0 1 1 1 0 1 1|
 +IY	iIY		|1 1 1 1 1 1 0 1|
 +IX	iIX		|1 1 0 1 1 1 0 1|
 """
@@ -246,7 +246,7 @@ class z80_ins(assy.Instree_ins):
         return assy.Arg_imm(self['n'], 8)
 
     def assy_io(self):
-        return assy.Arg_imm(self['io'], 8)
+        return assy.Arg_dst(self.lang.as_io, self['io'])
 
     def assy_iIX(self):
         self.idx = "IX"
@@ -256,6 +256,9 @@ class z80_ins(assy.Instree_ins):
 
     def assy_HL(self):
         return self.idx
+
+    def assy_idx(self):
+        return "(%s)" % self.idx
 
     def assy_iHL(self):
         if self.idx == "HL":
@@ -283,7 +286,8 @@ class z80(assy.Instree_disass):
                 (0x0020, "RST20"),
                 (0x0028, "RST28"),
                 (0x0030, "RST30"),
-                (0x0038, "RST38_IRQ"),
+                (0x0038, "RST38"),
+                (0x0038, "IRQ"),
                 (0x0066, "NMI"),
             ),
         )
@@ -292,6 +296,10 @@ class z80(assy.Instree_disass):
         self.mask = mask
         self.verbatim += (
             "A", "DE", "(DE)", "(BC)", "(SP)", "(C)", "SP", "AF", "AF'",
-            "I", "2",
+            "I", "2", "R",
             "C", "NC", "NZ", "Z",
         )
+
+    def dataptr(self, a):
+        return data.Dataptr(self.m, a, a + 2, self.m.lu16(a))
+
