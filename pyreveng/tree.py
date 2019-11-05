@@ -83,7 +83,6 @@ class Tree():
             hi = lo + 1
         if lo is None:
             lo = hi - 1
-        #print("FF %x-%x" % (lo, hi), self, self.less, len(self.cuts), self.more)
         if lo <= self.mid and self.less is not None:
             yield from self.less.find(lo, hi)
         for i in self.cuts:
@@ -169,25 +168,10 @@ def test_tree():
 
     print("  .__iter__() OK")
 
-    for i in slo:
-        lst = it.find_lo(i)
-        for j in lst:
-            assert j.lo == i
-        assert len(lst) == dlo[i]
-    print("  .find_lo() OK")
-
-    for i in shi:
-        lst = it.find_hi(i)
-        for j in lst:
-            assert j.hi == i
-        assert len(lst) == dhi[i]
-    print("  .find_hi() OK")
-
-    lst = it.find_range(0x200, 0x300)
-    for i in range(4):
-        for j in lst[i]:
-            assert j.tag == i
-    print("  .find_range() OK")
+    for j in it.find(0x200, 0x299):
+        assert j.lo < 0x299
+        assert j.hi > 0x200
+    print("  .find() OK")
 
     print("Happy")
 
