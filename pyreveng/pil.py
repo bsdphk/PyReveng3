@@ -182,7 +182,7 @@ def pil_lex(t):
             s = 0
         if s == 0 and c.isspace():
             continue
-        if s == 0 and c in (',', '=', '(', ')', '-', '+'):
+        if s == 0 and c in ('*', ',', '=', '(', ')', '-', '+'):
             l.append(c)
             continue
         if s == 0 and (c.isalnum() or c in ('%', '_', '.')):
