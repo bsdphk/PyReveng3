@@ -782,7 +782,7 @@ class Arm(assy.Instree_disass):
             abits=32,
         )
         self.add_ins(arm_desc, Arm_ins)
-        self.verbatim += ("CPSR", "SPSR,")
+        self.verbatim += ("CPSR", "SPSR")
 
     def codeptr(self, adr):
         t = self.m.lu32(adr)
