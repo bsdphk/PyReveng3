@@ -44,6 +44,7 @@ SYMBOLS = {
     0x00074448: "err_scsi_error[1]",
     0x00074244: "scsi_disk_hard_reset()",
     0x000743dc: "scsi_disk_soft_reset()",
+    0x000745d2: "D1=scsi_disk_get_status()",
     0x00076000: "RESHA_TAPE_EEPROM_DEST",
     0x8000000c: "print_OK()",
     0x80000010: "failure()",
