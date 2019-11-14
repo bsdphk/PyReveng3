@@ -33,12 +33,29 @@ import pyreveng.cpu.m68020 as m68020
 
 NAME = "R1000_400"
 
-FILENAME = "IOC_EEPROM.bin"
+FILENAMES = ("IOC_EEPROM.bin", "RESHA_EEPROM.bin",)
 
 SYMBOLS = {
+    0x00070000: "RESHA_TEST_EEPROM_DEST",
+    0x00072000: "RESHA_LANCE_EEPROM_DEST",
+    0x00074000: "RESHA_DISK_EEPROM_DEST",
+    0x00076000: "RESHA_TAPE_EEPROM_DEST",
+    0x8000000c: "print_OK()",
+    0x80000010: "failure()",
+    0x80000014: "delay()",
+    0x80000018: "puts(A0)",
+    0x8000001c: "puts(inline)",
+    0x80000020: "print_CRLF()",
     0x80000024: "RESET",
+    0x80000072: "txt_FAILURE",
+    0x80000088: "failure",
+    0x800000d8: "_puts(A0)",
+    0x800000e2: "_puts(inline)",
+    0x800000f8: "_outstring(A0)",
+    0x80000142: "_print_OK()",
+    0x8000014c: "_print_CRLF()",
+    0x8000015e: "_delay()",
     0x8000016c: "checksum",
-    0xffff9000: "IO_UART",
     0x8000038a: "ramtest",
     0x800003aa: "ramtest_1",
     0x800003e4: "ramtest_2",
@@ -46,24 +63,12 @@ SYMBOLS = {
     0x8000043a: "ramtest_4",
     0x80000464: "ramtest_5",
     0x800004fe: "ramtest_6",
-    0x80000088: "failure",
-    0x80000072: "txt_FAILURE",
-    0x80000018: "puts(A0)",
-    0x8000001c: "puts(inline)",
-    0x800000e2: "_puts(inline)",
-    0x800000d8: "_puts(A0)",
-    0x800000f8: "_outstring(A0)",
-
-    0x8000000c: "print_OK()",
-    0x80000142: "_print_OK()",
-
-    0x80000010: "failure()",
-
-    0x80000014: "delay()",
-    0x8000015e: "_delay()",
-
-    0x80000020: "print_CRLF()",
-    0x8000014c: "_print_CRLF()",
+    0x80001010: "resha_download_part(DO=part, A1=name)",
+    0x80002054: "resha_download_target_address()",
+    0x8000205c: "resha_download()",
+    0x80003a40: "resha_download_target_address()",
+    0x80003a9a: "resha_download()",
+    0xffff9000: "IO_UART",
 }
 
 my68k20_instructions = """
@@ -100,21 +105,88 @@ def inline_text(asp, ins):
     y = data.Txt(asp, ins.hi, label=False, splitnl=True, align=2)
     ins.lang.disass(y.hi, asp=asp)
 
+def resha_section(asp, a, handle):
+
+    y = data.Pstruct(asp, a + 1, "B", fmt="RESHA_SECTION_MARKER=0x%02x")
+    assert y.data[0] == 0xa5
+
+    y = data.Pstruct(asp, a + 0x1ffa, "B", fmt="RESHA_CHECKSUM_OFFSET=0x%02x")
+    s = 0x56
+    for i in range(0x2000):
+        s += asp[a + i]
+    s &= 0xff
+    s -= y.data[0]
+    print("resha_sum 0x%x = 0x%x" % (a, s))
+    assert s == 0, "SUM 0x%x" % s
+
+    y = data.Pstruct(asp, a + 0, "B", fmt="RESHA_NENTRY=0x%02x")
+    for i in range(y.data[0]):
+        z = data.Pstruct(asp, a + 2 + 2 * i, ">H", fmt="0x%04x")
+        b = a + z.data[0]
+        asp.set_block_comment(b, "RESHA 0x%x ENTRY[0x%x]" % (a, i))
+        c = handle.get(i)
+        if c and c[0]:
+            asp.set_label(b, c[0])
+        if c and c[1]:
+            c[1](b)
+
 def example():
-    m0 = mem.Stackup((FILENAME,), nextto=__file__)
+    m0 = mem.Stackup(FILENAMES, nextto=__file__)
 
     cx = my68k20()
+
+    cx.flow_check.append(inline_text)
+    cx.trap_returns[0] = True
+
     cx.m.map(m0, 0x0, 0x8)
     cx.m.map(m0, 0x80000000, 0x80002000, 0x0000)
     cx.m.map(m0, 0x80004000, 0x80006000, 0x2000)
     cx.m.map(m0, 0x80002000, 0x80004000, 0x4000)
     cx.m.map(m0, 0x80006000, 0x80008000, 0x6000)
-
-    cx.flow_check.append(inline_text)
-    cx.trap_returns[0] = True
+    cx.m.map(m0, 0x00070000, 0x00072000, 0x8000)
+    cx.m.map(m0, 0x00072000, 0x00074000, 0xa000)
+    cx.m.map(m0, 0x00074000, 0x00076000, 0xc000)
+    cx.m.map(m0, 0x00076000, 0x00078000, 0xe000)
 
     for a, b in SYMBOLS.items():
         cx.m.set_label(a, b)
+
+    resha_section(
+        cx.m,
+        0x70000,
+        {
+            0: ( None, cx.disass ),
+            1: ( None, cx.disass ),
+            2: ( None, cx.disass ),
+            3: ( None, cx.disass ),
+            4: ( None, cx.disass ),
+            5: ( None, cx.disass ),
+        }
+    )
+    resha_section(
+        cx.m,
+        0x72000,
+        {
+            0: ( None, cx.disass ),
+            2: ( None, cx.disass ),
+            3: ( None, cx.disass ),
+        }
+    )
+    resha_section(
+        cx.m,
+        0x74000,
+        {
+            0: ( None, cx.disass ),
+            1: ( None, cx.disass ),
+        }
+    )
+    resha_section(
+        cx.m,
+        0x76000,
+        {
+            0: ( None, cx.disass ),
+        }
+    )
 
     cx.disass(0x80000024)
     for a in (
@@ -135,12 +207,82 @@ def example():
     ):
         data.Txt(cx.m, a, label=False, align=2)
 
-    def txts(a, b, align=2):
+    def txts(a, b, align=2, label=False):
         while a < b:
-            y = data.Txt(cx.m, a, label=False, align=align, splitnl=True)
+            y = data.Txt(cx.m, a, label=label, align=align, splitnl=True)
             a = y.hi
 
-    txts(0x800010cc, 0x80001122, align=1)
+    txts(0x7063e, 0x70708, align=1)
+    txts(0x712a6, 0x71308, align=1)
+    txts(0x719f2, 0x71ab8, align=1)
+    txts(0x74006, 0x7412c, align=1)
+    txts(0x76248, 0x763b0, align=1)
+
+    for a in range(0x76084, 0x760c8, 4):
+        y = cx.dataptr(a)
+        data.Txt(cx.m, y.dst)
+
+    for a in range(0x76a4c, 0x76a54, 4):
+        y = cx.dataptr(a)
+        data.Txt(cx.m, y.dst)
+
+    a = 0x765e4
+    while a < 0x76656:
+        w = data.Pstruct(cx.m, a, "<H", fmt="0x%x")
+        y = cx.dataptr(w.hi)
+        if y.dst:
+            data.Txt(cx.m, y.dst)
+        a = y.hi
+
+    a = 0x7351e
+    while True:
+        w = data.Pstruct(cx.m, a, "<H", fmt="0x%x")
+        if not w.data[0]:
+            break
+        y = cx.codeptr(w.hi)
+        a = y.hi
+
+    for a in range(0x7352e, 0x7353c, 4):
+        y = cx.codeptr(a)
+        cx.m.set_line_comment(y.dst, "VIA 0x%x" % a)
+
+    for a in range(0x734ea, 0x7351e, 4):
+        y = cx.codeptr(a)
+        cx.m.set_line_comment(y.dst, "VIA 0x%x" % a)
+
+    for a in range(0x76040, 0x76080, 4):
+        y = cx.codeptr(a)
+        cx.m.set_line_comment(y.dst, "VIA 0x%x" % a)
+
+    for a in (
+        0x7051c,
+        0x70554,
+        0x705d4,
+        0x705df,
+        0x705e8,
+        0x705f5,
+        0x70628,
+        0x70746,
+        0x709ea,
+        0x71010,
+        0x71025,
+        0x71039,
+        0x7104c,
+        0x71b10,
+        0x7200a,
+        0x76128,
+        0x762b0,
+        0x76a0a,
+        0x76a28,
+        0x76a46,
+        0x76990,
+        0x76a46,
+        0x76220,
+        # 0x77666,
+    ):
+        data.Txt(cx.m, a)
+
+    txts(0x800010cc, 0x80001122, align=1, label=True)
     txts(0x80001bb0, 0x80001bc2)
     txts(0x80002c14, 0x80002e04, align=1)
     txts(0x80004ece, 0x80004fbf, align=1)
@@ -171,28 +313,48 @@ def example():
     y = data.Txt(cx.m, 0x8000258c, splitnl=True, align=1)
     y = data.Txt(cx.m, 0x8000259b, splitnl=True, align=1)
 
-    for a in (
-        0x8000000c,
-        0x80000010,
-        0x80000014,
-        0x80000018,
-        0x8000001c,
-        0x80000020,
-        0x800001f6,
-        0x80000208,
-        0x8000021a,
-        0x80001524,
-        0x80001566,
-        0x800015a8,
-        0x80001628,
-        0x800016c2,
-        0x80002796,
-        0x800027ca,
-        0x80002bbe,
-        0x80002bc4,
-        0x800040a0,
+    for a, b in (
+        (0x704e8, None),
+        (0x70708, None),
+        (0x72c5e, None),
+        (0x730a8, None),       # via 0x734f2
+        (0x73134, None),       # via 0x734ee
+        (0x73258, None),       # via 0x731b2
+        (0x7338a, None),
+        (0x73396, None),       # via 0x731b2
+        (0x734ca, None),
+        (0x733a2, None),
+        (0x731b6, None),
+        (0x7412e, None),
+        (0x7665a, None),
+        (0x74208, None),
+        (0x74212, None),
+        (0x77662, None),
+
+        (0x8000000c, None,),
+        (0x80000010, None,),
+        (0x80000014, None,),
+        (0x80000018, None,),
+        (0x8000001c, None,),
+        (0x80000020, None,),
+        (0x800001f6, None,),
+        (0x80000208, None,),
+        (0x8000021a, None,),
+        (0x80001524, None,),
+        (0x80001566, None,),
+        (0x800015a8, None,),
+        (0x80001628, None,),
+        (0x800016c2, None,),
+        (0x80002796, None,),
+        (0x800027ca, None,),
+        (0x80002bbe, None,),
+        (0x80002bc4, None,),
+        (0x800040a0, None,),
     ):
         cx.disass(a)
+        if not b:
+            b = "MANUAL"
+        cx.m.set_line_comment(a, b)
 
     for a in range(0x80002000, 0x80002074, 4):
         cx.disass(a)
@@ -244,4 +406,4 @@ def example():
 #######################################################################
 
 if __name__ == '__main__':
-    listing.Example(example)
+    listing.Example(example, ncol=8)
