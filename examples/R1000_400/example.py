@@ -39,6 +39,11 @@ SYMBOLS = {
     0x00070000: "RESHA_TEST_EEPROM_DEST",
     0x00072000: "RESHA_LANCE_EEPROM_DEST",
     0x00074000: "RESHA_DISK_EEPROM_DEST",
+    0x000741b8: "err_scsi_error[0]",
+    0x00074238: "err_scsi_error[1]",
+    0x00074448: "err_scsi_error[1]",
+    0x00074244: "scsi_disk_hard_reset()",
+    0x000743dc: "scsi_disk_soft_reset()",
     0x00076000: "RESHA_TAPE_EEPROM_DEST",
     0x8000000c: "print_OK()",
     0x80000010: "failure()",
@@ -68,6 +73,33 @@ SYMBOLS = {
     0x8000205c: "resha_download()",
     0x80003a40: "resha_download_target_address()",
     0x80003a9a: "resha_download()",
+    0x9303e800: "SCSI_00_OWN_ID_CDB_SIZE",
+    0x9303e801: "SCSI_01_CONTROL",
+    0x9303e802: "SCSI_02_TIMEOUT_PERIOD",
+    0x9303e803: "SCSI_03_CDB1_TOTSECT",
+    0x9303e804: "SCSI_04_CDB2_TOTHEAD",
+    0x9303e805: "SCSI_05_CDB3_TOTCYL1",
+    0x9303e806: "SCSI_06_CDB4_TOTCYL0",
+    0x9303e807: "SCSI_07_CDB5_LBA3",
+    0x9303e808: "SCSI_08_CDB6_LBA2",
+    0x9303e809: "SCSI_09_CDB7_LBA1",
+    0x9303e80a: "SCSI_0a_CDB8_LBA0",
+    0x9303e80b: "SCSI_0b_CDB9_SECT",
+    0x9303e80c: "SCSI_0c_CDB10_HEAD",
+    0x9303e80d: "SCSI_0d_CDB11_CYL1",
+    0x9303e80e: "SCSI_0e_CDB12_CYL2",
+    0x9303e80f: "SCSI_0f_LUN",
+    0x9303e810: "SCSI_10_CMD_PHASE",
+    0x9303e811: "SCSI_11_SYNC_XFER",
+    0x9303e812: "SCSI_12_COUNT2",
+    0x9303e813: "SCSI_13_COUNT1",
+    0x9303e814: "SCSI_14_COUNT0",
+    0x9303e815: "SCSI_15_DEST_ID",
+    0x9303e816: "SCSI_16_SRC_ID",
+    0x9303e817: "SCSI_17_SCSI_STATUS",
+    0x9303e818: "SCSI_18_CMD",
+    0x9303e819: "SCSI_19_DATA",
+    0x9303e81f: "SCSI_1f_AUX_STATUS",
     0xffff9000: "IO_UART",
 }
 
@@ -215,7 +247,7 @@ def example():
     txts(0x7063e, 0x70708, align=1)
     txts(0x712a6, 0x71308, align=1)
     txts(0x719f2, 0x71ab8, align=1)
-    txts(0x74006, 0x7412c, align=1)
+    txts(0x74006, 0x7412c, align=1, label=True)
     txts(0x76248, 0x763b0, align=1)
 
     for a in range(0x76084, 0x760c8, 4):
