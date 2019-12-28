@@ -1022,6 +1022,8 @@ class m68000_ins(assy.Instree_ins):
 			s = "(" + "+".join(lan + lxr)
 			if basedisp < 0:
 				s += "-#%x" % (-basedisp)
+			elif basedisp and s == "(":
+				s += "#%x" % basedisp
 			elif basedisp:
 				s += "+#%x" % basedisp
 			s += ")"
@@ -1031,6 +1033,8 @@ class m68000_ins(assy.Instree_ins):
 				s = "((" + lan[0]
 				if basedisp < 0:
 					s += "-#%x" % (-basedisp)
+				elif basedisp and s == "((":
+					s += "#%x" % basedisp
 				elif basedisp:
 					s += "+#%x" % basedisp
 				s += ")"
@@ -1041,6 +1045,8 @@ class m68000_ins(assy.Instree_ins):
 				s = "((" + "+".join(lan + lxr)
 				if basedisp < 0:
 					s += "-#%x" % (-basedisp)
+				elif basedisp and s == "((":
+					s += "#%x" % basedisp
 				elif basedisp:
 					s += "+#%x" % basedisp
 				s += ")"
