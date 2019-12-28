@@ -186,8 +186,8 @@ class Decoder():
             return None
         try:
             x = self.decode(asp, adr)
-        except Invalid:
-            print("Failed decode", self.name, asp.afmt(adr), src)
+        except Invalid as e:
+            print("Failed decode", self.name, asp.afmt(adr), src, "\n\t", e)
             return None
         except mem.MemError:
             print("No Memory", self.name, asp.adr(adr), src)
