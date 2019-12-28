@@ -52,7 +52,7 @@ def example():
                 continue
             a = int(j[0], 16)
             b = int(j[1], 16)
-            m.wr(a0 + a, b)
+            m[a0 + a] = b
         fi.close()
 
     hexfile("P8316.hex", 0)
@@ -100,4 +100,4 @@ def example():
     return NAME, (cx.m,)
 
 if __name__ == '__main__':
-    listing.Example(example)
+    listing.Example(example, pil=True)
