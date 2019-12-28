@@ -850,9 +850,7 @@ class m68000_ins(assy.Instree_ins):
 
 	def assy_eaxt(self, id, ref):
 		'''Extension Word Controlled Address Mode'''
-		il = self.ea[id]
-		iltyp = self.isz + "*"
-		ll = [None]
+
 		ew = self.lang.m.bu16(self.hi)
 		self.hi += 2
 
@@ -862,42 +860,50 @@ class m68000_ins(assy.Instree_ins):
 		if ew & 0x600 and not self.ea_scale:
 			raise assy.Invalid("Non-zero scale in extension word")
 
-		basedisp = 0
-		outherdisp = 0
-		nobase = 0
-		noidx = 0
 		if ew & 0x100:
-			# Full extension word
-			bd = (ew >> 4) & 3
-			if bd == 2:
-				basedisp = self.lang.m.bu16(self.hi)
-				self.hi += 2
-			elif bd == 3:
-				basedisp = self.lang.m.bu32(self.hi)
-				self.hi += 4
-
-			IS = (ew >> 6) & 1
-			IIS = (ew & 7)
-			if (IIS & 2) and (not IS or IIS < 4):
-				if ew & 1:
-					outherdisp = self.lang.m.bu32(self.hi)
-					self.hi += 4
-				else:
-					outherdisp = self.lang.m.bu16(self.hi)
-					self.hi += 2
+			return self.assy_eaxt_f(id, ref, ew)
 		else:
-			basedisp = ew & 0xff
-			if basedisp & 0x80:
-				basedisp -= 0x100
+			return self.assy_eaxt_s(id, ref, ew)
 
-		scale = (ew >> 9) & 3
+	def assy_eaxt_s(self, id, ref, ew):
+		'''Short Extension Word Controlled Address Mode'''
+
+		basedisp = ew & 0xff
+		if basedisp & 0x80:
+			basedisp -= 0x100
 
 		if ew & 0x8000:
 			reg = "A"
 		else:
 			reg = "D"
-
 		reg = reg + "%d" % ((ew >> 12) & 7)
+
+		if ew & 0x800:
+			wl = ".L"
+		else:
+			wl = ".W"
+
+		xr = "+" + reg + wl
+
+		scale = (ew >> 9) & 3
+		if scale:
+			xr += "*%d" % (1 << scale)
+
+		s = "("
+		if ref == "PC":
+			s += "#0x%x" % (basedisp + self.hi - 2) + xr
+		elif basedisp < 0:
+			s += ref + xr + "-#0x%x" % (- basedisp)
+		elif basedisp > 0:
+			s += ref + xr + "+#0x%x" % basedisp
+		else:
+			s += ref + xr
+		s += ")"
+
+		# XXX: IL part needs review
+		il = self.ea[id]
+		iltyp = self.isz + "*"
+		ll = [None]
 
 		if ew & 0x800:
 			wl = ".L"
@@ -940,22 +946,160 @@ class m68000_ins(assy.Instree_ins):
 		)
 		ll[0] = "%5"
 
-		s = "("
-		if ref == "PC":
-			s += "#0x%x" % (basedisp + self.hi - 2)
-		elif basedisp != 0:
-			s += "#0x%x+" % basedisp + ref
-		else:
-			s += ref
-		s += "+" + reg + wl
-		if scale:
-			s += "*%d" % (1 << scale)
-		s += ")"
 		il += [ll[0], ll[1:]]
-		if outherdisp:
-			s += " {XXX: outherdisp=0x%x} " % outherdisp
 		return s
 
+
+	def assy_eaxt_f(self, id, ref, ew):
+		'''Full Extension Word Controlled Address Mode'''
+
+		self.lcmt += " LEW=%04x" % ew
+		nobase = 0
+		noidx = 0
+		pc = self.hi - 2
+
+		if ew & 0x47 in (0x04, 0x44, 0x45, 0x46, 0x47):
+			raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
+			    self.lo, ew), self.im)
+
+		if not (ew & 0x30): 
+			raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
+			    self.lo, ew), self.im)
+
+		if ref != "PC" and not (ew & 0x80):	# Base Supress
+			lan = [ref]
+		else:
+			lan = []
+
+		if ew & 0x8000:
+			reg = "A"
+		else:
+			reg = "D"
+
+		reg = reg + "%d" % ((ew >> 12) & 7)
+
+		if ew & 0x800:
+			wl = ".L"
+		else:
+			wl = ".W"
+
+		xr = reg + wl
+
+		scale = (ew >> 9) & 3
+		if scale:
+			xr += "*%d" % (1 << scale)
+
+		if not (ew & 0x40):			# Index Supress
+			lxr = [xr]
+		else:
+			lxr = []
+
+		bd = (ew >> 4) & 3
+		if bd == 2:
+			basedisp = self.lang.m.bs16(self.hi)
+			self.hi += 2
+		elif bd == 3:
+			basedisp = self.lang.m.bu32(self.hi)
+			self.hi += 4
+		else:
+			basedisp = 0
+
+		if ref == "PC" and not (ew & 0x80):	# Base Supress
+			basedisp += pc
+
+		if ew & 2:
+			if ew & 1:
+				outherdisp = self.lang.m.bu32(self.hi)
+				self.hi += 4
+			else:
+				outherdisp = self.lang.m.bs16(self.hi)
+				self.hi += 2
+		else:
+			outherdisp = 0
+
+		if not (ew & 7):
+			# No index
+			s = "(" + "+".join(lan + lxr)
+			if basedisp < 0:
+				s += "-#%x" % (-basedisp)
+			elif basedisp:
+				s += "+#%x" % basedisp
+			s += ")"
+		else:
+			if ew & 4:
+				# Post index
+				s = "((" + lan[0]
+				if basedisp < 0:
+					s += "-#%x" % (-basedisp)
+				elif basedisp:
+					s += "+#%x" % basedisp
+				s += ")"
+				if lxr:
+					s += "+" + lxr[0]
+			else:
+				# Pre index
+				s = "((" + "+".join(lan + lxr)
+				if basedisp < 0:
+					s += "-#%x" % (-basedisp)
+				elif basedisp:
+					s += "+#%x" % basedisp
+				s += ")"
+			if outherdisp < 0:
+				s += "-#%x" % (-outherdisp)
+			elif outherdisp:
+				s += "+#%x" % outherdisp
+			s += ")"
+
+		IS = (ew >> 6) & 1
+		IIS = (ew & 7)
+
+		il = self.ea[id]
+		iltyp = self.isz + "*"
+		ll = [None]
+
+		if ew & 0x800:
+			wl = ".L"
+			ll.append(
+				["%2", "=", iltyp, "%" + reg]
+			)
+		else:
+			ll.append(
+				["%1", "=", "trunc", "i32", "%" + reg,
+				    "to", "i16"]
+			)
+			ll.append(
+				["%2", "=", "sext", "i16", "%1",
+				    "to", iltyp]
+			)
+			wl = ".W"
+		ll[0] = "%2"
+
+		if scale != 0:
+			ll.append(
+				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
+			)
+			ll[0] = "%3"
+
+		if basedisp > 0:
+			ll.append(
+				["%4", "=", "add", iltyp, ll[0], ",",
+				    "0x%x" % basedisp]
+			)
+			ll[0] = "%4"
+		if basedisp < 0:
+			ll.append(
+				["%4", "=", "sub", iltyp, ll[0], ",",
+				    "0x%x" % -basedisp]
+			)
+			ll[0] = "%4"
+
+		ll.append(
+		    ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
+		)
+		ll[0] = "%5"
+
+		il += [ll[0], ll[1:]]
+		return s
 
 	def assy_eax(self, id, eam, ear):
 		il = []
