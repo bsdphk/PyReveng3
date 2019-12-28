@@ -157,7 +157,7 @@ def example():
     m = mem.ByteMem(0x8000, 0x10000)
     for i in open(fwd + "06626-80005-REV-A-00-04.hex"):
         j = i.split()
-        m.wr(int(j[0],16), int(j[1],16))
+        m[int(j[0],16)] = int(j[1],16)
 
     cx = mc6809.mc6809()
     cx.m.map(m, 0x8000, offset=0x8000)

@@ -140,7 +140,7 @@ def example():
     fn = os.path.join(os.path.dirname(__file__), FILENAME)
     for i in open(fn):
         j = i.split()
-        m.wr(int(j[0], 16), int(j[1], 16))
+        m[int(j[0], 16)] = int(j[1], 16)
 
     cx = tms9900.Tms9981()
     cx.flow_check.append(inline_args)
