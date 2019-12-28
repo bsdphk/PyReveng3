@@ -109,7 +109,7 @@ WRR	-		|1 1 1 0|0 0 1 0| {
 	store i4 %A, i4 addrspace(3) * %SPC
 }
 WPM	-		|1 1 1 0|0 0 1 1|
-WR	-		|1 1 1 0|0 1|sr | {
+WR	sr		|1 1 1 0|0 1|sr | {
 	%0 = zext i1 %SPC to i10
 	%1 = %0 or i10 %0 , SR
 	store i4 %A, i4 addrspace(2) * %1
