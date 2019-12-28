@@ -166,43 +166,18 @@ def hack(cpu, lo):
         lo = y.dst
 
 
-def charrom_big(m1, m2):
+def charrom(m1, m2):
     s = chargen.SVG_Charset(
-        "/tmp/_" + NAME + "_chargen_big.svg",
+        "/tmp/_" + NAME + "_chargen.svg",
         cols=8,
-        char_w=15,
-        char_h=20,
+        char_w=16,
+        char_h=32,
         imargin=1,
         linewidth=1,
     )
     for i in range(128):
         l = []
-        for j in range(8, 28):
-            x = m1[i * 32 + j]
-            y = m2[i * 32 + j]
-            a = 0
-            b = 0x80
-            while b:
-                a = a << 2
-                a |= 2 if y & b else 0
-                a |= 1 if x & b else 0
-                b = b >> 1
-            l.append(a)
-        s.set_char(i // 16, i % 16, l)
-    s.render()
-
-def charrom_small(m1, m2):
-    s = chargen.SVG_Charset(
-        "/tmp/_" + NAME + "_chargen_small.svg",
-        cols=8,
-        char_w=15,
-        char_h=6,
-        imargin=1,
-        linewidth=1,
-    )
-    for i in range(128):
-        l = []
-        for j in range(0, 6):
+        for j in range(0, 32):
             x = m1[i * 32 + j]
             y = m2[i * 32 + j]
             a = 0
@@ -223,8 +198,7 @@ def example():
         assert sum(i.bytearray(i.lo, i.hi)) & 0xffff == csum
         m.append(i)
 
-    charrom_big(m[3], m[4])
-    charrom_small(m[3], m[4])
+    charrom(m[3], m[4])
 
     cpu = z80.z80()
     cpu.m.map(m[0], 0x0000)
