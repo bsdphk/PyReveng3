@@ -43,39 +43,47 @@ def tolines(s):
     return s
 
 class Listing():
-    def __init__(
-        self,
-        asp,
-        fn=None,
-        fo=None,
-        lo=None,
-        hi=None,
-        ncol=None,
-        pil=False,
-        hide_undone=False,
-    ):
+    def __init__(self, asp, **kwargs):
         self.asp = asp
 
-        if lo is None:
-            lo = asp.lo
-        if hi is None:
-            hi = asp.hi
-        self.lo = lo
-        self.hi = hi
-        self.pil = pil
-        self.hide_undone = hide_undone
+        for an, dv in dict(
+            fn=None,
+            fo=None,
+            lo=None,
+            hi=None,
+            ncol=None,
+            pil=False,
+            charset=None,
+            align_xxx=False,
+            compact_xxx=False,
+            align_blank=False,
+            blanks=None,
+        ).items():
+            setattr(self, an, kwargs.pop(an) if an in kwargs else dv)
+        assert not kwargs, "Surplus kwargs: " + str(kwargs)
 
-        assert not fo or not fn
-        if not fo:
-            print("Listing", asp, "to", fn, asp.afmt(self.lo) + "-" + asp.afmt(self.hi))
-            fo = open(fn, "w")
-        self.fo = fo
+        assert not self.fo or not self.fn
+
+        if self.charset is None:
+            self.charset = [' '] * 256
+            for i in range(0x20, 0x7f):
+                self.charset[i] = '%c' % i
+        assert len(self.charset) == 256
+
+        if self.lo is None:
+            self.lo = asp.lo
+        if self.hi is None:
+            self.hi = asp.hi
+
+        if not self.fo:
+            print("Listing", asp, "to", self.fn, asp.afmt(self.lo) + "-" + asp.afmt(self.hi))
+            self.fo = open(self.fn, "w")
 
         self.in_seg = None
-        if ncol is None:
-            ncol = self.asp.ncol
-        self.ncol = ncol
-        self.blanks = ncol * 2
+        if self.ncol is None:
+            self.ncol = self.asp.ncol
+        if self.blanks is None:
+            self.blanks = self.ncol * 2
 
         self.x_label = None
         for _n in range(10):
@@ -98,15 +106,24 @@ class Listing():
             t = tabto(t, self.x_pil) + "|PIL"
         # fo.write(t + '\n')
 
-        self.plan = []
-        self.plan += [[lo, 10, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()]
-        self.plan += [[hi, 10, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()]
-        self.plan += [[r.lo, 20, self.plan_range, 0, r] for r in asp.ranges()]
-        self.plan += [[r.hi, 20, self.plan_range, 1, r] for r in asp.ranges()]
-        self.plan += [[adr, 30, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if self.inside(adr)]
-        self.plan += [[adr, 40, self.plan_label, l] for adr, l in asp.get_all_labels() if self.inside(adr)]
-        self.plan += [[adr, 50, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if self.inside(adr)]
-        self.plan += [[leaf.lo, 60, self.plan_leaf, leaf] for leaf in asp if self.inside(leaf.lo)]
+
+        self.plan = [
+            [lo, 10, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()
+        ] + [
+            [hi, 10, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()
+        ] + [
+            [r.lo, 20, self.plan_range, 0, r] for r in asp.ranges()
+        ] + [
+            [r.hi, 20, self.plan_range, 1, r] for r in asp.ranges()
+        ] + [
+            [adr, 30, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if adr in self
+        ] + [
+            [adr, 40, self.plan_label, l] for adr, l in asp.get_all_labels() if adr in self
+        ] + [
+            [adr, 50, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if adr in self
+        ] + [
+            [leaf.lo, 60, self.plan_leaf, leaf] for leaf in asp if leaf.lo in self
+        ]
 
         self.start = False
         last = 0
@@ -114,7 +131,6 @@ class Listing():
         prev = None
         for i in sorted(self.plan):
             a = self.asp.afmt(i[0])
-            # print("P", a, i[2].__doc__, i[3:])
             if i[0] < last:
                 print("OVERLAP")
                 print(" last ", self.asp.afmt(last))
@@ -137,7 +153,7 @@ class Listing():
                 break
             if r is not None:
                 last = r
-        fo.flush()
+        self.fo.flush()
 
     def fmt_adr(self, lo, hi):
         t = self.asp.afmt(lo) + " "
@@ -154,10 +170,10 @@ class Listing():
             lo += 1
         t += "  |"
         for j in s:
-            if j is None or not 0x20 < j < 0x7f:
-                t += ' '
+            if j is not None:
+                t += self.charset[j]
             else:
-                t += '%c' % j
+                t += ' '
         return t + "|"
 
     def format(self, lo, hi, leaf, pil, compact=True):
@@ -187,70 +203,82 @@ class Listing():
             self.fo.flush()
         return hi
 
-    def gap2(self, lo, hi):
-        if self.hide_undone:
-            self.format(lo, hi, [".XXX[0x%x]" % (hi - lo),], None, True)
+    def gap1(self, lo, hi, c):
+        assert lo != hi, "%x-%x" % (lo, hi)
+        if c is None:
+            self.format(lo, hi, [".XXX" + "[0x%x]" % (hi - lo),], None, self.compact_xxx)
         else:
-            r = lo % self.ncol
-            if r:
-                i = min(lo + self.ncol - r, hi)
-                self.format(lo, i, [".XXX",], None, False)
-                lo = i
-            if lo != hi:
-                self.format(lo, hi, [".XXX",], None, False)
+            self.format(lo, hi, [".BLANK\t" + self.asp.dfmt(lo) + "[0x%x]" % (hi - lo),], None, True)
 
-    def gap1(self, s, r, lo, a):
-        if a is None:
-            self.format(s, lo, [".UNDEF\t0x%x" % (lo - s),], None, True)
-        elif lo - r >= self.blanks:
-            if s != r:
-                self.gap2(s, r)
-            self.format(r, lo, [".BLANK\t" + self.asp.dfmt(r) + "[0x%x]" % (lo - r),], None, True)
-        else:
-            self.gap2(s, lo)
+    def gap0(self, lo, hi, c):
+        assert lo != hi, "%x-%x" % (lo, hi)
+        if lo // self.ncol == hi // self.ncol:
+            self.gap1(lo, hi, c)
+            return
+        if (c is None and self.align_xxx) or (c is not None and self.align_blank):
+            if lo % self.ncol:
+                a = lo + self.ncol - lo % self.ncol
+                self.gap1(lo, a, c)
+                lo = a
+            if hi % self.ncol:
+                a = hi - hi % self.ncol
+                if lo < a:
+                    self.gap1(lo, a, c)
+                    lo = a
+        if lo != hi:
+            self.gap1(lo, hi, c)
+
+    def gap_undef(self, lo, hi):
+        self.format(lo, hi, [".UNDEF\t0x%x" % (hi - lo),], None, True)
+
+    def probe(self, lo):
+        try:
+            x = self.asp[lo]
+            return x
+        except mem.MemError:
+            return None
 
     def gap(self, lo, hi):
+        '''Render unaccounted for intervals of address space'''
         self.purge_lcmt()
         if not self.in_seg:
             return hi
-        try:
-            c = self.asp[lo]
-            a = c * 0
-        except mem.MemError:
-            c = None
-            a = None
         s = lo
-        r = lo
+        sr = lo
+        r = 1
+        c = self.probe(lo)
         while lo < hi:
-            try:
-                d = self.asp[lo]
-                b = d * 0
-            except mem.MemError:
-                d = None
-                b = None
-            if a != b:
-                self.gap1(s, r, lo, a)
-                a = b
-                s = lo
-                r = lo
+            d = self.probe(lo)
+            if d == c:
+                r += 1
+            elif c is None or d is None or r >= self.blanks:
+                break
+            else:
                 c = d
-            elif c != d:
-                if lo - r >= self.blanks:
-                    self.gap1(s, r, lo, a)
-                    s = lo
-                r = lo
-                c = d
+                sr = lo
+                r = 1
             lo += 1
-        if s != hi:
-            self.gap1(s, r, lo, a)
-        return hi
+        if c is None:
+            self.gap_undef(s, lo)
+            return lo
+        lo2 = lo
+        if self.align_blank and sr % self.ncol:
+            sr = sr + self.ncol - sr % self.ncol
+            lo2 -= lo2 % self.ncol
+        if lo2 - sr >= self.blanks:
+            if s != sr:
+                self.gap0(s, sr, None)
+            self.gap0(sr, lo2, c)
+            return lo2
+        self.gap0(s, lo, None)
+        return lo
 
     def purge_lcmt(self):
         while self.lcmts:
             cmt = self.lcmts.pop(0)
             self.fo.write(tabto("", self.x_lcmt) + "; " + cmt + '\n')
 
-    def inside(self, adr):
+    def __contains__(self, adr):
         return self.lo <= adr < self.hi
 
     def plan_bcmt(self, adr, afmt, *_args):

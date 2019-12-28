@@ -29,6 +29,7 @@ Run all examples
 """
 
 import glob, os, sys, importlib
+sys.path.insert(0, "..")
 from pyreveng import code, listing
 
 import cProfile
@@ -72,7 +73,9 @@ def one_example(dir, example):
                 ncol = 8,
                 fn = fn + a,
                 pil=b,
-                hide_undone=True,
+                align_blank=True,
+                align_xxx=True,
+                compact_xxx=True,
             )
     sys.stdout.flush()
 
@@ -83,5 +86,5 @@ def all_examples():
         print(j[0], k)
         one_example(j[0], k)
 
-cProfile.run("all_examples()", sort=1)
-#all_examples()
+#cProfile.run("all_examples()", sort=1)
+all_examples()
