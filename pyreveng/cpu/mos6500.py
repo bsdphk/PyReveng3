@@ -218,15 +218,15 @@ class mos6500_ins(assy.Instree_ins):
         d = self.lang.m[self.hi]
         self.hi += 1
         return [
-            assy.Arg_dst(self.lang.m, d),
-            assy.Arg_verbatim("X"),
+            assy.Arg_dst(self.lang.m, d, pfx="("),
+            assy.Arg_verbatim("X)"),
         ]
 
     def assy_Indy(self):
         d = self.lang.m[self.hi]
         self.hi += 1   
         return [
-            assy.Arg_dst(self.lang.m, d),
+            assy.Arg_dst(self.lang.m, d, pfx="(", sfx=")"),
             assy.Arg_verbatim("Y"),
         ]
 
@@ -248,6 +248,14 @@ class mos6500_ins(assy.Instree_ins):
             assy.Arg_verbatim("X"),
         ]
 
+    def assy_Pzy(self):
+        d = self.lang.m[self.hi]
+        self.hi += 1   
+        return [
+            assy.Arg_dst(self.lang.m, d),
+            assy.Arg_verbatim("Y"),
+        ]
+
     def assy_Rel(self):
         v = self.lang.m.s8(self.hi)
         self.hi += 1
@@ -265,6 +273,21 @@ class mos6500(assy.Instree_disass):
             vectors=(
                 (0xfffe, "IRQ"),
                 (0xfffc, "RESET"),
+            ),
+        )
+        self.add_ins(mos6500_desc, mos6500_ins)
+
+class rockwell6500(assy.Instree_disass):
+    def __init__(self):
+        super().__init__(
+            "r6500",
+            ins_word=8,
+            endian="<",
+            abits=16,
+            vectors=(
+                (0xffe, "IRQ"),
+                (0xffc, "RESET"),
+                (0xffa, "NMI"),
             ),
         )
         self.add_ins(mos6500_desc, mos6500_ins)
