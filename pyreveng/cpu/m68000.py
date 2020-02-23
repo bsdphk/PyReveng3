@@ -1616,7 +1616,7 @@ class m68000(assy.Instree_disass):
 		for i in vn:
 			for v in vn[i]:
 				k = self.vector_name(v)
-				if vi[i] != None and isinstance(vi[i], m68000_ins):
+				if isinstance(vi[i], m68000_ins):
 					vi[i].lcmt += "--> " + k + "\n"
 
 			if len(vn[i]) == 1:

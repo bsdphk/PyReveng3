@@ -87,7 +87,9 @@ def example():
     #######################################################################
     def jmp_table(lo, hi, span, txt="table", src=None):
         x = cx.m.add_range(lo, hi, "table")
-        if src != None:
+        if src is None:
+            ins = None
+        else:
             ins = list(cx.m.find(src))
             print("JMPTABLE %x" % src, ins)
             if len(ins) != 1:
@@ -96,10 +98,8 @@ def example():
                 ins = ins[0]
                 assert len(ins.flow_out) == 1
                 ins.flow_out = list()
-        else:
-            ins = None
         for a in range(lo, hi, span):
-            if ins != None:
+            if ins is not None:
                 ins += code.Jump(to=a)
             cx.disass(a)
 
