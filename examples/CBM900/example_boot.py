@@ -188,8 +188,10 @@ def example():
     )
 
     cx = z8000.z8001()
-    cx.m.map(m0, 0x00000000, 0x00007816)
+    cx.m.map(m0, 0x00000000, 0x00006800)
     cx.m.map(m0, 0x01000000, 0x01001016, 0x00006800)
+    cx.m.map(m0, 0x00007816, 0x00010000, 0x00007816)
+
     cx.flow_check.append(fc_outstr)
     cx.z8010_mmu(0xf8)
     cx.z8010_mmu(0xfc)
@@ -197,10 +199,7 @@ def example():
     for i, j in LABELS.items():
         cx.m.set_label(i, j)
 
-    y = data.Data(cx.m, 0x6800, 0x6800 + 0x1016, "MAP SEG1")
-    y.compact = None
-    y.rendered = str(y)
-    cx.m.insert(y)
+    cx.m.set_block_comment(0x6800, "0x6800-0x7816 mapped to segment 0x1:0x0")
 
     # const.w32(p, 0x01000614)
     # cx.m.set_label(0x01000614, "screen_ptr")
