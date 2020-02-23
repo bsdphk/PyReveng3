@@ -45,13 +45,14 @@ pretty ok.
 """
 
 class Tree():
-    def __init__(self, lo, hi, lim=128):
+    def __init__(self, lo, hi, lim=128, unique=True):
         # lim is only a performance parameter, it does not change
         # funcationality in any way.
         self.lo = lo
         self.mid = (lo + hi) // 2
         self.hi = hi
         self.lim = lim
+        self.unique = unique
         self.less = None
         self.more = None
         self.cuts = list()
@@ -67,14 +68,19 @@ class Tree():
         assert o.lo < o.hi
         if o.hi <= self.mid and not self.leaf:
             if self.less is None:
-                self.less = Tree(self.lo, self.mid, self.lim)
+                self.less = Tree(self.lo, self.mid, self.lim, self.unique)
             self.less.insert(o)
-        elif o.lo >= self.mid and not self.leaf:
+            return
+        if o.lo >= self.mid and not self.leaf:
             if self.more is None:
-                self.more = Tree(self.mid, self.hi, self.lim)
+                self.more = Tree(self.mid, self.hi, self.lim, self.unique)
             self.more.insert(o)
-        else:
-            self.cuts.append(o)
+            return
+        if self.unique:
+            for i in self.cuts:
+                if i == o:
+                    return
+        self.cuts.append(o)
 
     def find(self, lo=None, hi=None):
         ''' iterate over leaves between lo and hi '''

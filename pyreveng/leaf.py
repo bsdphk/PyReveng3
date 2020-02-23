@@ -54,6 +54,18 @@ class Leaf():
         if self.hi != other.hi:
             return self.hi > other.hi
 
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.lo != other.lo:
+            return False
+        if self.hi != other.hi:
+            return False
+        return True
+
+    def __contains__(self, a):
+        return self.lo <= a < self.hi
+
     def render(self):
         return self.rendered
 

@@ -252,9 +252,15 @@ class MemMapper(AddressSpace):
             super().__init__(lo, hi, "LinkLeaf")
             self.link = link
 
+        def __repr__(self):
+            return "<" + super().__repr__() + " -> " + self.link.__repr__() + ">"
+
         def render(self):
             self.compact = self.link.compact
             return self.link.render()
+
+        def __eq__(self, other):
+            return super().__eq__(other) and self.link.__class__ == other.link.__class__
 
     class Alien(leaf.Leaf):
         def __init__(self, lo, hi, them):
