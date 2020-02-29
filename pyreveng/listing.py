@@ -24,9 +24,10 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+import sys
 import random
 
-from pyreveng import mem, data, leaf
+from pyreveng import mem
 
 def tabto(s, n):
     ln = len(s.expandtabs())
@@ -41,6 +42,139 @@ def tolines(s):
     while s and not s[-1]:
         s.pop(-1)
     return s
+
+class List():
+    def __init__(self, lst, lo, hi, pri):
+        self.lst = lst
+        self.lo = lo
+        self.hi = hi
+        self.pri = pri
+
+    def __lt__(self, other):
+        return (self.lo, self.pri) < (other.lo, other.pri)
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.lo == other.lo and self.hi == other.hi
+
+    def __repr__(self):
+        return "<List (%s) %x-%x>" % (str(self.__class__), self.lo, self.hi)
+
+    def render(self, _fo):
+        print("NO render", self)
+
+    def afmt(self, a=None):
+        if a is None:
+            a = self.lo
+        return self.lst.asp.afmt(a)
+
+class ListSegmentStart(List):
+    def __init__(self, lst, lo, asp):
+        super().__init__(lst, lo, lo, 11)
+        self.asp = asp
+
+    def render(self, fo):
+        self.lst.purge_lcmt()
+        if self.lst.in_seg is not None:
+            fo.write('\n')
+            fo.write('-' * 80 + '\n')
+            fo.write('\n')
+        self.lst.in_seg = True
+
+class ListSegmentEnd(List):
+    def __init__(self, lst, hi, asp):
+        super().__init__(lst, hi, hi, 10)
+        self.asp = asp
+
+    def render(self, _fo):
+        self.lst.purge_lcmt()
+        self.lst.in_seg = False
+
+class ListRangeStart(List):
+    def __init__(self, lst, rng):
+        super().__init__(lst, rng.lo, rng.lo, 21)
+        self.rng = rng
+
+    def render(self, fo):
+        self.lst.purge_lcmt()
+        r = self.rng
+        fo.write(
+            "%s-%s\t%s\n" % (
+                self.afmt(r.lo),
+                self.afmt(r.hi),
+                r.txt,
+            )
+        )
+
+class ListRangeEnd(List):
+    def __init__(self, lst, rng):
+        super().__init__(lst, rng.hi, rng.hi, 20)
+        self.rng = rng
+
+    def render(self, _fo):
+        self.lst.purge_lcmt()
+
+class ListBlockComment(List):
+    def __init__(self, lst, lo):
+        super().__init__(lst, lo, lo, 30)
+
+    def render(self, fo):
+        self.lst.purge_lcmt()
+        fo.write(self.afmt() + " ; " + "-" * 86 + "\n")
+        for i in self.lst.asp.get_block_comments(self.lo):
+            for ln in tolines(i):
+                fo.write(self.afmt() + " ; " + ln.rstrip() + "\n")
+        fo.write(self.afmt() + " ; " + "-" * 86 + "\n")
+
+class ListLineComment(List):
+    def __init__(self, lst, lo, lcmt):
+        super().__init__(lst, lo, lo, 50)
+        self.lcmt = set(lcmt)
+
+    def render(self, _fo):
+        for i in sorted(self.lcmt):
+            for j in tolines(i):
+                self.lst.lcmts.append(j.rstrip())
+
+class ListLabel(List):
+
+    def __init__(self, lst, lo, lbl):
+        super().__init__(lst, lo, lo, 40)
+        self.lbl = lbl
+
+    def render(self, fo):
+        self.lst.purge_lcmt()
+        for lbl in sorted(self.lst.asp.get_labels(self.lo)):
+            fo.write(tabto(self.afmt(), self.lst.x_label) + lbl.strip() + ":" + "\n")
+
+class ListLeaf(List):
+
+    def __init__(self, lst, leaf):
+        super().__init__(lst, leaf.lo, leaf.hi, 60)
+        self.leaf = leaf
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.leaf.render() == other.leaf.render() and self.leaf.lcmt == other.leaf.lcmt
+
+    def render(self, fo):
+        if self.leaf.lcmt:
+            self.lst.purge_lcmt()
+            for i in tolines(self.leaf.lcmt):
+                self.lst.lcmts.append(i.rstrip())
+
+        if self.lst.pil and self.leaf.pil:
+            pil = tolines(self.leaf.pil.render())
+        else:
+            pil = None
+
+        return self.lst.format(
+            fo,
+            self.lo,
+            self.hi,
+            tolines(self.leaf.render()),
+            pil,
+            self.leaf.compact,
+        )
+
 
 class Listing():
     def __init__(self, asp, **kwargs):
@@ -108,21 +242,21 @@ class Listing():
 
 
         self.plan = [
-            [lo, 10, self.plan_seg, 1, asp] for asp, lo, _hi in asp.segments()
+            ListSegmentStart(self, lo, asp) for asp, lo, _hi in asp.segments()
         ] + [
-            [hi, 10, self.plan_seg, 0, asp] for asp, _lo, hi in asp.segments()
+            ListSegmentEnd(self, hi, asp) for asp, _lo, hi in asp.segments()
         ] + [
-            [r.lo, 20, self.plan_range, 0, r] for r in asp.ranges()
+            ListRangeStart(self, r) for r in asp.ranges()
         ] + [
-            [r.hi, 20, self.plan_range, 1, r] for r in asp.ranges()
+            ListRangeEnd(self, r) for r in asp.ranges()
         ] + [
-            [adr, 30, self.plan_bcmt] for adr, _l in asp.get_all_block_comments() if adr in self
+            ListBlockComment(self, adr) for adr, _l in asp.get_all_block_comments() if adr in self
         ] + [
-            [adr, 40, self.plan_label, l] for adr, l in asp.get_all_labels() if adr in self
+            ListLabel(self, adr, l) for adr, l in asp.get_all_labels() if adr in self
         ] + [
-            [adr, 50, self.plan_lcmt] for adr, _l in asp.get_all_line_comments() if adr in self
+            ListLineComment(self, adr, l) for adr, l in asp.get_all_line_comments() if adr in self
         ] + [
-            [leaf.lo, 60, self.plan_leaf, leaf] for leaf in asp if leaf.lo in self
+            ListLeaf(self, leaf) for leaf in asp if leaf.lo in self
         ]
 
         self.start = False
@@ -130,29 +264,20 @@ class Listing():
         self.lcmts = []
         prev = None
         for i in sorted(self.plan):
-            a = self.asp.afmt(i[0])
-            if i[0] < last:
-                print("OVERLAP")
-                print(" last ", self.asp.afmt(last))
-                print(" prev ", prev[2].__doc__, prev[3:])
-                if len(prev) > 3 and isinstance(prev[3], leaf.Leaf):
-                    print("\t", prev[3].render())
-                print(" this ", a)
-                print(" what ", i[2].__doc__, i[3:])
-                if len(i) > 3 and isinstance(i[3], leaf.Leaf):
-                    print("\t", i[3].render())
-                if len(i) > 3 and len(prev) > 3:
-                    print(" same", i[3] == i[3])
+            if i == prev:
+                continue
+            if i.lo < last:
+                print("OVERLAP", i, prev)
+                print("prev:")
+                prev.render(sys.stdout)
+                print("this:")
+                i.render(sys.stdout)
                 continue
             prev = i
-            while i[0] > last:
-                last = self.gap(last, i[0])
-            last = i[0]
-            r = i[2](i[0], a, i[3:])
-            if r is False:
-                break
-            if r is not None:
-                last = r
+            while i.lo > last:
+                last = self.gap(last, i.lo)
+            last = i.hi
+            i.render(self.fo)
         self.fo.flush()
 
     def fmt_adr(self, lo, hi):
@@ -176,10 +301,10 @@ class Listing():
                 t += ' '
         return t + "|"
 
-    def format(self, lo, hi, leaf, pil, compact=True):
+    def format(self, fo, lo, hi, leaf, pil, compact=True):
         lines = len(leaf)
         if compact is None:
-            lines = lines
+            pass
         elif not compact:
             lines = max(lines, ((self.ncol - 1) + hi - lo) // self.ncol)
         if pil:
@@ -199,16 +324,16 @@ class Listing():
                 t = tabto(t, self.x_lcmt) + "; " + self.lcmts.pop(0)
             if pil:
                 t = tabto(t, self.x_pil) + "| " + pil.pop(0)
-            self.fo.write(t + '\n')
-            self.fo.flush()
+            fo.write(t + '\n')
+            fo.flush()
         return hi
 
     def gap1(self, lo, hi, c):
         assert lo != hi, "%x-%x" % (lo, hi)
         if c is None:
-            self.format(lo, hi, [".XXX" + "[0x%x]" % (hi - lo),], None, self.compact_xxx)
+            self.format(self.fo, lo, hi, [".XXX" + "[0x%x]" % (hi - lo),], None, self.compact_xxx)
         else:
-            self.format(lo, hi, [".BLANK\t" + self.asp.dfmt(lo) + "[0x%x]" % (hi - lo),], None, True)
+            self.format(self.fo, lo, hi, [".BLANK\t" + self.asp.dfmt(lo) + "[0x%x]" % (hi - lo),], None, True)
 
     def gap0(self, lo, hi, c):
         assert lo != hi, "%x-%x" % (lo, hi)
@@ -229,7 +354,7 @@ class Listing():
             self.gap1(lo, hi, c)
 
     def gap_undef(self, lo, hi):
-        self.format(lo, hi, [".UNDEF\t0x%x" % (hi - lo),], None, True)
+        self.format(self.fo, lo, hi, [".UNDEF\t0x%x" % (hi - lo),], None, True)
 
     def probe(self, lo):
         try:
@@ -280,79 +405,6 @@ class Listing():
 
     def __contains__(self, adr):
         return self.lo <= adr < self.hi
-
-    def plan_bcmt(self, adr, afmt, *_args):
-        '''P:Bcmt'''
-        self.purge_lcmt()
-        self.fo.write(afmt + " ; " + "-" * 86 + "\n")
-        for i in self.asp.get_block_comments(adr):
-            for ln in tolines(i):
-                self.fo.write(afmt + " ; " + ln.rstrip() + "\n")
-        self.fo.write(afmt + " ; " + "-" * 86 + "\n")
-
-    def plan_label(self, adr, afmt, *_args):
-        '''P:Label'''
-        self.purge_lcmt()
-        s = {}
-        for lbl in self.asp.get_labels(adr):
-            if lbl in s:
-                print("Duplicate label", afmt, lbl, s[adr])
-            else:
-                self.fo.write(tabto(afmt, self.x_label) + lbl.strip() + ":" + "\n")
-                s[adr] = lbl
-
-    def plan_lcmt(self, adr, _afmt, *_args):
-        '''P:Lcmt'''
-        self.purge_lcmt()
-        for i in self.asp.get_line_comments(adr):
-            for j in tolines(i):
-                self.lcmts.append(i.rstrip())
-
-    def plan_seg(self, _adr, _afmt, *args):
-        '''P::Seg'''
-        if args[0][0]:
-            if self.in_seg is False:
-                self.fo.write('\n')
-                self.fo.write('-' * 80 + '\n')
-                self.fo.write('\n')
-            self.in_seg = True
-        else:
-            self.in_seg = False
-
-    def plan_range(self, _adr, _afmt, *args):
-        '''P:Range'''
-        if not args[0][0]:
-            r = args[0][1]
-            self.fo.write(
-                "%s-%s\t%s\n" % (
-                    self.asp.afmt(r.lo),
-                    self.asp.afmt(r.hi),
-                    r.txt,
-                )
-            )
-
-    def plan_leaf(self, _adr, _afmt, *args):
-        '''P::Leaf'''
-        leaf = args[0][0]
-
-        if leaf.lcmt:
-            self.purge_lcmt()
-            for i in tolines(leaf.lcmt):
-                self.lcmts.append(i.rstrip())
-
-        if self.pil and leaf.pil:
-            pil = tolines(leaf.pil.render())
-        else:
-            pil = None
-
-        # print("\t", leaf.__dict__)
-        return self.format(
-            leaf.lo,
-            leaf.hi,
-            tolines(leaf.render()),
-            pil,
-            leaf.compact,
-        )
 
 def Example(func, **kwargs):
     nm, ms = func()

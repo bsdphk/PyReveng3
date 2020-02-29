@@ -45,7 +45,7 @@ pretty ok.
 """
 
 class Tree():
-    def __init__(self, lo, hi, lim=128, unique=True):
+    def __init__(self, lo, hi, lim=128, unique=False):
         # lim is only a performance parameter, it does not change
         # funcationality in any way.
         self.lo = lo
