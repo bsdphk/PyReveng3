@@ -86,12 +86,12 @@ class Instree_ins(Assy):
         hi = lim[-1].adr + len(lim[-1].words) * lang.scale
         super().__init__(lo, hi, lang)
         self.prefix = False
-        self.cc = True
+        self.cc = None
         self.dstadr = None
         self.lim = lim
         self.mne = lim[-1].assy[0]
         self.cache = {}
-        self.verbatim = []
+        self.verbatim = ()
 
     def args_done(self):
         return
@@ -104,17 +104,15 @@ class Instree_ins(Assy):
 
     def flow_RC(self):
         if self.cc is not False:
-            self += code.Return(cond=self.cc)
+            self += code.Return(cond=str(self.cc))
         if self.cc is not True:
-            self += code.Flow(cond="!" + self.cc)
+            self += code.Flow(cond="!" + str(self.cc))
 
     def flow_JC(self):
-        if self.cc is True:
-            self += code.Jump(cond="?", to=self.dstadr)
-            self += code.Flow(cond="!?")
-        else:
-            self += code.Jump(cond=self.cc, to=self.dstadr)
-            self += code.Flow(cond="!" + self.cc)
+        if self.cc is not False:
+            self += code.Jump(cond=str(self.cc), to=self.dstadr)
+        if self.cc is not True:
+            self += code.Flow(cond="!" + str(self.cc))
 
     def flow_C(self):
         self += code.Call(to=self.dstadr)

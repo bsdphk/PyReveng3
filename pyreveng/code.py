@@ -83,9 +83,7 @@ class Flow():
         if self.typ is True:
             return
         s = "Flow %s" % self.typ
-        if self.cond is None:
-            s += " cc=?"
-        elif self.cond is not True:
+        if self.cond not in (True, None):
             s += " cc=%s" % self.cond
         if not self.to is None:
             s += " 0x%x" % self.to
