@@ -92,6 +92,7 @@ DEVNAMES = {
     0x0a: "PTR",
     0x0b: "PTP",
     0x0c: "RTC",
+    0x0e: "CDR",
     0x0f: "LPT",
     0x18: "MT",
     0x2a: "AMX",
