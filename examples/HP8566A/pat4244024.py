@@ -453,7 +453,7 @@ class appendix_b_18():
 class appendix_b_19():
     '''Patent 4,244,024, Appendix B-19 (pg206)'''
     def __init__(self, cx, lo):
-        cx.m.add_range(lo, lo + 0o2, self.__doc__)
+        cx.m.add_range(lo, lo + 0o2, txt=self.__doc__)
         cx.m.set_block_comment(lo, self.__doc__)
         for a, b in {
             0o000:      "_.ANDT",
@@ -463,7 +463,7 @@ class appendix_b_19():
 class appendix_b_21():
     '''Patent 4,244,024, Appendix B-21 (pg207)'''
     def __init__(self, cx, lo):
-        cx.m.add_range(lo, lo + 0o24, self.__doc__)
+        cx.m.add_range(lo, lo + 0o24, txt=self.__doc__)
         cx.m.set_block_comment(lo, self.__doc__)
         for a, b in {
             0o000:      "_ATNER",
@@ -480,7 +480,7 @@ class appendix_b_21():
 class appendix_b_28a():
     '''Patent 4,244,024, Appendix B-28 (pg217) - part A'''
     def __init__(self, cx, lo):
-        cx.m.add_range(lo, lo + 0o10, self.__doc__)
+        cx.m.add_range(lo, lo + 0o10, txt=self.__doc__)
         cx.m.set_block_comment(lo, self.__doc__)
         for a, b in {
              0o00:	"PWRON",

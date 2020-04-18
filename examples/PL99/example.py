@@ -239,7 +239,7 @@ def leds(asp):
 
 def chain_table(asp):
 
-    x = asp.add_range(0x9d20, 0x9d68, "chain-tbl")
+    x = asp.add_range(0x9d20, 0x9d68, txt="chain-tbl")
     asp.set_label(x.lo, "CHAINS")
     for a in range(x.lo, x.hi, 4):
         CHAINS.append("GRI_" + d_chain(asp, a).num + "0")
@@ -250,13 +250,13 @@ def asf_table(asp):
     This is probably ASF data
     (Based partially on number of records = 204)
     """
-    x = asp.add_range(0x9d68, 0xaa28, "asf-tbl")
+    x = asp.add_range(0x9d68, 0xaa28, txt="asf-tbl")
     for a in range(x.lo, x.hi, 16):
         d_asf(asp, a)
 
 def onkey_table(cx):
     # ON_KEY table
-    x = cx.m.add_range(0xe072, 0xe0e2, "on-key-tbl")
+    x = cx.m.add_range(0xe072, 0xe0e2, txt="on-key-tbl")
     cx.m.set_label(x.lo, "ON_KEY_TBL")
     n = 0x80
     for a in range(x.lo, x.hi, 2):
@@ -266,7 +266,7 @@ def onkey_table(cx):
 
 def cmd_table(cx):
     # CMD table
-    x = cx.m.add_range(0x9b81, 0x9bff, "cmd-tbl")
+    x = cx.m.add_range(0x9b81, 0x9bff, txt="cmd-tbl")
     cx.m.set_label(x.lo, "CMDTBL")
     for a in range(x.lo, x.hi, 3):
         y = data.Txt(cx.m, a, a+1, label=False)
@@ -279,7 +279,7 @@ def cmd_table(cx):
 def fn_table(cx):
 
     # FN table
-    x = cx.m.add_range(0xf885, 0xf94d, "fn-tbl")
+    x = cx.m.add_range(0xf885, 0xf94d, txt="fn-tbl")
     cx.m.set_label(x.lo, "FN_TBL")
     d = dict()
     n = 0
@@ -360,30 +360,30 @@ def chaindata_table(asp):
     #
     # Chain data, idx'ed by 0x9d20
     #
-    x = asp.add_range(0xaa29, 0xb131, "tbl")
+    x = asp.add_range(0xaa29, 0xb131, txt="tbl")
     n = 0
     for a in range(x.lo, x.hi, 100):
-        x = asp.add_range(a, a + 100, "chain-tbl")
+        x = asp.add_range(a, a + 100, txt="chain-tbl")
         asp.set_label(a, "CHAIN_" + CHAINS[n])
         x = cword(asp, a)
         x.lcmt = "GRI %d * 5" % (x.val / 5)
         #data.Data(asp, a, a + 100)
-        x = asp.add_range(a + 0x02, a + 0x02 + 5 * 4, "alpha-tbl")
-        x = asp.add_range(a + 0x16, a + 0x16 + 5 * 4, "beta-tbl")
-        x = asp.add_range(a + 0x2a, a + 0x2a + 5 * 4, "gamma-tbl")
+        x = asp.add_range(a + 0x02, a + 0x02 + 5 * 4, txt="alpha-tbl")
+        x = asp.add_range(a + 0x16, a + 0x16 + 5 * 4, txt="beta-tbl")
+        x = asp.add_range(a + 0x2a, a + 0x2a + 5 * 4, txt="gamma-tbl")
         for c in range(5):
             d_q(asp, a + 0x02 + c * 4, lbl=False)
             _lat = lattitude(asp, a + 0x16 + c * 4)
             _lon = longitude(asp, a + 0x2a + c * 4)
 
-        x = asp.add_range(a + 0x3e, a + 0x3e + 4 * 4, "rho-tbl")
-        x = asp.add_range(a + 0x4e, a + 0x4e + 4 * 4, "sigma-tbl")
+        x = asp.add_range(a + 0x3e, a + 0x3e + 4 * 4, txt="rho-tbl")
+        x = asp.add_range(a + 0x4e, a + 0x4e + 4 * 4, txt="sigma-tbl")
         for c in range(4):
             x = d_q(asp, a + 0x3e + c * 4, lbl=False)
             x.lcmt = "%.3f us / 2^23" % (x.dec * 2**23)
             d_q(asp, a + 0x4e + c * 4, lbl=False)
 
-        x = asp.add_range(a + 0x5e, a + 0x5e + 5, "epsilon-tbl")
+        x = asp.add_range(a + 0x5e, a + 0x5e + 5, txt="epsilon-tbl")
         for c in range(5):
             cbyte(asp, a + 0x5e + c)
 
@@ -399,7 +399,7 @@ def misc_stuff(cx):
     # idx into tbl at b156
     # Chain data (18 pieces)
     #
-    x = cx.m.add_range(0xb132, 0xb155, "tbl")
+    x = cx.m.add_range(0xb132, 0xb155, txt="tbl")
     n = 0
     for a in range(x.lo, x.hi, 2):
         y = cword(cx.m, a)
@@ -407,7 +407,7 @@ def misc_stuff(cx):
         cx.m.set_label(0xb156 + y.val, "CHAIN_I_" + CHAINS[n])
         n += 1
 
-    x = cx.m.add_range(0xb156, 0xb43e, "tbl")
+    x = cx.m.add_range(0xb156, 0xb43e, txt="tbl")
     for a in range(x.lo, x.hi, 4):
         #data.Data(cx.m, a, a + 4)
         d_q(cx.m, a, lbl=False)
@@ -419,7 +419,7 @@ def misc_stuff(cx):
         c = cword(cx.m, a)
         c.fmt = "%d" % c.val
 
-    x = cx.m.add_range(0x9d00, 0x9d20, "tbl")
+    x = cx.m.add_range(0x9d00, 0x9d20, txt="tbl")
     cx.m.set_line_comment(x.lo, "accessed via 0x9cc2 pointer")
     for a in range(x.lo, x.hi, 2):
         c = cword(cx.m, a)
@@ -449,7 +449,7 @@ def misc_stuff(cx):
     for i in range(0xe363, 0xe369, 2):
         x = cx.codeptr(i)
 
-    x = cx.m.add_range(0xb963, 0xb975, "tbl")
+    x = cx.m.add_range(0xb963, 0xb975, txt="tbl")
     for i in range(x.lo, x.hi):
         cbyte(cx.m, i)
 

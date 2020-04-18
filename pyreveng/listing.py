@@ -53,13 +53,10 @@ class List():
     def __lt__(self, other):
         return (self.lo, self.pri) < (other.lo, other.pri)
 
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self.lo == other.lo and self.hi == other.hi
-
     def __repr__(self):
         return "<List (%s) %x-%x>" % (str(self.__class__), self.lo, self.hi)
 
-    def render(self, _fo):
+    def render(self, _fo, _lst):
         print("NO render", self)
 
     def afmt(self, a=None):
@@ -72,7 +69,7 @@ class ListSegmentStart(List):
         super().__init__(lst, lo, lo, 11)
         self.asp = asp
 
-    def render(self, fo):
+    def render(self, fo, _lst):
         self.lst.purge_lcmt()
         if self.lst.in_seg is not None:
             fo.write('\n')
@@ -85,7 +82,7 @@ class ListSegmentEnd(List):
         super().__init__(lst, hi, hi, 10)
         self.asp = asp
 
-    def render(self, _fo):
+    def render(self, _fo, _lst):
         self.lst.purge_lcmt()
         self.lst.in_seg = False
 
@@ -94,30 +91,35 @@ class ListRangeStart(List):
         super().__init__(lst, rng.lo, rng.lo, 21)
         self.rng = rng
 
-    def render(self, fo):
+    def render(self, fo, lst):
         self.lst.purge_lcmt()
+        if self.rng.indent:
+            lst.nindent += 1
         r = self.rng
-        fo.write(
-            "%s-%s\t%s\n" % (
-                self.afmt(r.lo),
-                self.afmt(r.hi),
-                r.txt,
+        if self.rng.visible:
+            fo.write(
+                "%s-%s\t%s\n" % (
+                    self.afmt(r.lo),
+                    self.afmt(r.hi),
+                    r.txt,
+                )
             )
-        )
 
 class ListRangeEnd(List):
     def __init__(self, lst, rng):
         super().__init__(lst, rng.hi, rng.hi, 20)
         self.rng = rng
 
-    def render(self, _fo):
+    def render(self, _fo, lst):
         self.lst.purge_lcmt()
+        if self.rng.indent:
+            lst.nindent -= 1
 
 class ListBlockComment(List):
     def __init__(self, lst, lo):
         super().__init__(lst, lo, lo, 30)
 
-    def render(self, fo):
+    def render(self, fo, _lst):
         self.lst.purge_lcmt()
         fo.write(self.afmt() + " ; " + "-" * 86 + "\n")
         for i in self.lst.asp.get_block_comments(self.lo):
@@ -130,7 +132,7 @@ class ListLineComment(List):
         super().__init__(lst, lo, lo, 50)
         self.lcmt = set(lcmt)
 
-    def render(self, _fo):
+    def render(self, _fo, _lst):
         for i in sorted(self.lcmt):
             for j in tolines(i):
                 self.lst.lcmts.append(j.rstrip())
@@ -141,7 +143,7 @@ class ListLabel(List):
         super().__init__(lst, lo, lo, 40)
         self.lbl = lbl
 
-    def render(self, fo):
+    def render(self, fo, _lst):
         self.lst.purge_lcmt()
         for lbl in sorted(self.lst.asp.get_labels(self.lo)):
             fo.write(tabto(self.afmt(), self.lst.x_label) + lbl.strip() + ":" + "\n")
@@ -153,9 +155,9 @@ class ListLeaf(List):
         self.leaf = leaf
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.leaf.render() == other.leaf.render() and self.leaf.lcmt == other.leaf.lcmt
+        return self.__class__ == other.__class__ and self.lo == other.lo and self.hi == other.hi and self.leaf.render() == other.leaf.render() and self.leaf.lcmt == other.leaf.lcmt
 
-    def render(self, fo):
+    def render(self, fo, _lst):
         if self.leaf.lcmt:
             self.lst.purge_lcmt()
             for i in tolines(self.leaf.lcmt):
@@ -192,9 +194,11 @@ class Listing():
             compact_xxx=False,
             align_blank=False,
             blanks=None,
+            indent='┆ ',
         ).items():
             setattr(self, an, kwargs.pop(an) if an in kwargs else dv)
         assert not kwargs, "Surplus kwargs: " + str(kwargs)
+        self.nindent = 0
 
         assert not self.fo or not self.fn
 
@@ -265,19 +269,20 @@ class Listing():
         prev = None
         for i in sorted(self.plan):
             if i == prev:
+                # print("DUP", i, prev)
                 continue
             if i.lo < last:
                 print("OVERLAP", i, prev)
                 print("prev:")
-                prev.render(sys.stdout)
+                prev.render(sys.stdout, self)
                 print("this:")
-                i.render(sys.stdout)
+                i.render(sys.stdout, self)
                 continue
             prev = i
             while i.lo > last:
                 last = self.gap(last, i.lo)
             last = i.hi
-            i.render(self.fo)
+            i.render(self.fo, self)
         self.fo.flush()
 
     def fmt_adr(self, lo, hi):
@@ -319,7 +324,7 @@ class Listing():
             else:
                 t = ''
             if leaf:
-                t = tabto(t, self.x_leaf) + leaf.pop(0).rstrip()
+                t = tabto(t, self.x_leaf) + self.indent * self.nindent + leaf.pop(0).rstrip()
             if self.lcmts:
                 t = tabto(t, self.x_lcmt) + "; " + self.lcmts.pop(0)
             if pil:

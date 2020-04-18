@@ -290,7 +290,7 @@ def one_eprom(cx, start, eprom_size):
         print("NB: Bad Eprom checksum @%x" % start)
         j = "BAD"
 
-    c = cx.m.add_range(start, start + eprom_size, "EPROM")
+    c = cx.m.add_range(start, start + eprom_size, txt="EPROM")
 
     c = data.Data(cx.m, start, start + 2, "u16")
     c.rendered = ".WORD 0x%04x" % cx.m.bu16(start)
@@ -316,7 +316,7 @@ def eprom(cx, start, end, sz):
     lx.append(end & 0xff)
 
 def cmd_tbl(cx, start, end):
-    x = cx.m.add_range(start, end, "CMD_TABLE")
+    x = cx.m.add_range(start, end, txt="CMD_TABLE")
     cx.m.set_label(start, "CMD_TABLE")
     l = list()
     for a in range(start, end, 2):
@@ -325,7 +325,7 @@ def cmd_tbl(cx, start, end):
     return l
 
 def arg_range(cx, cmds, start, end):
-    x = cx.m.add_range(start, end, "ARG_RANGE")
+    x = cx.m.add_range(start, end, txt="ARG_RANGE")
     cx.m.set_label(start, "ARG_RANGE")
     l = list()
     n = 0
@@ -351,7 +351,7 @@ def cmd_dispatch(cx, cmds, start):
             c.lcmt = CMD_DESC[i]
         cx.m.set_label(c.dst, "CMD_%s" % i)
         a += 2
-    x = cx.m.add_range(start, a, "CMD_DISPATCH")
+    x = cx.m.add_range(start, a, txt="CMD_DISPATCH")
     cx.m.set_label(start, "CMD_DISPATCH")
 
 def key_dispatch(cx, start, end):
@@ -380,12 +380,12 @@ def key_dispatch(cx, start, end):
             else:
                 c.lcmt = n + " = " + str(list(cx.m.get_labels(c.dst)))
             a += 2
-    x = cx.m.add_range(start, a, "KEY_DISPATCH")
+    x = cx.m.add_range(start, a, txt="KEY_DISPATCH")
     cx.m.set_label(start, "KEY_DISPATCH")
 
 def dsp_dispatch(cx, start, end):
     assert start + 16 == end
-    x = cx.m.add_range(start, end, "DSP_DISPATCH")
+    x = cx.m.add_range(start, end, txt="DSP_DISPATCH")
     cx.m.set_label(start, "DSP_DISPATCH")
     a = start
     for i in ("AVG", "STD", "MIN", "MAX", "REF", "EVT", "ALL", "ALL"):

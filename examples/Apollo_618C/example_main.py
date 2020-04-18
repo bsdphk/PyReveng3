@@ -87,7 +87,7 @@ def example():
     ###################################################################
 
     def tbl(seg, off_lo, off_hi):
-        cx.m.add_range(off_lo, off_hi, "%04x-jmp-tbl" % seg)
+        cx.m.add_range(off_lo, off_hi, txt="%04x-jmp-tbl" % seg)
         for i in range(off_lo, off_hi, 2):
             off = cx.m.lu16(i)
             a = (seg << 4) + off
@@ -154,7 +154,7 @@ def example():
 
     def text_lines(cx, a):
         # cx.m.set_line_comment(a, "txt-tbl")
-        cx.m.add_range(a, a + 24, "text-tbl")
+        cx.m.add_range(a, a + 24, txt="text-tbl")
         data.Txt(cx.m, a, a + 8, label=False)
         data.Txt(cx.m, a + 8, a + 16, label=False)
         data.Txt(cx.m, a + 16, a + 24, label=False)

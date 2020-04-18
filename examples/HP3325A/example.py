@@ -86,7 +86,7 @@ def example():
 
     #######################################################################
     def jmp_table(lo, hi, span, txt="table", src=None):
-        x = cx.m.add_range(lo, hi, "table")
+        x = cx.m.add_range(lo, hi, txt="table")
         if src is None:
             ins = None
         else:

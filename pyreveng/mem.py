@@ -60,10 +60,12 @@ class MemError(Exception):
 
 class Range():
     ''' A range grouping '''
-    def __init__(self, lo, hi, txt):
+    def __init__(self, lo, hi, txt, indent=False, visible=True):
         self.lo = lo
         self.hi = hi
         self.txt = txt
+        self.indent = indent
+        self.visible = visible
 
     def __repr__(self):
         return "<range 0x%x-0x%x %s>" % (self.lo, self.hi, self.txt)
@@ -211,8 +213,8 @@ class AddressSpace():
     def get_all_block_comments(self):
         yield from self.bcmt_d.items()
 
-    def add_range(self, lo, hi, txt):
-        r = Range(lo, hi, txt)
+    def add_range(self, lo, hi, **kwargs):
+        r = Range(lo, hi, **kwargs)
         self.rangelist.append(r)
         return r
 
@@ -416,10 +418,10 @@ class MemMapper(AddressSpace):
     def get_all_block_comments(self):
         yield from self.get_all_somethings("get_all_block_comments")
 
-    def add_range(self, lo, hi, txt):
+    def add_range(self, lo, hi, **kwargs):
         ms, sa, _sh = self.xlat(lo, False)
-        ms.add_range(sa, sa + hi - lo, txt)
-        return super().add_range(lo, hi, txt)
+        ms.add_range(sa, sa + hi - lo, **kwargs)
+        return super().add_range(lo, hi, **kwargs)
 
     def segments(self):
         for low, high, _offset, mem, _shared in sorted(self.seglist):
