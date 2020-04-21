@@ -272,10 +272,10 @@ class Listing():
                 # print("DUP", i, prev)
                 continue
             if i.lo < last:
-                print("OVERLAP", i, prev)
-                print("prev:")
+                print("OVERLAP")
+                print("prev:", prev)
                 prev.render(sys.stdout, self)
-                print("this:")
+                print("this:", i)
                 i.render(sys.stdout, self)
                 continue
             prev = i
