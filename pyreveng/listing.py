@@ -195,6 +195,7 @@ class Listing():
             align_blank=False,
             blanks=None,
             indent='┆ ',
+            wordspace=' ',
         ).items():
             setattr(self, an, kwargs.pop(an) if an in kwargs else dv)
         assert not kwargs, "Surplus kwargs: " + str(kwargs)
@@ -206,7 +207,7 @@ class Listing():
             self.charset = [' '] * 256
             for i in range(0x20, 0x7f):
                 self.charset[i] = '%c' % i
-        assert len(self.charset) == 256
+        # assert len(self.charset) == 256    XXX: should be wordsize ?
 
         if self.lo is None:
             self.lo = asp.lo
@@ -272,6 +273,7 @@ class Listing():
                 # print("DUP", i, prev)
                 continue
             if i.lo < last:
+                print("")
                 print("OVERLAP")
                 print("prev:", prev)
                 prev.render(sys.stdout, self)
@@ -288,23 +290,27 @@ class Listing():
     def fmt_adr(self, lo, hi):
         t = self.asp.afmt(lo) + " "
         s = []
+        w = []
         for _k in range(self.ncol):
             if lo < hi:
                 x = self.asp.dfmt(lo)
-                t += " " + x
+                w.append(x)
                 y = self.asp.tfmt(lo)
                 s += y
             else:
-                t += " " + " " * len(x)
+                w.append(" " * len(x))
                 s += [None] * len(y)
             lo += 1
-        t += "  |"
-        for j in s:
-            if j is not None:
-                t += self.charset[j]
-            else:
-                t += ' '
-        return t + "|"
+        t += self.wordspace.join(w)
+        if self.charset:
+            t += "  |"
+            for j in s:
+                if j is not None:
+                    t += self.charset[j]
+                else:
+                    t += ' '
+            t += "|"
+        return t
 
     def format(self, fo, lo, hi, leaf, pil, compact=True):
         lines = len(leaf)
