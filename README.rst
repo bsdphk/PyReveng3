@@ -95,6 +95,16 @@ Disassemblers and examples using them
   * ```HP3455A/example.py```
     HP3455 Digital Voltmeter
 
+* Hewlett Packard Hybrid Processor
+
+  * ```HP8566A/example.py```
+    HP8566A Spectrum Analyzer
+
+* Hewlett Packard Saturn (1LT8)
+
+  * ```HP48/example.py```
+    HP48GX Scientific Calculator
+
 * Intel i8085
 
 (No in-project examples)
