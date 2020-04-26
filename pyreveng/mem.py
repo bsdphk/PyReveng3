@@ -584,21 +584,24 @@ class WordMem(AddressSpace):
                 ll.append((w >> b) & 0xff)
         return ll
 
-    def _do_ascii(self, w):
-        """Return an ASCII representation of a value"""
-        s = " |"
-        b = self.bits - 8
-        while b >= 0:
-            if w is None:
-                s += " "
-            else:
-                x = (w >> b) & 0xff
-                if 32 < x < 127:
-                    s += "%c" % x
-                else:
-                    s += " "
-            b -= 8
-        return s + "|"
+    @mapped
+    def be(self, adr, n=2):
+        ''' Big endian multiword '''
+        v = 0
+        for a in range(adr, adr + n):
+            v <<= self.bits
+            v |= self[a]
+        return v
+
+    @mapped
+    def le(self, adr, n=2):
+        ''' Little endian multiword '''
+        v = 0
+        s = 0
+        for a in range(adr, adr + n):
+            v |= self[a] << s
+            s += self.bits
+        return v
 
 class ByteMem(WordMem):
 
