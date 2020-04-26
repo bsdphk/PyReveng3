@@ -43,9 +43,14 @@ XXX: Need resolution of who controls rendering...
 import os.path
 import ctypes
 
-from pyreveng import tree, leaf, data
+from pyreveng import tree, leaf
 
 DEFINED = (1 << 7)
+
+def mapped(x):
+    ''' Decorator to mark methods which should be "exported" up to MemMapper'''
+    x.ismapped = True
+    return x
 
 class MemError(Exception):
 
@@ -121,20 +126,6 @@ class AddressSpace():
         self.afmtpct = "%%0%dx" % pos
         self.apct = "0x%%0%dx" % pos
 
-    def octal_format(self, pos=None):
-        ''' Render stuff in octal '''
-        if pos is None:
-            pos = max(len("%o" % self.lo), len("%o" % (self.hi - 1)))
-        self.afmtpct = "%%0%do" % pos
-        self.apct = "0%%0%do" % pos
-
-    def set_apct(self, pct=None):
-        assert False
-        if pct is None:
-            al = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-            pct = "0x%%0%dx" % al
-        self.apct = pct
-
     def adr(self, dst):
         ''' Render an address '''
         lbl = list(self.get_labels(dst))
@@ -145,7 +136,7 @@ class AddressSpace():
     def afmt(self, adr, sym=False):
         ''' Format address '''
         if sym:
-            lbl = list(self.get_labels(dst))
+            lbl = list(self.get_labels(adr))
             if lbl:
                 return lbl[0]
         return self.afmtpct % adr
@@ -221,18 +212,15 @@ class AddressSpace():
     def ranges(self):
         yield from self.rangelist
 
-    def bytearray(self, _lo, _bcnt):
-        assert False
-
-    def insert(self, leaf):
-        leaf.aspace = self
-        return self.t.insert(leaf)
+    def insert(self, lf):
+        lf.aspace = self
+        return self.t.insert(lf)
 
     def find(self, *args, **kwargs):
         yield from self.t.find(*args, **kwargs)
 
     def occupied(self, *args, **kwargs):
-        for i in self.find(*args, **kwargs):
+        for _i in self.find(*args, **kwargs):
             return True
         return False
 
@@ -296,8 +284,28 @@ class MemMapper(AddressSpace):
             self.xlat = self.xlatn
         else:
             self.bits = mem.bits
+        self.map_methods(mem)
 
-    def xlat0(self, adr, fail=True):
+    def map_methods(self, mem):
+        ''' Create wrapper methods in this class, for the @mapped decorated
+        methods of the memory we map.
+        '''
+        for f in dir(mem):
+            if getattr(self, f, False):
+                continue
+            a = getattr(mem, f)
+            if callable(a) and getattr(a, "ismapped", False):
+                #print("MAP", f, "from", mem)
+                src = "def %s(self, adr, *args, **kwargs):\n" % f
+                src += "    ms, sa, _sh = self.xlat(adr)\n"
+                src += "    return ms.%s(sa, *args, **kwargs)\n" % f
+                src += "\n"
+                d = {}
+                exec(src, {}, d)
+                setattr(self.__class__, f, d[f])
+
+
+    def xlat0(self, adr, _fail=True):
         return self, adr, False
 
     def xlat1(self, adr, fail=True):
@@ -331,7 +339,7 @@ class MemMapper(AddressSpace):
         for i in self.t:
             assert not isinstance(i, self.Link), i
             yield i
-        for low, high, offset, mem, shared in self.seglist:
+        for low, high, offset, mem, _shared in self.seglist:
             for i in mem.t:
                 ll = i.lo + low - offset
                 hh = i.hi + low - offset
@@ -355,27 +363,27 @@ class MemMapper(AddressSpace):
             lo = hi - 1
         #print("FS", "%x" % lo, "%x" % hi)
         yield from super().find(lo=lo, hi=hi, **kwargs)
-        for low, high, offset, mem, shared in self.seglist:
+        for low, high, offset, mem, _shared in self.seglist:
             #print(" fs", "%x" % low, "%x" % high, "%x" % offset)
             if low <= hi or lo <= high:
                 ll = max(lo, low) + offset - low
                 hh = min(hi, high) + offset - low
                 #print("  fs", "%x" % ll, "%x" % hh)
-                for j in mem.find(lo=ll , hi=hh, **kwargs):
+                for j in mem.find(lo=ll, hi=hh, **kwargs):
                     #print("   fs", j)
                     x = self.dealienate(j, low, offset)
                     #print("    fs", x)
                     yield x
 
     def set_something(self, what, adr, *args):
-        ms, sa, sh = self.xlat(adr, False)
+        ms, sa, _sh = self.xlat(adr, False)
         if ms == self:
             getattr(super(), what)(adr, *args)
         else:
             getattr(ms, what)(sa, *args)
 
     def get_something(self, what, adr, *args):
-        ms, sa, sh = self.xlat(adr, False)
+        ms, sa, _sh = self.xlat(adr, False)
         if ms == self:
             yield from getattr(super(), what)(adr, *args)
         else:
@@ -383,7 +391,7 @@ class MemMapper(AddressSpace):
 
     def get_all_somethings(self, what):
         yield from getattr(super(), what)()
-        for low, high, offset, mem, shared in self.seglist:
+        for low, high, offset, mem, _shared in self.seglist:
             for a, b in getattr(mem, what)():
                 aa = a + low - offset
                 if low <= aa < high:
@@ -435,10 +443,6 @@ class MemMapper(AddressSpace):
         ms, sa, _sh = self.xlat(adr)
         return ms.set_attr(sa, aval)
 
-    def _afmt(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.afmt(adr)
-
     def dfmt(self, adr):
         ms, sa, _sh = self.xlat(adr, False)
         if ms == self:
@@ -448,66 +452,6 @@ class MemMapper(AddressSpace):
     def tfmt(self, adr):
         ms, sa, _sh = self.xlat(adr)
         return ms.tfmt(sa)
-
-    def u8(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.u8(sa)
-
-    def lu16(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.lu16(sa)
-
-    def bu16(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bu16(sa)
-
-    def lu32(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.lu32(sa)
-
-    def bu32(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bu32(sa)
-
-    def lu64(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.lu64(sa)
-
-    def bu64(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bu64(sa)
-
-    def s8(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.s8(sa)
-
-    def ls16(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.ls16(sa)
-
-    def bs16(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bs16(sa)
-
-    def ls32(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.ls32(sa)
-
-    def bs32(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bs32(sa)
-
-    def ls64(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.ls64(sa)
-
-    def bs64(self, adr):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bs64(sa)
-
-    def bytearray(self, adr, ln):
-        ms, sa, _sh = self.xlat(adr)
-        return ms.bytearray(sa, ln)
 
     def gaps(self):
         for glo, ghi in super().gaps():
@@ -519,7 +463,7 @@ class MemMapper(AddressSpace):
                 yield glo, ghi
 
     def insert(self, item):
-        ms, sa, sh = self.xlat(item.lo, False)
+        ms, sa, _sh = self.xlat(item.lo, False)
         if ms != self:
             item.aspace = self
             ll = self.Link(sa, item.hi - (item.lo - sa), item)
@@ -626,7 +570,7 @@ class WordMem(AddressSpace):
         self.a[b] &= ~x
 
     def tfmt(self, adr):
-        l = []
+        ll = []
         b = self.bits
         try:
             w = self[adr]
@@ -635,10 +579,10 @@ class WordMem(AddressSpace):
         while b >= 8:
             b -= 8
             if w is None:
-                l.append(None)
+                ll.append(None)
             else:
-                l.append((w >> b) & 0xff)
-        return l
+                ll.append((w >> b) & 0xff)
+        return ll
 
     def _do_ascii(self, w):
         """Return an ASCII representation of a value"""
@@ -677,6 +621,7 @@ class ByteMem(WordMem):
         return "<ByteMem 0x%x-0x%x, %d attr %s>" % (
             self.lo, self.hi, self.attr, self.name)
 
+    @mapped
     def bytearray(self, lo, bcnt):
         i = self._off(lo)
         return bytearray(self.m[i:i+bcnt])
@@ -687,16 +632,19 @@ class ByteMem(WordMem):
         except MemError:
             return (None,)
 
+    @mapped
     def u8(self, a):
         """Unsigned 8-bit byte"""
         return self[a]
 
+    @mapped
     def bu16(self, a):
         """Big Endian Unsigned 16-bit half-word"""
         b = self[a] << 8
         b |= self[a + 1]
         return b
 
+    @mapped
     def bu32(self, a):
         """Big Endian Unsigned 32-bit word"""
         b = self[a] << 24
@@ -705,6 +653,7 @@ class ByteMem(WordMem):
         b |= self[a + 3]
         return b
 
+    @mapped
     def bu64(self, a):
         """Big Endian Unsigned 64-bit double-word"""
         b = self[a] << 56
@@ -717,12 +666,14 @@ class ByteMem(WordMem):
         b |= self[a + 7]
         return b
 
+    @mapped
     def lu16(self, a):
         """Little Endian Unsigned 16-bit half-word"""
         b = self[a]
         b |= self[a + 1] << 8
         return b
 
+    @mapped
     def lu32(self, a):
         """Little Endian Unsigned 32-bit word"""
         b = self[a]
@@ -731,6 +682,7 @@ class ByteMem(WordMem):
         b |= self[a + 3] << 24
         return b
 
+    @mapped
     def lu64(self, a):
         """Little Endian Unsigned 64-bit double-word"""
         b = self[a]
@@ -743,6 +695,7 @@ class ByteMem(WordMem):
         b |= self[a + 7] << 56
         return b
 
+    @mapped
     def s8(self, a):
         """Signed 8-bit byte"""
         b = self[a]
@@ -750,6 +703,7 @@ class ByteMem(WordMem):
             b -= 256
         return b
 
+    @mapped
     def bs16(self, a):
         """Big Endian Signed 16-bit half-word"""
         b = self.bu16(a)
@@ -757,6 +711,7 @@ class ByteMem(WordMem):
             b -= 0x10000
         return b
 
+    @mapped
     def ls16(self, a):
         """Little Endian Signed 16-bit half-word"""
         b = self.lu16(a)
@@ -764,6 +719,7 @@ class ByteMem(WordMem):
             b -= 0x10000
         return b
 
+    @mapped
     def bs32(self, a):
         """Big Endian Signed 32-bit word"""
         b = self.bu32(a)
@@ -771,6 +727,7 @@ class ByteMem(WordMem):
             b -= 0x100000000
         return b
 
+    @mapped
     def ls32(self, a):
         """Little Endian Signed 32-bit word"""
         b = self.lu32(a)
@@ -778,6 +735,7 @@ class ByteMem(WordMem):
             b -= 0x100000000
         return b
 
+    @mapped
     def bs64(self, a):
         """Big Endian Signed 64-bit double-word"""
         b = self.bu64(a)
@@ -785,6 +743,7 @@ class ByteMem(WordMem):
             b -= 0x10000000000000000
         return b
 
+    @mapped
     def ls64(self, a):
         """Little Endian Signed 64-bit double-word"""
         b = self.lu64(a)
@@ -792,8 +751,8 @@ class ByteMem(WordMem):
             b -= 0x10000000000000000
         return b
 
-    def load_data(self, first, step, data):
-        for i in data:
+    def load_data(self, first, step, dat):
+        for i in dat:
             self[first] = i
             first += step
 
