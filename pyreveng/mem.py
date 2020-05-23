@@ -101,6 +101,7 @@ class AddressSpace():
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
         self.hex_format()
+        self.has_pil = False
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (

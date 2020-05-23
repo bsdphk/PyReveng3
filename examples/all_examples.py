@@ -64,15 +64,22 @@ def one_example(dir, example):
         else:
             fn = "_output/" + nm + ".%02d" % i
         print(i, j, fn)
-        for a, b in (
-            (".asm", False),
-            # (".pil", True)
-        ):
+
+        listing.Listing(
+            j,
+            ncol = 8,
+            fn = fn + ".asm",
+            pil=False,
+            align_blank=True,
+            align_xxx=True,
+            compact_xxx=True,
+        )
+        if j.has_pil:
             listing.Listing(
                 j,
                 ncol = 8,
-                fn = fn + a,
-                pil=b,
+                fn = fn + ".pil",
+                pil=True,
                 align_blank=True,
                 align_xxx=True,
                 compact_xxx=True,
