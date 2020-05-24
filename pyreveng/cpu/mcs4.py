@@ -67,7 +67,7 @@ INC	r		|0 1 1 0| r	| {
 ISZ	r,adr,isz,>JC	|0 1 1 1| r	| adr		| {
 	R = add i4 R , 1
 	%0 = icmp i4 R , 0
-	br i1 %0 , SKIP , NEXT
+	br i1 %0 , label SKIP , label NEXT
 }
 ADD	r		|1 0 0 0| r	| {
 	%0 = zext i1 %C to i4
@@ -189,7 +189,7 @@ STC	-		|1 1 1 1|1 0 1 0| {
 DAA	-		|1 1 1 1|1 0 1 1| {
 	%0 = icmp gt i4 %A , 9
 	%1 = or i1 %C , %0
-	br %1 label %2 , NEXT
+	br %1 label %2 , label NEXT
 %2:
 	%3 = pyreveng.carry.add ( %A , 6 )
 	%A = add i4 %A , 6
@@ -280,9 +280,9 @@ class mcs4_ins(assy.Instree_ins):
             l.append(["%2", "=", "load", "i1", "addrspace", "(", "5", ")", "*", "0"])
             l.append(["%0", "=", "or", "i1", "%0", ",", "%TEST"])
         if cc & 0x8:
-            l.append(["br", "i1", "%0", ",", "NEXT", ",", "SKIP"])
+            l.append(["br", "i1", "%0", ",", "label", "NEXT", ",", "label", "SKIP"])
         else:
-            l.append(["br", "i1", "%0", ",", "SKIP", ",", "NEXT"])
+            l.append(["br", "i1", "%0", ",", "label", "SKIP", ",", "label", "NEXT"])
         self.add_il(l)
 
 class mcs4(assy.Instree_disass):
