@@ -257,6 +257,7 @@ class MemMapper(AddressSpace):
         def __init__(self, lo, hi, them):
             super().__init__(lo, hi, "Alien")
             self.them = them
+            self.compact = True
 
         def render(self):
             t = "ALIEN"
