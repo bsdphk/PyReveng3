@@ -205,7 +205,11 @@ class Decoder():
         xx = None
         while self.todo:
             asp, adr, src = self.todo.pop()
-            x = self.decode_one(asp, adr, src)
+            try:
+                x = self.decode_one(asp, adr, src)
+            except Exception:
+                self.lang.busy = False
+                raise
             if adr == a0 and x:
                 xx = x
         self.lang.busy = False
