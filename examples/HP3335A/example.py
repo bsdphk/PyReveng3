@@ -79,7 +79,9 @@ def example():
 
     cx = mc6800.mc6800()
     cx.m.map(m, 0x6800)
-    cx.m.map(m, 0xfff8, 0x10000, offset=0x17f8)
+    nmi = m.bu16(m.hi - 4)
+    print("NMI %x" % nmi)
+    cx.m.map(m, 0x8000 | nmi, 0x10000, offset=nmi - 0x6800)
 
     for a, l in SYMBOLS.items():
         cx.m.set_label(a, l)
