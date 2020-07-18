@@ -30,11 +30,26 @@
 from pyreveng import mem, listing, data
 import pyreveng.cpu.mc6809 as mc6809
 import pyreveng.cpu.banked as banked
+import pyreveng.toolchest.bitmap as bitmap
 
 NAME = "HP8904_BANKED"
 FILENAME1 = "08904-87011.BIN"
 DIR = "/critter/Doc/TestAndMeasurement/HP8904A/FW/"
 NPG = 6
+
+CHARSET = dict(data.ASCII.items())
+CHARSET[0x00] = "f̲"
+CHARSET[0x01] = "1̲"
+CHARSET[0x02] = "2̲"
+CHARSET[0x03] = "3̲"
+CHARSET[0x04] = "4̲"
+CHARSET[0x05] = "φ"
+CHARSET[0x06] = "µ"
+
+class Txt(data.Txt):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, charset=CHARSET, **kwargs)
 
 SYMBOLS = (
     (0, 0x0100, "SERVICE_SWITCH"),
@@ -63,9 +78,14 @@ SYMBOLS = (
     (0, 0x1003, "PTM_TIMER2"),
     (0, 0x1004, "PTM_TIMER3"),
 
-        (0, 0x8dba, "SETUP_MENU(Y, U)"),
-        (0, 0x8efe, "MENU_EXIT()"),
-        (0, 0xc52a, "MENU_NOP()"),
+    (0, 0x8dba, "SETUP_MENU(Y, U)"),
+    (0, 0x8efe, "MENU_EXIT()"),
+    (0, 0xc52a, "MENU_NOP()"),
+
+    (0, 0xd68f, "LCD_WR_CTL()"),
+    (0, 0xd6b1, "LCD_WR_DATA()"),
+    (0, 0xd6d3, "LCD_RD_DATA()"),
+    (0, 0xd6f8, "LCD_RD_CTL()"),
 )
 
 def romsum(m, lo, hi):
@@ -85,7 +105,7 @@ def dataptr(cx, a):
 
 def textptr(cx, a):
     y = dataptr(cx, a)
-    data.Txt(cx[0].m, y.dst, pfx=1, label=False)
+    Txt(cx[0].m, y.dst, pfx=1, label=False)
     return y
 
 def menuxxx(cx, a):
@@ -94,7 +114,7 @@ def menuxxx(cx, a):
         y = dataptr(cx, a + i * 2)
         if y.dst not in s:
             s.add(y.dst)
-            data.Txt(cx.m, y.dst, y.dst + 40, label=False)
+            Txt(cx.m, y.dst, y.dst + 40, label=False)
 
 class MenuPage(data.Data):
 
@@ -102,8 +122,8 @@ class MenuPage(data.Data):
         super().__init__(cx.m, adr, adr + 10)
         self.tp = []
         x = cx.m.bu16(adr)
-        self.tp.append(data.Txt(cx.m, x, x + 40, label=False))
-        self.tp.append(data.Txt(cx.m, x + 40, x + 80, label=False))
+        self.tp.append(Txt(cx.m, x, x + 40, label=False))
+        self.tp.append(Txt(cx.m, x + 40, x + 80, label=False))
         self.fp = []
         for i in range(2, 10, 2):
             self.fp.append(cx.m.bu16(adr + i))
@@ -170,6 +190,18 @@ class mycpu(mc6809.mc6809):
         super().__init__(*args, **kwargs)
         self.flow_check.append(flow_out_ffed)
 
+def lcd_config(cx):
+
+    a = 0xea03
+    for ch in range(8):
+        bm = bitmap.BitMap(8, 8)
+        for y in range(8):
+            for x in range(8):
+                if cx[1].m[a + y] & (1<<x):
+                    bm.set(7 - x, y)
+        z = data.Data(cx[1].m, a, a + 8, fmt = str(bm))
+        a = z.hi
+
 def example():
     rv = []
     m1 = mem.Stackup((FILENAME1,), prefix=DIR)
@@ -191,6 +223,8 @@ def example():
         y.lcmt = "Bank#"
         y = data.Const(b.m, 0x4001, 0x4002)
         y.lcmt = "Checksum Adjust"
+
+    lcd_config(cx)
 
     for p, a, t in SYMBOLS:
         cx[p].m.set_label(a, t)
@@ -218,7 +252,7 @@ def example():
     ):
         for i in range(a, b, 2):
             y = data.Dataptr(cx[0].m, i, i + 2, cx[0].m.bu16(i))
-            data.Txt(cx[0].m, y.dst, pfx=1, label=False)
+            Txt(cx[0].m, y.dst, pfx=1, label=False)
 
     for a, b in (
             (0, 0x45ba,),
@@ -264,6 +298,7 @@ def example():
             (0, 0xdafe,),
             (0, 0xf07f,),
             (0, 0xf1a3,),
+            (0, 0xf212,),
             (0, 0xf42c,),
             (0, 0xfa0d,),
     ):

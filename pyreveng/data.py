@@ -32,9 +32,13 @@ import struct
 
 from pyreveng import leaf
 
-# Characters from text strings that go into their labels
+# Characters from text strings that go into their labels.
 LABELCHAR = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?_'
 
+# Standard ASCII character set.
+ASCII = {x : "%c" % x for x in range(32, 127)}
+ASCII[10] = "\\n"
+ASCII[13] = "\\r"
 
 #######################################################################
 
@@ -103,23 +107,20 @@ class Dataptr(Data):
     def render(self):
         return ".PTR\t" + self.aspace.adr(self.dst)
 
-def stringify(asp, lo, length=None, term=None):
+def stringify(asp, lo, length=None, term=None, charset=None):
     if term is None:
         term = (0,)
+    if not charset:
+        charset = ASCII
     s = ""
     while True:
         x = asp[lo]
         lo += 1
         if length is None and x in term:
             return lo, s
-        if x > 32 and x < 127:
-            s += "%c" % x
-        elif x == 32:
-            s += " "
-        elif x == 10:
-            s += "\\n"
-        elif x == 13:
-            s += "\\r"
+        t = charset.get(x)
+        if t:
+            s += t
         else:
             s += "\\x%02x" % x
         if length is not None:
@@ -129,35 +130,35 @@ def stringify(asp, lo, length=None, term=None):
 
 class Txt(Data):
     def __init__(self, asp, lo, hi=None,
-        label=True, term=None, pfx=None, align=1, splitnl=False):
+        label=True, pfx=None, align=1, splitnl=False, **kwargs):
         self.splitnl = splitnl
         self.pre = ""
         if pfx == 1:
             x = asp[lo]
             self.pre = '%d,' % x
-            hi, s = stringify(asp, lo + 1, length=x)
+            hi, s = stringify(asp, lo + 1, length=x, **kwargs)
             while hi % align:
                 hi += 1
         elif pfx is not None:
             raise Exception("unknown pfx")
         elif hi is None:
-            hi, s = stringify(asp, lo, term=term)
+            hi, s = stringify(asp, lo, **kwargs)
             while hi % align:
                 hi += 1
         else:
-            hi, s = stringify(asp, lo, hi - lo, term=term)
+            hi, s = stringify(asp, lo, hi - lo, **kwargs)
 
         super().__init__(asp, lo, hi, "txt")
         self.txt = s
         self.fmt = "'" + s + "'"
         if label:
-            l = 't_'
+            lbl = 't_'
             for i in s:
                 if i in LABELCHAR:
-                    l += i
-                elif l[-1] != '_':
-                    l += '_'
-            asp.set_label(lo, l)
+                    lbl += i
+                elif lbl[-1] != '_':
+                    lbl += '_'
+            asp.set_label(lo, lbl)
         self.compact = True
 
     def render(self):
