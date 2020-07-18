@@ -32,6 +32,9 @@ import struct
 
 from pyreveng import leaf
 
+# Characters from text strings that go into their labels
+LABELCHAR = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?_'
+
 
 #######################################################################
 
@@ -104,30 +107,25 @@ def stringify(asp, lo, length=None, term=None):
     if term is None:
         term = (0,)
     s = ""
-    v = ""
     while True:
         x = asp[lo]
         lo += 1
         if length is None and x in term:
-            return lo, s, v
+            return lo, s
         if x > 32 and x < 127:
             s += "%c" % x
-            v += "%c" % x
         elif x == 32:
             s += " "
         elif x == 10:
             s += "\\n"
-            v += "NL"
         elif x == 13:
             s += "\\r"
-            v += "CR"
         else:
             s += "\\x%02x" % x
-            v += "%%%02x" % x
         if length is not None:
             length -= 1
             if length == 0:
-                return lo, s, v
+                return lo, s
 
 class Txt(Data):
     def __init__(self, asp, lo, hi=None,
@@ -137,23 +135,29 @@ class Txt(Data):
         if pfx == 1:
             x = asp[lo]
             self.pre = '%d,' % x
-            hi, s, v = stringify(asp, lo + 1, length=x)
+            hi, s = stringify(asp, lo + 1, length=x)
             while hi % align:
                 hi += 1
         elif pfx is not None:
             raise Exception("unknown pfx")
         elif hi is None:
-            hi, s, v = stringify(asp, lo, term=term)
+            hi, s = stringify(asp, lo, term=term)
             while hi % align:
                 hi += 1
         else:
-            hi, s, v = stringify(asp, lo, hi - lo, term=term)
+            hi, s = stringify(asp, lo, hi - lo, term=term)
 
         super().__init__(asp, lo, hi, "txt")
         self.txt = s
         self.fmt = "'" + s + "'"
         if label:
-            asp.set_label(lo, "t_" + v.strip())
+            l = 't_'
+            for i in s:
+                if i in LABELCHAR:
+                    l += i
+                elif l[-1] != '_':
+                    l += '_'
+            asp.set_label(lo, l)
         self.compact = True
 
     def render(self):

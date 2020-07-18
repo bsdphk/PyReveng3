@@ -524,7 +524,7 @@ def flow_switch(asp, ins):
 class oldcmd(data.Data):
     def __init__(self, asp, lo, n):
         super().__init__(asp, lo, lo + 2)
-        x, self.name, y = data.stringify(asp, self.lo, 2)
+        _x, self.name = data.stringify(asp, self.lo, 2)
 
         self.key = asp[0x194b2 + n]
         self.imm = (asp[0x1951e + (n >> 3)] >> (n & 7)) & 1
@@ -611,7 +611,7 @@ class mnem(data.Data):
 
         self.compact = True
 
-        _a, b, _c = data.stringify(cx.m, self.lo, self.len)
+        _a, b = data.stringify(cx.m, self.lo, self.len)
         self.string = b
 
         self.hash = 0
