@@ -27,7 +27,7 @@
 '''HP8904 Synthesizer/Level Generator
 '''
 
-from pyreveng import mem, listing, data
+from pyreveng import mem, listing, data, assy
 import pyreveng.cpu.mc6809 as mc6809
 import pyreveng.cpu.banked as banked
 import pyreveng.toolchest.bitmap as bitmap
@@ -176,19 +176,77 @@ def flow_out_ffed(a, b):
     if b.mne == "BSR" and b.dstadr == 0xffed:
         print("FFED", a, b.render(), b.flow_out)
         b.flow_out.pop(1)
-    if b.mne == "BSR" and b.dstadr == 0xfd89:
-        if b.lang.m[b.lo - 3] == 0xfc:
-            x = b.lang.m.bu16(b.lo - 2)
-            #data.Pstruct(b.lang.m, x, "B")
-            #data.Pstruct(b.lang.m, x + 1, "B")
-            y = b.lang.m.bu16(x)
-            b.lcmt = "= #0x%04x" % y
+
+mc6809_prologue = '''
+PROLOGUE	a	|1 1 1 1 1 1 0 0|a		|b		|0 0 0 1 0 1 1 1| c		| d		|
+PROLOGUE	b	|1 1 0 0 1 1 0 0|a		|b		|0 0 0 1 0 1 1 1| c		| d		|
+'''
+
+class mc6809_prologue_ins(assy.Instree_ins):
+
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        i = (self['c'] << 8) | self['d']
+        i = (self.hi + i) & 0xffff
+        if i != 0xfd89:
+            raise assy.Invalid("6809 PROLOGUE wrong dest")
+
+    def assy_a(self):
+        i = (self['a'] << 8) | self['b']
+        self.heap = self.lang.m.bu16(i)
+        if self.heap:
+            y = data.Const(self.lang.m, i, i + 2, func=self.lang.m.bu16, size=2)
+        else:
+            y = data.Const(self.lang.m, i, i + 1, size=1)
+        return assy.Arg_imm(self.heap)
+
+    def assy_b(self):
+        i = (self['a'] << 8) | self['b']
+        self.heap = i
+        return assy.Arg_imm(self.heap)
+
+
+mc6809_switches = '''
+SWITCH	-	|1 0 0 0 1 1 1 0| a		| b		| 58 | 49 | 6E | 9B |
+SWITCH	-	|1 0 0 0 1 1 1 0| a		| b		| 4F | 58 | 49 | 6E | 9B |
+'''
+
+class mc6809_switch_ins(assy.Instree_ins):
+
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        tbl = self['a'] << 8
+        tbl |= self['b']
+        if tbl != self.hi:
+            raise assy.Invalid("Not a recognized 6809 SWITCH ")
+        print("6809SW", lim, tbl - self.hi)
+        a = self.hi
+        n = 0
+        while True:
+            if lang.m.occupied(a):
+                break
+            d = lang.m.bu16(a)
+            if d - self.hi > 0x800:
+                print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
+                break
+            if self.hi - d > 0x800:
+                print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
+                break
+            #print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a))
+            y = lang.codeptr(a)
+            lang.m.set_label(y.dst, "SWITCH_0x%x_0x%x" % (self.hi, n))
+            a += 2
+            n += 1
+        raise assy.Invalid("6809 SWITCH incomplete")
+
 
 class mycpu(mc6809.mc6809):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.flow_check.append(flow_out_ffed)
+        self.add_ins(mc6809_switches, mc6809_switch_ins)
+        self.add_ins(mc6809_prologue, mc6809_prologue_ins)
 
 def lcd_config(cx):
 
@@ -205,7 +263,6 @@ def lcd_config(cx):
 def example():
     rv = []
     m1 = mem.Stackup((FILENAME1,), prefix=DIR)
-    rv.append(m1)
     m3 = mem.ByteMem(lo=0x0000, hi=0x4000)
 
     cx = banked.BankedCPU(NPG, mycpu)
@@ -216,6 +273,8 @@ def example():
         rv.append(cx[i].m)
 
         romsum(cx[i], 0x4000, 0x8000)
+
+    rv.append(m1)
 
     for b in cx.bank:
         print(b, b.m)
@@ -231,20 +290,6 @@ def example():
 
     cx[0].vectors()
 
-    for a, b in (
-            (0x9280, 0x92c4),
-            (0xa9d2, 0xa9dc),
-            (0xaab7, 0xaac3),
-            (0xb0cd, 0xb0dd),
-            (0xb1d0, 0xb238),
-            (0xb31a, 0xb328),
-            (0xb5ae, 0xb5ba),
-            (0xc443, 0xc463),
-            (0xd78e, 0xd79a),
-            (0xe433, 0xe43f),
-    ):
-        for i in range(a, b, 2):
-            cx[0].codeptr(i)
 
     for a, b in (
             (0xee5b, 0xee91),
@@ -254,59 +299,17 @@ def example():
             y = data.Dataptr(cx[0].m, i, i + 2, cx[0].m.bu16(i))
             Txt(cx[0].m, y.dst, pfx=1, label=False)
 
-    for a, b in (
-            (0, 0x45ba,),
-            (0, 0x4d99,),
-            (0, 0x58c7,),
-            (0, 0x5b01,),
-            (0, 0x6aef,),
-            (0, 0x6fe9,),
-
-            (1, 0x4607,),
-            (1, 0x4f71,),
-            (1, 0x5033,),
-            (1, 0x50ab,),
-            (1, 0x54ea,),
-            (1, 0x56a1,),
-            (1, 0x57b3,),
-            (1, 0x627e,),
-
-            # Common page
-            (0, 0x8000,),
-            (0, 0x8de1,),
-            (0, 0x8f6a,),
-            (0, 0xa1ac,),
-            (0, 0xa23b,),
-            (0, 0xa421,),
-            (0, 0xa45b,),
-            (0, 0xa5c9,),
-            (0, 0xa69d,),
-            (0, 0xa6cf,),
-            (0, 0xa705,),
-            (0, 0xa732,),
-            (0, 0xa758,),
-            (0, 0xc601,),
-            (0, 0xca79,),
-            (0, 0xcb68,),
-            (0, 0xcc32,),
-            (0, 0xcd13,),
-            (0, 0xce0c,),
-            (0, 0xce56,),
-            (0, 0xcebd,),
-            (0, 0xd1d1,),
-            (0, 0xd6f8,),
-            (0, 0xdafe,),
-            (0, 0xf07f,),
-            (0, 0xf1a3,),
-            (0, 0xf212,),
-            (0, 0xf42c,),
-            (0, 0xfa0d,),
+    for p, a, b in (
+            (1, 0x449a, 0x44aa),
     ):
-        cx[a].disass(b)
-        cx[a].m.set_line_comment(b, "%x:%x MANUAL" % (a, b))
+        for i in range(a, b, 2):
+            cx[p].codeptr(i)
 
     pg0(cx[0])
     pg1(cx[1])
+
+    for a in range(0x514a, 0x519a, 8):
+        data.Pstruct(cx[5].m, a, ">d")
 
     # discover.Discover(cx[0])
 
@@ -317,6 +320,28 @@ def example():
     Menu(cx[3], 0x4292, 4)
     Menu(cx[4], 0x4172, 4)
     Menu(cx[5], 0x4144, 4)
+
+    ads = set()
+    while True:
+        l = []
+        for p in range(NPG):
+            for a, b in cx[p].m.gaps():
+                try:
+                    if not cx[p].m[a]:
+                        a += 1
+                    #print("G", p, "0x%x" % a, "0x%x" % b, "0x%04x" % cx[p].m.bu16(a))
+                    if cx[p].m[a] in (0xcc, 0xfc,) and cx[p].m[a + 3] == 0x17:
+                        j = (p, a)
+                        if j not in ads:
+                            l.append(j)
+                            ads.add(j)
+                except mem.MemError:
+                    pass
+        if not l:
+            break
+        for p, a in l:
+            cx[p].disass(a)
+            cx[p].m.set_line_comment(a, "AUTODISC")
 
     return NAME, rv
 
