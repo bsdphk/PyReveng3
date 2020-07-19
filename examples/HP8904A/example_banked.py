@@ -45,6 +45,7 @@ CHARSET[0x03] = "3̲"
 CHARSET[0x04] = "4̲"
 CHARSET[0x05] = "φ"
 CHARSET[0x06] = "µ"
+CHARSET[0xff] = "▒"
 
 class Txt(data.Txt):
 
@@ -81,11 +82,16 @@ SYMBOLS = (
     (0, 0x8dba, "SETUP_MENU(Y, U)"),
     (0, 0x8efe, "MENU_EXIT()"),
     (0, 0xc52a, "MENU_NOP()"),
+    (0, 0xc579, "MEMCPY(6, len, src, dst)"),
 
-    (0, 0xd68f, "LCD_WR_CTL()"),
-    (0, 0xd6b1, "LCD_WR_DATA()"),
+    (0, 0xd7be, "LCD_CHARGEN(4, int charno, void *chardef)"),
+    (0, 0xd963, "LCD_INIT(0)"),
+    (0, 0xd68f, "LCD_WR_CTL(2, int)"),
+    (0, 0xd6b1, "LCD_WR_DATA(2, int)"),
+    (0, 0xd71c, "LCD_SET_ADR(2, int)"),
     (0, 0xd6d3, "LCD_RD_DATA()"),
     (0, 0xd6f8, "LCD_RD_CTL()"),
+    (0, 0xd867, "LCD_WRITE(6, pos, len, ptr)"),
 )
 
 def romsum(m, lo, hi):
@@ -135,7 +141,7 @@ class MenuPage(data.Data):
         for i in self.tp:
             t += "\t.txt =\t'" + i.txt + "'\n"
         for i, j in enumerate(self.fp):
-            t += "\t.f%d =\t" % (i + 1) + self.aspace.afmt(j) + "\n"
+            t += "\t.f%d =\t" % (i + 1) + self.aspace.adr(j) + "\n"
         t += "}"
         return t
 
@@ -168,9 +174,29 @@ def pg0(cx):
         print(cx, " -> %x" % a, "%x" % x, "%x" % y)
         cx[x].disass(y)
 
+
 def pg1(cx):
     for a in range(0x43af, 0x43bf, 2):
         cx.codeptr(a)
+
+def pg5(cx):
+    for a in range(0x514a, 0x519a, 8):
+        data.Pstruct(cx.m, a, ">d")
+    for a in (
+        0x77bc,
+        0x77c3,
+    ):
+        l = cx.m.bu16(a)
+        data.Txt(cx.m, a + 2, a + 2 + l)
+    for a, b in (
+        (0xea87, 0x23),
+        (0xec99, 0x28),
+        (0xea5f, 0x28),
+        (0xee18, 0x28),
+        (0xeaaa, 0x28),
+        (0xecc1, 0x28),
+    ):
+        Txt(cx.m, a, a + b)
 
 def flow_out_ffed(a, b):
     if b.mne == "BSR" and b.dstadr == 0xffed:
@@ -239,6 +265,22 @@ class mc6809_switch_ins(assy.Instree_ins):
             n += 1
         raise assy.Invalid("6809 SWITCH incomplete")
 
+mc6809_c_call = '''
+NO_ARG  d       | CE | 00 | 00 | 34 | 40 | 17 | a             | b             | 32 | 62 |
+'''
+
+class mc6809_c_call_ins(assy.Instree_ins):
+
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        print("CC0", self, lim)
+        dst = (self['a'] << 8) | self['b']
+        self.dst = (self.hi + dst - 2) & 0xffff
+        self.mne = "CALL"
+
+    def assy_d(self):
+        return assy.Arg_dst(self.lang.m, self.dst, sfx="()")
+        
 
 class mycpu(mc6809.mc6809):
 
@@ -247,6 +289,7 @@ class mycpu(mc6809.mc6809):
         self.flow_check.append(flow_out_ffed)
         self.add_ins(mc6809_switches, mc6809_switch_ins)
         self.add_ins(mc6809_prologue, mc6809_prologue_ins)
+        self.add_ins(mc6809_c_call, mc6809_c_call_ins)
 
 def lcd_config(cx):
 
@@ -290,7 +333,6 @@ def example():
 
     cx[0].vectors()
 
-
     for a, b in (
             (0xee5b, 0xee91),
             (0xef1f, 0xef41),
@@ -307,11 +349,9 @@ def example():
 
     pg0(cx[0])
     pg1(cx[1])
+    pg5(cx[5])
 
-    for a in range(0x514a, 0x519a, 8):
-        data.Pstruct(cx[5].m, a, ">d")
-
-    # discover.Discover(cx[0])
+   
 
     Menu(cx[0], 0x4257, 7)
     Menu(cx[1], 0x437d, 5)
