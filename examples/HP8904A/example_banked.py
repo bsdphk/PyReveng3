@@ -79,9 +79,13 @@ SYMBOLS = (
     (0, 0x1003, "PTM_TIMER2"),
     (0, 0x1004, "PTM_TIMER3"),
 
+    (0, 0x4000, "PAGE_NO_LATCH"),
+    (0, 0x4027, "ERROR_MSG(B)"),
+
     (0, 0x8dba, "SETUP_MENU(Y, U)"),
     (0, 0x8efe, "MENU_EXIT()"),
     (0, 0xc52a, "MENU_NOP()"),
+    (0, 0xc533, "MEMCMP(6, len, src, dst)"),
     (0, 0xc579, "MEMCPY(6, len, src, dst)"),
 
     (0, 0xd7be, "LCD_CHARGEN(4, int charno, void *chardef)"),
@@ -92,6 +96,17 @@ SYMBOLS = (
     (0, 0xd6d3, "LCD_RD_DATA()"),
     (0, 0xd6f8, "LCD_RD_CTL()"),
     (0, 0xd867, "LCD_WRITE(6, pos, len, ptr)"),
+    (0, 0xdd5d, "PG_JMP"),
+    (0, 0xd9fc, "SET_PAGE(2, pgno)"),
+    (0, 0x246a, "pg_jmp_page"),
+    (0, 0x246b, "pg_jmp_offset"),
+    (0, 0xf065, "SET_NMI_VECTOR"),
+
+    (1, 0x4170, "IRQ_HANDLER_0"),
+    (1, 0x411f, "IRQ_HANDLER_1"),
+    (2, 0x444c, "IRQ_HANDLER_2"),
+    (2, 0x42d1, "IRQ_HANDLER_3"),
+    (4, 0x419d, "IRQ_HANDLER_4"),
 )
 
 def romsum(m, lo, hi):
@@ -151,6 +166,52 @@ class Menu():
             y = MenuPage(cx, adr)
             adr = y.hi
 
+class lex(data.Data):
+
+    def __init__(self, cx, lo, pfx):
+        assert cx.m[lo]
+        hi = lo + 4
+        if cx.m[lo + 1]:
+            hi += 1
+        super().__init__(cx.m, lo, hi)
+        self.pfx = pfx
+        self.token = '%c' % cx.m[lo]
+        self.args = []
+        if cx.m[lo + 1]:
+            self.args.append(cx.m[lo + 1])
+            self.args.append(cx.m[lo + 4])
+        self.dst = cx.m.bu16(lo + 2)
+        if cx.m[lo + 1]:
+            cx.disass(self.dst)
+            cx.m.set_block_comment(self.dst, self.render())
+
+    def render(self):
+        return ".LEX\t'%s%s', 0x%x, %s" % (self.pfx, self.token, self.dst, str(self.args))
+
+def lextab(cx, a, pfx):
+    cx.m.set_label(a, "LEX_HPIB_CMD_" + pfx)
+    while cx.m[a]:
+        y = lex(cx, a, pfx)
+        if not y.args:
+            lextab(cx, y.dst, pfx + y.token)
+        a = y.hi
+    y = data.Data(cx.m, a, a + 1)
+    y.rendered = ".LEX\tEND"
+
+def pgc(cx):
+    for a in (
+        0x93fc,
+        0x9412,
+    ):
+        cx.disass(a)
+        cx.m.set_line_comment(a, "MANUAL:pgc()")
+
+    for n, a in enumerate(range(0x9ab3, 0x9ae7, 2)):
+        print("NA", n, "0x%x" % a)
+        y = dataptr(cx, a)
+        lextab(cx, y.dst, "%c" % (0x41 + n))
+   
+
 def pg0(cx):
     menuxxx(cx, 0x4018)
     cx.codeptr(0x4004)
@@ -178,6 +239,62 @@ def pg0(cx):
 def pg1(cx):
     for a in range(0x43af, 0x43bf, 2):
         cx.codeptr(a)
+    cx.disass(0x4170)	# IRQ handler
+    cx.disass(0x411f)	# IRQ handler
+
+def pg2(cx):
+    cx.disass(0x42d1)	# IRQ handler
+    cx.disass(0x444c)	# IRQ handler
+
+def pg3(cx):
+    for a, b in (
+        (0x42ba, 0x28),
+        (0x42e2, 0x1a),
+        (0x42fc, 0x28),
+        (0x4324, 0x28),
+        (0x434c, 0x10),
+        (0x436c, 0x18),
+        (0x4384, 0x28),
+        (0x43ac, 0x1a),
+        (0x43c6, 0x28),
+        (0x43ee, 0x1a),
+        (0x4408, 0x1a),
+        (0x4422, 0x28),
+        (0x444a, 0x28),
+        (0x4472, 0x28),
+        (0x44a0, 0x1a),
+        (0x44ba, 0x28),
+        (0x44e2, 0x6),
+    ):
+        Txt(cx.m, a, a + b)
+    cx.m.set_label(0x44e2, "SERVICE_CODE")
+    # stored into 0x2213
+    for a in (
+        0x4b5a,
+        0x4f40,
+        0x538c,
+        0x8f6a,
+    ):
+        cx.m.set_block_comment(a, "via 0x2213")
+        cx.disass(a)
+
+    for a in range(0x4502, 0x45e2, 4):
+        b = cx.m.bu16(a + 2)
+        data.Pstruct(cx.m, a, ">BBH", fmt="0x%02x, 0x%02x, 0x%04x")
+        Txt(cx.m, b, b + cx.m[a + 1], label=False)
+
+    for a in range(0x6654, 0x6760, 4):
+        b = cx.m.bu16(a + 2)
+        data.Pstruct(cx.m, a, ">BBH", fmt="0x%02x, 0x%02x, 0x%04x")
+        Txt(cx.m, b, b + cx.m[a + 1], label=False)
+
+    a = 0x5344
+    while a < 0x5382:
+        y = Txt(cx.m, a)
+        a = y.hi
+
+def pg4(cx):
+    cx.disass(0x419d)	# IRQ handler
 
 def pg5(cx):
     for a in range(0x514a, 0x519a, 8):
@@ -285,7 +402,7 @@ class mc6809_c_call_ins(assy.Instree_ins):
 class mycpu(mc6809.mc6809):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs, macros=True)
         self.flow_check.append(flow_out_ffed)
         self.add_ins(mc6809_switches, mc6809_switch_ins)
         self.add_ins(mc6809_prologue, mc6809_prologue_ins)
@@ -347,8 +464,12 @@ def example():
         for i in range(a, b, 2):
             cx[p].codeptr(i)
 
+    pgc(cx[0])
     pg0(cx[0])
     pg1(cx[1])
+    pg2(cx[2])
+    pg3(cx[3])
+    pg4(cx[4])
     pg5(cx[5])
 
    
