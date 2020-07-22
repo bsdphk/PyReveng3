@@ -436,539 +436,542 @@ for i in (
     "87", "8F",
     "C7", "CD", "CF",
 ):
-	mc6809_desc += "UNDEF\t-\t|\t" + i + "\t|\n"
+    mc6809_desc += "UNDEF\t-\t|\t" + i + "\t|\n"
 
 class mc6809_ins(assy.Instree_ins):
-	def __init__(self, lim, lang):
-		super().__init__(lim, lang)
-		self.isz = "i8"
-		self.icache = {}
-		self.pfx = None
-		self.off = None
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        self.isz = "i8"
+        self.icache = {}
+        self.pfx = None
+        self.off = None
 
-	def assy_PFX10(self):
-		self.pfx = 0x10
+    def assy_PFX10(self):
+        self.pfx = 0x10
 
-	def assy_AB(self):
-		self.mne += "AB"[self['a']]
+    def assy_AB(self):
+        self.mne += "AB"[self['a']]
 
-	def assy_M2(self, mm):
-		if self.mne[-1] in ('U', 'S', 'D', 'X', 'Y'):
-			self.isz = "i16"
-		self.icache["AM"] = mm
+    def assy_M2(self, mm):
+        if self.mne[-1] in ('U', 'S', 'D', 'X', 'Y'):
+            self.isz = "i16"
+        self.icache["AM"] = mm
 
-		if mm == "I":
-			if self.isz == "i16":
-				self.hi += 1
-				self.off = self.lang.m.bu16(self.hi - 2)
-				return "#0x%x" % self.off
-			else:
-				self.off = self['m']
-				return "#0x%02x" % self.off
+        if mm == "I":
+            if self.isz == "i16":
+                self.hi += 1
+                self.off = self.lang.m.bu16(self.hi - 2)
+                return "#0x%x" % self.off
+            else:
+                self.off = self['m']
+                return "#0x%02x" % self.off
 
-		if mm == "Z":
-			return "$0x%02x" % self['m']
+        if mm == "Z":
+            return "$0x%02x" % self['m']
 
-		if mm == "D":
-			self.hi += 1
-			self.dstadr = self.lang.m.bu16(self.hi - 2)
-			return assy.Arg_dst(self.lang.m, self.dstadr)
+        if mm == "D":
+            self.hi += 1
+            self.dstadr = self.lang.m.bu16(self.hi - 2)
+            return assy.Arg_dst(self.lang.m, self.dstadr)
 
-		assert mm == "C"
+        assert mm == "C"
 
-		a = self['m']
-		X = a >> 7
-		r = "XYUS"[(a>>5)&3]
-		i = (a >> 4) & 1
-		m = a & 0xf
+        a = self['m']
+        X = a >> 7
+        r = "XYUS"[(a>>5)&3]
+        i = (a >> 4) & 1
+        m = a & 0xf
 
-		if not X:
-			if i:
-				return("%s-%d" % (r, 16-m))
-			else:
-				return("%s+%d" % (r, m))
+        if not X:
+            if i:
+                return "%s-%d" % (r, 16-m)
+            else:
+                return "%s+%d" % (r, m)
 
-		self.hi += [
-		    0, 0, 0, 0, 0, 0, 0, 0,
-		    1, 2, 0, 0, 1, 2, 0, 2][m]
+        self.hi += [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            1, 2, 0, 0, 1, 2, 0, 2][m]
 
-		if m == 0 and i == 0:
-			return r + "+"
-		elif m == 1:
-			s = r + "++"
-		elif m == 2 and i == 0:
-			return "-" + r
-		elif m == 3:
-			s = "--" + r
-		elif m == 4:
-			s = r
-		elif m == 5:
-			s = r + "+B"
-		elif m == 6:
-			s = r + "+A"
-		elif m == 8:
-			self.off = self.lang.m.s8(self.hi - 1)
-			s = r + "%+d" % self.off
-		elif m == 0x9:
-			self.off = self.lang.m.bs16(self.hi - 2)
-			s = r + "%+d" % self.off
-		elif m == 0xb:
-			s = r + "+D"
-		elif m == 0xc:
-			self.off = self.lang.m.s8(self.hi - 1)
-			s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
-		elif m == 0xd:
-			self.off = self.lang.m.bs16(self.hi - 2)
-			s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
-		elif m == 0xf:
-			self.off = self.lang.m.bs16(self.hi - 2)
-			s = "0x%x" % self.off
-		else:
-			return "XXX"
-		if i:
-			return "[" + s + "]"
-		else:
-			return s
+        if m == 0 and i == 0:
+            return r + "+"
+        elif m == 1:
+            s = r + "++"
+        elif m == 2 and i == 0:
+            return "-" + r
+        elif m == 3:
+            s = "--" + r
+        elif m == 4:
+            s = r
+        elif m == 5:
+            s = r + "+B"
+        elif m == 6:
+            s = r + "+A"
+        elif m == 8:
+            self.off = self.lang.m.s8(self.hi - 1)
+            s = r + "%+d" % self.off
+        elif m == 0x9:
+            self.off = self.lang.m.bs16(self.hi - 2)
+            s = r + "%+d" % self.off
+        elif m == 0xb:
+            s = r + "+D"
+        elif m == 0xc:
+            self.off = self.lang.m.s8(self.hi - 1)
+            s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
+        elif m == 0xd:
+            self.off = self.lang.m.bs16(self.hi - 2)
+            s = "0x%x" % ((0x10000 + self.hi + self.off) & 0xffff)
+        elif m == 0xf:
+            self.off = self.lang.m.bs16(self.hi - 2)
+            s = "0x%x" % self.off
+        else:
+            return "XXX"
+        if i:
+            return "[" + s + "]"
+        else:
+            return s
 
-	def assy_M(self):
-		M = self.get('M')
-		if not M is None:
-			return self.assy_M2("IZCD"[M])
-		e = self.get('e')
-		if not e is None:
-			return self.assy_M2("CD"[e])
-		return self.assy_M2("C")
+    def assy_M(self):
+        M = self.get('M')
+        if not M is None:
+            return self.assy_M2("IZCD"[M])
+        e = self.get('e')
+        if not e is None:
+            return self.assy_M2("CD"[e])
+        return self.assy_M2("C")
 
-	def assy_MM(self):
-		mm = self.get('mm')
-		if mm == 0:
-			return self.assy_M2("Z")
-		if mm == 6:
-			return self.assy_M2("C")
-		if mm == 7:
-			return self.assy_M2("D")
-		raise assy.Invalid()
+    def assy_MM(self):
+        mm = self.get('mm')
+        if mm == 0:
+            return self.assy_M2("Z")
+        if mm == 6:
+            return self.assy_M2("C")
+        if mm == 7:
+            return self.assy_M2("D")
+        raise assy.Invalid()
 
-	def assy_XY(self):
-		if self.pfx == 0x10:
-			self.mne += "Y"
-		else:
-			self.mne += "X"
+    def assy_XY(self):
+        if self.pfx == 0x10:
+            self.mne += "Y"
+        else:
+            self.mne += "X"
 
-	def assy_SU(self):
-		if self.pfx == 0x10:
-			self.mne += "S"
-		else:
-			self.mne += "U"
+    def assy_SU(self):
+        if self.pfx == 0x10:
+            self.mne += "S"
+        else:
+            self.mne += "U"
 
-	def assy_i(self):
-		return "#0x%02x" % self['i']
+    def assy_i(self):
+        return "#0x%02x" % self['i']
 
-	def assy_CC(self):
-		self.cc = [
-			"RA", "RN", "HI", "LS", "CC", "CS", "NE", "EQ",
-			"VC", "VS", "PL", "MI", "GE", "LT", "GT", "LE"
-		][self['cc']]
-		self.mne += self.cc
-		if self['cc'] == 0:
-			self.flow_J()
-		elif self['cc'] > 1:
-			self.flow_JC()
+    def assy_CC(self):
+        self.cc = [
+            "RA", "RN", "HI", "LS", "CC", "CS", "NE", "EQ",
+            "VC", "VS", "PL", "MI", "GE", "LT", "GT", "LE"
+        ][self['cc']]
+        self.mne += self.cc
+        if self['cc'] == 0:
+            self.flow_J()
+        elif self['cc'] > 1:
+            self.flow_JC()
 
-	def assy_I(self):
-		self.dstadr = (self['I1'] << 8) | self['I2']
-		return assy.Arg_dst(self.lang.m, self.dstadr, "#")
+    def assy_I(self):
+        self.dstadr = (self['I1'] << 8) | self['I2']
+        return assy.Arg_dst(self.lang.m, self.dstadr, "#")
 
-	def assy_r(self):
-		a = self['r']
-		if a & 0x80:
-			a += 0xff00
-		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_r(self):
+        a = self['r']
+        if a & 0x80:
+            a += 0xff00
+        self.dstadr = (self.hi + a) & 0xffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_R(self):
-		a = self['R1'] << 8 | self['R2']
-		self.dstadr = (self.hi + a) & 0xffff
-		return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_R(self):
+        a = self['R1'] << 8 | self['R2']
+        self.dstadr = (self.hi + a) & 0xffff
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-	def assy_s(self):
-		# XXX: if PULL PC fix flow record
-		x = self['i']
-		l = []
-		r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
-		if self.mne[-1] == "S":
-			r[6] = "U"
-		elif self.mne[-1] == "U":
-			r[6] = "S"
-		for i in r:
-			if x & 1:
-				l.append(i)
-			x >>= 1
-		if self.mne[:3] == "PSH":
-			l = list(reversed(l))
-		elif "PC" in l:
-			self += code.Jump()
-		return ",".join(l)
+    def assy_s(self):
+        # XXX: if PULL PC fix flow record
+        x = self['i']
+        l = []
+        r = ["CCR", "A", "B", "DPR", "X", "Y", "_", "PC"]
+        if self.mne[-1] == "S":
+            r[6] = "U"
+        elif self.mne[-1] == "U":
+            r[6] = "S"
+        for i in r:
+            if x & 1:
+                l.append(i)
+            x >>= 1
+        if self.mne[:3] == "PSH":
+            l = list(reversed(l))
+        elif "PC" in l:
+            self += code.Jump()
+        return ",".join(l)
 
 
-	def assy_t(self):
-		val = self['t']
-		sr = val >> 4
-		dr = val & 0xf
-		r = [
-			"D", "X",  "Y", "U",
-			"S", "PC", "?6?", "?7?",
-			"A", "B", "CCR", "DPR",
-			"?c?", "?d?", "?e?", "?f?"
-		]
-		if r[sr][0] == "?" or r[dr][0] == "?":
-			raise assy.Invalid("Wrong arg to TFR (0x%02x)" % val)
-		return r[sr] + "," + r[dr]
+    def assy_t(self):
+        val = self['t']
+        sr = val >> 4
+        dr = val & 0xf
+        r = [
+            "D", "X", "Y", "U",
+            "S", "PC", "?6?", "?7?",
+            "A", "B", "CCR", "DPR",
+            "?c?", "?d?", "?e?", "?f?"
+        ]
+        if r[sr][0] == "?" or r[dr][0] == "?":
+            raise assy.Invalid("Wrong arg to TFR (0x%02x)" % val)
+        return r[sr] + "," + r[dr]
 
-	###############################################################
+    ###############################################################
 
-	def pil_adr(self):
+    def pil_adr(self):
 
-		am = self.icache["AM"]
+        am = self.icache["AM"]
 
-		if am == "I":
-			return None
+        if am == "I":
+            return None
 
-		if am == "Z":
-			return self.add_il([
-				["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % self['m']]
-			], "%0")
+        if am == "Z":
+            return self.add_il([
+                ["%0", "=", "add", "i16", "%DP", ",", "0x%02x" % self['m']]
+            ], "%0")
 
-		if am == "D":
-			return "0x%04x" % self.dstadr
+        if am == "D":
+            return "0x%04x" % self.dstadr
 
-		assert am == "C"
+        assert am == "C"
 
-		a = self['m']
-		X = a >> 7
-		r = "%" + "XYUS"[(a>>5)&3]
-		i = (a >> 4) & 1
-		m = a & 0xf
+        a = self['m']
+        X = a >> 7
+        r = "%" + "XYUS"[(a>>5)&3]
+        i = (a >> 4) & 1
+        m = a & 0xf
 
-		if X == 0:
-			if i:
-				return self.add_il([
-					["%0", "=", "sub", "i16", r, ",", "0x%x" % (16 - m)],
-				], "%0")
-			else:
-				return self.add_il([
-					["%0", "=", "add", "i16", r, ",", "0x%x" % m],
-				], "%0")
-		if m == 0:
-			adr = self.add_il([
-				["%0", "=", "i16", r],
-				[r, "=", "add", "i16", r, ",", "1"],
-			], "%0")
-		elif m == 1:
-			adr = self.add_il([
-				["%0", "=", "i16", r],
-				[r, "=", "add", "i16", r, ",", "2"],
-			], "%0")
-		elif m == 2:
-			self.add_il([
-				[r, "=", "sub", "i16", r, ",", "1"],
-			])
-			adr = r
-		elif m == 3:
-			self.add_il([
-				[r, "=", "sub", "i16", r, ",", "2"],
-			])
-			adr = r
-		elif m == 4:
-			adr = r
-		elif m == 5:
-			adr = self.add_il([
-				["%1", "=", "zext", "i8", "%B", "to", "i16"],
-				["%0", "=", "add", "i16", "%1", ",", r],
-			], "%0")
-		elif m == 6:
-			adr = self.add_il([
-				["%1", "=", "zext", "i8", "%A", "to", "i16"],
-				["%0", "=", "add", "i16", "%1", ",", r],
-			], "%0")
-		elif m == 8 or m == 9:
-			adr = self.add_il([
-				["%0", "=", "add", "i16", r, ",", "0x%x" % self.off],
-			], "%0")
-		elif m == 11:
-			adr = self.add_il([
-				["%0", "=", "add", "i16", r, ",", "%D"],
-			], "%0")
-		elif m == 12 or m == 13:
-			if self.off is None:
-				print("??? No .off", self, self.render())
-			adr = self.add_il([
-				["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
-			], "%0")
-		elif m == 15:
-			if self.off is None:
-				print("??? No .off", self, self.mne, self.oper)
-			adr = "0x%04x" % self.off
-		else:
-			return "XXXm%d" % m
+        if X == 0:
+            if i:
+                return self.add_il([
+                    ["%0", "=", "sub", "i16", r, ",", "0x%x" % (16 - m)],
+                ], "%0")
+            else:
+                return self.add_il([
+                    ["%0", "=", "add", "i16", r, ",", "0x%x" % m],
+                ], "%0")
+        if m == 0:
+            adr = self.add_il([
+                ["%0", "=", "i16", r],
+                [r, "=", "add", "i16", r, ",", "1"],
+            ], "%0")
+        elif m == 1:
+            adr = self.add_il([
+                ["%0", "=", "i16", r],
+                [r, "=", "add", "i16", r, ",", "2"],
+            ], "%0")
+        elif m == 2:
+            self.add_il([
+                [r, "=", "sub", "i16", r, ",", "1"],
+            ])
+            adr = r
+        elif m == 3:
+            self.add_il([
+                [r, "=", "sub", "i16", r, ",", "2"],
+            ])
+            adr = r
+        elif m == 4:
+            adr = r
+        elif m == 5:
+            adr = self.add_il([
+                ["%1", "=", "zext", "i8", "%B", "to", "i16"],
+                ["%0", "=", "add", "i16", "%1", ",", r],
+            ], "%0")
+        elif m == 6:
+            adr = self.add_il([
+                ["%1", "=", "zext", "i8", "%A", "to", "i16"],
+                ["%0", "=", "add", "i16", "%1", ",", r],
+            ], "%0")
+        elif m == 8 or m == 9:
+            adr = self.add_il([
+                ["%0", "=", "add", "i16", r, ",", "0x%x" % self.off],
+            ], "%0")
+        elif m == 11:
+            adr = self.add_il([
+                ["%0", "=", "add", "i16", r, ",", "%D"],
+            ], "%0")
+        elif m == 12 or m == 13:
+            if self.off is None:
+                print("??? No .off", self, self.render())
+            adr = self.add_il([
+                ["%0", "=", "add", "i16", r, ",", "0x%x" % (self.hi + self.off)],
+            ], "%0")
+        elif m == 15:
+            if self.off is None:
+                print("??? No .off", self, self.mne, self.oper)
+            adr = "0x%04x" % self.off
+        else:
+            return "XXXm%d" % m
 
-		if i:
-			return self.add_il([
-				["%0", "=", "load", "i16", ",", "i16*", adr],
-			], "%0")
+        if i:
+            return self.add_il([
+                ["%0", "=", "load", "i16", ",", "i16*", adr],
+            ], "%0")
 
-		return adr
+        return adr
 
-	def pilmacro_AB(self):
-		return "%" + "AB"[self['a']]
+    def pilmacro_AB(self):
+        return "%" + "AB"[self['a']]
 
-	def pilmacro_M(self):
-		m = self.icache.get("M")
-		if m is None:
-			m = self.pil_adr()
-			self.icache["M"] = m
-		assert m is not None
-		return m
+    def pilmacro_M(self):
+        m = self.icache.get("M")
+        if m is None:
+            m = self.pil_adr()
+            self.icache["M"] = m
+        assert m is not None
+        return m
 
-	def pilmacro_V(self):
-		if self.icache["AM"] == "I":
-			return "0x%x" % self.off
+    def pilmacro_V(self):
+        if self.icache["AM"] == "I":
+            return "0x%x" % self.off
 
-		m = self.pil_adr()
-		sz = self.isz
-		return self.add_il([
-			[ "%0", "=", "load", sz, ",", sz + "*", m ]
-		], "%0")
+        m = self.pil_adr()
+        sz = self.isz
+        return self.add_il(
+            [
+                ["%0", "=", "load", sz, ",", sz + "*", m]
+            ],
+            "%0"
+        )
 
-	def pilmacro_BR(self):
-		cc = self['cc']
-		if cc == 0:
-			self.add_il([["br", "label", "0x%04x" % self.dstadr]])
-			return
-		if cc == 1:
-			self.add_il([["%0", "=", "i8", "0"]])
-			return
-		if cc & 1:
-			d1 = "0x%04x" % self.dstadr
-			d2 = "HI"
-		else:
-			d1 = "HI"
-			d2 = "0x%04x" % self.dstadr
-		l = []
-		cc &= 0xe
-		if cc == 2:
-			l.append(["%0", "=", "or", "i1", "%CC.z", ",", "%CC.c"])
-			bb = "%0"
-		elif cc == 4:
-			bb = "%CC.c"
-		elif cc == 6:
-			bb = "%CC.z"
-		elif cc == 8:
-			bb = "%CC.v"
-		elif cc == 10:
-			bb = "%CC.n"
-		elif cc == 12:
-			l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
-			bb = "%0"
-		else:
-			l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
-			l.append(["%1", "=", "or", "i1", "%CC.z", ",", "%0"])
-			bb = "%1"
-		l.append(["br", "i1", bb, ",", "label", d1, ",", "label", d2])
+    def pilmacro_BR(self):
+        cc = self['cc']
+        if cc == 0:
+            self.add_il([["br", "label", "0x%04x" % self.dstadr]])
+            return
+        if cc == 1:
+            self.add_il([["%0", "=", "i8", "0"]])
+            return
+        if cc & 1:
+            d1 = "0x%04x" % self.dstadr
+            d2 = "HI"
+        else:
+            d1 = "HI"
+            d2 = "0x%04x" % self.dstadr
+        l = []
+        cc &= 0xe
+        if cc == 2:
+            l.append(["%0", "=", "or", "i1", "%CC.z", ",", "%CC.c"])
+            bb = "%0"
+        elif cc == 4:
+            bb = "%CC.c"
+        elif cc == 6:
+            bb = "%CC.z"
+        elif cc == 8:
+            bb = "%CC.v"
+        elif cc == 10:
+            bb = "%CC.n"
+        elif cc == 12:
+            l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
+            bb = "%0"
+        else:
+            l.append(["%0", "=", "xor", "i1", "%CC.n", ",", "%CC.v"])
+            l.append(["%1", "=", "or", "i1", "%CC.z", ",", "%0"])
+            bb = "%1"
+        l.append(["br", "i1", bb, ",", "label", d1, ",", "label", d2])
 
-		self.add_il(l)
+        self.add_il(l)
 
-	def pilmacro_DST(self):
-		return "0x%04x" % self.dstadr
+    def pilmacro_DST(self):
+        return "0x%04x" % self.dstadr
 
-	def pilmacro_HI(self):
-		return "0x%x" % self.hi
+    def pilmacro_HI(self):
+        return "0x%x" % self.hi
 
-	def pilmacro_I1(self):
-		return "0x%02x" % (self['I1'])
+    def pilmacro_I1(self):
+        return "0x%02x" % (self['I1'])
 
-	def pilmacro_I2(self):
-		return "0x%02x" % (self['I2'])
+    def pilmacro_I2(self):
+        return "0x%02x" % (self['I2'])
 
-	def pilmacro_I(self):
-		return "0x%02x" % (self['i'])
+    def pilmacro_I(self):
+        return "0x%02x" % (self['i'])
 
-	def pilmacro_MKAB(self):
-		self.add_il([
-			["%B", "=", "trunc", "i16", "%D", "to", "i8"],
-			["%D", "=", "lshr", "i16", "%D", ",", "8"],
-			["%A", "=", "trunc", "i16", "%D", "to", "i8"],
-			["%D", "=", "i16", "pyreveng.void", "(", ")"],
-		])
+    def pilmacro_MKAB(self):
+        self.add_il([
+            ["%B", "=", "trunc", "i16", "%D", "to", "i8"],
+            ["%D", "=", "lshr", "i16", "%D", ",", "8"],
+            ["%A", "=", "trunc", "i16", "%D", "to", "i8"],
+            ["%D", "=", "i16", "pyreveng.void", "(", ")"],
+        ])
 
-	def pilmacro_MKD(self):
-		self.isz = "i16"
-		self.add_il([
-			["%0", "=", "zext", "i8", "%A", "to", "i16"],
-			["%1", "=", "shl", "i16", "%0", ",", "8"],
-			["%2", "=", "zext", "i8", "%B", "to", "i16"],
-			["%D", "=", "or", "i16", "%1", ",", "%2"],
-		])
+    def pilmacro_MKD(self):
+        self.isz = "i16"
+        self.add_il([
+            ["%0", "=", "zext", "i8", "%A", "to", "i16"],
+            ["%1", "=", "shl", "i16", "%0", ",", "8"],
+            ["%2", "=", "zext", "i8", "%B", "to", "i16"],
+            ["%D", "=", "or", "i16", "%1", ",", "%2"],
+        ])
 
-	def pilmacro_SU(self):
-		if self.pfx == 0x10:
-			return "%S"
-		else:
-			return "%U"
+    def pilmacro_SU(self):
+        if self.pfx == 0x10:
+            return "%S"
+        else:
+            return "%U"
 
-	def pilmacro_XY(self):
-		if self.pfx == 0x10:
-			return "%Y"
-		else:
-			return "%X"
+    def pilmacro_XY(self):
+        if self.pfx == 0x10:
+            return "%Y"
+        else:
+            return "%X"
 
-	def pilfunc_TFR(self, arg):
-		val = self['t']
-		sr = val >> 4
-		dr = val & 0xf
-		sz = ["i16", "i8"][sr >> 3]
-		r = [
-			"?0?", "%X",  "%Y", "%U",
-			"%S", "%PC", "?6?", "?7?",
-			"%A", "%B", "%CC", "%DP",
-			"?c?", "?d?", "?e?", "?f?"
-		]
-		if sr == 0:
-			r[0] = self.add_il([
-				["%1", "=", "zext", "i8", "%A", "to", "i16"],
-				["%2", "=", "zext", "i8", "%B", "to", "i16"],
-				["%3", "=", "shl", "i16", "8", ",", "%2"],
-				["%0", "=", "or", "i16", "%1", ",", "%3"],
-			], "%0")
-		elif dr == 0:
-			r[0] = "%0"
-		self.add_il([
-			[r[dr], "=", sz, r[sr]]
-		])
-		if dr == 0:
-			self.add_il([
-				["%A", "=", "trunc", "i16", r[0], "to", "i8"],
-				["%0", "=", "lshr", "i16", r[0], ",", "8"],
-				["%B", "=", "trunc", "i16", "%0", "to", "i8"],
-			])
+    def pilfunc_TFR(self, arg):
+        val = self['t']
+        sr = val >> 4
+        dr = val & 0xf
+        sz = ["i16", "i8"][sr >> 3]
+        r = [
+            "?0?", "%X", "%Y", "%U",
+            "%S", "%PC", "?6?", "?7?",
+            "%A", "%B", "%CC", "%DP",
+            "?c?", "?d?", "?e?", "?f?"
+        ]
+        if sr == 0:
+            r[0] = self.add_il([
+                ["%1", "=", "zext", "i8", "%A", "to", "i16"],
+                ["%2", "=", "zext", "i8", "%B", "to", "i16"],
+                ["%3", "=", "shl", "i16", "8", ",", "%2"],
+                ["%0", "=", "or", "i16", "%1", ",", "%3"],
+            ], "%0")
+        elif dr == 0:
+            r[0] = "%0"
+        self.add_il([
+            [r[dr], "=", sz, r[sr]]
+        ])
+        if dr == 0:
+            self.add_il([
+                ["%A", "=", "trunc", "i16", r[0], "to", "i8"],
+                ["%0", "=", "lshr", "i16", r[0], ",", "8"],
+                ["%B", "=", "trunc", "i16", "%0", "to", "i8"],
+            ])
 
-	def pilfunc_FLG_N(self, arg):
-		c = "0x80"
-		if self.isz == "i16":
-			c += "00"
-		self.add_il([
-			["%1", "=", "and", self.isz, arg[0], ",", c],
-			["%CC.n", "=", "icmp", "eq", self.isz, "%1", ",", c]
-		])
+    def pilfunc_FLG_N(self, arg):
+        c = "0x80"
+        if self.isz == "i16":
+            c += "00"
+        self.add_il([
+            ["%1", "=", "and", self.isz, arg[0], ",", c],
+            ["%CC.n", "=", "icmp", "eq", self.isz, "%1", ",", c]
+        ])
 
-	def pilfunc_FLG_V(self, arg):
-		# XXX "Set if the carry from the MSB in the ALU does not match
-		# XXX the carry from the MSB-1"
-		assert len(arg) == 4
-		self.add_il([
-			["%CC.v", "=", "i1",
-			    "pyreveng.overflow." + arg[1], "(", arg[2], ",", arg[3], ")"]
-		])
+    def pilfunc_FLG_V(self, arg):
+        # XXX "Set if the carry from the MSB in the ALU does not match
+        # XXX the carry from the MSB-1"
+        assert len(arg) == 4
+        self.add_il([
+            ["%CC.v", "=", "i1",
+                "pyreveng.overflow." + arg[1], "(", arg[2], ",", arg[3], ")"]
+        ])
 
-	def pilfunc_FLG_Z(self, arg):
-		self.add_il([
-			["%CC.z", "=", "icmp", "eq", self.isz, arg[0], ",", "0"]
-		])
+    def pilfunc_FLG_Z(self, arg):
+        self.add_il([
+            ["%CC.z", "=", "icmp", "eq", self.isz, arg[0], ",", "0"]
+        ])
 
-	def pilfunc_FLG_H(self, arg):
-		# XXX
-		self.add_il([
-			["%CC.h", "=", "i1", "void"]
-		])
+    def pilfunc_FLG_H(self, arg):
+        # XXX
+        self.add_il([
+            ["%CC.h", "=", "i1", "void"]
+        ])
 
-	def pilfunc_FLG_C(self, arg):
-		assert len(arg) == 4
-		self.add_il([
-			["%CC.c", "=", "i1",
-			    "pyreveng.carry." + arg[1], "(", arg[2], ",", arg[3], ")"]
-		])
+    def pilfunc_FLG_C(self, arg):
+        assert len(arg) == 4
+        self.add_il([
+            ["%CC.c", "=", "i1",
+                "pyreveng.carry." + arg[1], "(", arg[2], ",", arg[3], ")"]
+        ])
 
-	def pilfunc_FLG(self, arg):
-		f = {
-			"H": self.pilfunc_FLG_H,
-			"N": self.pilfunc_FLG_N,
-			"Z": self.pilfunc_FLG_Z,
-			"V": self.pilfunc_FLG_V,
-			"C": self.pilfunc_FLG_C,
-		}
-		a1 = arg.pop(0)
-		for j in "HNZVC":
-			if a1[0] == "0":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "0"]])
-			elif a1[0] == "1":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "1"]])
-			elif a1[0] == "U":
-				self.add_il([["%CC." + j.lower(), "=", "i1", "void"]])
-			elif a1[0] != "-":
-				assert len(arg) > 0
-				f[j](arg)
-			a1 = a1[1:]
+    def pilfunc_FLG(self, arg):
+        f = {
+            "H": self.pilfunc_FLG_H,
+            "N": self.pilfunc_FLG_N,
+            "Z": self.pilfunc_FLG_Z,
+            "V": self.pilfunc_FLG_V,
+            "C": self.pilfunc_FLG_C,
+        }
+        a1 = arg.pop(0)
+        for j in "HNZVC":
+            if a1[0] == "0":
+                self.add_il([["%CC." + j.lower(), "=", "i1", "0"]])
+            elif a1[0] == "1":
+                self.add_il([["%CC." + j.lower(), "=", "i1", "1"]])
+            elif a1[0] == "U":
+                self.add_il([["%CC." + j.lower(), "=", "i1", "void"]])
+            elif a1[0] != "-":
+                assert len(arg) > 0
+                f[j](arg)
+            a1 = a1[1:]
 
-	def pilfunc_FLG16(self, arg):
-		self.isz = "i16"
-		self.pilfunc_FLG(arg)
+    def pilfunc_FLG16(self, arg):
+        self.isz = "i16"
+        self.pilfunc_FLG(arg)
 
-	def pilfunc_PULL(self, arg):
-		i = self['i']
-		s = "%" + arg[0]
-		if s == "%S":
-			sa = "%U"
-		else:
-			sa = "%S"
-		j = 0x01
-		for r in ('%CC', '%A', '%B', '%DP'):
-			if i & j:
-				self.add_il([
-					[r, "=", "load", "i8", ",", "i8*", s],
-					[s, "=", "add", "i16", s, ",", "1"],
-				])
-			j <<= 1
-		for r in ('%X', '%Y', sa):
-			if i & j:
-				self.add_il([
-					[r, "=", "load", "i16", ",", "i16*", s],
-					[s, "=", "add", "i16", s, ",", "2"],
-				])
-			j <<= 1
-		if i & j:
-			self.add_il([
-				["%0", "=", "load", "i16", ",", "i16*", s],
-				[s, "=", "add", "i16", s, ",", "2"],
-				["br", "label", "%0"],
-			])
+    def pilfunc_PULL(self, arg):
+        i = self['i']
+        s = "%" + arg[0]
+        if s == "%S":
+            sa = "%U"
+        else:
+            sa = "%S"
+        j = 0x01
+        for r in ('%CC', '%A', '%B', '%DP'):
+            if i & j:
+                self.add_il([
+                    [r, "=", "load", "i8", ",", "i8*", s],
+                    [s, "=", "add", "i16", s, ",", "1"],
+                ])
+            j <<= 1
+        for r in ('%X', '%Y', sa):
+            if i & j:
+                self.add_il([
+                    [r, "=", "load", "i16", ",", "i16*", s],
+                    [s, "=", "add", "i16", s, ",", "2"],
+                ])
+            j <<= 1
+        if i & j:
+            self.add_il([
+                ["%0", "=", "load", "i16", ",", "i16*", s],
+                [s, "=", "add", "i16", s, ",", "2"],
+                ["br", "label", "%0"],
+            ])
 
-	def pilfunc_PUSH(self, arg):
-		i = self['i']
-		s = "%" + arg[0]
-		if s == "%S":
-			sa = "%U"
-		else:
-			sa = "%S"
-		j = 0x80
-		for r in ('HI', sa, '%Y', '%X'):
-			if i & j:
-				self.add_il([
-					[s, "=", "sub", "i16", s, ",", "2"],
-					["store", "i16", r, ",", "i16*", s],
-				])
-			j >>= 1
-		for r in ('%DP', '%B', '%A', '%CC'):
-			if i & j:
-				self.add_il([
-					[s, "=", "sub", "i16", s, ",", "1"],
-					["store", "i8", r, ",", "i8*", s],
-				])
-			j >>= 1
+    def pilfunc_PUSH(self, arg):
+        i = self['i']
+        s = "%" + arg[0]
+        if s == "%S":
+            sa = "%U"
+        else:
+            sa = "%S"
+        j = 0x80
+        for r in ('HI', sa, '%Y', '%X'):
+            if i & j:
+                self.add_il([
+                    [s, "=", "sub", "i16", s, ",", "2"],
+                    ["store", "i16", r, ",", "i16*", s],
+                ])
+            j >>= 1
+        for r in ('%DP', '%B', '%A', '%CC'):
+            if i & j:
+                self.add_il([
+                    [s, "=", "sub", "i16", s, ",", "1"],
+                    ["store", "i8", r, ",", "i8*", s],
+                ])
+            j >>= 1
 
 
 class mc6809(assy.Instree_disass):
-	def __init__(self, macros=False):
-		super().__init__(
+    def __init__(self, macros=False):
+        super().__init__(
                     "mc6809",
                     ins_word=8,
                     abits=16,
@@ -984,11 +987,11 @@ class mc6809(assy.Instree_disass):
                         (0xfffe, "RST"),
                     ),
                 )
-		self.add_ins(mc6809_desc, mc6809_ins)
-		if macros:
-			self.add_ins(mc6809_macro_desc, mc6809_ins)
+        self.add_ins(mc6809_desc, mc6809_ins)
+        if macros:
+            self.add_ins(mc6809_macro_desc, mc6809_ins)
 
 
 if __name__ == '__main__':
-	m = mc6809()
-	m.it.dump()
+    m = mc6809()
+    m.it.dump()
