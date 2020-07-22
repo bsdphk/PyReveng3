@@ -405,6 +405,12 @@ LDD	i	|1 1 0 0 0 1 1 0| i		|0 1 0 0 1 1 1 1| {
 	FLG U0100
 }
 
+# LDB+SEX
+LDD	j	|1 1 0 0 0 1 1 0| i             |0 0 0 1 1 1 0 1|
+
+# CLRB+SEX
+CLRD	-	|0 1 0 1 1 1 1 1|0 0 0 1 1 1 0 1|
+
 ANDD	I	|1 0 0 0 0 1 0 0| I1		|1 1 0 0 0 1 0 0| I2		| {
 	%A = and i8 %A , I1
 	%B = and i8 %A , I2
@@ -563,6 +569,12 @@ class mc6809_ins(assy.Instree_ins):
 
     def assy_i(self):
         return "#0x%02x" % self['i']
+
+    def assy_j(self):
+        i = self['i']
+        if i & 0x80:
+            i |= 0xff00
+        return "#0x%04x" % i
 
     def assy_CC(self):
         self.cc = [
