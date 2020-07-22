@@ -79,11 +79,27 @@ SYMBOLS = (
     (0, 0x1003, "PTM_TIMER2"),
     (0, 0x1004, "PTM_TIMER3"),
 
-    (0, 0x4000, "PAGE_NO_LATCH"),
+    (0, 0x3ff6, "ram_firmware_copy"),
+    (0, 0x3ffc, "ram_options"),
+    (0, 0x4000, "page_no_latch"),
     (0, 0x4027, "ERROR_MSG(B)"),
 
-    (0, 0x8dba, "SETUP_MENU(Y, U)"),
+    (0, 0x8dba, "SETUP_MENU(2, U)"),
     (0, 0x8efe, "MENU_EXIT()"),
+    (0, 0x8d5c, "MENU_SHOW_PAGE(0)"),
+    (0, 0x8de1, "MENU_HANDLE_KEY(0)"),
+
+    (0, 0x8f6a, "KEY_HANDLER_DEFAULT(0)"),
+    (0, 0x8f9a, "do_key_0x01"),
+    (0, 0x8f76, "do_key_0x10"),
+    (0, 0x8f83, "do_key_0x13_f1"),
+    (0, 0x8f9a, "do_key_0x14_f2"),
+    (0, 0x8f9d, "do_key_0x15_f3"),
+    (0, 0x8f9a, "do_key_0x16_f4"),
+    (0, 0x8fb4, "do_key_0x17_next"),
+    (0, 0x8fd9, "do_key_0x18_prev"),
+    (0, 0x8f9a, "do_key_0x3c"),
+
     (0, 0xc52a, "MENU_NOP()"),
     (0, 0xc533, "MEMCMP(6, len, src, dst)"),
     (0, 0xc579, "MEMCPY(6, len, src, dst)"),
@@ -96,17 +112,39 @@ SYMBOLS = (
     (0, 0xd6d3, "LCD_RD_DATA()"),
     (0, 0xd6f8, "LCD_RD_CTL()"),
     (0, 0xd867, "LCD_WRITE(6, pos, len, ptr)"),
+    (0, 0xd822, "LCD_WRITE_DIRECT(6, pos, len, ptr)"),
     (0, 0xdd5d, "PG_JMP"),
     (0, 0xd9fc, "SET_PAGE(2, pgno)"),
+    (0, 0xd906, "LCD_WRITE_ENTIRE(2, ptr)"),
     (0, 0x246a, "pg_jmp_page"),
     (0, 0x246b, "pg_jmp_offset"),
+    (0, 0x24c6, "nmi_vector"),
+    (0, 0x24c8, "firq_vector"),
+    (0, 0x2202, "interrupt_vector_flags"),
+    (0, 0x2206, "irq_happened_flag"),
     (0, 0xf065, "SET_NMI_VECTOR"),
+    (0, 0xf07f, "SET_FIRQ_VECTOR"),
+    (0, 0xf0dc, "FIRQ_HANDLER"),
+    (0, 0xf18f, "IRQ_HANDLER"),
+    (0, 0xf099, "NMI_HANDLER"),
+    (0, 0xec93, "firmware_version"),
 
     (1, 0x4170, "IRQ_HANDLER_0"),
     (1, 0x411f, "IRQ_HANDLER_1"),
     (2, 0x444c, "IRQ_HANDLER_2"),
     (2, 0x42d1, "IRQ_HANDLER_3"),
     (4, 0x419d, "IRQ_HANDLER_4"),
+
+    (0, 0x221b, "menu_key_to_handle"),
+    (0, 0x2244, "menu_ptr"),
+    (0, 0x2246, "menu_last_pg"),
+    (0, 0x2682, "menu_cur_pg"),
+    (0, 0x223c, "menu_f1_func"),
+    (0, 0x223e, "menu_f2_func"),
+    (0, 0x2240, "menu_f3_func"),
+    (0, 0x2242, "menu_f4_func"),
+
+    (0, 0x8e82, "INJECT_KEY_PRESS(2, keyno)"),
 )
 
 def romsum(m, lo, hi):
@@ -146,9 +184,9 @@ class MenuPage(data.Data):
         self.tp.append(Txt(cx.m, x, x + 40, label=False))
         self.tp.append(Txt(cx.m, x + 40, x + 80, label=False))
         self.fp = []
-        for i in range(2, 10, 2):
-            self.fp.append(cx.m.bu16(adr + i))
-            cx.m.set_block_comment(self.fp[-1], "Menu@%x[%d]" % (adr, i//2))
+        for i in range(1, 5):
+            self.fp.append(cx.m.bu16(adr + i * 2))
+            cx.m.set_block_comment(self.fp[-1], "Menu@%x[f%d]" % (adr, i))
             cx.disass(self.fp[-1])
 
     def render(self):
@@ -161,8 +199,9 @@ class MenuPage(data.Data):
         return t
 
 class Menu():
-    def __init__(self, cx, adr, n):
-        for i in range(n):
+    def __init__(self, cx, adr):
+        y = data.Const(cx.m, adr - 1, adr)
+        for i in range(cx.m[adr - 1] + 1):
             y = MenuPage(cx, adr)
             adr = y.hi
 
@@ -210,6 +249,39 @@ def pgc(cx):
         print("NA", n, "0x%x" % a)
         y = dataptr(cx, a)
         lextab(cx, y.dst, "%c" % (0x41 + n))
+
+    cx.m.set_block_comment(0x8de1, '''
+Process Key-press in Menu Context
+    0x13 = f1
+    0x14 = f2
+    0x15 = f3
+    0x16 = f4
+    0x17 = Next
+    0x18 = Prev
+''')
+
+    for a, b in (
+        (0xea5f, 0x28),
+        (0xea87, 0x23),
+        (0xeaaa, 0x28),
+        (0xeadf, 0x28),
+        (0xeb07, 0x28),
+        (0xeb7f, 0x28),
+        (0xeba7, 0x15),
+        (0xebbc, 0x15),
+        (0xebd1, 0x28),
+        (0xebf9, 0x28),
+        (0xec21, 0x28),
+        (0xec93, 0x06),
+        (0xec99, 0x28),
+        (0xecc1, 0x28),
+        (0xece9, 0x28),
+        (0xeda0, 0x28),
+        (0xedc8, 0x28),
+        (0xedf0, 0x28),
+        (0xee18, 0x28),
+    ):
+        Txt(cx.m, a, a + b)
    
 
 def pg0(cx):
@@ -248,6 +320,7 @@ def pg2(cx):
 
 def pg3(cx):
     for a, b in (
+        (0x4012, 0x18),
         (0x42ba, 0x28),
         (0x42e2, 0x1a),
         (0x42fc, 0x28),
@@ -265,18 +338,32 @@ def pg3(cx):
         (0x44a0, 0x1a),
         (0x44ba, 0x28),
         (0x44e2, 0x6),
+        (0x5647, 0x28),
+        (0x566f + 0 * 0x28, 0x28),
+        (0x566f + 1 * 0x28, 0x28),
+        (0x566f + 2 * 0x28, 0x28),
+        (0x566f + 3 * 0x28, 0x28),
+        (0x566f + 4 * 0x28, 0x28),
+        (0x566f + 5 * 0x28, 0x28),
+        (0x566f + 6 * 0x28, 0x28),
+        (0x566f + 7 * 0x28, 0x28),
+        (0x57af, 0x28),
+        (0x57d7, 0x28),
+        (0x57ff, 0x28),
+        (0x5827, 0x28),
+        (0x584f, 0x10),
+        (0x585f, 0x28),
+        (0x5887, 0x28),
+        (0x58af, 0x28),
+        (0x58d7, 0x28),
+        (0x58ff, 0x28),
+        (0x5927, 0x28),
+        (0x594f, 0x28),
+        (0x5977, 0x28),
+        (0x664f, 0x03),
     ):
         Txt(cx.m, a, a + b)
     cx.m.set_label(0x44e2, "SERVICE_CODE")
-    # stored into 0x2213
-    for a in (
-        0x4b5a,
-        0x4f40,
-        0x538c,
-        0x8f6a,
-    ):
-        cx.m.set_block_comment(a, "via 0x2213")
-        cx.disass(a)
 
     for a in range(0x4502, 0x45e2, 4):
         b = cx.m.bu16(a + 2)
@@ -305,15 +392,6 @@ def pg5(cx):
     ):
         l = cx.m.bu16(a)
         data.Txt(cx.m, a + 2, a + 2 + l)
-    for a, b in (
-        (0xea87, 0x23),
-        (0xec99, 0x28),
-        (0xea5f, 0x28),
-        (0xee18, 0x28),
-        (0xeaaa, 0x28),
-        (0xecc1, 0x28),
-    ):
-        Txt(cx.m, a, a + b)
 
 def flow_out_ffed(a, b):
     if b.mne == "BSR" and b.dstadr == 0xffed:
@@ -393,6 +471,7 @@ class mc6809_c_call_ins(assy.Instree_ins):
         print("CC0", self, lim)
         dst = (self['a'] << 8) | self['b']
         self.dst = (self.hi + dst - 2) & 0xffff
+        lang.disass(self.dst)
         self.mne = "CALL"
 
     def assy_d(self):
@@ -472,15 +551,64 @@ def example():
     pg4(cx[4])
     pg5(cx[5])
 
-   
+    # Probably mode-vectoring
+    for p, a, v in (
 
-    Menu(cx[0], 0x4257, 7)
-    Menu(cx[1], 0x437d, 5)
-    Menu(cx[2], 0x416b, 4)
-    Menu(cx[2], 0x4234, 4)
-    Menu(cx[3], 0x4292, 4)
-    Menu(cx[4], 0x4172, 4)
-    Menu(cx[5], 0x4144, 4)
+        (0, 0x506e, 0x2213),
+        (0, 0x4d99, 0x2217),
+
+        (1, 0x4634, 0x2213),
+        (1, 0x5114, 0x2215),
+
+        (1, 0x516c, 0x2217),
+
+        (2, 0x4c22, 0x2213),
+        (2, 0x51a6, 0x2215),
+
+        (2, 0x5204, 0x2217),
+
+        (3, 0x4b5a, 0x2213),
+
+        (3, 0x4f40, 0x2213),
+
+        (3, 0x538c, 0x2213),
+
+        (3, 0x5efb, 0x2211),
+
+        (3, 0x6118, 0x2211),
+
+        (3, 0x5b8a, 0x2211),
+
+        (4, 0x6acb, 0x2213),
+        (4, 0x6f5b, 0x2215),
+        (4, 0x6fb9, 0x2217),
+
+        (5, 0x65b5, 0x2213),
+        (5, 0x42b7, 0x2217),
+
+        (0, 0x8f6a, 0x2213),
+
+        (0, 0xa45b, 0x2211),
+
+        (0, 0xa5c9, 0x2211),
+
+        (0, 0xf212, 0x2211),
+
+        (0, 0xf42c, 0x2211),
+
+        (0, 0xfa0d, 0x2211),
+
+    ):
+        cx[p].m.set_block_comment(a, "via 0x%04x" % v)
+        cx[p].disass(a)
+
+    Menu(cx[0], 0x4257)
+    Menu(cx[1], 0x437d)
+    Menu(cx[2], 0x416b)
+    Menu(cx[2], 0x4234)
+    Menu(cx[3], 0x4292)
+    Menu(cx[4], 0x4172)
+    Menu(cx[5], 0x4144)
 
     ads = set()
     while True:
