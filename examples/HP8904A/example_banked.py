@@ -383,6 +383,14 @@ def pg3(cx):
 def pg4(cx):
     cx.disass(0x419d)	# IRQ handler
 
+    for a in range(0x424c, 0x425c, 2):
+        y = cx.codeptr(a)
+        cx.m.set_label(y.dst, "FROM_0x%x" % a)
+
+    for a in range(0x4337, 0x4347, 2):
+        y = cx.codeptr(a)
+        cx.m.set_label(y.dst, "FROM_0x%x" % a)
+
 def pg5(cx):
     for a in range(0x514a, 0x519a, 8):
         data.Pstruct(cx.m, a, ">d")
@@ -392,6 +400,15 @@ def pg5(cx):
     ):
         l = cx.m.bu16(a)
         data.Txt(cx.m, a + 2, a + 2 + l)
+    for a in (
+        0x41ca,
+        0x7417,
+        0x7419,
+        0x7488,
+    ):
+        cx.disass(a)
+        cx.m.set_line_comment(a, "MANUAL:pg5()")
+
 
 def flow_out_ffed(a, b):
     if b.mne == "BSR" and b.dstadr == 0xffed:
@@ -440,7 +457,7 @@ class mc6809_switch_ins(assy.Instree_ins):
         tbl |= self['b']
         if tbl != self.hi:
             raise assy.Invalid("Not a recognized 6809 SWITCH ")
-        print("6809SW", lim, tbl - self.hi)
+        # print("6809SW", lim, tbl - self.hi)
         a = self.hi
         n = 0
         while True:
@@ -448,10 +465,10 @@ class mc6809_switch_ins(assy.Instree_ins):
                 break
             d = lang.m.bu16(a)
             if d - self.hi > 0x800:
-                print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
+                # print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
                 break
             if self.hi - d > 0x800:
-                print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
+                # print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a), "BAIL")
                 break
             #print("SW", "0x%x" % self.hi, n, "%x" % a, "%x" % d, self.hi - d, lang.m.occupied(a))
             y = lang.codeptr(a)
@@ -468,7 +485,6 @@ class mc6809_c_call_ins(assy.Instree_ins):
 
     def __init__(self, lim, lang):
         super().__init__(lim, lang)
-        print("CC0", self, lim)
         dst = (self['a'] << 8) | self['b']
         self.dst = (self.hi + dst - 2) & 0xffff
         lang.disass(self.dst)
