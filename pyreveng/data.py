@@ -100,12 +100,18 @@ class Codeptr(Data):
         return self.aspace.adr(self.dst)
 
 class Dataptr(Data):
-    def __init__(self, asp, lo, hi, dst):
+    def __init__(self, asp, lo, hi, dst, dasp=None, pfx="", sfx=""):
         super().__init__(asp, lo, hi, "dataptr")
         self.dst = dst
+        if dasp:
+            self.dasp = dasp
+        else:
+            self.dasp = asp
+        self.pfx = pfx
+        self.sfx = sfx
 
     def render(self):
-        return ".PTR\t" + self.aspace.adr(self.dst)
+        return ".PTR\t" + self.pfx + self.dasp.afmt(self.dst) + self.sfx
 
 def stringify(asp, lo, length=None, term=None, charset=None):
     if term is None:
