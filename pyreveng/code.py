@@ -187,8 +187,8 @@ class Decoder():
         except Invalid as e:
             print("Failed decode", self.name, asp.afmt(adr), src, "\n\t", e)
             return None
-        except mem.MemError:
-            print("No Memory", self.name, asp.adr(adr), src)
+        except mem.MemError as e:
+            print("No Memory", self.name, asp.adr(adr), src, e)
             return None
         assert isinstance(x, Code)
         for i in asp.find(lo=x.lo, hi=x.hi):
