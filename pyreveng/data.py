@@ -111,7 +111,7 @@ class Dataptr(Data):
         self.sfx = sfx
 
     def render(self):
-        return ".PTR\t" + self.pfx + self.dasp.afmt(self.dst) + self.sfx
+        return ".PTR\t" + self.pfx + self.dasp.adr(self.dst) + self.sfx
 
 def stringify(asp, lo, length=None, term=None, charset=None):
     if term is None:
