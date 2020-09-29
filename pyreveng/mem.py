@@ -85,7 +85,7 @@ class AddressSpace():
     address-spaces and memory types.
     '''
 
-    def __init__(self, lo, hi, name="", ncol=None):
+    def __init__(self, lo, hi, name="", ncol=None, apfx="", asfx=""):
         assert lo <= hi
         self.lo = lo
         self.hi = hi
@@ -100,8 +100,10 @@ class AddressSpace():
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
-        self.hex_format()
         self.has_pil = False
+        self.apfx = apfx
+        self.asfx = asfx
+        self.hex_format()
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (
@@ -124,22 +126,19 @@ class AddressSpace():
         ''' Render stuff in hex '''
         if pos is None:
             pos = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-        self.afmtpct = "%%0%dx" % pos
-        self.apct = "0x%%0%dx" % pos
+        self.afmtpct = self.apfx + "%%0%dx" % pos + self.asfx
+        self.apct = self.apfx + "0x%%0%dx" % pos + self.asfx
+        self.apct = self.apfx + "0x%x" + self.asfx
 
     def adr(self, dst):
         ''' Render an address '''
         lbl = list(self.get_labels(dst))
         if lbl:
             return lbl[0]
-        return "0x%x" % dst
+        return self.apct % dst
 
-    def afmt(self, adr, sym=False):
-        ''' Format address '''
-        if sym:
-            lbl = list(self.get_labels(adr))
-            if lbl:
-                return lbl[0]
+    def afmt(self, adr):
+        ''' Format address, fixed width, for addr col of listing '''
         return self.afmtpct % adr
 
     def dfmt(self, adr):
@@ -275,10 +274,7 @@ class MemMapper(AddressSpace):
         self.seglist.append([lo, hi, offset, mem, shared])
         self.mapping.append([lo, hi, offset, mem, shared])
 
-        hi = max(self.mapping, key=lambda x: x[1])[1]
-        lo = min(self.mapping, key=lambda x: x[0])[0]
-        al = max(len("%x" % lo), len("%x" % (hi - 1)))
-        self.apct = "0x%%0%dx" % al
+        self.hex_format()
 
         if len(self.mapping) == 1:
             self.xlat = self.xlat1

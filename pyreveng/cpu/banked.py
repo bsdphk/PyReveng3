@@ -2,25 +2,18 @@
 from pyreveng import mem
 
 class BankedMem(mem.MemMapper):
-    def __init__(self, lo, hi, bank):
-        super().__init__(lo, hi, name="Bank %d" % bank)
+    def __init__(self, lo, hi, bank, apfx=None, asfx=""):
+        if apfx is None:
+            apfx = "0x%x:" % bank
+        super().__init__(lo, hi, name="Bank %d" % bank, apfx=apfx, asfx=asfx)
         self.bank = bank
 
     def __repr__(self):
         return "<BankedMem %x-%x %s>" % (self.lo, self.hi, self.name)
 
-    def adr(self, dst):
-        lbl = list(self.get_labels(dst))
-        if lbl:
-            return lbl[0]
-        return "0x%x:" % self.bank + self.apct % dst
-
-    def afmt(self, adr):
-        return "0x%x:" % self.bank + super().afmt(adr)
-
 class BankedCPU():
 
-    def __init__(self, banks, model):
+    def __init__(self, banks, model, mem=BankedMem):
         self.model = model
         self.banks = banks
         self.bank = []
@@ -30,7 +23,7 @@ class BankedCPU():
                 super().__init__()
                 self.bank = bank
                 self.up = up
-                self.add_as("mem", aspace=BankedMem(self.m.lo, self.m.hi, bank))
+                self.add_as("mem", aspace=mem(self.m.lo, self.m.hi, bank))
 
             def __repr__(self):
                 return "<Banked CPU %s #%d>" % (self.name, self.bank)
