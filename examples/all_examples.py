@@ -29,7 +29,6 @@ Run all examples
 """
 
 import glob, os, sys, importlib
-sys.path.insert(0, "..")
 from pyreveng import code, listing
 
 import cProfile
@@ -64,22 +63,19 @@ def one_example(dir, example):
         else:
             fn = "_output/" + nm + ".%02d" % i
         print(i, j, fn)
-
-        listing.Listing(
-            j,
-            ncol = 8,
-            fn = fn + ".asm",
-            pil=False,
-            align_blank=True,
-            align_xxx=True,
-            compact_xxx=True,
-        )
-        if j.has_pil:
+        if j.bits <= 8:
+            ncol = 8
+        else:
+            ncol = 8
+        for a, b in (
+            (".asm", False),
+            # (".pil", True)
+        ):
             listing.Listing(
                 j,
-                ncol = 8,
-                fn = fn + ".pil",
-                pil=True,
+                ncol = ncol,
+                fn = fn + a,
+                pil=b,
                 align_blank=True,
                 align_xxx=True,
                 compact_xxx=True,
