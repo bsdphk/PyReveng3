@@ -155,20 +155,23 @@ class nova_ins(assy.Instree_ins):
         i = self["idx"]
         d = self["displ"]
         t = None
+        asp = self.lang.m
         if i == 0:
-            t = d
-        else:
-            if d & 0x80:
-                d -= 256
-            if i == 1:
-                t = self.lo + d
-        if t is None:
-            if d < 0:
-                return "-0x%x,%d" % (-d, i)
-            return "0x%x,%d" % (d, i)
-        if not self['i']:
-            self.dstadr = t
-        return assy.Arg_dst(self.lang.m, t)
+            return assy.Arg_dst(self.lang.page_zero_asp, d)
+        if d & 0x80:
+            d -= 256
+        if i == 1:
+            t = self.lo + d
+            if not self['i']:
+                self.dstadr = t
+            return assy.Arg_dst(asp, t)
+        for j in self.lang.ac23:
+            k = j(self.lo, i, d)
+            if k:
+                return k
+        if d < 0:
+            return "-0x%x,%d" % (-d, i)
+        return "0x%x,%d" % (d, i)
 
     def assy_db(self):
         r = self.assy_da()
@@ -190,3 +193,5 @@ class nova(assy.Instree_disass):
         )
         self.m.ncol = 1
         self.add_ins(nova_instructions, nova_ins)
+        self.page_zero_asp = self.m
+        self.ac23 = []
