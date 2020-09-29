@@ -56,7 +56,9 @@ class Data(leaf.Leaf):
         return "<Data %x-%x %s>" % (self.lo, self.hi, self.tag)
 
 class Const(Data):
-    def __init__(self, asp, lo, hi, fmt=None, func=None, size=1):
+    def __init__(self, asp, lo, hi=None, fmt=None, func=None, size=1):
+        if hi is None:
+            hi = lo + 1
         super().__init__(asp, lo, hi, "const")
         if func is None:
             func = asp.__getitem__
