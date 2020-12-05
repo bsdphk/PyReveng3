@@ -194,6 +194,7 @@ class Listing():
             compact_xxx=False,
             align_blank=False,
             blanks=None,
+            leaf_width=32,
             indent='┆ ',
             wordspace=' ',
         ).items():
@@ -236,8 +237,8 @@ class Listing():
             if self.x_label is not None:
                 break
         self.x_leaf = self.x_label + 8
-        self.x_lcmt = self.x_leaf + 32
-        self.x_pil = self.x_lcmt + 40
+        self.x_lcmt = self.x_leaf + self.leaf_width
+        self.x_pil = self.x_lcmt + 16
         t = tabto("", self.x_label) + "|LABEL"
         t = tabto(t, self.x_leaf) + "|LEAF"
         t = tabto(t, self.x_lcmt) + "|LCMT"
@@ -336,6 +337,7 @@ class Listing():
             if pil:
                 t = tabto(t, self.x_pil) + "| " + pil.pop(0)
             fo.write(t + '\n')
+            self.purge_lcmt()
             fo.flush()
         return hi
 
@@ -419,5 +421,9 @@ class Listing():
 
 def Example(func, **kwargs):
     nm, ms = func()
+    rv = []
     for n, m in enumerate(ms):
-        Listing(m, fn="/tmp/_%s.%02d.asm" % (nm, n), **kwargs)
+        fn="/tmp/_%s.%02d.asm" % (nm, n)
+        rv.append(fn)
+        Listing(m, fn=fn, **kwargs)
+    return rv
