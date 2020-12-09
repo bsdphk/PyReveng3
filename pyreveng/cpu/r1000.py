@@ -49,12 +49,42 @@ Document references:
 	R1000_Guru_Course_01_Basic.pdf
 	https://datamuseum.dk/wiki/Bits:30000916
 
+   FEH:
+	R1000_FE_Handbook.pdf
+	https://datamuseum.dk/wiki/Bits:30000964
+	
+
 '''
 
 from pyreveng import assy, data, code, mem
 
 
 r1000_desc = """
+
+################
+# Ref: FEH p269
+INDIRECT_LITERAL	DISCRETE,0x20					| 6004 |
+DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
+CALL			0,0						| 8000 |
+
+################
+# Ref: GC1 p88
+JUMP			1						| 7801	|
+DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+CALL			2,2						| 8402 |
+BREAK_UNCONDITIONAL	-						| 006F |
+EXECUTE			EXCEPTION_CLASS,RAISE_OP			| 0100 |
+INDIRECT_LITERAL	57						| 6039 |
+INDIRECT_LITERAL	52						| 6034 |
+EXECUTE			MODULE_CLASS,ACTIVATE_OP			| 020F |
+CALL			3,3						| 8603 |
+
+################
+# Ref: GC1 p28
+#RAISE			>R						| 0100 |
+
+################
+# Ref: GC1 p41-46
 BREAK_OPTIONAL	-							| 0007 |
 SIGNAL_COMPLETION	>R						| 00BB |
 SIGNAL_ACTIVATED	-						| 00BC |
@@ -62,9 +92,6 @@ ACCEPT_ACTIVATION	-						| 00BF |
 ELABORATE_SUBPROGRAM	-						| 00C7 |
 unknown_return		>R						| 00CA |
 LOAD_TOP_0		-						| 00D8 |
-
-# Ref: GC1 p28
-RAISE			>R						| 0100 |
 
 EXECUTE_VECTOR_CLASS	CHECK_IN_TYPE_OP				| 01C3 |
 EXECUTE_VECTOR_CLASS	CATENATE_OP					| 01CC |
@@ -183,6 +210,10 @@ class r1000(assy.Instree_disass):
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
             'WITH_VALUE',
+            'MODULE_CLASS',
+            'WITH_CONSTRAINT',
+            'ACTIVATE_OP',
+            'DISCRETE',
         )
 
         self.subprograms = set()

@@ -57,6 +57,8 @@ def debug(m):
     m.set_block_comment(b, "Debug Table")
 
     data.Const(m, b, b+2, fmt="0x%04x")
+    if m[b] != 3:
+        return
     a = b+2
     for i in range(m[b+1]):
         y = data.Const(m, a, a + 8, fmt="0x%04x")
@@ -92,8 +94,11 @@ def segment_file(mb):
 
     cx.subprogram(0xb)
 
-    if m[3]:
-        debug(m)
+    if m[3] and True:
+        try:
+            debug(m)
+        except mem.MemError:
+            m.set_line_comment(3, "XXX DEBUG FAILED")
 
     return cx
 
