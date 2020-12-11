@@ -65,19 +65,19 @@ r1000_desc = """
 # Ref: FEH p269
 INDIRECT_LITERAL	DISCRETE,0x20					| 6004 |
 DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
-CALL			0,0						| 8000 |
+# CALL			0,0						| 8000 |
 
 ################
 # Ref: GC1 p88
-JUMP			1						| 7801	|
+#JUMP			1						| 7801	|
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
-CALL			2,2						| 8402 |
+# CALL			2,2						| 8402 |
 BREAK_UNCONDITIONAL	-						| 006F |
 EXECUTE			EXCEPTION_CLASS,RAISE_OP			| 0100 |
 INDIRECT_LITERAL	57						| 6039 |
 INDIRECT_LITERAL	52						| 6034 |
 EXECUTE			MODULE_CLASS,ACTIVATE_OP			| 020F |
-CALL			3,3						| 8603 |
+# CALL			3,3						| 8603 |
 
 ################
 # Ref: GC1 p28
@@ -111,6 +111,9 @@ EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
+unknown_return		>R						|0 0 0 0|1 0 0 0|0 0 1 1|0 0|a|1|
+unknown_return		>R						| 08E2 |
+zero_is_invalid_ins	>R						| 0000 |
 
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
@@ -120,6 +123,7 @@ PUSH_STRING_EXTENDED	pse						|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0| pse				|
 PUSH_STRING_XXX		pse						|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1| pse				|
 LOAD_ENCACHED		eon						|0 0 0 0 0 0 0 0 1 1 1| eon	|
 SHORT_LITERAL		slit						|0 1 0 0 1| slit		|
+JUMP			pcrel,>J					|0 1 1 1 1| pcrel		|
 CALL			llvl,ldelta					|1 0 0| llvl  | ldelta		|
 STORE_UNCHECKED		llvl,ldelta					|1 0 1| llvl  | ldelta		|
 STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
@@ -139,23 +143,16 @@ class r1000_ins(assy.Instree_ins):
 
    def assy_pse(self):
        v = self['pse']
-       b1 = (v<<1) + self.lang.m[v]
-       b2 = ((v + 1)<<1) + self.lang.m[v + 1]
-       data.Const(self.lang.m, v, fmt="0x%%04x->0x%04x" % b1)
-       t = '"'
-       for aa in range(b1, b2):
-           i = self.lang.m[aa >> 1]
-           if aa & 1:
-               i &= 0xff
-           else:
-               i >>= 8
-           if 32 <= i <= 126 and i not in (0x22, 0x5c):
-               t += "%c" % i
-           else:
-               t += "\\x%02x" % i
-       t += '"'
-       self.lang.m.set_line_comment(v, t)
-       return "@0x%x: %s" % (v, t)
+       y = self.lang.strtab(v)
+       return "@0x%x: %s" % (v, y.txt)
+
+   def assy_pcrel(self):
+       v = self['pcrel']
+       if v & 0x400:
+           self.dstadr = self.hi + v - 0x800
+       else:
+           self.dstadr = self.hi + v
+       return assy.Arg_dst(self.lang.m, self.dstadr)
 
    def assy_eon(self):
        # EncachedObjectNumber: 0..31
@@ -234,3 +231,31 @@ class r1000(assy.Instree_disass):
         self.m.set_label(self.m[a0], "BODY_%04x" % a0)
         if self.m[a0] != adr:
             self.disass(self.m[a0])
+
+    def strtab(self, adr):
+        b1 = (adr<<1) + self.lang.m[adr]
+        b2 = ((adr + 1)<<1) + self.lang.m[adr + 1]
+        y = data.Const(self.lang.m, adr, fmt="0x%%04x->0x%04x" % b1)
+        y.typ = ".STRTAB"
+        y.strptr = b1 >> 1
+        
+        t = '"'
+        for aa in range(b1, b2):
+            i = self.lang.m[aa >> 1]
+            if aa & 1:
+                i &= 0xff
+            else:
+                i >>= 8
+            if 32 <= i <= 126 and i not in (0x22, 0x5c):
+                t += "%c" % i
+            else:
+                t += "\\x%02x" % i
+        t += '"'
+        self.lang.m.set_line_comment(adr, t)
+        y.txt = t
+        return y
+
+if __name__ == "__main__":
+
+    cx = r1000()
+    cx.it.dump()

@@ -40,7 +40,7 @@ FILENAME = "6466568.SEG"
 def debug_table(m, adr, number):
     m.set_block_comment(adr, "Debug3 Subtable 0x%x" % number)
     y = data.Const(m, adr, adr+2, fmt="0x%04x")
-    y.typ = ".DBG3TAB
+    y.typ = ".DBG3TAB"
     neg = m[adr]
     pos = m[adr + 1]
     a = adr + 2
@@ -96,6 +96,48 @@ def debug(m):
                 chain(m, c)
             a = a + 4
 
+def fill_stabs(cx):
+
+    stabs = {}
+    lostr = [0xffff]
+
+    def add_stab(yy):
+        lostr[0] = min(lostr[0], yy.strptr)
+        stabs[yy.lo] = yy
+
+    for y in cx.m:
+        if not isinstance(y, data.Const):
+            continue
+        if y.typ != ".STRTAB":
+            continue
+        add_stab(y)
+
+    if not stabs:
+        return
+
+    # Plug holes
+    for j in range(min(stabs), max(stabs)):
+        if j not in stabs:
+            y = cx.strtab(j)
+            add_stab(y)
+
+    hip = max(stabs)
+    lop = min(stabs)
+    while cx.m[lop] > cx.m[lop-1]:
+        d = (lop-1) + (cx.m[lop-1]>>1)
+        if d <= hip + 1:
+            break
+        y = cx.strtab(lop-1)
+        add_stab(y)
+        lop -= 1
+
+    if cx.m[lop] < cx.m[lop-1]:
+        j = max(stabs) + 1
+        while j < lostr[0] - 1:
+            y = cx.strtab(j)
+            add_stab(y)
+            j += 1
+
 #######################################################################
 
 def segment_file(mb):
@@ -125,6 +167,8 @@ def segment_file(mb):
             debug(cx.m)
         except mem.MemError:
             m.set_line_comment(3, "XXX DEBUG FAILED")
+
+    fill_stabs(cx)
 
     return cx
 
