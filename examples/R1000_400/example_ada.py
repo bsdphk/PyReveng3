@@ -38,8 +38,9 @@ FILENAME = "6466568.SEG"
 #######################################################################
 
 def debug_table(m, adr, number):
-    m.set_block_comment(adr, "Debug Subtable 0x%x" % number)
-    data.Const(m, adr, adr+2, fmt="0x%04x")
+    m.set_block_comment(adr, "Debug3 Subtable 0x%x" % number)
+    y = data.Const(m, adr, adr+2, fmt="0x%04x")
+    y.typ = ".DBG3TAB
     neg = m[adr]
     pos = m[adr + 1]
     a = adr + 2
@@ -51,24 +52,49 @@ def debug_table(m, adr, number):
         )
         a += 2
 
+def chain(m, adr):
+    m.set_block_comment(adr, "Debug chain")
+    for j in range(1):
+        y = data.Const(m, adr, adr+2, fmt="0x%04x")
+        y.typ = ".DBGLEN"
+        n0 = m[adr]
+        n1 = m[adr + 1]
+        if n0 + n1 == 0:
+            break
+        adr += 2
+        y = data.Const(m, adr, adr+n0+n1, fmt="0x%04x")
+        y.typ = ".DBGLNO"
+        adr += n0 + n1
+
 def debug(m):
     b = m[3]
     assert 0 < b < m.hi
     m.set_block_comment(b, "Debug Table")
 
-    data.Const(m, b, b+2, fmt="0x%04x")
-    if m[b] != 3:
-        return
-    a = b+2
-    for i in range(m[b+1]):
-        y = data.Const(m, a, a + 8, fmt="0x%04x")
-        y.typ = ".DEBUG"
-        spa = m[a]
-        #assert (spa & 3) == 3, "0x%x" % spa
-        #spa &= ~3
-        m.set_line_comment(spa, "Debug Table 0x%x = %s" % (i, y.render()))
-        debug_table(m, m[a + 1], i)
-        a += 8
+    if m[b] == 3:
+        data.Const(m, b, b+2, fmt="0x%04x")
+        a = b+2
+        for i in range(m[b+1]):
+            y = data.Const(m, a, a + 8, fmt="0x%04x")
+            y.typ = ".DEBUG"
+            spa = m[a]
+            #assert (spa & 3) == 3, "0x%x" % spa
+            #spa &= ~3
+            m.set_line_comment(spa, "Debug Table 0x%x = %s" % (i, y.render()))
+            debug_table(m, m[a + 1], i)
+            a += 8
+    elif m[b] == 4:
+        y = data.Const(m, b, b+6, fmt="0x%04x")
+        y.typ = ".DEBUG4"
+        n = m[b + 5]
+        a = b + 6
+        for i in range(n):
+            y = data.Const(m, a, a+4, fmt="0x%04x")
+            y.typ = ".DBG4T"
+            c = m[a + 1]
+            if c:
+                chain(m, c)
+            a = a + 4
 
 #######################################################################
 
@@ -82,21 +108,21 @@ def segment_file(mb):
     cx.m.map(m, 0)
 
     for a in range(0, 8):
-        data.Const(m, a, fmt="0x%04x")
-    m.set_line_comment(0, "Version of machine code")
-    m.set_line_comment(1, "Diana Version, RCG Major Version, RCG minor version")
-    m.set_line_comment(2, "Zero")
-    m.set_line_comment(3, "Offset of debug table")
-    m.set_line_comment(4, "Default exception handler - raise instruction")
-    m.set_line_comment(5, "Module termination instruction - signal completion")
-    m.set_line_comment(6, "Offset to segment table (only in elab segments)")
-    m.set_line_comment(7, "0, wired, #pages in seg - 1)")
+        data.Const(cx.m, a, fmt="0x%04x")
+    cx.m.set_line_comment(0, "Version of machine code")
+    cx.m.set_line_comment(1, "Diana Version, RCG Major Version, RCG minor version")
+    cx.m.set_line_comment(2, "Zero")
+    cx.m.set_line_comment(3, "Offset of debug table")
+    cx.m.set_line_comment(4, "Default exception handler - raise instruction")
+    cx.m.set_line_comment(5, "Module termination instruction - signal completion")
+    cx.m.set_line_comment(6, "Offset to segment table (only in elab segments)")
+    cx.m.set_line_comment(7, "0, wired, #pages in seg - 1)")
 
     cx.subprogram(0xb)
 
-    if m[3] and True:
+    if cx.m[3] and True:
         try:
-            debug(m)
+            debug(cx.m)
         except mem.MemError:
             m.set_line_comment(3, "XXX DEBUG FAILED")
 
