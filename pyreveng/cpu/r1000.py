@@ -52,18 +52,18 @@ Document references:
    FEH:
 	R1000_FE_Handbook.pdf
 	https://datamuseum.dk/wiki/Bits:30000964
-	
+
 
 '''
 
-from pyreveng import assy, data, code, mem
+from pyreveng import assy, data, code
 
 
 r1000_desc = """
 
 ################
 # Ref: FEH p269
-INDIRECT_LITERAL	DISCRETE,0x20					| 6004 |
+#INDIRECT_LITERAL	DISCRETE,0x20					| 6004 |
 DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
 # CALL			0,0						| 8000 |
 
@@ -74,8 +74,8 @@ DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 
 # CALL			2,2						| 8402 |
 BREAK_UNCONDITIONAL	-						| 006F |
 EXECUTE			EXCEPTION_CLASS,RAISE_OP			| 0100 |
-INDIRECT_LITERAL	57						| 6039 |
-INDIRECT_LITERAL	52						| 6034 |
+#INDIRECT_LITERAL	57						| 6039 |
+#INDIRECT_LITERAL	52						| 6034 |
 EXECUTE			MODULE_CLASS,ACTIVATE_OP			| 020F |
 # CALL			3,3						| 8603 |
 
@@ -98,7 +98,7 @@ EXECUTE_VECTOR_CLASS	CATENATE_OP					| 01CC |
 EXECUTE_VECTOR_CLASS	FIELD_WRITE_OP					| 01D6 |
 EXECUTE_MODULE_CLASS	AUGMENT_IMPORTS_OP				| 020E |
 EXECUTE_MODULE_CLASS	ALL_REFERENCE_OP				| 0217 |
-unknown_return		>R						| 0257 |
+# unknown_return		>R						| 0257 |
 DECLARE_VARIABLE	ARRAY_CLASS					| 0337 |
 DECLARE_TYPE		ARRAY_CLASS,DEFINED				| 035D |
 DECLARE_VARIABLE	PACKAGE_CLASS					| 0387 |
@@ -107,73 +107,111 @@ DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	| 0396 |
 DECLARE_TYPE		ACCESS_CLASS,DEFINED				| 03AD |
 DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		| 03B6 |
 
-EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0 0| x	|
-unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
-unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
-unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
-unknown_return		>R						|0 0 0 0|1 0 0 0|0 0 1 1|0 0|a|1|
-unknown_return		>R						| 08E2 |
 zero_is_invalid_ins	>R						| 0000 |
+push			abs,maybe_subprog				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| abs				|
+unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
 
+PUSH_STRING_XXX		pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
+PUSH_STRING_EXTENDED	pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
+XXXa2			abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+# a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
+XXXa4			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+XXXa7			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+unknown_skip_cond	skip						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
+unknown_return		>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
+DECLARE_SUBPROGRAM	subp,XXX					|0 0 0 0|0 0 1 0|1 0 0 1|1| how | subp				|
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
 DECLARE_SUBPROGRAM	subp,FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
 DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
-PUSH_STRING_EXTENDED	pse						|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0| pse				|
-PUSH_STRING_XXX		pse						|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1| pse				|
-LOAD_ENCACHED		eon						|0 0 0 0 0 0 0 0 1 1 1| eon	|
-SHORT_LITERAL		slit						|0 1 0 0 1| slit		|
-JUMP			pcrel,>J					|0 1 1 1 1| pcrel		|
+EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
+EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP				|0 0 0 1|1 1 0 1|0 0 0 0| x	|
+EXECUTE_PACKAGE_CLASS	FIELD_EXECUTE_OP				|0 0 0 1|1 0 0 0|0|       x	|
+unknown_return		>R						|0 1 0 0|0 0 0 1|0 0 0| x	|
+unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
+unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
+unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
+EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0 0| x	|
+JUMP_CASE		case_max					|0 1 0 0|0 1 1 0| case_max	|
+SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
+jump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
+INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
+JUMP			pcrel,>J					|0 1 1 1|1| pcrel		|
 CALL			llvl,ldelta					|1 0 0| llvl  | ldelta		|
 STORE_UNCHECKED		llvl,ldelta					|1 0 1| llvl  | ldelta		|
 STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
 LOAD			llvl,ldelta					|1 1 1| llvl  | ldelta		|
 LOAD_INCREASING		-						| 3FFB |
-EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP				|0 0 0 1|1 1 0 1|0 0 0 0| x	|
-EXECUTE_PACKAGE_CLASS	FIELD_EXECUTE_OP				|0 0 0 1|1 0 0 0|0|       x	|
-EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
 unknown_instruction	-						| unknown			|
 """
 
 class r1000_ins(assy.Instree_ins):
-   ''' '''
+    ''' '''
 
-   def assy_subp(self):
-       self.lang.subprogram(self['subp'])
+    def assy_case_max(self):
+        i = self['case_max']
+        self += code.Jump(cond="default", to=self.hi)
+        self.lang.m.set_line_comment(self.hi, "case default")
+        for j in range(i + 1):
+            self += code.Jump(cond="#0x%x" % j, to=self.hi + 1 + j)
+            self.lang.m.set_line_comment(self.hi + 1 + j, "case 0x%x" % j)
+        return "0x%x" % i
 
-   def assy_pse(self):
-       v = self['pse']
-       y = self.lang.strtab(v)
-       return "@0x%x: %s" % (v, y.txt)
+    def assy_skip(self):
+        self += code.Jump(cond="?", to=self.hi)
+        self += code.Jump(cond="!?x", to=self.hi + 1)
 
-   def assy_pcrel(self):
-       v = self['pcrel']
-       if v & 0x400:
-           self.dstadr = self.hi + v - 0x800
-       else:
-           self.dstadr = self.hi + v
-       return assy.Arg_dst(self.lang.m, self.dstadr)
+    def assy_subp(self):
+        self.dstadr = self['subp']
+        self.lang.subprogram(self.dstadr)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-   def assy_eon(self):
-       # EncachedObjectNumber: 0..31
-       v = self['eon']
-       return "0x%x" % v
+    def assy_pse(self):
+        v = self['pse']
+        y = self.lang.strtab(v)
+        return "@0x%x: %s" % (v, y.txt)
 
-   def assy_slit(self):
-       # Short_Literal_Value [-2**10..2**10-1]
-       v = self['slit']
-       return "0x%x" % v
+    def assy_abs(self):
+        self.dstadr = self['abs']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
-   def assy_llvl(self):
-       # Lexical_Level [0..15]
-       return "0x%x" % self['llvl']
+    def assy_maybe_subprog(self):
+        if self.lang.m[self.lo + 2] == 0x2a0 and (self.dstadr & 3) == 3:
+            self.lang.subprogram(self.dstadr)
 
-   def assy_ldelta(self):
-       # Lexical_Delta [-256..511]
-       v = self['ldelta']
-       if v & 0x100:
-           return "-0x%x" % (0x200 - v)
-       return "0x%x" % v
+    def assy_pcrel(self):
+        v = self['pcrel']
+        if v & 0x400:
+            self.dstadr = self.hi + v - 0x800
+        else:
+            self.dstadr = self.hi + v
+        return assy.Arg_dst(self.lang.m, self.dstadr)
+
+    def assy_literal(self):
+        y = self.lang.literal(self.dstadr)
+        return y.repr
+
+    def assy_eon(self):
+        # EncachedObjectNumber: 0..31
+        v = self['eon']
+        return "0x%x" % v
+
+    def assy_slit(self):
+        # Short_Literal_Value [-2**10..2**10-1]
+        v = self['slit']
+        return "0x%x" % v
+
+    def assy_llvl(self):
+        # Lexical_Level [0..15]
+        return "0x%x" % self['llvl']
+
+    def assy_ldelta(self):
+        # Lexical_Delta [-256..511]
+        v = self['ldelta']
+        if v & 0x100:
+            return "-0x%x" % (0x200 - v)
+        return "0x%x" % v
 
 
 class r1000(assy.Instree_disass):
@@ -211,34 +249,57 @@ class r1000(assy.Instree_disass):
             'WITH_CONSTRAINT',
             'ACTIVATE_OP',
             'DISCRETE',
+            'RAISE_OP',
+            'EXCEPTION_CLASS',
+            'XXX',
         )
+        self.literals = {}
+        self.strtabs = {}
 
         self.subprograms = set()
 
     def subprogram(self, adr):
+        if not self.m[adr]:
+            print("ZERO at SUBPROGRAM+3 (0x%04x)" % adr)
+            return
         if adr in self.subprograms:
             return
         assert adr & 3 == 3
         a0 = adr & ~3
+        self.m.set_label(adr, "INIT_%04x" % a0)
         self.m.set_block_comment(a0, "SUBPROGRAM")
         data.Const(self.m, a0, fmt="0x%04x")
         self.m.set_line_comment(a0, "Address of begin")
         data.Const(self.m, a0+1, fmt="0x%04x")
         self.m.set_line_comment(a0+1, "Address of exception handler")
         data.Const(self.m, a0+2, fmt="0x%04x")
-        self.m.set_line_comment(a0+1, "Number of locals")
+        self.m.set_line_comment(a0+2, "Number of locals")
         self.disass(adr)
         self.m.set_label(self.m[a0], "BODY_%04x" % a0)
         if self.m[a0] != adr:
             self.disass(self.m[a0])
 
+    def literal(self, adr):
+        y = self.literals.get(adr)
+        if not y:
+            v1 = (self.m[adr] << 16) | self.m[adr+1]
+            v2 = (self.m[adr + 2] << 16) | self.m[adr+3]
+            y = data.Data(self.m, adr, adr + 4)
+            y.repr = "{0x%08x, 0x%08x}" % (v1, v2)
+            y.rendered = ".LITERAL\t" + y.repr
+            y.value = [v1, v2]
+            y.compact = True
+            self.literals[adr] = y
+        return y
+
     def strtab(self, adr):
         b1 = (adr<<1) + self.lang.m[adr]
         b2 = ((adr + 1)<<1) + self.lang.m[adr + 1]
-        y = data.Const(self.lang.m, adr, fmt="0x%%04x->0x%04x" % b1)
+        y = data.Const(self.lang.m, adr, fmt="0x%%04x->0x%04x" % (b1>>1))
         y.typ = ".STRTAB"
-        y.strptr = b1 >> 1
-        
+        y.strptr = b1
+        self.strtabs[adr] = y
+
         t = '"'
         for aa in range(b1, b2):
             i = self.lang.m[aa >> 1]

@@ -54,17 +54,16 @@ def debug_table(m, adr, number):
 
 def chain(m, adr):
     m.set_block_comment(adr, "Debug chain")
-    for j in range(1):
-        y = data.Const(m, adr, adr+2, fmt="0x%04x")
-        y.typ = ".DBGLEN"
-        n0 = m[adr]
-        n1 = m[adr + 1]
-        if n0 + n1 == 0:
-            break
-        adr += 2
-        y = data.Const(m, adr, adr+n0+n1, fmt="0x%04x")
-        y.typ = ".DBGLNO"
-        adr += n0 + n1
+    y = data.Const(m, adr, adr+2, fmt="0x%04x")
+    y.typ = ".DBGLEN"
+    n0 = m[adr]
+    n1 = m[adr + 1]
+    if n0 + n1 == 0:
+        return
+    adr += 2
+    y = data.Const(m, adr, adr+n0+n1, fmt="0x%04x")
+    y.typ = ".DBGLNO"
+    adr += n0 + n1
 
 def debug(m):
     b = m[3]
@@ -96,47 +95,60 @@ def debug(m):
                 chain(m, c)
             a = a + 4
 
-def fill_stabs(cx):
+class StringTable():
 
-    stabs = {}
-    lostr = [0xffff]
+    def __init__(self, cx):
+        self.cx = cx
+        self.lostr = 0xffff
+        self.histr = 0x0000
+        self.lop = 0xffff
+        self.hip = 0x0000
 
-    def add_stab(yy):
-        lostr[0] = min(lostr[0], yy.strptr)
-        stabs[yy.lo] = yy
+        if not cx.strtabs:
+            return
 
-    for y in cx.m:
-        if not isinstance(y, data.Const):
-            continue
-        if y.typ != ".STRTAB":
-            continue
-        add_stab(y)
+        for y in cx.strtabs.values():
+            self.add(y)
 
-    if not stabs:
-        return
+        for a in range(self.lop, self.hip):
+            if a not in self.cx.strtabs:
+                self.add(cx.strtab(a))
 
-    # Plug holes
-    for j in range(min(stabs), max(stabs)):
-        if j not in stabs:
-            y = cx.strtab(j)
-            add_stab(y)
+        while True:
+            i = self.strptr(self.lop - 1)
+            #print("SPEC %04x -> %04x -> %04x" % (self.lop - 1, i, i >> 1))
+            if i >= self.lostr:
+                break
+            if (i>>1) < self.hip + 2:
+                break
+            self.add(cx.strtab(self.lop - 1))
 
-    hip = max(stabs)
-    lop = min(stabs)
-    while cx.m[lop] > cx.m[lop-1]:
-        d = (lop-1) + (cx.m[lop-1]>>1)
-        if d <= hip + 1:
-            break
-        y = cx.strtab(lop-1)
-        add_stab(y)
-        lop -= 1
+        while self.hip + 2 < self.lostr >> 1:
+            i = self.strptr(self.hip + 1)
+            if i <= self.histr:
+                break
+            self.add(cx.strtab(self.hip + 1))
 
-    if cx.m[lop] < cx.m[lop-1]:
-        j = max(stabs) + 1
-        while j < lostr[0] - 1:
-            y = cx.strtab(j)
-            add_stab(y)
-            j += 1
+        y = data.Data(cx.m, self.hip + 1, self.hip +2)
+        y.rendered = ".STREND 0x%04x->0x%04x" % (cx.m[y.lo], self.strptr(y.lo) >> 1)
+
+        ep = self.hip + 1 + (cx.m[self.hip + 1] >> 1)
+        if cx.m[self.hip + 1] & 1:
+            ep += 1
+        y = data.Data(cx.m, self.lostr >> 1, ep)
+        y.compact = True
+        y.rendered = ".STRTAB_STRINGS"
+        cx.m.set_block_comment(self.lop, "STRING TABLE")
+
+    def add(self, yy):
+        self.lop = min(self.lop, yy.lo)
+        self.hip = max(self.hip, yy.lo)
+        self.lostr = min(self.lostr, yy.strptr)
+        self.histr = max(self.histr, yy.strptr)
+        #print("ST %04x" % yy.lo, "LOP %04x" % self.lop, "HIP %04x" % self.hip, "LOSTR %04x" % self.lostr)
+
+    def strptr(self, aa):
+        return (aa  << 1) + self.cx.m[aa]
 
 #######################################################################
 
@@ -159,6 +171,9 @@ def segment_file(mb):
     cx.m.set_line_comment(5, "Module termination instruction - signal completion")
     cx.m.set_line_comment(6, "Offset to segment table (only in elab segments)")
     cx.m.set_line_comment(7, "0, wired, #pages in seg - 1)")
+    if cx.m[6]:
+        print("NB: ELAB SEGMENT TABLE at 0x%04x" % cx.m[6])
+        cx.m.set_block_comment(cx.m[6], "Segment Table")
 
     cx.subprogram(0xb)
 
@@ -168,7 +183,7 @@ def segment_file(mb):
         except mem.MemError:
             m.set_line_comment(3, "XXX DEBUG FAILED")
 
-    fill_stabs(cx)
+    StringTable(cx)
 
     return cx
 
@@ -188,7 +203,7 @@ if __name__ == '__main__':
         cx = segment_file(mb)
         listing.Listing(cx.m, fn=sys.argv[2], ncol=1, leaf_width=72)
         exit(0)
-    
+
     listing.Example(example, ncol=1)
 
     if False:
@@ -200,7 +215,7 @@ if __name__ == '__main__':
             if len(b) > 131072:
                 continue
             if b[0] or b[1] != 0xf or b[2] != 0x58:
-               continue
+                continue
             i = fn.split("/")
             i = "".join(i[-2:])[:-4]
             FILENAME=fn
