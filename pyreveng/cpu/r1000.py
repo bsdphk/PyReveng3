@@ -73,7 +73,12 @@ DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
 DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
 # CALL			2,2						| 8402 |
 BREAK_UNCONDITIONAL	-						| 006F |
-EXECUTE			EXCEPTION_CLASS,RAISE_OP			| 0100 |
+EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			| 0100 |
+
+# RERAISE_OP at 0x0101 is a guess, based on it occuring right before 0x0000
+# and being subsequent to RAISE_OP (0x0100) in the Machine_Code.ada
+EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			| 0101 |
+
 #INDIRECT_LITERAL	57						| 6039 |
 #INDIRECT_LITERAL	52						| 6034 |
 EXECUTE			MODULE_CLASS,ACTIVATE_OP			| 020F |
@@ -111,11 +116,12 @@ zero_is_invalid_ins	>R						| 0000 |
 push			abs,maybe_subprog				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| abs				|
 unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
 
-PUSH_STRING_XXX		pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
-PUSH_STRING_EXTENDED	pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
+PUSH_STRING_INDEXED	pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
+PUSH_STRING		pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 XXXa2			abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
-# a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
+# XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
 XXXa4			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+# XXX: a7 may be unconditional, (see fad6fc6b and dfb9935e)
 XXXa7			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 unknown_skip_cond	skip						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
@@ -128,12 +134,13 @@ DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
 EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP				|0 0 0 1|1 1 0 1|0 0 0 0| x	|
 EXECUTE_PACKAGE_CLASS	FIELD_EXECUTE_OP				|0 0 0 1|1 0 0 0|0|       x	|
+LOOP_INCREASING		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
 unknown_return		>R						|0 1 0 0|0 0 0 1|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
 unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
-EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0 0| x	|
-JUMP_CASE		case_max					|0 1 0 0|0 1 1 0| case_max	|
+EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
+JUMP_CASE		case_max					|0 1 0 0|0 1 1|   case_max	|
 SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
 jump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
 INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
@@ -142,7 +149,6 @@ CALL			llvl,ldelta					|1 0 0| llvl  | ldelta		|
 STORE_UNCHECKED		llvl,ldelta					|1 0 1| llvl  | ldelta		|
 STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
 LOAD			llvl,ldelta					|1 1 1| llvl  | ldelta		|
-LOAD_INCREASING		-						| 3FFB |
 unknown_instruction	-						| unknown			|
 """
 
@@ -168,9 +174,10 @@ class r1000_ins(assy.Instree_ins):
         return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_pse(self):
-        v = self['pse']
-        y = self.lang.strtab(v)
-        return "@0x%x: %s" % (v, y.txt)
+        self.dstadr = self['pse']
+        y = self.lang.strtab(self.dstadr)
+        self.lang.m.set_line_comment(self.lo, y.txt)
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_abs(self):
         self.dstadr = self['abs']
@@ -179,6 +186,11 @@ class r1000_ins(assy.Instree_ins):
     def assy_maybe_subprog(self):
         if self.lang.m[self.lo + 2] == 0x2a0 and (self.dstadr & 3) == 3:
             self.lang.subprogram(self.dstadr)
+
+    def assy_pcrelneg(self):
+        v = self['pcrelneg']
+        self.dstadr = self.hi + v - 0x200
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_pcrel(self):
         v = self['pcrel']
@@ -250,6 +262,7 @@ class r1000(assy.Instree_disass):
             'ACTIVATE_OP',
             'DISCRETE',
             'RAISE_OP',
+            'RERAISE_OP',
             'EXCEPTION_CLASS',
             'XXX',
         )
