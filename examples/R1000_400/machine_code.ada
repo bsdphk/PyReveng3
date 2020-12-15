@@ -267,7 +267,7 @@ package Machine_Code is
                       Has_Repeated_Initialization_Op,
 
                       Is_Initialization_Repated_Op,
-                      Raise_Op,
+                      Raise_Op,				
                       Reraise_Op,
 
                       Get_Name_Op,
@@ -527,15 +527,15 @@ package Machine_Code is
                              Illegal,
                              Idle,
 
-                             Elaborate_Subprogram,
+                             Elaborate_Subprogram,		
                              Check_Subprogram_Elaborated,
 
-                             Accept_Activation,
+                             Accept_Activation,			
                              Activate_Tasks,
                              Activate_Heap_Tasks,
 
-                             Signal_Activated,
-                             Signal_Completion,
+                             Signal_Activated,			
+                             Signal_Completion,			
                              Propagate_Abort,
 
                              Set_Priority,
@@ -562,8 +562,8 @@ package Machine_Code is
                              Pop_Block,
                              Pop_Block_With_Result,
 
-                             Break_Unconditional,
-                             Break_Optional,
+                             Break_Unconditional,		
+                             Break_Optional,			
                              Exit_Break,
 
                              Query_Break_Cause,
@@ -581,9 +581,9 @@ package Machine_Code is
                              Push_Float_Extended,
 
                              Push_Structure_Extended,
-                             Push_String_Extended,
+                             Push_String_Extended,		
 
-                             Push_String_Extended_Indexed,
+                             Push_String_Extended_Indexed,	
                              Store_String_Extended,
 
                              Jump_Extended,
@@ -607,39 +607,125 @@ package Machine_Code is
                              Spare11_Action
                             );
 
-   type Op_Code is (
+
+   type Op_Code is (				-- Source Annotations:
+						--  'gxx' = Guru01 page xx
+						--  'fe' = FE handbook page 269
                     Declare_Type,
+						-- g44 |0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1| Array_Class, Defined
+						-- g43 |0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0| Package_Class, Defined
+						-- g44 |0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1| Heap_Access_Class, Defined
+						-- g44 |0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1| Access_Class, Defined
+						
                     Complete_Type,
                     Declare_Variable,
+						-- g44 |0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1| Array_Class
+						-- g43 |0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1| Package_Class
+						-- g44 |0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0| Heap_Access_Class, By_Allocation, With_Value
+						-- g44 |0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0| Access_Class, By_Allocation, With_Value
+						-- fe  |0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0| Discrete, With_Value, With_Constraint
+						
                     Declare_Subprogram,
-                    Load,
-                    Store,
-                    Store_Unchecked,
+						
+						-- g42 |0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| For_Outher_Call, Is_Visble, Not_Elaborated
+						-- g87 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| For_Outher_Call, Is_Visible
+						-- g43 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| For_Outher_Call
+						-- g44 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| For_Call
+						-- g43 |0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0| Null_Subprogram
+                    Load,			
+						-- g43 |1 1 1 0|0 0 0|0 0 0 0 0 0 0 0 1| 0,1
+						-- g43 |1 1 1 0|0 0 0|0 0 0 0 0 0 0 1 0| 0,2
+						-- g43 |1 1 1 0|0 0 0|0 0 0 0 0 0 0 1 1| 0,3
+						-- g43 |1 1 1 0|0 1 0|0 0 0 0 0 0 0 1 0| 2,2
+						-- g44 |1 1 1 0|0 1 0|0 0 0 0 0 0 0 1 1| 2,3
+						-- g44 |1 1 1 0|0 1 0|1 1 1 1 1 1 1 1 1| 2,-1
+						-- g45 |1 1 1 0|0 1 1|1 1 1 1 1 1 1 1 1| 3,-1
+
+                    Store,			
+						-- g44 |1 1 0 0|0 1 0 0|0 0 0 0|0 1 1 1| 2,7
+                    Store_Unchecked,		
+						-- g45 |1 0 1 0|0 1 0|0 0 0 0 0 0 0 1 0| 2,2
+						-- g45 |1 0 1 0|0 1 1|0 0 0 0 0 0 0 1 0| 3,2
+						-- g45 |1 0 1 0|0 0 1|0 0 0 0 0 1 1 1 0| 1,14
                     Reference,
-                    Call,
-                    Exit_Subprogram,
+                    Call,			
+						-- g44 |1 0 0 0|0 0 1|0 0 0 0 0 1 1 1 1| 1, 15
+						-- g44 |1 0 0 0|0 1 0|0 0 0 0 0 1 0 0 1| 2, 9
+                    Exit_Subprogram,		
+						-- g43 |0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1| 1
+						-- g43 |0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0| 2
+
                     End_Rendezvous,
                     Execute,
+						-- g44 |0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0| Vector_Class, Field_Write_Op
+						-- g44 |0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1| Vector_Class, Check_In_Type_Op
+						-- g44 |0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0| Vector_Class, Catenate_Op
+						-- g88 |0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0| Exception_Class, Raise_Op
+						-- g45 |0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1| Heap_Access_Class, All_Reference_Op
+						-- g43 |0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0| Module_Class, Augment_Imports_Op
+						-- g43 |0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1| Module_Class, Activate_Op
+						-- g43 |0 0 0 1|1 0 0 0|0 0 0 0 1 1 0 1| Package_Class, Field_Execute_Op, 13
+						-- g44 |0 0 0 1|1 0 0 0|0 0 0 1 0 0 0 1| Package_Class, Field_Execute_Op, 17
+						-- g45 |0 0 0 1|1 0 0 0|0 0 0 1 1 0 0 0| Package_Class, Field_Execute_Op, 24
+						-- g45 |0 0 0 1|1 0 0 0|0 1 1 0 0 1 0 0| Package_Class, Field_Execute_Op, 100
+						-- g88 |0 0 0 1|1 0 0 1|0 0 0 0 1 1 0 1| Package_Class, Field_Reference_Op, 13
                     Action,
+						-- g44 |0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1| Break_Optional
+						-- g88 |0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1| Break_Unconditional
+						-- g43 |0 0 0 0|0 0 0 0|1 0 0 1|1 0 1 0| Push_String_Extended
+						-- g42 |0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1| Signal_Completion
+						-- g42 |0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0| Signal_Activated
+						-- g42 |0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1| Accept_Activation
+						-- g42 |0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1| Elaborate_Subprogram
+						-- fe  |0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0| Illegal
                     Execute_Immediate,
-                    Jump,
+						-- g43 |0 0 0 0|0 1 1 0|0 0|1 0 0 0 0 1| Set_Value_Unchecked_Op, 33
+						-- g42 |0 0 0 1|1 1 0 1|0 0|0 0 1 1 0 1| Reference_Lex_1_Op, 13
+                    Jump,			
+						-- g88 |0 1 1 1|1 0 0 0|0 0 0 0|0 0 0 1| 1 	(w/ extension ?)
+						-- g88 |0 1 1 1|1 0 0 0|0 0 0 0|0 0 1 0| 2 	(w/ 2xext ?)
                     Jump_Zero,
                     Jump_Nonzero,
-                    Jump_Case,
-                    Loop_Increasing,
+                    Jump_Case,			
+                    Loop_Increasing,		
+						-- g44 |0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1| -5
                     Loop_Decreasing,
+
                     Short_Literal,
-                    Indirect_Literal,
+						-- g43 |0 1 0 0|1 0 0 0|0 0 0 0 0 0 0 0| 0
+						-- g43 |0 1 0 0|1 0 0 0|0 0 0 0 0 0 1 1| 3
+						-- g44 |0 1 0 0|1 0 0 0|0 0 0 0 1 0 1 1| 10
+						-- g44 |0 1 0 0|1 0 0 0|0 0 0 1 1 0 0 0| 24
+                    Indirect_Literal,		
+						-- g88 |0 1 1 0|0 0 0 0|0 0 1 1 1 0 0 1| Discrete_Class, 57
+						-- g88 |0 1 1 0|0 0 0 0|0 0 1 1 0 1 0 0| Discrete_Class, 52
+						-- g88 |0 1 1 0|0 0 0 0|0 0 1 0 1 0 1 0| Discrete_Class, 42
                     Pop_Control,
-                    Load_Top,
+                    Load_Top,			
+						-- g43 |0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0| 0
                     Store_Top,
+
                     Store_Top_Unchecked,
-                    Load_Encached,
+                    Load_Encached,		
+						-- g43 |0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0| 2
+						-- g44 |0 0 0 0|0 0 0 0|1 1 1 0|0 0 0 1| 1
                     Extension,
+						-- g43 |0 0 0 0|0 0 0 0|1 0 0 1 0 0 1 1| 147
+						-- g43 |0 0 0 0|0 0 0 0|0 0 1 1 0|0 1 1| 6,3
                     Literal_Value,
+						-- g88 [0000,0000,000e,3804] Discrete Class, 931844
                     Block_Begin,
+						-- g42 |0 0 0 0|0 0 0 0|0 0 0 1 0|0 0 0|	2,0
+						-- g43 |0 0 0 0|0 0 0 0|0 0 1 0 1|0 0 1| 5,1
+						-- g43 |0 0 0 0|0 0 0 0|0 0 1 1 1|1 0 0| 7,4
+
                     Block_Handler,
+						-- g42 |0 0 0 0|0 0 0 0|0 0 0 0|0 1 0 0|	0,4
+						-- g43 |0 0 0 0|0 0 0 0|0 0 0 0|0 1 0 0|	0,4
                     End_Locals
+						-- g42 0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 1|	1
+						-- g43 0 0 0 0|0 0 0 0|0 0 0 0|0 0 1 0|	2
+						-- g43 0 0 0 0|0 0 0 0|0 0 0 0|1 1 1 1|	15
                    );
 
    type Instruction (
