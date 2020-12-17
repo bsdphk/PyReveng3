@@ -611,11 +611,17 @@ package Machine_Code is
    type Op_Code is (				-- Source Annotations:
 						--  'gxx' = Guru01 page xx
 						--  'fe' = FE handbook page 269
+						--  'aa?' = Allan's hypothesis
                     Declare_Type,
+						-- aa? |0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0| Variant_Record_Class, ?
+						-- aa? |0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0| Record_Class, Defined
+						-- aa? |0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0| Record_Class, ?
 						-- g44 |0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1| Array_Class, Defined
 						-- g43 |0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0| Package_Class, Defined
 						-- g44 |0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1| Heap_Access_Class, Defined
 						-- g44 |0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1| Access_Class, Defined
+						-- aa? |0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0| Discrete_Class, Defined
+						-- aa? |0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0| Discrete_Class, Defined ?
 						
                     Complete_Type,
                     Declare_Variable,

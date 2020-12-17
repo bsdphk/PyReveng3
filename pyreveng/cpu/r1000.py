@@ -112,6 +112,10 @@ DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	| 0396 |
 DECLARE_TYPE		ACCESS_CLASS,DEFINED				| 03AD |
 DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		| 03B6 |
 
+# XXX: Fra Allan
+DECLARE_TYPE		DISCRETE_CLASS,DEFINED				| 03FE |
+DECLARE_TYPE		RECORD_CLASS,DEFINED				| 032E |
+
 zero_is_invalid_ins	>R						| 0000 |
 push			abs,maybe_subprog				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| abs				|
 unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
@@ -264,6 +268,8 @@ class r1000(assy.Instree_disass):
             'RAISE_OP',
             'RERAISE_OP',
             'EXCEPTION_CLASS',
+            'DISCRETE_CLASS',
+            'RECORD_CLASS',
             'XXX',
         )
         self.literals = {}
