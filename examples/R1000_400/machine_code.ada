@@ -339,7 +339,7 @@ package Machine_Code is
 
    type Subprogram_Sort is (
                             For_Call,
-                            For_Outher_Call,
+                            For_Outer_Call,
                             For_Accept,
                             Null_Subprogram
                            );
@@ -633,9 +633,9 @@ package Machine_Code is
 						
                     Declare_Subprogram,
 						
-						-- g42 |0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| For_Outher_Call, Is_Visble, Not_Elaborated
-						-- g87 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| For_Outher_Call, Is_Visible
-						-- g43 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| For_Outher_Call
+						-- g42 |0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| For_Outer_Call, Is_Visble, Not_Elaborated
+						-- g87 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| For_Outer_Call, Is_Visible
+						-- g43 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| For_Outer_Call
 						-- g44 |0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| For_Call
 						-- g43 |0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0| Null_Subprogram
                     Load,			

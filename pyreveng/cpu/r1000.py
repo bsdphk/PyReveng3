@@ -70,7 +70,7 @@ DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
 ################
 # Ref: GC1 p88
 #JUMP			1						| 7801	|
-DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
 # CALL			2,2						| 8402 |
 BREAK_UNCONDITIONAL	-						| 006F |
 EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			| 0100 |
@@ -130,9 +130,9 @@ XXXa7			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 unknown_skip_cond	skip						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
 unknown_return		>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
-DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
+DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
 DECLARE_SUBPROGRAM	subp,XXX					|0 0 0 0|0 0 1 0|1 0 0 1|1| how | subp				|
-DECLARE_SUBPROGRAM	subp,FOR_OUTHER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
+DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
 DECLARE_SUBPROGRAM	subp,FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
 DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
 EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
@@ -252,7 +252,7 @@ class r1000(assy.Instree_disass):
             'FIELD_EXECUTE_OP',
             'FIELD_WRITE_OP',
             'FOR_CALL',
-            'FOR_OUTHER_CALL',
+            'FOR_OUTER_CALL',
             'HEAP_ACCESS_CLASS',
             'IS_VISIBLE',
             'NOT_ELABORATED',
