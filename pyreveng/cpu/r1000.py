@@ -60,100 +60,315 @@ from pyreveng import assy, data, code
 
 
 r1000_desc = """
+#-----------------------
+# Make places we get to, but do not handle grep(1)able
+unknown_instruction	-						| unknown			|
 
-################
-# Ref: FEH p269
-#INDIRECT_LITERAL	DISCRETE,0x20					| 6004 |
-DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		| 03EC |
-# CALL			0,0						| 8000 |
+#-----------------------
+# Very helpful, but only hypothesis /phk
+zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
-################
-# Ref: GC1 p88
-#JUMP			1						| 7801	|
-DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
-# CALL			2,2						| 8402 |
-BREAK_UNCONDITIONAL	-						| 006F |
-EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			| 0100 |
+#-----------------------
+# gc44,0076								|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
+ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
-# RERAISE_OP at 0x0101 is a guess, based on it occuring right before 0x0000
-# and being subsequent to RAISE_OP (0x0100) in the Machine_Code.ada
-EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			| 0101 |
+#-----------------------
+# gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
+ACTION			BREAK_UNCONDITIONAL				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 
-#INDIRECT_LITERAL	57						| 6039 |
-#INDIRECT_LITERAL	52						| 6034 |
-EXECUTE			MODULE_CLASS,ACTIVATE_OP			| 020F |
-# CALL			3,3						| 8603 |
+#-----------------------
+ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
 
-################
-# Ref: GC1 p28
-#RAISE			>R						| 0100 |
+#-----------------------
+# gc43,0029		PUSH_STRING					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0|
+ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 
-################
-# Ref: GC1 p41-46
-BREAK_OPTIONAL	-							| 0007 |
-SIGNAL_COMPLETION	>R						| 00BB |
-SIGNAL_ACTIVATED	-						| 00BC |
-ACCEPT_ACTIVATION	-						| 00BF |
-ELABORATE_SUBPROGRAM	-						| 00C7 |
-unknown_return		>R						| 00CA |
-LOAD_TOP_0		-						| 00D8 |
-
-EXECUTE_VECTOR_CLASS	CHECK_IN_TYPE_OP				| 01C3 |
-EXECUTE_VECTOR_CLASS	CATENATE_OP					| 01CC |
-EXECUTE_VECTOR_CLASS	FIELD_WRITE_OP					| 01D6 |
-EXECUTE_MODULE_CLASS	AUGMENT_IMPORTS_OP				| 020E |
-EXECUTE_MODULE_CLASS	ALL_REFERENCE_OP				| 0217 |
-# unknown_return		>R						| 0257 |
-DECLARE_VARIABLE	ARRAY_CLASS					| 0337 |
-DECLARE_TYPE		ARRAY_CLASS,DEFINED				| 035D |
-DECLARE_VARIABLE	PACKAGE_CLASS					| 0387 |
-DECLARE_TYPE		PACKAGE_CLASS,DEFINED				| 038E |
-DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	| 0396 |
-DECLARE_TYPE		ACCESS_CLASS,DEFINED				| 03AD |
-DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		| 03B6 |
-
-# XXX: Fra Allan
-DECLARE_TYPE		DISCRETE_CLASS,DEFINED				| 03FE |
-DECLARE_TYPE		RECORD_CLASS,DEFINED				| 032E |
-
-zero_is_invalid_ins	>R						| 0000 |
+#-----------------------
 push			abs,maybe_subprog				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| abs				|
-unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
 
-PUSH_STRING_INDEXED	pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
-PUSH_STRING		pse						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
+#-----------------------
 XXXa2			abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+
+#-----------------------
 # XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
 XXXa4			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+
+#-----------------------
 # XXX: a7 may be unconditional, (see fad6fc6b and dfb9935e)
 XXXa7			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+
+#-----------------------
+# gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
+ACTION			SIGNAL_COMPLETION,>R				|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
+
+#-----------------------
+# gc43,003c 		SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
+ACTION			SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
+
+#-----------------------
+# gc42,000d		ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
+ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
+
+#-----------------------
+# gc42,000f		ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
+ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
+
+#-----------------------
+# speculation /phk
+unknown_return		>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+
+#-----------------------
 unknown_skip_cond	skip						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+
+#-----------------------
+# gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
+# /aa
+LOAD_TOP		x						|0 0 0 0|0 0 0 0|1 1 0 1|1|0| x |
+
+#-----------------------
+# feh269,1c		Value_02					|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
+# gc44,0046		1						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 0 1|
+# gc43,0036		2						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
 LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
+
+#-----------------------
+# g88,001e		EXCEPTION_CLASS,RAISE_OP 			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
+# g28, location 4 = raise instruction					|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
+EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
+
+#-----------------------
+# This is a guess, based on it occuring right before 0x0000
+# and being subsequent to RAISE_OP (0x0100) in the Machine_Code.ada
+# /phk
+EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
+
+#-----------------------
+# gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
+EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
+
+#-----------------------
+# gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
+# gc45,008f		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
+EXECUTE			VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
+
+#-----------------------
+# gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+# gc45,00a6		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+EXECUTE			VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+
+#-----------------------
+# gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
+EXECUTE			MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
+
+#-----------------------
+EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
+
+#-----------------------
+# gc45,00a5		HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
+EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
+
+#-----------------------
 unknown_return		>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+
+#-----------------------
+# /aa (2fa0095f7 1c9e)
+?EXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
+
+#-----------------------
+# /aa (3bf0c159 0236)
+?EXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
+
+#-----------------------
+# /aa (3bf0c159 00d9)
+?EXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
+
+#-----------------------
+# /aa (3bf0c159 00da)
+?EXECUTE		MINUS						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# gc42,000b		FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0|
 DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
-DECLARE_SUBPROGRAM	subp,XXX					|0 0 0 0|0 0 1 0|1 0 0 1|1| how | subp				|
+
+#-----------------------
+# gc87,000b		subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+
+#-----------------------
+# gc43,0038		FOR_OUTER_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1|
 DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
+
+#-----------------------
+# gc44,0077		FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1|
 DECLARE_SUBPROGRAM	subp,FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
+
+#-----------------------
+# gc43,001e		NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
 DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
+
+#-----------------------
+# /aa
+?DECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
+
+#-----------------------
+# /aa
+?DECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
+
+#-----------------------
+# gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
+DECLARE_VARIABLE	ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
+
+#-----------------------
+# gc44,0049		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
+DECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
+
+#-----------------------
+# gc43,0020		PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
+DECLARE_VARIABLE	PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
+
+#-----------------------
+# gc43,001f		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
+DECLARE_TYPE		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
+
+#-----------------------
+# gc44,0074		HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+
+#-----------------------
+# gc44,0052		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+DECLARE_TYPE		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+
+#-----------------------
+# gc44,0061		ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
+DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
+
+#-----------------------
+# gc44,004f		ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+DECLARE_VARIABLE	ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+
+
+#-----------------------
+# feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+
+#-----------------------
+# /aa
+?DECLARE_TYPE		DISCRETE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
+
+#-----------------------
+# /aa
+?DECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
+
+#-----------------------
+# g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
 EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
+
+#-----------------------
+unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
+
+#-----------------------
+# /aa (3bf0c159 00da )
+?minus_1		-						|0 0 0 0|1 0 1 0|1 1 1 1 1 1 1 1|
+
+#-----------------------
+# g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
+# g44,0071		PACKAGE_CLASS,FIELD_EXECUTE_OP,17		|0 0 0 1|1 0 0 0|0 0 0 1|0 0 0 1|
+# g45,008e		PACKAGE_CLASS,FIELD_EXECUTE_OP,24		|0 0 0 1|1 0 0 0|0 0 0 1|1 0 0 0|
+# g45,0091		PACKAGE_CLASS,FIELD_EXECUTE_OP,100		|0 0 0 1|1 0 0 0|0 1 1 0|0 1 0 0|
+EXECUTE			PACKAGE_CLASS,FIELD_EXECUTE_OP,x		|0 0 0 1|1 0 0 0|0|       x	|
+
+#-----------------------
+# g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
+EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0 0 0 0| x     |
+
+#-----------------------
+# g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP				|0 0 0 1|1 1 0 1|0 0 0 0| x	|
-EXECUTE_PACKAGE_CLASS	FIELD_EXECUTE_OP				|0 0 0 1|1 0 0 0|0|       x	|
+
+
+#-----------------------
+# g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
 LOOP_INCREASING		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
+
+#-----------------------
+# phk
 unknown_return		>R						|0 1 0 0|0 0 0 1|0 0 0| x	|
+
+#-----------------------
+# phk
 unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
+
+#-----------------------
+# phk
 unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
+
+#-----------------------
+# phk
 unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
+
+#-----------------------
+# g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
+# g44,0080		2						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0|
+# feh269,1e		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
 EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
+
+#-----------------------
+# phk
 JUMP_CASE		case_max					|0 1 0 0|0 1 1|   case_max	|
+
+#-----------------------
+# g43,001b		0						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 0 0|
+# g43,0024		3						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 1 1|
+# g44,0045		10						|0 1 0 0|1 0 0 0|0 0 0 0 1 0 1 1|
+# g44,004e		24						|0 1 0 0|1 0 0 0|0 0 0 1 1 0 0 0|
 SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
-jump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
+
+#-----------------------
+# g88,0026		Discrete_Class,57				|0 1 1 0|0 0 0 0|0 0 1 1 1 0 0 1|
+# g88,0027		Discrete_Class,52				|0 1 1 0|0 0 0 0|0 0 1 1 0 1 0 0|
+# g88,002d		Discrete_Class,42				|0 1 1 0|0 0 0 0|0 0 1 0 1 0 1 0|
+# feh269,1b		Discrete, #0020					|0 1 1 0|0 0 0 0|0 0 0 0 0 1 0 0|
 INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
+
+#-----------------------
+jump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
+
+#-----------------------
+# /aa Sandsynligvis jump_zero
+jump_cond		pcrel,>JC					|0 1 1 1|0| pcrel		|
+
+#-----------------------
+# XXX: Not obvious if "1" and "2" is count of extension words or if and why those words are jumped over
+# g88,001a		1						|0 1 1 1|1 0 0 0|0 0 0 0|0 0 0 1|
+# g88,0047		2						|0 1 1 1|1 0 0 0|0 0 0 0|0 0 1 0|
 JUMP			pcrel,>J					|0 1 1 1|1| pcrel		|
+
+#-----------------------
+# g44,007d		1,15						|1 0 0 0|0 0 1|0 0 0 0 0 1 1 1 1|
+# g44,007f		2,9						|1 0 0 0|0 1 0|0 0 0 0 0 1 0 0 1|
+# feh269,22		0						|1 0 0 0|0 0 0|0 0 0 0 0 0 0 0 0|
 CALL			llvl,ldelta					|1 0 0| llvl  | ldelta		|
+
+#-----------------------
+# g45,009d		2,2						|1 0 1 0|0 1 0|0 0 0 0 0 0 0 1 0|
+# g45,009f		3,2						|1 0 1 0|0 1 1|0 0 0 0 0 0 0 1 0|
+# g45,00a1		1,14						|1 0 1 0|0 0 1|0 0 0 0 0 1 1 1 0|
 STORE_UNCHECKED		llvl,ldelta					|1 0 1| llvl  | ldelta		|
+
+#-----------------------
+# g44,0062		2,7						|1 1 0 0|0 1 0 0|0 0 0 0|0 1 1 1|
+# g44,0075		2,8						|1 1 0 0|0 1 0 0|0 0 0 0|1 0 0 0|
 STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
+
+#-----------------------
+# g43,0021		0,1						|1 1 1 0|0 0 0|0 0 0 0 0 0 0 0 1|
+# g43,0022		0,2						|1 1 1 0|0 0 0|0 0 0 0 0 0 0 1 0|
+# g43,0023		0,3						|1 1 1 0|0 0 0|0 0 0 0 0 0 0 1 1|
+# g43,0025		2,2						|1 1 1 0|0 1 0|0 0 0 0 0 0 0 1 0|
+# g44,004c		2,3						|1 1 1 0|0 1 0|0 0 0 0 0 0 0 1 1|
+# g44,0079		2,-1						|1 1 1 0|0 1 0|1 1 1 1 1 1 1 1 1|
+# g45,00a0		3,-1						|1 1 1 0|0 1 1|1 1 1 1 1 1 1 1 1|
 LOAD			llvl,ldelta					|1 1 1| llvl  | ldelta		|
-unknown_instruction	-						| unknown			|
 """
 
 class r1000_ins(assy.Instree_ins):
@@ -204,6 +419,10 @@ class r1000_ins(assy.Instree_ins):
             self.dstadr = self.hi + v
         return assy.Arg_dst(self.lang.m, self.dstadr)
 
+    def assy_x(self):
+        v = self['x']
+        return "0x%x" % v
+
     def assy_literal(self):
         y = self.lang.literal(self.dstadr)
         return y.repr
@@ -211,7 +430,16 @@ class r1000_ins(assy.Instree_ins):
     def assy_eon(self):
         # EncachedObjectNumber: 0..31
         v = self['eon']
-        return "0x%x" % v
+        return [
+            "Standard_Cache", "Boolean_Cache", "Integer_Cache", "Natural_Cache",
+            "Positive_Cache", "Long_Integer_Cache", "Float_Cache", "Duration_Cache",
+            "Character_Cache", "String_Cache", "Null_String_Cache", "Diana_Cache",
+            "Diana_Tree_Cache", "Diana_Symbol_Rep_Cache", "Diana_Seq_Type_Cache", "Diana_Sequence_Cache",
+            "Segment_Cache", "Diana_Temp_Seq", "Diana_Attr_List", "Diana_Tree_Node",
+            "Diana_Seq_Type_Node", "Unused21", "Unused22", "Unused23",
+            "Unused24", "Unused25", "Unused26", "Unused27",
+            "Unused28", "Unused29", "Unused30", "Unused31",
+        ][v]
 
     def assy_slit(self):
         # Short_Literal_Value [-2**10..2**10-1]
@@ -270,6 +498,22 @@ class r1000(assy.Instree_disass):
             'EXCEPTION_CLASS',
             'DISCRETE_CLASS',
             'RECORD_CLASS',
+            'VECTOR_CLASS',
+            'SIGNAL_ACTIVATED',
+            'SIGNAL_COMPLETION',
+            'ACCEPT_ACTIVATION',
+            'ELABORATE_SUBPROGRAM',
+            'BREAK_UNCONDITIONAL',
+            'FIELD_REFERENCE_OP',
+            'PUSH_STRING',
+            'PUSH_STRING_INDEXED',
+            'BREAK_OPTIONAL',
+            'ENUM',
+            'IN_RANGE',
+            'BELOW_BOUND',
+            'VARIANT_RECORD_CLASS',
+            'EXPONENTIATE',
+            'MINUS',
             'XXX',
         )
         self.literals = {}
@@ -339,3 +583,15 @@ if __name__ == "__main__":
 
     cx = r1000()
     cx.it.dump()
+
+    l = ""
+    for i in r1000_desc.split("\n"):
+        if not i or i[0] == '#':
+            continue
+        j = i.split("|", maxsplit=1)
+        if j[1] < l:
+            print("oo", p)
+            print("OO", i)
+            print("")
+        l = j[1]
+        p = i
