@@ -738,7 +738,7 @@ package Machine_Code is
 
    -- more indices into the encaching registers for declarations from Diana
 
-   Diana_Temp_Se_Index : constant Encached_Object_Number := 17;
+   Diana_Temp_Seq_Index : constant Encached_Object_Number := 17;
    Diana_Attr_List_Index : constant Encached_Object_Number := 18;
    Diana_Tree_Node_Index : constant Encached_Object_Number := 19;
    Diana_Seq_Type_Node_Index : constant Encached_Object_Number := 20;
