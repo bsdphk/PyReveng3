@@ -95,7 +95,7 @@ XXXa4			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
 
 #-----------------------
 # XXX: a7 may be unconditional, (see fad6fc6b and dfb9935e)
-XXXa7			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+XXXa7			abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 
 #-----------------------
 # gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
@@ -118,7 +118,9 @@ ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 unknown_return		>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
 
 #-----------------------
-unknown_skip_cond	skip						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+# ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
+# May be conditional return? /phk
+unknown_jump_cond	>J						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
@@ -187,8 +189,16 @@ unknown_return		>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 ?EXECUTE		MINUS						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
 
 #-----------------------
+# ⟦37717da67⟧ @0x5ce4 indicates this takes an extension /phk
+?			subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
+
+#-----------------------
 # gc42,000b		FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0|
 DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
+
+#-----------------------
+# ⟦a88379b5f⟧ indicates this takes an extension # /phk
+?declare_subprogram	x						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| x				|
 
 #-----------------------
 # gc87,000b		subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
@@ -197,6 +207,10 @@ DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1
 #-----------------------
 # gc43,0038		FOR_OUTER_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1|
 DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
+
+#-----------------------
+# ⟦89b72b217⟧ @0x2abd indicates this takes an extension # /phk
+?declare_subprogram	subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
 
 #-----------------------
 # gc44,0077		FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1|
@@ -313,8 +327,9 @@ unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
 EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
 
 #-----------------------
-# phk
-JUMP_CASE		case_max					|0 1 0 0|0 1 1|   case_max	|
+# ⟦fad6fc6ba⟧ limits the argument to 8 bits
+# /phk
+JUMP_CASE		case_max					|0 1 0 0|0 1 1|0| case_max	|
 
 #-----------------------
 # g43,001b		0						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 0 0|

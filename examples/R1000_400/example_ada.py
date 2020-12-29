@@ -37,7 +37,8 @@ FILENAME = "6466568.SEG"
 
 #######################################################################
 
-def debug_table(m, adr, number):
+def debug_table(cx, adr, number):
+    m = cx.m
     m.set_block_comment(adr, "Debug3 Subtable 0x%x" % number)
     y = data.Const(m, adr, adr+2, fmt="0x%04x")
     y.typ = ".DBG3TAB"
@@ -46,6 +47,7 @@ def debug_table(m, adr, number):
     a = adr + 2
     for i in range(neg + pos):
         data.Const(m, a, a + 2, fmt="0x%04x")
+        cx.disass(m[a])
         m.set_line_comment(
             m[a],
             "Debug Table 0x%x.0x%x = 0x%x,0x%x" % (number, i, m[a], m[a+1])
@@ -65,7 +67,8 @@ def chain(m, adr):
     y.typ = ".DBGLNO"
     adr += n0 + n1
 
-def debug(m):
+def debug(cx):
+    m = cx.m
     b = m[3]
     assert 0 < b < m.hi
     m.set_block_comment(b, "Debug Table")
@@ -80,7 +83,7 @@ def debug(m):
             #assert (spa & 3) == 3, "0x%x" % spa
             #spa &= ~3
             m.set_line_comment(spa, "Debug Table 0x%x = %s" % (i, y.render()))
-            debug_table(m, m[a + 1], i)
+            debug_table(cx, m[a + 1], i)
             a += 8
     elif m[b] == 4:
         y = data.Const(m, b, b+6, fmt="0x%04x")
@@ -179,7 +182,7 @@ def segment_file(mb):
 
     if cx.m[3] and True:
         try:
-            debug(cx.m)
+            debug(cx)
         except mem.MemError:
             m.set_line_comment(3, "XXX DEBUG FAILED")
 
