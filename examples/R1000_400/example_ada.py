@@ -83,6 +83,7 @@ def debug(cx):
             #assert (spa & 3) == 3, "0x%x" % spa
             #spa &= ~3
             m.set_line_comment(spa, "Debug Table 0x%x = %s" % (i, y.render()))
+            cx.disass(spa)
             debug_table(cx, m[a + 1], i)
             a += 8
     elif m[b] == 4:
