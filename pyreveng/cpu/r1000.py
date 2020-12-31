@@ -93,19 +93,31 @@ ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 QQupush93		subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
 
 #-----------------------
+# See for instance ⟦2009596b6⟧ @b4
+PUSH_STRING_EXTENDED	abs,mark					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs				|
+
+#-----------------------
 # See for instance ⟦b66a7252c⟧  /phk
 PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
 
 #-----------------------
-QQuXXXa2		abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+PUSH_DISCRETE_EXTENDED	abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
 
 #-----------------------
 # XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
-QQuXXXa4		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+QQujump_a4		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
 
 #-----------------------
-# XXX: a7 may be unconditional, (see fad6fc6b and dfb9935e)
-QQuXXXa7		abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+# XXX: See 9739edd68 @0xf2e
+QQujump_a5		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 1| abs				|
+
+#-----------------------
+# XXX: See f1ef8a8ae @0x57d
+QQujump_a6		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 0| abs				|
+
+#-----------------------
+# ⟦ed62618ed⟧ @0x1cc confirms this is unconditional /phk
+JUMP			abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 
 #-----------------------
 # gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
@@ -506,6 +518,9 @@ class r1000_ins(assy.Instree_ins):
         if v & 0x100:
             return "-0x%x" % (0x200 - v)
         return "0x%x" % v
+
+    def assy_mark(self):
+        self.lang.m.set_line_comment(self.dstadr, "See at 0x%04x" % self.lo)
 
     def assy_dbl(self):
         y = data.Data(self.lang.m, self.dstadr, self.dstadr + 4)
