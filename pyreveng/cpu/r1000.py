@@ -193,6 +193,12 @@ EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 
 #-----------------------
+# ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
+QQu_float_arith		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
+QQu_float_mul		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
+QQu_float_add		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
+
+#-----------------------
 # 196 times followed by 0x0000
 # a dozen times right before TRAP entry /phk
 QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
@@ -306,10 +312,11 @@ QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 
 #-----------------------
 # g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
-EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
+EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 
 #-----------------------
-QQunknown_return	XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
+# ⟦28af5d09d⟧ @0xd2
+QQunknown_return	x,>R						|0 0 0 0|1 0 0 0| 	x	|
 
 #-----------------------
 # /aa (3bf0c159 00da )
@@ -334,12 +341,11 @@ EXECUTE			PACKAGE_CLASS,FIELD_EXECUTE_OP,x		|0 0 0 1|1 0 0 0|0|       x	|
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0 0 0 0| x     |
+EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0|       x     |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
-EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP				|0 0 0 1|1 1 0 1|0 0 0 0| x	|
-
+EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
