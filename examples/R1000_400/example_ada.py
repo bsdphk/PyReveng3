@@ -93,6 +93,7 @@ def debug(cx):
         a = b + 6
         for i in range(n):
             y = data.Const(m, a, a+4, fmt="0x%04x")
+            cx.disass(m[a])
             y.typ = ".DBG4T"
             c = m[a + 1]
             if c:
@@ -179,7 +180,14 @@ def segment_file(mb):
         print("NB: ELAB SEGMENT TABLE at 0x%04x" % cx.m[6])
         cx.m.set_block_comment(cx.m[6], "Segment Table")
 
-    cx.subprogram(0xb)
+    if cx.m[0xb]:
+        cx.subprogram(0xb)
+    else:
+        a = cx.m[0x8]
+        a >>= 4
+        a <<= 3
+        a |= 3
+        cx.subprogram(a)
 
     if cx.m[3] and True:
         try:
@@ -205,7 +213,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         mb = mem.Stackup((sys.argv[1],))
         cx = segment_file(mb)
-        listing.Listing(cx.m, fn=sys.argv[2], ncol=1, leaf_width=72)
+        listing.Listing(cx.m, fn=sys.argv[2], ncol=2, leaf_width=72)
         exit(0)
 
     listing.Example(example, ncol=1)
