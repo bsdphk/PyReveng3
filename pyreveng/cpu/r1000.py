@@ -56,13 +56,19 @@ Document references:
 
 '''
 
+import struct
+
 from pyreveng import assy, data, code
 
 
 r1000_desc = """
+
+# Noteworthy segments:
+#   ⟦120ea4603⟧ - has unreach{ed|able} subprograms: 0x25b, 0x28b, 0x4fb
+
 #-----------------------
 # Make places we get to, but do not handle grep(1)able
-unknown_instruction	-						| unknown			|
+QQunknown_instruction	-						| unknown			|
 
 #-----------------------
 # Very helpful, but only hypothesis /phk
@@ -84,18 +90,22 @@ ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
 ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 
 #-----------------------
-push			abs,maybe_subprog				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| abs				|
+QQupush93		subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
 
 #-----------------------
-XXXa2			abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+# See for instance ⟦b66a7252c⟧  /phk
+PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
+
+#-----------------------
+QQuXXXa2		abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
 
 #-----------------------
 # XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
-XXXa4			abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+QQuXXXa4		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
 
 #-----------------------
 # XXX: a7 may be unconditional, (see fad6fc6b and dfb9935e)
-XXXa7			abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+QQuXXXa7		abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 
 #-----------------------
 # gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
@@ -114,13 +124,14 @@ ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 
 #-----------------------
-# speculation /phk
-unknown_return		>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+# 467 times followed by 0x0000
+# many times last instruction before TRAP entry point /phk
+QQunknown_return_ca	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
 
 #-----------------------
 # ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
 # May be conditional return? /phk
-unknown_jump_cond	>J						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+QQunknown_jump_cond	>RC						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
@@ -170,27 +181,29 @@ EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 
 #-----------------------
-unknown_return		>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+# 196 times followed by 0x0000
+# a dozen times right before TRAP entry /phk
+QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 
 #-----------------------
 # /aa (2fa0095f7 1c9e)
-?EXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
+QQuEXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
 
 #-----------------------
 # /aa (3bf0c159 0236)
-?EXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
+QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 
 #-----------------------
 # /aa (3bf0c159 00d9)
-?EXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
+QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 
 #-----------------------
 # /aa (3bf0c159 00da)
-?EXECUTE		MINUS						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+QQuEXECUTE		MINUS						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
 
 #-----------------------
 # ⟦37717da67⟧ @0x5ce4 indicates this takes an extension /phk
-?			subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
+QQunknown		subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
 
 #-----------------------
 # gc42,000b		FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0|
@@ -198,7 +211,7 @@ DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 
 
 #-----------------------
 # ⟦a88379b5f⟧ indicates this takes an extension # /phk
-?declare_subprogram	x						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| x				|
+QQudeclare_subprogram	x						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| x				|
 
 #-----------------------
 # gc87,000b		subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
@@ -210,7 +223,7 @@ DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp
 
 #-----------------------
 # ⟦89b72b217⟧ @0x2abd indicates this takes an extension # /phk
-?declare_subprogram	subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
+QQudeclare_subprogram	subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
 
 #-----------------------
 # gc44,0077		FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1|
@@ -221,12 +234,18 @@ DECLARE_SUBPROGRAM	subp,FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
 DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
 
 #-----------------------
-# /aa
-?DECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
+# See ⟦657d85b18⟧ @0x12d
+# See ⟦eecee3432⟧ @0x2f2/phk
+# See ⟦826a261d9⟧ @0x8a7/phk
+QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # /aa
-?DECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
+QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
+
+#-----------------------
+# /aa
+QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
 
 #-----------------------
 # gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
@@ -267,22 +286,32 @@ DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1
 
 #-----------------------
 # /aa
-?DECLARE_TYPE		DISCRETE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
+QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
 
 #-----------------------
 # /aa
-?DECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
+QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 
 #-----------------------
 # g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
 EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP				|0 0 0 0|0 1 1 0|0 0|     x	|
 
 #-----------------------
-unknown_return		XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
+QQunknown_return	XXX,>R						|0 0 0 0|1 0 0 0| unknown	|
 
 #-----------------------
 # /aa (3bf0c159 00da )
-?minus_1		-						|0 0 0 0|1 0 1 0|1 1 1 1 1 1 1 1|
+QQuminus_1		-						|0 0 0 0|1 0 1 0|1 1 1 1 1 1 1 1|
+
+#-----------------------
+# See ⟦a53169a08⟧ @0x64, some kind of comparison/test
+# Almost always followed by 0x70xx conditional jump /phk
+QQucomparison_1		x						|0 0 0 0|1 0 1 1| x		|
+
+#-----------------------
+# See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
+# Almost always followed by 0x70xx or 0x68xx conditional jump /phk
+QQucomparison_2		x						|0 0 0 0|1 1 0 0| x		|
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -306,19 +335,19 @@ LOOP_INCREASING		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
 
 #-----------------------
 # phk
-unknown_return		>R						|0 1 0 0|0 0 0 1|0 0 0| x	|
+QQunknown_return_1	>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
 
 #-----------------------
 # phk
-unknown_return		>R						|0 1 0 0|0 0 1 0|0 0 0| x	|
+QQunknown_return_2	>R,x						|0 1 0 0|0 0 1 0|0 0 0| x	|
 
 #-----------------------
 # phk
-unknown_return		>R						|0 1 0 0|0 0 1 1|0 0 0| x	|
+QQunknown_return_3	>R,x						|0 1 0 0|0 0 1 1|0 0 0| x	|
 
 #-----------------------
 # phk
-unknown_return		>R						|0 1 0 0|0 1 0 0|0 0 0| x	|
+QQunknown_return_4	>R,x						|0 1 0 0|0 1 0 0|0 0 0| x	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
@@ -339,6 +368,10 @@ JUMP_CASE		case_max					|0 1 0 0|0 1 1|0| case_max	|
 SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
 
 #-----------------------
+# ⟦85b414c73⟧ (sin/cos/tan) @0x42b...
+QQunknown_dbl_load	pcrel,dbl					|0 1 0 1|1| pcrel		|
+
+#-----------------------
 # g88,0026		Discrete_Class,57				|0 1 1 0|0 0 0 0|0 0 1 1 1 0 0 1|
 # g88,0027		Discrete_Class,52				|0 1 1 0|0 0 0 0|0 0 1 1 0 1 0 0|
 # g88,002d		Discrete_Class,42				|0 1 1 0|0 0 0 0|0 0 1 0 1 0 1 0|
@@ -346,11 +379,11 @@ SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
 INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
 
 #-----------------------
-jump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
+QQujump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
 
 #-----------------------
 # /aa Sandsynligvis jump_zero
-jump_cond		pcrel,>JC					|0 1 1 1|0| pcrel		|
+QQujump_cond		pcrel,>JC					|0 1 1 1|0| pcrel		|
 
 #-----------------------
 # XXX: Not obvious if "1" and "2" is count of extension words or if and why those words are jumped over
@@ -393,7 +426,7 @@ class r1000_ins(assy.Instree_ins):
         i = self['case_max']
         self += code.Jump(cond="default", to=self.hi)
         self.lang.m.set_line_comment(self.hi, "case default")
-        for j in range(i + 1):
+        for j in range(i):
             self += code.Jump(cond="#0x%x" % j, to=self.hi + 1 + j)
             self.lang.m.set_line_comment(self.hi + 1 + j, "case 0x%x" % j)
         return "0x%x" % i
@@ -457,6 +490,8 @@ class r1000_ins(assy.Instree_ins):
         ][v]
 
     def assy_slit(self):
+        if self.chk2cf():
+            return
         # Short_Literal_Value [-2**10..2**10-1]
         v = self['slit']
         return "0x%x" % v
@@ -472,6 +507,40 @@ class r1000_ins(assy.Instree_ins):
             return "-0x%x" % (0x200 - v)
         return "0x%x" % v
 
+    def assy_dbl(self):
+        y = data.Data(self.lang.m, self.dstadr, self.dstadr + 4)
+        a = self.lang.m[self.dstadr] << 48
+        a |= self.lang.m[self.dstadr + 1] << 32
+        a |= self.lang.m[self.dstadr + 2] << 16
+        a |= self.lang.m[self.dstadr + 3]
+        b = a.to_bytes(8, 'big')
+        c = struct.unpack(">d", b)
+        y.rendered = ".DBL\t" + str(c[0])
+        return str(c[0])
+
+    def chk2cf(self):
+        a = self.lo
+        l = []
+        while (self.lang.m[a] & 0xf800) == 0x4800:
+            l.append(self.lang.m[a] & 0x7ff)
+            a += 1
+        if self.lang.m[a] != 0x02cf:
+            return False
+        if len(l) != 4 + 2 * l[-1]:
+            return False
+        self.mne = "QQu_02CF"
+        self.hi = a + 1
+        self.oper.append(assy.Arg_verbatim("0x%03x, 0x%03x" % (l[-2], l[-1])))
+        l.pop(-1)
+        l.pop(-1)
+        while l:
+            self.oper.append(assy.Arg_verbatim("\n\t\t[0x%03x]: 0x%03x = 0x%04x" % (l[-2], l[-1], l[-1] << 3)))
+            if l[-1]:
+                self.lang.subprogram((l[-1] << 3) | 3)
+                self.lang.m.set_block_comment(l[-1] << 3, "See instruction 0x02cf at 0x%x, index=0x%x" % (self.lo, l[-2]))
+            l.pop(-1)
+            l.pop(-1)
+        return True
 
 class r1000(assy.Instree_disass):
     def __init__(self, abits=16):
@@ -537,11 +606,15 @@ class r1000(assy.Instree_disass):
         self.subprograms = set()
 
     def subprogram(self, adr):
+        if not adr:
+            print("ZERO SUBPROGRAM")
+            return
         if not self.m[adr]:
             print("ZERO at SUBPROGRAM+3 (0x%04x)" % adr)
             return
         if adr in self.subprograms:
             return
+        self.subprograms.add(adr)
         assert adr & 3 == 3
         a0 = adr & ~3
         self.m.set_label(adr, "INIT_%04x" % a0)
@@ -556,6 +629,9 @@ class r1000(assy.Instree_disass):
         self.m.set_label(self.m[a0], "BODY_%04x" % a0)
         if self.m[a0] != adr:
             self.disass(self.m[a0])
+        if self.m[a0+1] not in (0x4, adr):
+            self.m.set_label(self.m[a0+1], "TRAP_%04x" % a0)
+            self.disass(self.m[a0+1])
 
     def literal(self, adr):
         y = self.literals.get(adr)
