@@ -194,9 +194,16 @@ EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
-QQu_float_arith		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
-QQu_float_mul		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
-QQu_float_add		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
+FLOAT_**		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
+FLOAT_DIVIDE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
+FLOAT_MULTIPLY		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
+FLOAT_SUBTRACT		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|
+FLOAT_ADD		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
+FLOAT_ABS		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 0|
+FLOAT_NEGATE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 1|
+
+QQu_float_less_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
+QQu_float_greater_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
 
 #-----------------------
 # 196 times followed by 0x0000
@@ -214,6 +221,14 @@ QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 #-----------------------
 # /aa (3bf0c159 00d9)
 QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x171 /phk AND ?
+QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x8e  integer AND ?
+QQu_integer_and		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 1|
 
 #-----------------------
 # /aa (3bf0c159 00da)
@@ -319,6 +334,10 @@ EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 QQunknown_return	x,>R						|0 0 0 0|1 0 0 0| 	x	|
 
 #-----------------------
+# ⟦85b414c73⟧ @0x0170 /phk
+QQu_float_divide_by_two	-						|0 0 0 0|1 0 0 1|1 1 1 1 1 1 1 1|
+
+#-----------------------
 # /aa (3bf0c159 00da )
 QQuminus_1		-						|0 0 0 0|1 0 1 0|1 1 1 1 1 1 1 1|
 
@@ -387,7 +406,7 @@ SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
 
 #-----------------------
 # ⟦85b414c73⟧ (sin/cos/tan) @0x42b...
-QQunknown_dbl_load	pcrel,dbl					|0 1 0 1|1| pcrel		|
+PUSH_DOUBLE		pcrel,dbl					|0 1 0 1|1| pcrel		|
 
 #-----------------------
 # g88,0026		Discrete_Class,57				|0 1 1 0|0 0 0 0|0 0 1 1 1 0 0 1|
@@ -397,7 +416,7 @@ QQunknown_dbl_load	pcrel,dbl					|0 1 0 1|1| pcrel		|
 INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
 
 #-----------------------
-QQujump_cond		pcrel,>JC					|0 1 1 0|1| pcrel		|
+QQujump_if_not		pcrel,>JC					|0 1 1 0|1| pcrel		|
 
 #-----------------------
 # /aa Sandsynligvis jump_zero
