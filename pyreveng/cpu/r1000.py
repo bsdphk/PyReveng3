@@ -79,6 +79,11 @@ zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
+# ⟦85b414c73⟧ 0x34e..34f
+STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
+
+
+#-----------------------
 # gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 ACTION			BREAK_UNCONDITIONAL				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 
@@ -166,6 +171,19 @@ EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 # and being subsequent to RAISE_OP (0x0100) in the Machine_Code.ada
 # /phk
 EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x357
+IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x349
+QQu_float_below_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x337
+QQu_float_greater_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
+
 
 #-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
@@ -420,7 +438,8 @@ QQujump_if_not		pcrel,>JC					|0 1 1 0|1| pcrel		|
 
 #-----------------------
 # /aa Sandsynligvis jump_zero
-QQujump_cond		pcrel,>JC					|0 1 1 1|0| pcrel		|
+# ⟦85b414c73⟧ @0x326
+QQu_jump_non_zero	pcrel,>JC					|0 1 1 1|0| pcrel		|
 
 #-----------------------
 # XXX: Not obvious if "1" and "2" is count of extension words or if and why those words are jumped over
