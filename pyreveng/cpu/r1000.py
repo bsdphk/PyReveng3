@@ -177,6 +177,10 @@ EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
 
 #-----------------------
+# ⟦cb8e43375⟧ @0x7c
+QQu_float_great_equal_zero	-					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
+
+#-----------------------
 # ⟦85b414c73⟧ @0x349
 QQu_float_below_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
 
@@ -211,6 +215,14 @@ EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 
 #-----------------------
+# ⟦cb8e43375⟧ @0xc4
+ROUND_TO_DISCRETE_OP	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0xc7
+CONVERT_FROM_DISCRETE_OP -						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+
+#-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
 FLOAT_**		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
 FLOAT_DIVIDE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
@@ -220,13 +232,29 @@ FLOAT_ADD		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
 FLOAT_ABS		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 0|
 FLOAT_NEGATE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 1|
 
+#-----------------------
+# ⟦cb8e43375⟧ @0xb5
+QQu_float_less_equal_than	-					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 0|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0xa5
+QQu_float_greater_equal_than	-					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 1|
+
 QQu_float_less_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
 QQu_float_greater_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0xc9
+QQu_float_equal_to	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
 
 #-----------------------
 # 196 times followed by 0x0000
 # a dozen times right before TRAP entry /phk
 QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x54
+CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
 
 #-----------------------
 # /aa (2fa0095f7 1c9e)
@@ -330,6 +358,13 @@ DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1
 # gc44,004f		ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
 DECLARE_VARIABLE	ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
 
+#-----------------------
+# ⟦85b414c73⟧ @0x48 /aa
+DECLARE_VARIABLE	FLOAT_CLASS					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
+
+#-----------------------
+# ⟦85b414c73⟧ @0x57 /aa
+DECLARE_VARIABLE	FLOAT_CLASS,WITH_VALUE				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
 
 #-----------------------
 # feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
@@ -657,6 +692,7 @@ class r1000(assy.Instree_disass):
             'VARIANT_RECORD_CLASS',
             'EXPONENTIATE',
             'MINUS',
+            'FLOAT_CLASS',
             'XXX',
         )
         self.literals = {}
