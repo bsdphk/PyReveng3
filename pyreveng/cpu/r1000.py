@@ -269,6 +269,26 @@ QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 
 #-----------------------
+# ⟦cb8e43375⟧ @0x100 /phk  not sure.
+QQu_int_mod		-						|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x107 /phk
+QQu_int_divide		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x103 /phk  not sure.
+QQu_int_multiply	-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 1|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x109 /phk  not sure.
+QQu_int_subtract	-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 0|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x113 /phk  not sure.
+QQu_int_add		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
+
+#-----------------------
 # ⟦85b414c73⟧ @0x171 /phk AND ?
 QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 
@@ -403,6 +423,11 @@ QQucomparison_1		x						|0 0 0 0|1 0 1 1| x		|
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
 QQucomparison_2		x						|0 0 0 0|1 1 0 0| x		|
+
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x144
+QQu_int_less_zero	-						|0 0 0 0|1 1 0 1|0 0 0 0|0 0 0 0|
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -585,6 +610,9 @@ class r1000_ins(assy.Instree_ins):
             return
         # Short_Literal_Value [-2**10..2**10-1]
         v = self['slit']
+        if v & (1<<10):
+            v = v - (1<<11)
+            return "-0x%x" % (-v)
         return "0x%x" % v
 
     def assy_llvl(self):
