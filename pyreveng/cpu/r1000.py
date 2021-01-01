@@ -404,30 +404,30 @@ EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
-QQunknown_return	x,>R						|0 0 0 0|1 0 0 0| 	x	|
+QQu_return_imm		s8,>R						|0 0 0 0|1 0 0 0| 	s8	|
 
 #-----------------------
+# ⟦cb8e43375⟧ @0x108
 # ⟦85b414c73⟧ @0x0170 /phk
-QQu_float_divide_by_two	-						|0 0 0 0|1 0 0 1|1 1 1 1 1 1 1 1|
+BINARY_SCALE_OP		s8						|0 0 0 0|1 0 0 1|	s8	|
 
 #-----------------------
 # /aa (3bf0c159 00da )
-QQuminus_1		-						|0 0 0 0|1 0 1 0|1 1 1 1 1 1 1 1|
+QQu_add_imm		s8						|0 0 0 0|1 0 1 0|	s8	|
 
 #-----------------------
 # See ⟦a53169a08⟧ @0x64, some kind of comparison/test
 # Almost always followed by 0x70xx conditional jump /phk
-QQucomparison_1		x						|0 0 0 0|1 0 1 1| x		|
+QQu_comparison_1	s8						|0 0 0 0|1 0 1 1|	s8	|
 
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
-QQucomparison_2		x						|0 0 0 0|1 1 0 0| x		|
-
+QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
-QQu_int_less_zero	-						|0 0 0 0|1 1 0 1|0 0 0 0|0 0 0 0|
+QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -439,6 +439,15 @@ EXECUTE			PACKAGE_CLASS,FIELD_EXECUTE_OP,x		|0 0 0 1|1 0 0 0|0|       x	|
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
 EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0|       x     |
+
+
+#-----------------------
+# ⟦cb8e43375⟧ @0x10b
+QQu_field_store		x						|0 0 0 1|1 0 1 0|0|       x	|
+
+#-----------------------
+# ⟦cb8e43375⟧ @0xfe
+QQu_field_load		x						|0 0 0 1|1 0 1 1|0|       x	|
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
@@ -585,6 +594,12 @@ class r1000_ins(assy.Instree_ins):
 
     def assy_x(self):
         v = self['x']
+        return "0x%x" % v
+
+    def assy_s8(self):
+        v = self['s8']
+        if v & 0x80:
+            return "-0x%x" % (0x100 - v)
         return "0x%x" % v
 
     def assy_literal(self):
