@@ -343,6 +343,10 @@ QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x00fa/aa	Null_Time : constant Time := Time'(Year => Years'First...
+QQuDECLARE_VARIABLE	RECORD_CLASS					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
+
+#-----------------------
 # /aa
 QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
 
@@ -456,6 +460,10 @@ QQu_field_load		x						|0 0 0 1|1 0 1 1|0|       x	|
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
+QQu_EXECUTE		RECORD_CLASS,FIELD_WRITE_OP,x			|0 0 1 1|1 0 0 0|0|       x     |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
