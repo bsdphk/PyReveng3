@@ -439,7 +439,7 @@ QQu_comparison_3	s8						|0 0 0 0|1 1 1 0| 	s8	|
 
 #-----------------------
 # See ⟦282bd53ec⟧ @0xae, some kind of comparison/test /phk
-QQu_comparison_4	s8						|0 0 0 0|1 1 1 0| 	s8	|
+QQu_comparison_4	s8						|0 0 0 0|1 1 1 1| 	s8	|
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
