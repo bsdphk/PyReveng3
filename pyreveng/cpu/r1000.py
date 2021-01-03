@@ -188,6 +188,20 @@ QQu_float_below_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
 # ⟦85b414c73⟧ @0x337
 QQu_float_greater_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
 
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x05bf/aa	T  : Time    := Get_Time;
+# May be EXECUTE RECORD_CLASS,STRUCTURE_WRITE_OP
+QQuWrite_RECORD		-						|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x01a7/aa	Write full 2 dim array
+# May be EXECUTE MATRIX_CLASS,STRUCTURE_WRITE_OP
+QQuWrite_Full_Matrix	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x0132/aa	Write 2 dim array value
+# May be EXECUTE MATRIX_CLASS,FIELD_WRITE_OP
+QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 
 #-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
@@ -263,6 +277,11 @@ QQuEXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
 #-----------------------
 # /aa (3bf0c159 0236)
 QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
+
+#-----------------------
+# /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
+# May be EXECUTE		BOUNDS_OP
+QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
 
 #-----------------------
 # /aa (3bf0c159 00d9)
@@ -472,6 +491,10 @@ EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
 QQu_EXECUTE		RECORD_CLASS,FIELD_WRITE_OP,x			|0 0 1 1|1 0 0 0|0|       x     |
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x0608, read record field values in function Day_Of_Week
+QQu_EXECUTE		RECORD_CLASS,FIELD_READ_OP,x			|0 0 1 1|1 1 0 0|0|       x     |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
@@ -719,6 +742,7 @@ class r1000(assy.Instree_disass):
             'CHECK_IN_TYPE_OP',
             'DEFINED',
             'FIELD_EXECUTE_OP',
+            'FIELD_READ_OP',
             'FIELD_WRITE_OP',
             'FOR_CALL',
             'FOR_OUTER_CALL',
