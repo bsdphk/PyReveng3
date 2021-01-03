@@ -395,8 +395,16 @@ DECLARE_VARIABLE	FLOAT_CLASS					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
 DECLARE_VARIABLE	FLOAT_CLASS,WITH_VALUE				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x02a0 /aa	Junk, Min, Sec : Integer32;
+QQuDECLARE_VARIABLE	DISCRETE					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
+
+#-----------------------
 # feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
 DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x05c3 /aa      Hr : Natural := Natural (H);
+QQuDECLARE_VARIABLE	DISCRETE_CLASS,WITH_VALUE			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
 
 #-----------------------
 # /aa
