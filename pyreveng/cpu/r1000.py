@@ -351,6 +351,10 @@ QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
 DECLARE_VARIABLE	ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x008f/aa	type Number_Array is array (Positive range <>) of Natural;
+QQuDECLARE_TYPE		ARRAY_CLASS,UNCONSTRAINED			|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
+
+#-----------------------
 # gc44,0049		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 DECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 
@@ -428,6 +432,14 @@ QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
 QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
+
+#-----------------------
+# See ⟦281f02f0c⟧ @0x4ff, some kind of comparison/test /phk
+QQu_comparison_3	s8						|0 0 0 0|1 1 1 0| 	s8	|
+
+#-----------------------
+# See ⟦282bd53ec⟧ @0xae, some kind of comparison/test /phk
+QQu_comparison_4	s8						|0 0 0 0|1 1 1 1| 	s8	|
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -710,6 +722,7 @@ class r1000(assy.Instree_disass):
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
             'WITH_VALUE',
+            'UNCONSTRAINED',
             'MODULE_CLASS',
             'WITH_CONSTRAINT',
             'ACTIVATE_OP',
