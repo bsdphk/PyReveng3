@@ -177,6 +177,11 @@ EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x68d	Name : constant String := Months'Image (Month);
+# Used for Image function, followed by 1c00 or 1c01
+QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
+
+#-----------------------
 # ⟦cb8e43375⟧ @0x7c
 QQu_float_great_equal_zero	-					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
 
@@ -208,14 +213,29 @@ QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x06ff	Load previous result?
+# Used after call to CATENATE_OP or call to Image function returning string
+QQuLoad_Vector_Result	-						|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
+
+#-----------------------
 # gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 # gc45,008f		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 EXECUTE			VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x01e4
+# Used after writing all fields in vector
+QQuEXECUTE		VECTOR_CLASS,STRUCTURE_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
+
+
+#-----------------------
 # gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 # gc45,00a6		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 EXECUTE			VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
+QQuExecute_vector_class_first	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
@@ -439,6 +459,7 @@ EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
+# ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
 QQu_return_imm		s8,>R						|0 0 0 0|1 0 0 0| 	s8	|
 
 #-----------------------
@@ -458,11 +479,16 @@ QQu_comparison_1	s8						|0 0 0 0|1 0 1 1|	s8	|
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
+# Maybe Greater_Equal_Op  ⟦36a4ea3d7⟧ @0x0609   if Months'Pos (T.Month) >= 3 then
 QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
 QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
+QQu_int_is_equal	s8						|0 0 0 0|1 1 1 1|       s8      |
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -483,6 +509,10 @@ QQu_field_store		x						|0 0 0 1|1 0 1 0|0|       x	|
 #-----------------------
 # ⟦cb8e43375⟧ @0xfe
 QQu_field_load		x						|0 0 0 1|1 0 1 1|0|       x	|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x068e
+QQu_structure_Store	x						|0 0 0 1|1 1 0 0|0|       x     |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
@@ -753,6 +783,7 @@ class r1000(assy.Instree_disass):
             'PACKAGE_CLASS',
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
+            'STRUCTURE_WRITE_OP',
             'WITH_VALUE',
             'UNCONSTRAINED',
             'MODULE_CLASS',
