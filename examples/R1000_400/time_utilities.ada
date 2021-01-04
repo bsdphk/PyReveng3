@@ -135,18 +135,18 @@ package body Time_Utilities is
    Seconds_Per_Minute   : constant           := 60;
    Seconds_Per_Hour     : constant           := 60 * Seconds_Per_Minute;
    Seconds_Per_Half_Day : constant           := 12 * Seconds_Per_Hour;
-   Null_Calendar_Time   : Calendar.Time; -- 0088, 1,34
+   Null_Calendar_Time   : Calendar.Time; -- 0088, 1,33
         
-   type Number_Array is array (Positive range <>) of Natural; -- 008a, 1,35
+   type Number_Array is array (Positive range <>) of Natural; -- 008a, 1,34
         
-   type Character_Map is array (Character) of Boolean; -- 0090, 1,36
+   type Character_Map is array (Character) of Boolean; -- 0090, 1,35
    Is_Numeric : constant Character_Map :=
      Character_Map'('0' | '1' | '2' | '3' | '4' |
                       '5' | '6' | '7' | '8' | '9' => True,
-                    others                      => False); -- 0096 - 00d0, 1,37
+                    others                      => False); -- 0096 - 00d0, 1,36
         
    Is_Alphabetic : constant Character_Map :=
-     Character_Map'('a' .. 'z' | 'A' .. 'Z' => True, others => False); -- 00d1- 00f8, 1,38
+     Character_Map'('a' .. 'z' | 'A' .. 'Z' => True, others => False); -- 00d1- 00f8, 1,37
    Null_Time     : constant Time := Time'(Year         => Years'First,
                                           Month        => Months'First,
                                           Day          => Days'First,
@@ -198,9 +198,9 @@ package body Time_Utilities is
    begin
       Calendar.Split (Date, C_Year, C_Month, C_Day, C_Second);
         
-      Result.Year  := Years (C_Year);
-      Result.Month := Months'Val (C_Month - 1);
-      Result.Day   := Days (C_Day);
+      Result.Year  := Years (C_Year);            -- 02b3
+      Result.Month := Months'Val (C_Month - 1);  -- 02b4-
+      Result.Day   := Days (C_Day);              -- 02bd-02bf
         
       Total_Seconds := Integer32 (C_Second);
         
@@ -247,7 +247,7 @@ package body Time_Utilities is
       Total_Seconds := Integer32 (Date.Second) +
         Integer32 (Date.Minute) * Seconds_Per_Minute;
         
-      if Date.Hour /= 12 then
+      if Date.Hour /= 12 then  -- 0344
          Total_Seconds := Total_Seconds +
            Integer32 (Date.Hour) * Seconds_Per_Hour;
       end if;
@@ -259,7 +259,7 @@ package body Time_Utilities is
       return Calendar.Time_Of (C_Year, C_Month, C_Day,
                                Duration (Total_Seconds));
    exception
-      when Calendar.Time_Error =>
+      when Calendar.Time_Error =>         -- 0366
          return Calendar.Clock;
    end Convert_Time;
         

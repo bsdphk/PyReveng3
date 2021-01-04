@@ -177,9 +177,22 @@ EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x0366	when Calendar.Time_Error =>
+QQu_Is_Equal_Exception	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1|
+
+
+#-----------------------
 # ⟦36a4ea3d7⟧ @0x68d	Name : constant String := Months'Image (Month);
 # Used for Image function, followed by 1c00 or 1c01
 QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x000d	type Years  is new Calendar.Year_Number
+QQu_is_new_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x68d	return Calendar."=" (Date, Nil);
+QQu_is_equal_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x7c
@@ -197,6 +210,10 @@ QQu_float_greater_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
 # ⟦36a4ea3d7⟧, @0x05bf/aa	T  : Time    := Get_Time;
 # May be EXECUTE RECORD_CLASS,STRUCTURE_WRITE_OP
 QQuWrite_RECORD		-						|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x37d   return Date = Nil
+QQu_is_equal_record     -                                               |0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x01a7/aa	Write full 2 dim array
@@ -221,6 +238,11 @@ QQuLoad_Vector_Result	-						|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
 # gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 # gc45,008f		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 EXECUTE			VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x06a0	return Name (Name'First .. Name'First + 2);
+# Used to get a subarray
+QQuEXECUTE		VECTOR_CLASS,SUBARRAY_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x01e4
@@ -312,6 +334,11 @@ QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 QQu_int_mod		-						|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x02ed 		Total_Seconds := Total_Seconds rem Seconds_Per_Hour;
+# not sure if mod or rem /aa
+QQu_int_rem             -                                               |0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
+
+#-----------------------
 # ⟦cb8e43375⟧ @0x107 /phk
 QQu_int_divide		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
 
@@ -334,6 +361,10 @@ QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 #-----------------------
 # ⟦85b414c73⟧ @0x8e  integer AND ?
 QQu_integer_and		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 1|
+
+#-----------------------
+#  ⟦36a4ea3d7⟧, @0x00cc		if Total_Seconds < Integer32 (Seconds_Per_Half_Day) then
+QQu_less_than		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0|
 
 #-----------------------
 # /aa (3bf0c159 00da)
@@ -388,6 +419,10 @@ QQuDECLARE_VARIABLE	RECORD_CLASS					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
 #-----------------------
 # /aa
 QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x012c	Military_Hour : constant array (Sun_Positions, Hours) of Military_Hours :=
+QQu_DECLARE_VARIABLE_tmp_val	ARRAY_CLASS				|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 1|
 
 #-----------------------
 # gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
@@ -485,6 +520,10 @@ QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
 QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x0344	if Date.Hour /= 12 then
+QQu_int_not_equal	s8						|0 0 0 0|1 1 1 0|       s8      |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
@@ -784,6 +823,7 @@ class r1000(assy.Instree_disass):
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
             'STRUCTURE_WRITE_OP',
+            'SUBARRAY_OP',
             'WITH_VALUE',
             'UNCONSTRAINED',
             'MODULE_CLASS',
