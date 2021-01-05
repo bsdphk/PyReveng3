@@ -177,6 +177,24 @@ EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x0366	when Calendar.Time_Error =>
+QQu_Is_Equal_Exception	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1|
+
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x68d	Name : constant String := Months'Image (Month);
+# Used for Image function, followed by 1c00 or 1c01
+QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x000d	type Years  is new Calendar.Year_Number
+QQu_is_new_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x68d	return Calendar."=" (Date, Nil);
+QQu_is_equal_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
+
+#-----------------------
 # ⟦cb8e43375⟧ @0x7c
 QQu_float_great_equal_zero	-					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
 
@@ -188,10 +206,33 @@ QQu_float_below_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
 # ⟦85b414c73⟧ @0x337
 QQu_float_greater_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
 
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x05bf/aa	T  : Time    := Get_Time;
+# May be EXECUTE RECORD_CLASS,STRUCTURE_WRITE_OP
+QQuWrite_RECORD		-						|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x37d   return Date = Nil
+QQu_is_equal_record     -                                               |0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x01a7/aa	Write full 2 dim array
+# May be EXECUTE MATRIX_CLASS,STRUCTURE_WRITE_OP
+QQuWrite_Full_Matrix	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x0132/aa	Write 2 dim array value
+# May be EXECUTE MATRIX_CLASS,FIELD_WRITE_OP
+QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 
 #-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x06ff	Load previous result?
+# Used after call to CATENATE_OP or call to Image function returning string
+QQuLoad_Vector_Result	-						|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
 
 #-----------------------
 # gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
@@ -199,9 +240,24 @@ EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 EXECUTE			VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x06a0	return Name (Name'First .. Name'First + 2);
+# Used to get a subarray
+QQuEXECUTE		VECTOR_CLASS,SUBARRAY_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x01e4
+# Used after writing all fields in vector
+QQuEXECUTE		VECTOR_CLASS,STRUCTURE_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
+
+
+#-----------------------
 # gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 # gc45,00a6		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 EXECUTE			VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
+QQuExecute_vector_class_first	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
@@ -265,12 +321,22 @@ QQuEXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
 QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 
 #-----------------------
+# /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
+# May be EXECUTE		BOUNDS_OP
+QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
+
+#-----------------------
 # /aa (3bf0c159 00d9)
 QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x100 /phk  not sure.
 QQu_int_mod		-						|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x02ed 		Total_Seconds := Total_Seconds rem Seconds_Per_Hour;
+# not sure if mod or rem /aa
+QQu_int_rem             -                                               |0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x107 /phk
@@ -295,6 +361,10 @@ QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 #-----------------------
 # ⟦85b414c73⟧ @0x8e  integer AND ?
 QQu_integer_and		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 1|
+
+#-----------------------
+#  ⟦36a4ea3d7⟧, @0x00cc		if Total_Seconds < Integer32 (Seconds_Per_Half_Day) then
+QQu_less_than		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0|
 
 #-----------------------
 # /aa (3bf0c159 00da)
@@ -343,8 +413,16 @@ QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x00fa/aa	Null_Time : constant Time := Time'(Year => Years'First...
+QQuDECLARE_VARIABLE	RECORD_CLASS					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
+
+#-----------------------
 # /aa
 QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧, @0x012c	Military_Hour : constant array (Sun_Positions, Hours) of Military_Hours :=
+QQu_DECLARE_VARIABLE_tmp_val	ARRAY_CLASS				|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 1|
 
 #-----------------------
 # gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
@@ -391,8 +469,16 @@ DECLARE_VARIABLE	FLOAT_CLASS					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
 DECLARE_VARIABLE	FLOAT_CLASS,WITH_VALUE				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x02a0 /aa	Junk, Min, Sec : Integer32;
+QQuDECLARE_VARIABLE	DISCRETE					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
+
+#-----------------------
 # feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
 DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x05c3 /aa      Hr : Natural := Natural (H);
+QQuDECLARE_VARIABLE	DISCRETE_CLASS,WITH_VALUE			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
 
 #-----------------------
 # /aa
@@ -408,6 +494,7 @@ EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
+# ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
 QQu_return_imm		s8,>R						|0 0 0 0|1 0 0 0| 	s8	|
 
 #-----------------------
@@ -427,6 +514,7 @@ QQu_comparison_1	s8						|0 0 0 0|1 0 1 1|	s8	|
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
+# Maybe Greater_Equal_Op  ⟦36a4ea3d7⟧ @0x0609   if Months'Pos (T.Month) >= 3 then
 QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 
 #-----------------------
@@ -434,12 +522,12 @@ QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
 QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
 
 #-----------------------
-# See ⟦281f02f0c⟧ @0x4ff, some kind of comparison/test /phk
-QQu_comparison_3	s8						|0 0 0 0|1 1 1 0| 	s8	|
+# ⟦36a4ea3d7⟧ @0x0344	if Date.Hour /= 12 then
+QQu_int_not_equal	s8						|0 0 0 0|1 1 1 0|       s8      |
 
 #-----------------------
-# See ⟦282bd53ec⟧ @0xae, some kind of comparison/test /phk
-QQu_comparison_4	s8						|0 0 0 0|1 1 1 1| 	s8	|
+# ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
+QQu_int_is_equal	s8						|0 0 0 0|1 1 1 1|       s8      |
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -462,8 +550,20 @@ QQu_field_store		x						|0 0 0 1|1 0 1 0|0|       x	|
 QQu_field_load		x						|0 0 0 1|1 0 1 1|0|       x	|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x068e
+QQu_structure_Store	x						|0 0 0 1|1 1 0 0|0|       x     |
+
+#-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
+QQu_EXECUTE		RECORD_CLASS,FIELD_WRITE_OP,x			|0 0 1 1|1 0 0 0|0|       x     |
+
+#-----------------------
+# ⟦36a4ea3d7⟧ @0x0608, read record field values in function Day_Of_Week
+QQu_EXECUTE		RECORD_CLASS,FIELD_READ_OP,x			|0 0 1 1|1 1 0 0|0|       x     |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
@@ -711,6 +811,7 @@ class r1000(assy.Instree_disass):
             'CHECK_IN_TYPE_OP',
             'DEFINED',
             'FIELD_EXECUTE_OP',
+            'FIELD_READ_OP',
             'FIELD_WRITE_OP',
             'FOR_CALL',
             'FOR_OUTER_CALL',
@@ -721,6 +822,8 @@ class r1000(assy.Instree_disass):
             'PACKAGE_CLASS',
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
+            'STRUCTURE_WRITE_OP',
+            'SUBARRAY_OP',
             'WITH_VALUE',
             'UNCONSTRAINED',
             'MODULE_CLASS',
