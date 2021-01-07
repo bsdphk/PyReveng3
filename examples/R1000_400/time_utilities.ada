@@ -1,6 +1,7 @@
 --  This package is the source file for r1k_backup/36/36a4ea3d7.html
 --  It is annotated with references to the above file.
 --  Not all references are correct.
+--  Separates follows, link 93b91846e
 
 with Calendar;
 package Time_Utilities is
@@ -153,7 +154,7 @@ package body Time_Utilities is
                                           Hour         => Hours'First,
                                           Minute       => Minutes'First,
                                           Second       => Seconds'First,
-                                          Sun_Position => Sun_Positions'First); -- 01fd-0113, 1,37
+                                          Sun_Position => Sun_Positions'First); -- 00fd-0113, 1,37
    Null_Interval : constant Interval :=
      Interval'(Elapsed_Days         => Day_Count'First,
                Elapsed_Hours        => Military_Hours'First,
@@ -233,6 +234,7 @@ package body Time_Utilities is
       return Result;
    end Convert_Time;
         
+-- 0320
    function Convert_Time (Date : Time) return Calendar.Time is
       C_Year  : Calendar.Year_Number;
       C_Month : Calendar.Month_Number;
@@ -279,6 +281,7 @@ package body Time_Utilities is
       end if;
    end Image;
         
+-- 06a8
    function Time_Image (Date : Time; Time_Style : Time_Format) return String is
       Sep  : Character := ':';
       Hour : Integer   := Integer (Military_Hour
@@ -378,7 +381,7 @@ package body Time_Utilities is
    end Time_Stamp_Image;
         
         
-        
+        -- 0438
    function Convert (I : Interval) return Duration is
       Seconds : Duration := Duration (I.Elapsed_Milliseconds) / 1000;
    begin
@@ -389,7 +392,7 @@ package body Time_Utilities is
       return Seconds;
    end Convert;
         
-        
+        --0480
    function Convert (D : Duration) return Interval is
       I : Interval;
         
@@ -398,10 +401,7 @@ package body Time_Utilities is
       Milliseconds_Per_Hour   : constant := 60 * Milliseconds_Per_Minute;
       Milliseconds_Per_Day    : constant := 24 * Milliseconds_Per_Hour;
         
-      Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second
-        
-        
-                   ;
+      Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second;  -- 048f
    begin
       if D < 0.0 then
          return Null_Interval;
@@ -489,9 +489,10 @@ package body Time_Utilities is
       return Date = Nil;
    end Is_Nil;
         
+-- 0380
    function Nil return Calendar.Time is
    begin
-      return Null_Calendar_Time;
+      return Null_Calendar_Time;  -- 1,33=Null_Calendar_Time
    end Nil;
         
    function Is_Nil (Date : Calendar.Time) return Boolean is
@@ -532,6 +533,7 @@ package body Time_Utilities is
         
    pragma Inline (Make_Weekday);
         
+--0600
    function Day_Of_Week (T : Time := Get_Time) return Weekday is
       -- Uses Zeller's congruence to compute the day of week of given date.
       -- See "Problems for Computer Solutions", Gruenberger & Jaffray, Wiley,
@@ -577,6 +579,7 @@ package body Time_Utilities is
       return Duration_Until (Convert_Time (T));
    end Duration_Until;
         
+-- 05b8
    function Duration_Until_Next
      (H : Military_Hours; M : Minutes := 0; S : Seconds := 0)
       return Duration is
@@ -597,16 +600,19 @@ package body Time_Utilities is
       else
          T.Hour := Hours (Hr);
       end if;
-      D := Duration_Until (T);
+      D := Duration_Until (T);  -- 05e7
       if D < 0.0 then
-         D := Day + D;
+         D := Day + D;          -- 05ee
       end if;
       return D;
    end Duration_Until_Next;
         
 begin
    Null_Calendar_Time := Convert_Time (Null_Time);
-end Time_Utilities;separate (Time_Utilities)
+end Time_Utilities;
+
+-- start of 93b91846e
+separate (Time_Utilities)
 package body Interval_Value is
    function Value (S : String) return Interval is
       -- format is ddDhh:mm:ss.milli
@@ -617,6 +623,7 @@ package body Interval_Value is
       Position : Natural := S'First;
       Result   : Interval;
         
+--93b91846e, 0025
       type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number);
       type Item;
       type Item_Ptr   is access Item;
@@ -679,10 +686,10 @@ package body Interval_Value is
             Position := Position + 1;
          end loop;
         
-         if Position <= S'Last then
+         if Position <= S'Last then  -- 93b91846e, @0x00ce
             Last := Position - 1;
          else
-            Last := S'Last;
+            Last := S'Last;          -- 93b91846e, @0x00d5
          end if;
         
          if Dot_Observed then
@@ -768,7 +775,7 @@ package body Interval_Value is
       begin
          if Colons_Observed = 2 or else Dot_Observed then
             -- find right_most hour and make it minute
-            while Next_Item /= null loop
+            while Next_Item /= null loop  --  93b91846e @0x0149
                if Next_Item.Kind = Hour then
                   Hour_Item := Next_Item;
                end if;
@@ -874,7 +881,9 @@ package body Interval_Value is
       Normalize (First_Item, Last_Item);
       return Build_Value (First_Item, Last_Item);
    end Value;
-end Interval_Value;separate (Time_Utilities)
+end Interval_Value;
+
+separate (Time_Utilities)
 function Time_Value (S : String) return Time is
    -- accepts all of the formats output by value
    -- algorithm consists of parsing for a series of numbers
