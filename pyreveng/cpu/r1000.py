@@ -269,11 +269,13 @@ QQuEXECUTE		VECTOR_CLASS,FIELD_READ_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
 
 #-----------------------
 # ⟦93b91846e⟧, @0x00d5		Last := S'Last;
-QQuExecute_vector_class_last	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
+# gæt: EXECUTE VECTOR_CLASS,LAST_OP
+QQuExecute_last_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
-QQuExecute_vector_class_first	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
+# EXECUTE VECTOR_CLASS,FIRST_OP
+QQuExecute_first_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
@@ -297,7 +299,8 @@ ROUND_TO_DISCRETE_OP	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0xc7
-CONVERT_FROM_DISCRETE_OP -						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+# 85b414c73 0x055	Ymax : Float := Float (Integer (Pi * Two ** (It / 2)));
+QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
@@ -330,9 +333,9 @@ QQu_float_equal_to	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
 QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 
 #-----------------------
-# ⟦cb8e43375⟧ @0x54
-# ⟦36a4ea3d7⟧ 0x048f	May be Convert_Duration_To_Int 	Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second
-QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
+# ⟦cb8e43375⟧ @0x87			N := Integer (Y * One_Over_Pi);
+# ⟦36a4ea3d7⟧ @0x048f	D : Duration; 	Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second
+QQu_CONVERT_TO_INT	-						|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
 
 #-----------------------
 # /aa (2fa0095f7 1c9e)
@@ -439,7 +442,7 @@ QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # (3f2fe70c1, 004b)/aa	type An_Item (Subitem_Length : Natural) is...  (completing an incomplete variant record)
-QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
+QQuDECLARE_TYPE_complete	VARIANT_RECORD_CLASS			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
 
 #-----------------------
 # (3f2fe70c1, 0039)/aa		type An_Item (Subitem_Length : Natural); (incomplete variant record)
@@ -454,12 +457,16 @@ QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
 QQuDECLARE_VARIABLE	RECORD_CLASS					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
 
 #-----------------------
-# (3f2fe70c1, 0067)/aa	type Line is record...	Completing an incomplete record type
-QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 0|
+# (3f2fe70c1, 0067)/aa	type Line is record...	Completing an incomplete record type in body
+QQuDECLARE_TYPE_complete	RECORD_CLASS,DEFINED			|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 0|
 
 #-----------------------
 # (3f2fe70c1, 0054)/aa	type Line;	Incomplete record type in body
 QQuDECLARE_TYPE		RECORD_CLASS,DEFINED,INCOMPLETE			|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 0|
+
+#-----------------------
+# (93b91846e, 002d)/aa	type item s record ..	complete an incomplete record type in procedure
+QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 0 0|
 
 #-----------------------
 # /aa
@@ -575,13 +582,14 @@ QQu_add_imm		s8						|0 0 0 0|1 0 1 0|	s8	|
 #-----------------------
 # See ⟦a53169a08⟧ @0x64, some kind of comparison/test
 # Almost always followed by 0x70xx conditional jump /phk
-QQu_comparison_1	s8						|0 0 0 0|1 0 1 1|	s8	|
+# 93b91846e @0x0168	case Colons_Observed is 	when 2 =>
+QQu_is_equal		s8						|0 0 0 0|1 0 1 1|	s8	|
 
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
 # Maybe Greater_Equal_Op  ⟦36a4ea3d7⟧ @0x0609   if Months'Pos (T.Month) >= 3 then
-QQu_comparison_2	s8						|0 0 0 0|1 1 0 0| 	s8	|
+QQu_greater_equal	s8						|0 0 0 0|1 1 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
@@ -686,7 +694,8 @@ QQujump_if_not		pcrel,>JC					|0 1 1 0|1| pcrel		|
 #-----------------------
 # /aa Sandsynligvis jump_zero
 # ⟦85b414c73⟧ @0x326
-QQu_jump_non_zero	pcrel,>JC					|0 1 1 1|0| pcrel		|
+# (93b91846e, 0087	function Is_Digit, case Char is when '0'..'9' => return True;
+QQu_jump_if_true	pcrel,>JC					|0 1 1 1|0| pcrel		|
 
 #-----------------------
 # XXX: Not obvious if "1" and "2" is count of extension words or if and why those words are jumped over

@@ -185,6 +185,8 @@ package body Time_Utilities is
    end Interval_Value;
         
    procedure Unique_Prefix is new Enumeration_Value (Months);
+
+--0290
    function Convert_Time (Date : Calendar.Time) return Time is
       Result : Time;
         
@@ -620,28 +622,30 @@ package body Interval_Value is
       -- all non-numeric non delimiters are ignored
       -- if only one : is given, it is assumed to separate hrs and seconds
       --    10:17 is 10hrs 17min, :10:17 is 0hrs 10min 17sec
-      Position : Natural := S'First;
-      Result   : Interval;
+      Position : Natural := S'First;  -- 010e, 2,2
+      Result   : Interval; -- 0020, 2,3
         
---93b91846e, 0025
+--93b91846e, 0025, 2,4
       type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number);
+--Body 0058 for Kind_Value'Image
+
       type Item;
-      type Item_Ptr   is access Item;
+      type Item_Ptr   is access Item;   --2,5
         
       type Item is
          record
-            Kind  : Kind_Value;
-            Value : Natural;
-            Next  : Item_Ptr;
-         end record;
+            Kind  : Kind_Value; .. 0028
+            Value : Natural;  -- 0029
+            Next  : Item_Ptr; -- 002a
+         end record; -- 002d  2,6
         
-      First_Item : Item_Ptr;
-      Last_Item  : Item_Ptr;
+      First_Item : Item_Ptr; -- 0032  2,7
+      Last_Item  : Item_Ptr; -- 0034  2,8
         
-      Dot_Observed    : Boolean := False;
-      Colons_Observed : Natural := 0;
+      Dot_Observed    : Boolean := False; -- 0036  2,9
+      Colons_Observed : Natural := 0;  -- 0038  2,a
         
-        
+-- 0080, 2,b
       function Is_Digit (Char : Character) return Boolean is
       begin
          case Char is
@@ -651,7 +655,8 @@ package body Interval_Value is
                return False;
          end case;
       end Is_Digit;
-        
+
+-- 0090   2,c
       function Is_Delimiter (Char : Character) return Boolean is
       begin
          case Char is
@@ -661,11 +666,13 @@ package body Interval_Value is
                return False;
          end case;
       end Is_Delimiter;
-        
+
+--00b0       2,d
       function Get_Number return Item_Ptr is
          Start : Natural := Position;
          Last  : Natural;
         
+-- 01a8  3,4
          function Pad_To_Three_Digits (S : String) return Natural is
          begin
             if S'Length = 1 then
@@ -677,10 +684,12 @@ package body Interval_Value is
             end if;
          end Pad_To_Three_Digits;
         
+--INIT_01e8  3,5
          function Get_Item (N : Natural) return Item_Ptr is
          begin
             return new Item'(Kind => Number, Value => N, Next => null);
          end Get_Item;
+--00ba
       begin
          while Position <= S'Last and then Is_Digit (S (Position)) loop
             Position := Position + 1;
@@ -699,9 +708,11 @@ package body Interval_Value is
          end if;
       end Get_Number;
         
+--00f0 2,e
       function Get_Item return Item_Ptr is
          Char : Character;
         
+-- 0200
          function Item_Value (Ch : Character) return Item_Ptr is
             Result : Item_Ptr := new Item;
          begin
@@ -729,6 +740,7 @@ package body Interval_Value is
             return Result;
          end Item_Value;
       begin
+-- 00f6
          while Position <= S'Last loop
             Char := S (Position);
         
@@ -745,6 +757,7 @@ package body Interval_Value is
          return null;
       end Get_Item;
         
+--0118
       procedure Build_List (First, Last : in out Item_Ptr) is
          Next_Item : Item_Ptr;
       begin
@@ -762,10 +775,12 @@ package body Interval_Value is
          end loop;
       end Build_List;
         
+--0138
       procedure Normalize (First, Last : in out Item_Ptr) is
          Hour_Item : Item_Ptr;
          Next_Item : Item_Ptr := First;
-        
+
+--INIT_0248
          procedure Add (Kind : Kind_Value) is
             New_Item : Item_Ptr := new Item'(Kind, 0, null);
          begin
@@ -792,7 +807,7 @@ package body Interval_Value is
             if Dot_Observed then
                Add (Millisecond);
             else
-               case Colons_Observed is
+               case Colons_Observed is  -- 0167
                   when 2 =>
                      Add (Second);
                   when 1 =>
