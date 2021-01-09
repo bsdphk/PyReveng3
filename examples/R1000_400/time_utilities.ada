@@ -1,6 +1,7 @@
 --  This package is the source file for r1k_backup/36/36a4ea3d7.html
 --  It is annotated with references to the above file.
 --  Not all references are correct.
+--  Separates follows, link 93b91846e
 
 with Calendar;
 package Time_Utilities is
@@ -153,7 +154,7 @@ package body Time_Utilities is
                                           Hour         => Hours'First,
                                           Minute       => Minutes'First,
                                           Second       => Seconds'First,
-                                          Sun_Position => Sun_Positions'First); -- 01fd-0113, 1,37
+                                          Sun_Position => Sun_Positions'First); -- 00fd-0113, 1,37
    Null_Interval : constant Interval :=
      Interval'(Elapsed_Days         => Day_Count'First,
                Elapsed_Hours        => Military_Hours'First,
@@ -184,6 +185,8 @@ package body Time_Utilities is
    end Interval_Value;
         
    procedure Unique_Prefix is new Enumeration_Value (Months);
+
+--0290
    function Convert_Time (Date : Calendar.Time) return Time is
       Result : Time;
         
@@ -233,6 +236,7 @@ package body Time_Utilities is
       return Result;
    end Convert_Time;
         
+-- 0320
    function Convert_Time (Date : Time) return Calendar.Time is
       C_Year  : Calendar.Year_Number;
       C_Month : Calendar.Month_Number;
@@ -279,6 +283,7 @@ package body Time_Utilities is
       end if;
    end Image;
         
+-- 06a8
    function Time_Image (Date : Time; Time_Style : Time_Format) return String is
       Sep  : Character := ':';
       Hour : Integer   := Integer (Military_Hour
@@ -378,7 +383,7 @@ package body Time_Utilities is
    end Time_Stamp_Image;
         
         
-        
+        -- 0438
    function Convert (I : Interval) return Duration is
       Seconds : Duration := Duration (I.Elapsed_Milliseconds) / 1000;
    begin
@@ -389,7 +394,7 @@ package body Time_Utilities is
       return Seconds;
    end Convert;
         
-        
+        --0480
    function Convert (D : Duration) return Interval is
       I : Interval;
         
@@ -398,10 +403,7 @@ package body Time_Utilities is
       Milliseconds_Per_Hour   : constant := 60 * Milliseconds_Per_Minute;
       Milliseconds_Per_Day    : constant := 24 * Milliseconds_Per_Hour;
         
-      Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second
-        
-        
-                   ;
+      Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second;  -- 048f
    begin
       if D < 0.0 then
          return Null_Interval;
@@ -489,9 +491,10 @@ package body Time_Utilities is
       return Date = Nil;
    end Is_Nil;
         
+-- 0380
    function Nil return Calendar.Time is
    begin
-      return Null_Calendar_Time;
+      return Null_Calendar_Time;  -- 1,33=Null_Calendar_Time
    end Nil;
         
    function Is_Nil (Date : Calendar.Time) return Boolean is
@@ -532,6 +535,7 @@ package body Time_Utilities is
         
    pragma Inline (Make_Weekday);
         
+--0600
    function Day_Of_Week (T : Time := Get_Time) return Weekday is
       -- Uses Zeller's congruence to compute the day of week of given date.
       -- See "Problems for Computer Solutions", Gruenberger & Jaffray, Wiley,
@@ -577,6 +581,7 @@ package body Time_Utilities is
       return Duration_Until (Convert_Time (T));
    end Duration_Until;
         
+-- 05b8
    function Duration_Until_Next
      (H : Military_Hours; M : Minutes := 0; S : Seconds := 0)
       return Duration is
@@ -597,16 +602,19 @@ package body Time_Utilities is
       else
          T.Hour := Hours (Hr);
       end if;
-      D := Duration_Until (T);
+      D := Duration_Until (T);  -- 05e7
       if D < 0.0 then
-         D := Day + D;
+         D := Day + D;          -- 05ee
       end if;
       return D;
    end Duration_Until_Next;
         
 begin
    Null_Calendar_Time := Convert_Time (Null_Time);
-end Time_Utilities;separate (Time_Utilities)
+end Time_Utilities;
+
+-- start of 93b91846e
+separate (Time_Utilities)
 package body Interval_Value is
    function Value (S : String) return Interval is
       -- format is ddDhh:mm:ss.milli
@@ -614,27 +622,30 @@ package body Interval_Value is
       -- all non-numeric non delimiters are ignored
       -- if only one : is given, it is assumed to separate hrs and seconds
       --    10:17 is 10hrs 17min, :10:17 is 0hrs 10min 17sec
-      Position : Natural := S'First;
-      Result   : Interval;
+      Position : Natural := S'First;  -- 010e, 2,2
+      Result   : Interval; -- 0020, 2,3
         
+--93b91846e, 0025, 2,4
       type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number);
+--Body 0058 for Kind_Value'Image
+
       type Item;
-      type Item_Ptr   is access Item;
+      type Item_Ptr   is access Item;   --2,5
         
       type Item is
          record
-            Kind  : Kind_Value;
-            Value : Natural;
-            Next  : Item_Ptr;
-         end record;
+            Kind  : Kind_Value; .. 0028
+            Value : Natural;  -- 0029
+            Next  : Item_Ptr; -- 002a
+         end record; -- 002d  2,6
         
-      First_Item : Item_Ptr;
-      Last_Item  : Item_Ptr;
+      First_Item : Item_Ptr; -- 0032  2,7
+      Last_Item  : Item_Ptr; -- 0034  2,8
         
-      Dot_Observed    : Boolean := False;
-      Colons_Observed : Natural := 0;
+      Dot_Observed    : Boolean := False; -- 0036  2,9
+      Colons_Observed : Natural := 0;  -- 0038  2,a
         
-        
+-- 0080, 2,b
       function Is_Digit (Char : Character) return Boolean is
       begin
          case Char is
@@ -644,7 +655,8 @@ package body Interval_Value is
                return False;
          end case;
       end Is_Digit;
-        
+
+-- 0090   2,c
       function Is_Delimiter (Char : Character) return Boolean is
       begin
          case Char is
@@ -654,11 +666,13 @@ package body Interval_Value is
                return False;
          end case;
       end Is_Delimiter;
-        
+
+--00b0       2,d
       function Get_Number return Item_Ptr is
          Start : Natural := Position;
          Last  : Natural;
         
+-- 01a8  3,4
          function Pad_To_Three_Digits (S : String) return Natural is
          begin
             if S'Length = 1 then
@@ -670,19 +684,21 @@ package body Interval_Value is
             end if;
          end Pad_To_Three_Digits;
         
+--INIT_01e8  3,5
          function Get_Item (N : Natural) return Item_Ptr is
          begin
             return new Item'(Kind => Number, Value => N, Next => null);
          end Get_Item;
+--00ba
       begin
          while Position <= S'Last and then Is_Digit (S (Position)) loop
             Position := Position + 1;
          end loop;
         
-         if Position <= S'Last then
+         if Position <= S'Last then  -- 93b91846e, @0x00ce
             Last := Position - 1;
          else
-            Last := S'Last;
+            Last := S'Last;          -- 93b91846e, @0x00d5
          end if;
         
          if Dot_Observed then
@@ -692,9 +708,11 @@ package body Interval_Value is
          end if;
       end Get_Number;
         
+--00f0 2,e
       function Get_Item return Item_Ptr is
          Char : Character;
         
+-- 0200
          function Item_Value (Ch : Character) return Item_Ptr is
             Result : Item_Ptr := new Item;
          begin
@@ -722,6 +740,7 @@ package body Interval_Value is
             return Result;
          end Item_Value;
       begin
+-- 00f6
          while Position <= S'Last loop
             Char := S (Position);
         
@@ -738,6 +757,7 @@ package body Interval_Value is
          return null;
       end Get_Item;
         
+--0118
       procedure Build_List (First, Last : in out Item_Ptr) is
          Next_Item : Item_Ptr;
       begin
@@ -755,10 +775,12 @@ package body Interval_Value is
          end loop;
       end Build_List;
         
+--0138
       procedure Normalize (First, Last : in out Item_Ptr) is
          Hour_Item : Item_Ptr;
          Next_Item : Item_Ptr := First;
-        
+
+--INIT_0248
          procedure Add (Kind : Kind_Value) is
             New_Item : Item_Ptr := new Item'(Kind, 0, null);
          begin
@@ -768,7 +790,7 @@ package body Interval_Value is
       begin
          if Colons_Observed = 2 or else Dot_Observed then
             -- find right_most hour and make it minute
-            while Next_Item /= null loop
+            while Next_Item /= null loop  --  93b91846e @0x0149
                if Next_Item.Kind = Hour then
                   Hour_Item := Next_Item;
                end if;
@@ -785,7 +807,7 @@ package body Interval_Value is
             if Dot_Observed then
                Add (Millisecond);
             else
-               case Colons_Observed is
+               case Colons_Observed is  -- 0167
                   when 2 =>
                      Add (Second);
                   when 1 =>
@@ -874,7 +896,9 @@ package body Interval_Value is
       Normalize (First_Item, Last_Item);
       return Build_Value (First_Item, Last_Item);
    end Value;
-end Interval_Value;separate (Time_Utilities)
+end Interval_Value;
+
+separate (Time_Utilities)
 function Time_Value (S : String) return Time is
    -- accepts all of the formats output by value
    -- algorithm consists of parsing for a series of numbers
