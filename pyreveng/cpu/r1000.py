@@ -95,7 +95,9 @@ ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
 ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 
 #-----------------------
-QQupush93		subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
+# gc43,001c comments this as "push full address of a location in current code segment"
+# XXX: it may be a bit of a stretch to assume that is a subp /phk
+push_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
 
 #-----------------------
 # See for instance ⟦2009596b6⟧ @b4
@@ -866,11 +868,11 @@ class r1000(assy.Instree_disass):
         if not self.m[adr]:
             print("ZERO at SUBPROGRAM+3 (0x%04x)" % adr)
             return
-        if adr in self.subprograms:
+        assert adr & 7 in (0, 3)
+        a0 = adr & ~3
+        if a0 in self.subprograms:
             return
         self.subprograms.add(adr)
-        assert adr & 3 == 3
-        a0 = adr & ~3
         self.m.set_label(adr, "INIT_%04x" % a0)
         self.m.set_block_comment(a0, "SUBPROGRAM")
         data.Const(self.m, a0, fmt="0x%04x")
