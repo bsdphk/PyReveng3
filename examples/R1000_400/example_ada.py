@@ -27,13 +27,44 @@
 '''Rational R1000/400 Ada machine code
 '''
 
-from pyreveng import mem, listing, data
+from pyreveng import mem, listing, data, assy
 
 import pyreveng.cpu.r1000 as r1000
+
+import well_known_segments
 
 NAME = "R1000_400_6466568"
 
 FILENAME = "6466568.SEG"
+
+#######################################################################
+
+r1000_wks_desc = '''
+
+segref	wks	|0 1 1 0|0| pcrel		|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
+'''
+
+class r1000_wks_ins(assy.Instree_ins):
+
+    def assy_wks(self):
+        v = self['pcrel']
+        i = self.lo + v + 1
+        if v & 0x400:
+            i -= 0x800
+        segid = self.lang.m[i] << 16
+        segid |= self.lang.m[i+1]
+        j = well_known_segments.WELL_KNOWN_SEGMENTS.get(segid)
+        if j:
+            self.lang.m.set_line_comment(self.lo, "0x%x = " % segid + j)
+        raise assy.Invalid("Nothing to see here")
+
+class r1000_wks(r1000.r1000):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_ins(r1000_wks_desc, r1000_wks_ins);
+
+
 
 #######################################################################
 
@@ -163,7 +194,7 @@ def segment_file(mb):
     for i in range(0, mb.hi, 2):
         m[i >> 1] = (mb[i] << 8) | mb[i + 1]
 
-    cx = r1000.r1000()
+    cx = r1000_wks()
     cx.m.map(m, 0)
 
     for a in range(0, 8):
