@@ -167,7 +167,7 @@ package Machine_Code is
                       Terminate_Guard_Write_Op,
 
                       Timed_Guard_Write_Op,
-                      Lenght_Op,
+                      Length_Op,
 
                       Structure_Write_Op,
                       Structure_Clear_Op,
@@ -247,7 +247,7 @@ package Machine_Code is
                       Address_Op,
                       Size_Op,
 
-                      AddresS_Of_Type_Op,
+                      Address_Of_Type_Op,
                       Make_Root_Type_Op,
 
                       Set_Constraint_Op,
