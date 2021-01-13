@@ -437,7 +437,7 @@ QQucode_0x013d		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 0 1|
 QQucode_0x013e		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 0|
 QQucode_0x013f		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 1|
 QQucode_0x0140		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0|
-QQucode_0x0141		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 1|
+#QQucode_0x0141		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 1| QQu_int_multiply
 QQucode_0x0142		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 0|
 QQucode_0x0143		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 1|
 QQucode_0x0144		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 0 0|
@@ -523,13 +523,13 @@ QQucode_0x01d0		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 0|
 QQucode_0x01d1		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 1|
 QQucode_0x01d1		x	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 1|x|
 #QQucode_0x01d4		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 0 0| QQuEXECUTE VECTOR_CLASS,STRUCTURE_WRITE_OP
-QQucode_0x01d5		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 0 1|
+#QQucode_0x01d5		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 0 1| QQuEXECUTE VECTOR_CLASS,FIELD_REFERENCE_OP
 #QQucode_0x01d6		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 0| EXECUTE VECTOR_CLASS,FIELD_WRITE_OP
 #QQucode_0x01d7		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 1| QQuEXECUTE VECTOR_CLASS,FIELD_READ_OP
 QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
-QQucode_0x01d9		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 1|
-QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0|
-QQucode_0x01db		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1|
+#QQucode_0x01d9		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 1| QQuExecute_range_op
+#QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQunknown_vector_op
+#QQucode_0x01db		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1| QQuExecute_vector_length_op
 #QQucode_0x01dc		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 0| QQuExecute_last_op -
 #QQucode_0x01dd		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 1| QQuExecute_first_op -
 QQucode_0x01de		x	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 1|x|
@@ -635,7 +635,7 @@ QQucode_0x0256		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 0|
 QQucode_0x0258		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 0|
 QQucode_0x0259		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 1|
 QQucode_0x025a		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0|
-QQucode_0x025b		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 1|
+#QQucode_0x025b		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
 QQucode_0x025d		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 1|
 #QQucode_0x025e		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0| QQu_CONVERT_TO_INT -
@@ -643,7 +643,7 @@ QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
 #QQucode_0x0260		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 0| QQuEXECUTE BELOW_BOUND
 QQucode_0x0261		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 1|
 #QQucode_0x0262		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0| QQuEXECUTE IN_RANGE
-QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1|
+#QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQuEXECUTE_not_in_range
 QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0|
 QQucode_0x0265		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 1|
 #QQucode_0x0266		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 0| QQuDefine_Array_Full_Range -
@@ -667,11 +667,11 @@ QQucode_0x0277		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 1|
 QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
 #QQucode_0x0279		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 1| QQu_integer_and -
 #QQucode_0x027a		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 0| QQu_less_equal -
-QQucode_0x027b		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 1|
+#QQucode_0x027b		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 1| QQu_greater_equal
 #QQucode_0x027c		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 0| QQu_less_than -
 #QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQuEXECUTE MINUS
 QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0|
-QQucode_0x027f		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 1|
+#QQucode_0x027f		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 1| QQu_is_equal
 QQucode_0x0299		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 0 1|
 QQucode_0x029a		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 0|
 QQucode_0x029b		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 1|
@@ -752,9 +752,9 @@ QQucode_0x0355		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1|
 QQucode_0x0356		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 1 0|
 QQucode_0x0358		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 0|
 QQucode_0x0359		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 1|
-QQucode_0x035b		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 1 1|
+#QQucode_0x035b		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x035c		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 0|
-#QQucode_0x035d		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 1| DECLARE_TYPE ARRAY_CLASS,DEFINED
+#QQucode_0x035d		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x035e		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 1 0|
 QQucode_0x036a		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 0|
 QQucode_0x036b		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 1|
@@ -809,17 +809,17 @@ QQucode_0x03b8		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 0|
 QQucode_0x03b9		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 1|
 QQucode_0x03ba		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 0|
 QQucode_0x03bb		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 1|
-QQucode_0x03bc		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0|
+#QQucode_0x03bc		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0| QQu_DECLARE_VARIABLE_with_null_value ACCESS_CLASS
 QQucode_0x03bd		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 1|
 QQucode_0x03be		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 0|
 QQucode_0x03bf		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 1|
 QQucode_0x03c4		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 0|
 QQucode_0x03c5		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 1|
 QQucode_0x03c6		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 0|
-QQucode_0x03c7		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1|
+#QQucode_0x03c7		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS
 QQucode_0x03cc		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 0|
-QQucode_0x03cd		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 1|
-QQucode_0x03ce		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 0|
+#QQucode_0x03cd		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 1| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS,IS_VISIBLE,INCOMPLETE
+#QQucode_0x03ce		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 0| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS
 QQucode_0x03cf		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 1|
 QQucode_0x03d1		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 0 1|
 QQucode_0x03d2		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 0|
@@ -972,7 +972,11 @@ zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
-# ⟦85b414c73⟧ 0x34e..34f
+# 93b91846e, 011e+0125		(access type)
+QQu_store_ptr		x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
+
+#-----------------------
+# ⟦85b414c73⟧ 0x34e..34f	(Float)
 STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
 
 #-----------------------
@@ -1043,6 +1047,7 @@ ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 #-----------------------
 # 467 times followed by 0x0000
 # many times last instruction before TRAP entry point /phk
+# Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
 QQunknown_return_ca	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
 
 #-----------------------
@@ -1096,6 +1101,10 @@ QQu_Execute_make_visible_op	-					|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1|
 QQu_is_equal_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
 
 #-----------------------
+# ⟦36a4ea3d7⟧ @0x044d
+QQu_int_multiply	-						|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 1|
+
+#-----------------------
 # ⟦cb8e43375⟧ @0x7c
 QQu_float_great_equal_zero	-					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
 
@@ -1127,6 +1136,11 @@ QQuWrite_Full_Matrix	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
 QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 
 #-----------------------
+# ⟦36a4ea3d7⟧, @0x06b2/aa	Read from 2 dim array
+# May be EXECUTE MATRIX_CLASS,FIELD_READ_OP
+QQuRead_Matrix_element	-						|1 0 0 0|0 0 0 1|1 0 1 0|0 1 1 1|
+
+#-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 
@@ -1150,6 +1164,9 @@ QQuEXECUTE		VECTOR_CLASS,SUBARRAY_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
 # Used after writing all fields in vector
 QQuEXECUTE		VECTOR_CLASS,STRUCTURE_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
 
+#-----------------------
+# ⟦3f2fe70c1⟧, @0x0219	Max   : Natural     renames Max_Width (Current_Column);
+QQuEXECUTE		VECTOR_CLASS,FIELD_REFERENCE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 1|
 
 #-----------------------
 # gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
@@ -1162,14 +1179,28 @@ EXECUTE			VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 QQuEXECUTE		VECTOR_CLASS,FIELD_READ_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
 
 #-----------------------
+# ⟦3f2fe70c1⟧, @0x0238	for J in Line.Values'Range loop
+# gæt: EXECUTE VECTOR_CLASS,RANGE_OP
+QQuExecute_range_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 1|
+
+#-----------------------
+# ⟦3f2fe70c1⟧, @0x0276		Cell := new An_Item'(S'Length, S, Cell);
+QQunknown_vector_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
+
+#-----------------------
+# ⟦93b91846e⟧, @0x01ac		if S'Length = 1 then
+# gæt: EXECUTE VECTOR_CLASS,LENGTH_OP
+QQuExecute_vector_length_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 1|
+
+#-----------------------
 # ⟦93b91846e⟧, @0x00d5		Last := S'Last;
 # gæt: EXECUTE VECTOR_CLASS,LAST_OP
-QQuExecute_last_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
+QQuExecute_vector_last_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
 # EXECUTE VECTOR_CLASS,FIRST_OP
-QQuExecute_first_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
+QQuExecute_vector_first_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
@@ -1240,6 +1271,10 @@ QQuEXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
 QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 
 #-----------------------
+# /aa (3f2fe70c1 00b0)		for I in On_Fields'Range loop
+QQuEXECUTE_not_in_range		-					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+
+#-----------------------
 # /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
 # May be EXECUTE		BOUNDS_OP
 QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
@@ -1293,8 +1328,16 @@ QQu_less_than		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0|
 QQu_less_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 0|
 
 #-----------------------
-# /aa (3bf0c159 00da)
-QQuEXECUTE		MINUS						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+#  ⟦3f2fe70c1⟧, @0x01fd		if Left >= Right then
+QQu_greater_equal	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 1|
+
+#-----------------------
+# /aa (3f2fe70c1 022b)		if Width > Max then
+QQu_greater_than	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦3f2fe70c1⟧, @0x027f		if Current_Column = Column_Index'Last then
+QQu_is_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 1|
 
 #-----------------------
 # ⟦37717da67⟧ @0x5ce4 indicates this takes an extension /phk
@@ -1383,6 +1426,10 @@ QQuDECLARE_TYPE		ARRAY_CLASS,UNCONSTRAINED			|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
 QQuDECLARE_TYPE		ARRAY_CLASS,UNCONSTRAINED,IS_VISIBLE		|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 1|
 
 #-----------------------
+# ⟦3f2fe70c1⟧, @0x015e/aa	Table : Access_Line_Array (1 .. Normalize); (in procedure) variable declared later
+QQuDECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 1 1|
+
+#-----------------------
 # gc44,0049		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 DECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 
@@ -1399,8 +1446,24 @@ DECLARE_TYPE		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
 DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
 
 #-----------------------
+# 93b91846e, 0204	Result : Item_Ptr := new Item;
+QQu_DECLARE_VARIABLE_with_null_value	ACCESS_CLASS			|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 0|
+
+#-----------------------
 # gc44,0052		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
 DECLARE_TYPE		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+
+#-----------------------
+# 85eec923c, 0020	type List is access Listdata; (completing type List is private)
+QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
+
+#-----------------------
+# 85eec923c, 000c	type List is private; (type List is access Listdata;)
+QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS,IS_VISIBLE,INCOMPLETE		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
+
+#-----------------------
+# 93b91846e, 0027	type Item_Ptr   is access Item; (in procedure)
+QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS				|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
 
 #-----------------------
 # gc44,0061		ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
@@ -1433,10 +1496,11 @@ QQuDECLARE_VARIABLE	DISCRETE					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
 
 #-----------------------
 # feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+# ⟦36a4ea3d7⟧ @0x0717	Month : Integer := Months'Pos (Date.Month) + 1;
 DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
 
 #-----------------------
-# ⟦36a4ea3d7⟧ @0x05c3 /aa      Hr : Natural := Natural (H);
+# ⟦36a4ea3d7⟧ @0x05c3 /aa      Hr : Natural := Natural (H); (in procedure)
 QQuDECLARE_VARIABLE	DISCRETE_CLASS,WITH_VALUE			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
 
 #-----------------------
@@ -1462,7 +1526,7 @@ EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
 # ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
-QQu_return_imm_exception	s8,>R						|0 0 0 0|1 0 0 0| 	s8	|
+QQu_return_imm_exception	s8,>R					|0 0 0 0|1 0 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x108
@@ -1526,6 +1590,18 @@ QQu_structure_Store	x						|0 0 0 1|1 1 0 0|0|       x     |
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
+
+#-----------------------
+# ⟦3f2fe70c1⟧ @0x0259	not sure /aa	return P.Subitem;	P.Subitem is a string
+QQu_EXECUTE_25xx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|0 1 0 1|0|       x     |
+
+#-----------------------
+# ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = access type
+QQu_EXECUTE_2cxx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|1 1 0 0|0|       x     |
+
+#-----------------------
+# ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
+QQu_EXECUTE		RECORD_CLASS,STRUCTURE_READ_OP,x		|0 0 1 1|0 1 0 0|0|       x     |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
@@ -1805,6 +1881,7 @@ class r1000(assy.Instree_disass):
             'PACKAGE_CLASS',
             'REFERENCE_LEX_1_OP',
             'SET_VALUE_UNCHECKED_OP',
+            'STRUCTURE_READ_OP',
             'STRUCTURE_WRITE_OP',
             'SUBARRAY_OP',
             'WITH_VALUE',

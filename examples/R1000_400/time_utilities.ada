@@ -266,7 +266,8 @@ package body Time_Utilities is
       when Calendar.Time_Error =>         -- 0366
          return Calendar.Clock;
    end Convert_Time;
-        
+
+        -- 0288
    function Get_Time return Time is
    begin
       return Convert_Time (Calendar.Clock);
@@ -274,7 +275,7 @@ package body Time_Utilities is
         
    function Image (Month : Months; Full_Width : Boolean := True)
                    return String is
-      Name : constant String := Months'Image (Month);
+      Name : constant String := Months'Image (Month);  -- 068b
    begin
       if Full_Width then
          return String_Utilities.Capitalize (Name);
@@ -675,7 +676,7 @@ package body Interval_Value is
 -- 01a8  3,4
          function Pad_To_Three_Digits (S : String) return Natural is
          begin
-            if S'Length = 1 then
+            if S'Length = 1 then  --  01ac
                return Natural'Value (S & "00");
             elsif S'Length = 2 then
                return Natural'Value (S & '0');
@@ -741,37 +742,37 @@ package body Interval_Value is
          end Item_Value;
       begin
 -- 00f6
-         while Position <= S'Last loop
-            Char := S (Position);
-        
-            if Is_Delimiter (Char) then
-               Position := Position + 1;
-               return Item_Value (Char);
-            elsif Is_Digit (Char) then
-               return Get_Number;
+         while Position <= S'Last loop   -- 010e-0112
+            Char := S (Position);        -- 00f8-00fb
+
+            if Is_Delimiter (Char) then  -- 00fc-00fd
+               Position := Position + 1; -- 00ff-0101
+               return Item_Value (Char); -- 0102-0104
+            elsif Is_Digit (Char) then   -- 0105-0107
+               return Get_Number;        -- 0108-0109
             else
-               Position := Position + 1;
+               Position := Position + 1; -- 010a-010c
             end if;
          end loop;
         
-         return null;
+         return null;                    -- 0113-0115, 2,5=Item_Ptr
       end Get_Item;
         
 --0118
       procedure Build_List (First, Last : in out Item_Ptr) is
-         Next_Item : Item_Ptr;
+         Next_Item : Item_Ptr;      -- 011b
       begin
          -- build list of items
-         Next_Item := Get_Item;
-         First     := Next_Item;
-         Last      := First;
+         Next_Item := Get_Item;     -- 011d-011e
+         First     := Next_Item;    -- 011f-0120
+         Last      := First;        -- 0121-0122
         
          loop
-            Next_Item := Get_Item;
-            exit when Next_Item = null;
+            Next_Item := Get_Item;  -- 0124-0125
+            exit when Next_Item = null; -- 0126-0127
         
-            Last.Next := Next_Item;
-            Last      := Next_Item;
+            Last.Next := Next_Item; -- 0128-012b
+            Last      := Next_Item; -- 012c-012d
          end loop;
       end Build_List;
         
@@ -820,14 +821,16 @@ package body Interval_Value is
             end if;
          end if;
       end Normalize;
-        
+
+        -- 0180
       function Build_Value (First, Last : Item_Ptr) return Interval is
          Number_Kind : constant Kind_Value := Number;
         
          Result    : Interval := Null_Interval;
          Next_Item : Item_Ptr := First;
          Number    : Natural  := 0;
-        
+
+        -- 0260
          procedure Get_Number (Ptr   : in out Item_Ptr;
                                Value : in out Natural) is
          begin
@@ -838,7 +841,8 @@ package body Interval_Value is
                Value := 0;
             end if;
          end Get_Number;
-        
+
+        -- 0278
          procedure Set_Field (Kind   :        Kind_Value;
                               Number :        Natural;
                               Result : in out Interval) is
@@ -880,7 +884,7 @@ package body Interval_Value is
             end case;
          end Set_Field;
         
-      begin
+      begin -- 0180
          while Next_Item /= null loop
             Get_Number (Next_Item, Number);
             -- increments next_item (if appropriate)
