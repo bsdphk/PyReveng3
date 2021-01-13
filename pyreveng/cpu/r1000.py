@@ -754,7 +754,7 @@ QQucode_0x0358		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 0|
 QQucode_0x0359		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 1|
 #QQucode_0x035b		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x035c		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 0|
-#QQucode_0x035d		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
+#QQucode_0x035d		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 1| DECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x035e		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 1 0|
 QQucode_0x036a		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 0|
 QQucode_0x036b		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 1|
