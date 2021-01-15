@@ -331,14 +331,14 @@ QQucode_0x00c4		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 0|
 QQucode_0x00c5		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 1|
 QQucode_0x00c6		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 0|
 #QQucode_0x00c7		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 1| ACTION ELABORATE_SUBPROGRAM
-QQucode_0x00c8		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 0|
-QQucode_0x00c9		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 1|
-#QQucode_0x00ca		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 0| QQunknown_return_ca >R
+#QQucode_0x00c8		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 0| QQu_end_in_loop
+#QQucode_0x00c9		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 1| QQu_end_loop
+#QQucode_0x00ca		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 0| QQu_exit_nullary_function,>R
 QQucode_0x00cb		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 1|
 QQucode_0x00cc		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|
 QQucode_0x00cd		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 1|
 QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0|
-#QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQunknown_jump_cond >RC
+#QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQu_loop_start
 QQucode_0x00d0		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 0|
 QQucode_0x00d1		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 1|
 QQucode_0x00d2		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 0|
@@ -506,7 +506,7 @@ QQucode_0x01ae		x	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|x|
 QQucode_0x01be		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 0|
 QQucode_0x01bf		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 1|
 QQucode_0x01c0		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0|
-QQucode_0x01c1		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 1|
+#QQucode_0x01c1		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 1| QQu_string_is_less_than
 QQucode_0x01c2		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 0|
 #QQucode_0x01c3		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 1| EXECUTE VECTOR_CLASS,CHECK_IN_TYPE_OP
 QQucode_0x01c4		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 0|
@@ -528,7 +528,7 @@ QQucode_0x01d1		x	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 1|x|
 #QQucode_0x01d7		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 1| QQuEXECUTE VECTOR_CLASS,FIELD_READ_OP
 QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
 #QQucode_0x01d9		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 1| QQuExecute_range_op
-#QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQunknown_vector_op
+#QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQu_vector_length
 #QQucode_0x01db		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1| QQuExecute_vector_length_op
 #QQucode_0x01dc		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 0| QQuExecute_last_op -
 #QQucode_0x01dd		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 1| QQuExecute_first_op -
@@ -643,8 +643,8 @@ QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
 #QQucode_0x0260		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 0| QQuEXECUTE BELOW_BOUND
 QQucode_0x0261		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 1|
 #QQucode_0x0262		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0| QQuEXECUTE IN_RANGE
-#QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQuEXECUTE_not_in_range
-QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0|
+#QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQu_is_in_range
+#QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0| QQu_not_in_range
 QQucode_0x0265		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 1|
 #QQucode_0x0266		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 0| QQuDefine_Array_Full_Range -
 QQucode_0x0267		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 1|
@@ -669,8 +669,8 @@ QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
 #QQucode_0x027a		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 0| QQu_less_equal -
 #QQucode_0x027b		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 1| QQu_greater_equal
 #QQucode_0x027c		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 0| QQu_less_than -
-#QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQuEXECUTE MINUS
-QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0|
+#QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQu_greater_than
+#QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0| QQu_not_equal
 #QQucode_0x027f		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 1| QQu_is_equal
 QQucode_0x0299		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 0 1|
 QQucode_0x029a		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 0|
@@ -919,7 +919,7 @@ QQucode_0x2d00		x	|0 0 1 0 1 1 1 1|x              |
 QQucode_0x2e00		x	|0 0 1 0 1 1 1 0|x              |
 QQucode_0x3000		x	|0 0 1 1 0 0 0 0|x              |
 QQucode_0x3400		x	|0 0 1 1 0 1 0 0|x              |
-QQucode_0x3600		x	|0 0 1 1 0 1 1|x                |
+#QQucode_0x3600		x	|0 0 1 1 0 1 1|x                | QQu_LOOP_DECREASING pcrelneg,>JC
 QQucode_0x3800		x	|0 0 1 1 1 0 0 0|x              |
 QQucode_0x3c00		x	|0 0 1 1 1 1 0 0|x              |
 #QQucode_0x3e00		x	|0 0 1 1 1 1 1|x                | LOOP_INCREASING pcrelneg,>JC
@@ -1045,15 +1045,24 @@ ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 
 #-----------------------
+# (3f2fe70c1,02d3)	end of a loop		for J in X'range loop ... end loop;
+QQu_end_for_in_loop	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 0|
+
+#-----------------------
+# (3f2fe70c1,012e)	end of a loop
+QQu_end_loop		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
+
+#-----------------------
 # 467 times followed by 0x0000
 # many times last instruction before TRAP entry point /phk
 # Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
-QQunknown_return_ca	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+QQexit_nullary_function	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
 
 #-----------------------
 # ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
 # May be conditional return? /phk
-QQunknown_jump_cond	>RC						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+# (93b91846e,0123)	start of a loop
+QQu_loop_start		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
@@ -1141,6 +1150,10 @@ QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 QQuRead_Matrix_element	-						|1 0 0 0|0 0 0 1|1 0 1 0|0 1 1 1|
 
 #-----------------------
+# 3f2fe70c1, 04b1	Left.Values (On_Field).Subitem < Right.Values (On_Field).Subitem
+QQu_string_is_less_than	-						|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 1|
+
+#-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 
@@ -1184,8 +1197,9 @@ QQuEXECUTE		VECTOR_CLASS,FIELD_READ_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
 QQuExecute_range_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 1|
 
 #-----------------------
-# ⟦3f2fe70c1⟧, @0x0276		Cell := new An_Item'(S'Length, S, Cell);
-QQunknown_vector_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
+# ⟦3f2fe70c1⟧, @0x02f1 	for J in reverse Table'Range loop
+# gæt: EXECUTE VECTOR_CLASS,LENGTH
+QQu_vector_length	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
 
 #-----------------------
 # ⟦93b91846e⟧, @0x01ac		if S'Length = 1 then
@@ -1272,7 +1286,11 @@ QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 
 #-----------------------
 # /aa (3f2fe70c1 00b0)		for I in On_Fields'Range loop
-QQuEXECUTE_not_in_range		-					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+QQu_is_in_range		-						|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+
+#-----------------------
+# 3f2fe70c1,02f2 		for J in reverse Table'Range loop
+QQu_not_in_range	-						|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 0|
 
 #-----------------------
 # /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
@@ -1334,6 +1352,10 @@ QQu_greater_equal	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 1|
 #-----------------------
 # /aa (3f2fe70c1 022b)		if Width > Max then
 QQu_greater_than	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦3f2fe70c1⟧, @0x03a0		if J /= Column_Index'Last then
+QQu_not_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 0|
 
 #-----------------------
 # ⟦3f2fe70c1⟧, @0x027f		if Current_Column = Column_Index'Last then
@@ -1602,6 +1624,10 @@ QQu_EXECUTE_2cxx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|1 1 0 0|0|      
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
 QQu_EXECUTE		RECORD_CLASS,STRUCTURE_READ_OP,x		|0 0 1 1|0 1 0 0|0|       x     |
+
+#-----------------------
+# 93b91846e, 02fd	for J in reverse Table'Range loop
+QQu_LOOP_DECREASING	pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
