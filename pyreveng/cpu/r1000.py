@@ -231,14 +231,14 @@ QQucode_0x0033		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1|
 QQucode_0x0034		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0|
 QQucode_0x0035		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1|
 QQucode_0x0036		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0|
-QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1|
+#QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1| STORE_TOP ACCESS_TYPE, 1
 QQucode_0x003a		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 0|
 QQucode_0x003b		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1|
 QQucode_0x003c		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0|
 QQucode_0x003d		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1|
 QQucode_0x003e		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 0|
-QQucode_0x0041		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1|
-QQucode_0x0042		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0|
+#QQucode_0x0041		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1| STORE_TOP_UNCHECKED FLOAT, 1
+#QQucode_0x0042		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0|                          , 2 
 QQucode_0x0043		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 1|
 QQucode_0x0044		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0|
 QQucode_0x0045		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1|
@@ -337,7 +337,7 @@ QQucode_0x00c6		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 0|
 QQucode_0x00cb		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 1|
 QQucode_0x00cc		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|
 QQucode_0x00cd		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 1|
-QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0|
+#QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0| QQ_reset_loop_counter
 #QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQu_loop_start
 QQucode_0x00d0		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 0|
 QQucode_0x00d1		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 1|
@@ -661,7 +661,7 @@ QQucode_0x026c		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 0 0|
 #QQucode_0x0272		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 0| QQu_int_subtract -
 #QQucode_0x0273		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 1| QQu_int_add -
 QQucode_0x0274		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 0|
-#QQucode_0x0275		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 1| QQu_float_neg -
+#QQucode_0x0275		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 1| QQu_int_neg -
 QQucode_0x0276		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 0|
 QQucode_0x0277		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 1|
 QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
@@ -973,7 +973,8 @@ ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
 # 93b91846e, 011e+0125		(access type)
-QQu_store_ptr		x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
+QQu_store_top_unchecked_ptr	x					|0 0 0 0|0 0 0 0|0 0 1 1|0|0| x |
+QQu_store_top_ptr	x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
 
 #-----------------------
 # ⟦85b414c73⟧ 0x34e..34f	(Float)
@@ -982,8 +983,8 @@ STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
 #-----------------------
 # ⟦36a4ea3d7⟧
 # seems to store result to local variable. Both stores are used for same variable in 05e7 and 05ee
-QQu_Unknown_Store_1	-						|0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
-QQu_Unknown_Store_2	-						|0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
+QQ_store_top_unchecked_int	-					|0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
+QQ_Store_top_int	-						|0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
 
 #-----------------------
 # gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
@@ -1057,6 +1058,10 @@ QQu_end_loop		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
 # many times last instruction before TRAP entry point /phk
 # Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
 QQexit_nullary_function	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+
+#-----------------------
+# Guess/aa Follows LOOP_INCREASING, but not LOOP_DECREASING
+QQ_reset_loop_counter	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
 
 #-----------------------
 # ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
@@ -1295,10 +1300,12 @@ QQu_not_in_range	-						|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 0|
 #-----------------------
 # /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
 # May be EXECUTE		BOUNDS_OP
+# May be get type range
 QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
 
 #-----------------------
 # /aa (3f2fe70c1 002b)		type Width_List is array (Column_Index) of Natural;
+# May be get_subtype_range
 QQuDefine_Array_subtype_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
 
 #-----------------------
@@ -1331,7 +1338,8 @@ QQu_int_add		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x171 /phk AND ?
-QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
+# Epsilon : Float := Beta ** (-It / 2); (-It, It is integer)
+QQu_int_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x8e  integer AND ?
@@ -1647,15 +1655,15 @@ QQunknown_return_1	>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_2	>R,x						|0 1 0 0|0 0 1 0|0 0 0| x	|
+QQ_exit_subprogram_from_utility_with_value	>R,x			|0 1 0 0|0 0 1 0|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_3	>R,x						|0 1 0 0|0 0 1 1|0 0 0| x	|
+QQ_exit_subprogram_from_utility	>R,x					|0 1 0 0|0 0 1 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_4	>R,x						|0 1 0 0|0 1 0 0|0 0 0| x	|
+QQ_exit_subprogram_with_value	>R,x					|0 1 0 0|0 1 0 0|0 0 0| x	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
