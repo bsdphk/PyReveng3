@@ -231,14 +231,14 @@ QQucode_0x0033		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1|
 QQucode_0x0034		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0|
 QQucode_0x0035		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1|
 QQucode_0x0036		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0|
-QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1|
+#QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1| STORE_TOP ACCESS_TYPE, 1
 QQucode_0x003a		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 0|
 QQucode_0x003b		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1|
 QQucode_0x003c		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0|
 QQucode_0x003d		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1|
 QQucode_0x003e		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 0|
-QQucode_0x0041		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1|
-QQucode_0x0042		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0|
+#QQucode_0x0041		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1| STORE_TOP_UNCHECKED FLOAT, 1
+#QQucode_0x0042		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0|                          , 2 
 QQucode_0x0043		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 1|
 QQucode_0x0044		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0|
 QQucode_0x0045		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1|
@@ -331,14 +331,14 @@ QQucode_0x00c4		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 0|
 QQucode_0x00c5		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 1|
 QQucode_0x00c6		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 0|
 #QQucode_0x00c7		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 1| ACTION ELABORATE_SUBPROGRAM
-QQucode_0x00c8		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 0|
-QQucode_0x00c9		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 1|
-#QQucode_0x00ca		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 0| QQunknown_return_ca >R
+#QQucode_0x00c8		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 0| QQu_end_in_loop
+#QQucode_0x00c9		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 1| QQu_end_loop
+#QQucode_0x00ca		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 0| QQu_exit_nullary_function,>R
 QQucode_0x00cb		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 1|
 QQucode_0x00cc		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|
 QQucode_0x00cd		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 1|
-QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0|
-#QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQunknown_jump_cond >RC
+#QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0| QQ_reset_loop_counter
+#QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQu_loop_start
 QQucode_0x00d0		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 0|
 QQucode_0x00d1		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 1|
 QQucode_0x00d2		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 0|
@@ -506,7 +506,7 @@ QQucode_0x01ae		x	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|x|
 QQucode_0x01be		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 0|
 QQucode_0x01bf		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 1|
 QQucode_0x01c0		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0|
-QQucode_0x01c1		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 1|
+#QQucode_0x01c1		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 1| QQu_string_is_less_than
 QQucode_0x01c2		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 0|
 #QQucode_0x01c3		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 1| EXECUTE VECTOR_CLASS,CHECK_IN_TYPE_OP
 QQucode_0x01c4		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 0|
@@ -528,7 +528,7 @@ QQucode_0x01d1		x	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 1|x|
 #QQucode_0x01d7		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 1| QQuEXECUTE VECTOR_CLASS,FIELD_READ_OP
 QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
 #QQucode_0x01d9		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 1| QQuExecute_range_op
-#QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQunknown_vector_op
+#QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQu_vector_length
 #QQucode_0x01db		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1| QQuExecute_vector_length_op
 #QQucode_0x01dc		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 0| QQuExecute_last_op -
 #QQucode_0x01dd		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 1| QQuExecute_first_op -
@@ -568,39 +568,39 @@ QQucode_0x0214		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 0|
 QQucode_0x0215		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 1|
 QQucode_0x0216		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0|
 #QQucode_0x0217		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 1| EXECUTE HEAP_ACCESS_CLASS,ALL_REFERENCE_OP
-QQucode_0x0218		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 0|
-QQucode_0x0219		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 1|
-QQucode_0x021a		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 1 0|
-QQucode_0x021b		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 1 1|
-QQucode_0x021c		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 0 0|
-QQucode_0x021d		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 0 1|
-QQucode_0x021e		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 1 0|
-QQucode_0x021f		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 1 1|
-QQucode_0x0220		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0|
-QQucode_0x0221		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 1|
-QQucode_0x0222		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 0|
-QQucode_0x0223		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 1|
-QQucode_0x0224		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 0|
-QQucode_0x0225		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 1|
-QQucode_0x0226		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 0|
+#QQucode_0x0218		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 0|
+#QQucode_0x0219		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 1|
+#QQucode_0x021a		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 1 0|
+#QQucode_0x021b		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 1 1|
+#QQucode_0x021c		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 0 0|
+#QQucode_0x021d		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 0 1|
+#QQucode_0x021e		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 1 0|
+#QQucode_0x021f		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 1 1 1|
+#QQucode_0x0220		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0|
+#QQucode_0x0221		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 1|
+#QQucode_0x0222		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 0|
+#QQucode_0x0223		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 1|
+#QQucode_0x0224		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 0|
+#QQucode_0x0225		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 1|
+#QQucode_0x0226		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 0|
 #QQucode_0x0227		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 1| QQu_EXECUTE HEAP_ACCESS_CLASS,FIELD_REFERENCE_OP
-QQucode_0x0228		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 0|
-QQucode_0x0229		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1|
-QQucode_0x022a		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 1 0|
-QQucode_0x022b		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 1 1|
-QQucode_0x022c		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 0 0|
-QQucode_0x022d		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 0 1|
-QQucode_0x022e		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 1 0|
-QQucode_0x022f		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 1 1|
-QQucode_0x0230		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 0 0|
-QQucode_0x0231		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 0 1|
-QQucode_0x0232		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 1 0|
-QQucode_0x0233		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 1 1|
-QQucode_0x0234		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0|
+#QQucode_0x0228		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 0|
+#QQucode_0x0229		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1|
+#QQucode_0x022a		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 1 0|
+#QQucode_0x022b		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 1 1|
+#QQucode_0x022c		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 0 0|
+#QQucode_0x022d		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 0 1|
+#QQucode_0x022e		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 1 0|
+#QQucode_0x022f		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 1 1 1|
+#QQucode_0x0230		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 0 0|
+#QQucode_0x0231		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 0 1|
+#QQucode_0x0232		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 1 0|
+#QQucode_0x0233		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 0 1 1|
+#QQucode_0x0234		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0|
 #QQucode_0x0235		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 1| ROUND_TO_DISCRETE_OP -
-QQucode_0x0236		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 1 0|
+#QQucode_0x0236		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 1 0|
 #QQucode_0x0237		-	|0 0 0 0 0 0 1 0 0 0 1 1 0 1 1 1| QQu_CONVERT_TO_FLOAT
-QQucode_0x0238		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 0 0|
+#QQucode_0x0238		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 0 0|
 #QQucode_0x0239		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 0 1| FLOAT_** -
 #QQucode_0x023a		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 1 0| FLOAT_DIVIDE -
 #QQucode_0x023b		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 1 1| FLOAT_MULTIPLY -
@@ -608,33 +608,33 @@ QQucode_0x0238		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 0 0 0|
 #QQucode_0x023d		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 1 0 1| FLOAT_ADD -
 #QQucode_0x023e		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 1 1 0| FLOAT_ABS -
 #QQucode_0x023f		-	|0 0 0 0 0 0 1 0 0 0 1 1 1 1 1 1| FLOAT_NEGATE -
-QQucode_0x0240		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0|
-QQucode_0x0241		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1|
+#QQucode_0x0240		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0|
+#QQucode_0x0241		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1|
 #QQucode_0x0242		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 1 0| QQu_float_less_equal_than -
 #QQucode_0x0243		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 0 1 1| QQu_float_greater_equal_than -
 #QQucode_0x0244		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 1 0 0| QQu_float_less_than -
 #QQucode_0x0245		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 1 0 1| QQu_float_greater_than -
-QQucode_0x0246		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 0|
+#QQucode_0x0246		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 0|
 #QQucode_0x0247		-	|0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 1| QQu_float_equal_to -
-QQucode_0x0248		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 0|
-QQucode_0x0249		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 1|
-QQucode_0x024a		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 1 0|
-QQucode_0x024b		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 1 1|
-QQucode_0x024c		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 0 0|
-QQucode_0x024d		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 0 1|
-QQucode_0x024e		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 1 0|
-QQucode_0x024f		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 1 1|
-QQucode_0x0250		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 0 0|
-QQucode_0x0251		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 0 1|
-QQucode_0x0252		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 1 0|
-QQucode_0x0253		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 1 1|
-QQucode_0x0254		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 0 0|
-QQucode_0x0255		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 0 1|
-QQucode_0x0256		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 0|
+#QQucode_0x0248		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 0|
+#QQucode_0x0249		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 1|
+#QQucode_0x024a		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 1 0|
+#QQucode_0x024b		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 0 1 1|
+#QQucode_0x024c		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 0 0|
+#QQucode_0x024d		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 0 1|
+#QQucode_0x024e		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 1 0|
+#QQucode_0x024f		-	|0 0 0 0 0 0 1 0 0 1 0 0 1 1 1 1|
+#QQucode_0x0250		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 0 0|
+#QQucode_0x0251		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 0 1|
+#QQucode_0x0252		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 1 0|
+#QQucode_0x0253		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 0 1 1|
+#QQucode_0x0254		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 0 0|
+#QQucode_0x0255		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 0 1|
+#QQucode_0x0256		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 0|
 #QQucode_0x0257		-	|0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1| QQunknown_return_257 >R
-QQucode_0x0258		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 0|
-QQucode_0x0259		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 1|
-QQucode_0x025a		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0|
+#QQucode_0x0258		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 0|
+#QQucode_0x0259		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 1|
+#QQucode_0x025a		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0|
 #QQucode_0x025b		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
 QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
 QQucode_0x025d		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 1|
@@ -643,8 +643,8 @@ QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
 #QQucode_0x0260		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 0| QQuEXECUTE BELOW_BOUND
 QQucode_0x0261		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 1|
 #QQucode_0x0262		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0| QQuEXECUTE IN_RANGE
-#QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQuEXECUTE_not_in_range
-QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0|
+#QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQu_is_in_range
+#QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0| QQu_not_in_range
 QQucode_0x0265		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 1|
 #QQucode_0x0266		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 0| QQuDefine_Array_Full_Range -
 QQucode_0x0267		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 1|
@@ -661,7 +661,7 @@ QQucode_0x026c		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 0 0|
 #QQucode_0x0272		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 0| QQu_int_subtract -
 #QQucode_0x0273		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 1| QQu_int_add -
 QQucode_0x0274		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 0|
-#QQucode_0x0275		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 1| QQu_float_neg -
+#QQucode_0x0275		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 1| QQu_int_neg -
 QQucode_0x0276		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 0|
 QQucode_0x0277		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 1|
 QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
@@ -669,8 +669,8 @@ QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
 #QQucode_0x027a		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 0| QQu_less_equal -
 #QQucode_0x027b		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 1| QQu_greater_equal
 #QQucode_0x027c		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 0| QQu_less_than -
-#QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQuEXECUTE MINUS
-QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0|
+#QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQu_greater_than
+#QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0| QQu_not_equal
 #QQucode_0x027f		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 1| QQu_is_equal
 QQucode_0x0299		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 0 1|
 QQucode_0x029a		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 0|
@@ -919,7 +919,7 @@ QQucode_0x2d00		x	|0 0 1 0 1 1 1 1|x              |
 QQucode_0x2e00		x	|0 0 1 0 1 1 1 0|x              |
 QQucode_0x3000		x	|0 0 1 1 0 0 0 0|x              |
 QQucode_0x3400		x	|0 0 1 1 0 1 0 0|x              |
-QQucode_0x3600		x	|0 0 1 1 0 1 1|x                |
+#QQucode_0x3600		x	|0 0 1 1 0 1 1|x                | QQu_LOOP_DECREASING pcrelneg,>JC
 QQucode_0x3800		x	|0 0 1 1 1 0 0 0|x              |
 QQucode_0x3c00		x	|0 0 1 1 1 1 0 0|x              |
 #QQucode_0x3e00		x	|0 0 1 1 1 1 1|x                | LOOP_INCREASING pcrelneg,>JC
@@ -973,7 +973,8 @@ ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
 # 93b91846e, 011e+0125		(access type)
-QQu_store_ptr		x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
+QQu_store_top_unchecked_ptr	x					|0 0 0 0|0 0 0 0|0 0 1 1|0|0| x |
+QQu_store_top_ptr	x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
 
 #-----------------------
 # ⟦85b414c73⟧ 0x34e..34f	(Float)
@@ -982,8 +983,8 @@ STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
 #-----------------------
 # ⟦36a4ea3d7⟧
 # seems to store result to local variable. Both stores are used for same variable in 05e7 and 05ee
-QQu_Unknown_Store_1	-						|0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
-QQu_Unknown_Store_2	-						|0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
+QQ_store_top_unchecked_int	-					|0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
+QQ_Store_top_int	-						|0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
 
 #-----------------------
 # gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
@@ -1045,15 +1046,28 @@ ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 
 #-----------------------
+# (3f2fe70c1,02d3)	end of a loop		for J in X'range loop ... end loop;
+QQu_end_for_in_loop	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 0|
+
+#-----------------------
+# (3f2fe70c1,012e)	end of a loop
+QQu_end_loop		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
+
+#-----------------------
 # 467 times followed by 0x0000
 # many times last instruction before TRAP entry point /phk
 # Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
-QQunknown_return_ca	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+QQexit_nullary_function	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+
+#-----------------------
+# Guess/aa Follows LOOP_INCREASING, but not LOOP_DECREASING
+QQ_reset_loop_counter	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
 
 #-----------------------
 # ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
 # May be conditional return? /phk
-QQunknown_jump_cond	>RC						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+# (93b91846e,0123)	start of a loop
+QQu_loop_start		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
 
 #-----------------------
 # gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
@@ -1141,6 +1155,10 @@ QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
 QQuRead_Matrix_element	-						|1 0 0 0|0 0 0 1|1 0 1 0|0 1 1 1|
 
 #-----------------------
+# 3f2fe70c1, 04b1	Left.Values (On_Field).Subitem < Right.Values (On_Field).Subitem
+QQu_string_is_less_than	-						|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 1|
+
+#-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 
@@ -1184,8 +1202,9 @@ QQuEXECUTE		VECTOR_CLASS,FIELD_READ_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
 QQuExecute_range_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 1|
 
 #-----------------------
-# ⟦3f2fe70c1⟧, @0x0276		Cell := new An_Item'(S'Length, S, Cell);
-QQunknown_vector_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
+# ⟦3f2fe70c1⟧, @0x02f1 	for J in reverse Table'Range loop
+# gæt: EXECUTE VECTOR_CLASS,LENGTH
+QQu_vector_length	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
 
 #-----------------------
 # ⟦93b91846e⟧, @0x01ac		if S'Length = 1 then
@@ -1212,23 +1231,54 @@ EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
 #-----------------------
 # gc45,00a5		HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
-
+EXECUTE			HEAP_ACCESS_CLASS,ALL_WRITE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 0|
+EXECUTE			HEAP_ACCESS_CLASS,ALL_READ			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 1|
+EXECUTE			HEAP_ACCESS_CLASS,ELEMENT_TYPE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 0|
+EXECUTE			HEAP_ACCESS_CLASS,SET_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 1|
+EXECUTE			HEAP_ACCESS_CLASS,NOT_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 0|
+EXECUTE			HEAP_ACCESS_CLASS,IS_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 1|
+EXECUTE			HEAP_ACCESS_CLASS,MAXIMUM			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 0|
+EXECUTE			HEAP_ACCESS_CLASS,EQUAL				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 1|
+EXECUTE			ACCESS,DEALLOCATE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 0|
+EXECUTE			ACCESS,ALLOW_DEALLOCATE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 1|
+EXECUTE			ACCESS,CONVERT_REFERENCE			|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 0|
+EXECUTE			ACCESS,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 1|
+EXECUTE			ACCESS,NOT_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 0|
+EXECUTE			ACCESS,IN_TYPE					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 1|
+EXECUTE			ACCESS,CONVERT					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 0|
 #-----------------------
 # ⟦93b91846e⟧ @0x0149	if Ptr.Kind = Number_Kind then
-QQu_EXECUTE		HEAP_ACCESS_CLASS,FIELD_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 1|
+EXECUTE			ACCESS,ALL_REFERENCE				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 1|
 
+EXECUTE			ACCESS,ALL_WRITE				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 0|
+EXECUTE			ACCESS,ALL_READ					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 1|
+EXECUTE			ACCESS,ELEMENT_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 0|
+EXECUTE			ACCESS,SET_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 1|
+EXECUTE			ACCESS,NOT_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 0|
+EXECUTE			ACCESS,IS_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 1|
+EXECUTE			ACCESS,NOT_EQUAL				|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 0|
+EXECUTE			ACCESS,EQUAL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 1|
 
+EXECUTE			FLOAT,IN_RANGE					|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 0|
+EXECUTE			FLOAT,WRITE_UNCHECKED				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 1|
+EXECUTE			FLOAT,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 0|
+EXECUTE			FLOAT,NOT_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 1|
+EXECUTE			FLOAT,IN_TYPE					|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc4
-ROUND_TO_DISCRETE_OP	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
-
+EXECUTE			ROUND_TO_DISCRETE				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
+EXECUTE			FLOAT,TRUNCATE_TO_DISCRETE			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc7
 # 85b414c73 0x055	Ymax : Float := Float (Integer (Pi * Two ** (It / 2)));
-QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+#QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+
+EXECUTE			FLOAT,CONVERT_FROM_DISCRETE			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+EXECUTE			FLOAT,CONVERT					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 0|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
+# Assembler instruction is EXECUTE, Float_Class, op
 FLOAT_**		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
 FLOAT_DIVIDE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
 FLOAT_MULTIPLY		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
@@ -1236,26 +1286,41 @@ FLOAT_SUBTRACT		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|
 FLOAT_ADD		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
 FLOAT_ABS		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 0|
 FLOAT_NEGATE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 1|
+FLOAT_FIRST		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 0|
+FLOAT_LAST		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 1|
+FLOAT_LESS_EQUAL	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 0|
+FLOAT_GREATER_EQUAL	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 1|
+FLOAT_LESS		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
+FLOAT_GREATER		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
+FLOAT_NOT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 0|
+FLOAT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
 
-#-----------------------
-# ⟦cb8e43375⟧ @0xb5
-QQu_float_less_equal_than	-					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 0|
-
-#-----------------------
-# ⟦cb8e43375⟧ @0xa5
-QQu_float_greater_equal_than	-					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 1|
-
-QQu_float_less_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
-QQu_float_greater_than	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
-
-#-----------------------
-# ⟦cb8e43375⟧ @0xc9
-QQu_float_equal_to	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
-
+EXECUTE			DISCRETE,CHECK_IN_INTEGER			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 0|
+EXECUTE			DISCRETE,CASE_IN_RANGE				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 1|
+EXECUTE			DISCRETE,IS_UNSIGNED				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 0|
+EXECUTE			DISCRETE,COUNT_TRAILING_ZEROS			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 1|
+EXECUTE			DISCRETE,COUNT_LEADING_ZEROS			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 0|
+EXECUTE			DISCRETE,COUNT_NONZERO_BITS			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 1|
+EXECUTE			DISCRETE,EXTRACT_BITS				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 0|
+EXECUTE			DISCRETE,INSERT_BITS				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 1|
+EXECUTE			DISCRETE,ROTATE					|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 0|
+EXECUTE			DISCRETE,LOGICAL_SHIFT				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 1|
+EXECUTE			DISCRETE,ARITMETIC_SHIFT			|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 0|
+EXECUTE			DISCRETE,BINARY_SCALE				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 1|
+EXECUTE			DISCRETE,PARTIAL_MINUS				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 0|
+EXECUTE			DISCRETE,PARTIAL_PLUS				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 1|
+EXECUTE			DISCRETE,INSTRUCTION_READ			|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 0|
+#EXECUTE		DISCRETE,RAISE					|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 #-----------------------
 # 196 times followed by 0x0000
 # a dozen times right before TRAP entry /phk
 QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+
+EXECUTE			DISCRETE,TEST_AND_SET_NEXT			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
+EXECUTE			DISCRETE,TEST_AND_SET_PREVIOUS			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
+EXECUTE			DISCRETE,WRITE_UNCHECKED			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
+EXECUTE			DISCRETE,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
+
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x87			N := Integer (Y * One_Over_Pi);
@@ -1272,15 +1337,21 @@ QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
 
 #-----------------------
 # /aa (3f2fe70c1 00b0)		for I in On_Fields'Range loop
-QQuEXECUTE_not_in_range		-					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+QQu_is_in_range		-						|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+
+#-----------------------
+# 3f2fe70c1,02f2 		for J in reverse Table'Range loop
+QQu_not_in_range	-						|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 0|
 
 #-----------------------
 # /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
 # May be EXECUTE		BOUNDS_OP
+# May be get type range
 QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
 
 #-----------------------
 # /aa (3f2fe70c1 002b)		type Width_List is array (Column_Index) of Natural;
+# May be get_subtype_range
 QQuDefine_Array_subtype_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
 
 #-----------------------
@@ -1313,7 +1384,8 @@ QQu_int_add		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x171 /phk AND ?
-QQu_float_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
+# Epsilon : Float := Beta ** (-It / 2); (-It, It is integer)
+QQu_int_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x8e  integer AND ?
@@ -1334,6 +1406,10 @@ QQu_greater_equal	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 1|
 #-----------------------
 # /aa (3f2fe70c1 022b)		if Width > Max then
 QQu_greater_than	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+
+#-----------------------
+# ⟦3f2fe70c1⟧, @0x03a0		if J /= Column_Index'Last then
+QQu_not_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 0|
 
 #-----------------------
 # ⟦3f2fe70c1⟧, @0x027f		if Current_Column = Column_Index'Last then
@@ -1604,6 +1680,10 @@ QQu_EXECUTE_2cxx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|1 1 0 0|0|      
 QQu_EXECUTE		RECORD_CLASS,STRUCTURE_READ_OP,x		|0 0 1 1|0 1 0 0|0|       x     |
 
 #-----------------------
+# 93b91846e, 02fd	for J in reverse Table'Range loop
+QQu_LOOP_DECREASING	pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
+
+#-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
 QQu_EXECUTE		RECORD_CLASS,FIELD_WRITE_OP,x			|0 0 1 1|1 0 0 0|0|       x     |
 
@@ -1621,15 +1701,15 @@ QQunknown_return_1	>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_2	>R,x						|0 1 0 0|0 0 1 0|0 0 0| x	|
+QQ_exit_subprogram_from_utility_with_value	>R,x			|0 1 0 0|0 0 1 0|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_3	>R,x						|0 1 0 0|0 0 1 1|0 0 0| x	|
+QQ_exit_subprogram_from_utility	>R,x					|0 1 0 0|0 0 1 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQunknown_return_4	>R,x						|0 1 0 0|0 1 0 0|0 0 0| x	|
+QQ_exit_subprogram_with_value	>R,x					|0 1 0 0|0 1 0 0|0 0 0| x	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
