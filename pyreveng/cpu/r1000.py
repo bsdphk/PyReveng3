@@ -231,7 +231,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
 #QQucode_0x0034		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0|
 #QQucode_0x0035		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1|
 #QQucode_0x0036		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0|
-#QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1| STORE_TOP ACCESS_TYPE, 1
+#QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1| STORE_TOP Access_TYPE, 1
 #QQucode_0x003a		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 0|
 #QQucode_0x003b		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1|
 #QQucode_0x003c		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0|
@@ -567,7 +567,7 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x0214		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 0|
 #QQucode_0x0215		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 1|
 #QQucode_0x0216		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0|
-#QQucode_0x0217		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 1| EXECUTE HEAP_ACCESS_CLASS,ALL_REFERENCE_OP
+#QQucode_0x0217		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 1| EXECUTE Heap_Access,All_Reference
 #QQucode_0x0218		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 0|
 #QQucode_0x0219		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 1|
 #QQucode_0x021a		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 1 0|
@@ -583,7 +583,7 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x0224		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 0|
 #QQucode_0x0225		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 1|
 #QQucode_0x0226		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 0|
-#QQucode_0x0227		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 1| QQu_EXECUTE HEAP_ACCESS_CLASS,FIELD_REFERENCE_OP
+#QQucode_0x0227		-	|0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 1| QQu_EXECUTE Heap_Access,FIELD_REFERENCE_OP
 #QQucode_0x0228		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 0|
 #QQucode_0x0229		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1|
 #QQucode_0x022a		-	|0 0 0 0 0 0 1 0 0 0 1 0 1 0 1 0|
@@ -778,7 +778,7 @@ QQucode_0x038d		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 0 1|
 #QQucode_0x038e		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 1 0| DECLARE_TYPE PACKAGE_CLASS,DEFINED
 QQucode_0x038f		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 1 1|
 QQucode_0x0395		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 0 1|
-#QQucode_0x0396		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 0| DECLARE_VARIABLE HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE
+#QQucode_0x0396		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 0| DECLARE_VARIABLE Heap_Access,BY_ALLOCATION,WITH_VALUE
 QQucode_0x0397		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 1|
 QQucode_0x0398		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 0|
 QQucode_0x0399		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 1|
@@ -800,32 +800,32 @@ QQucode_0x03a8		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 0|
 QQucode_0x03a9		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 1|
 QQucode_0x03ab		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 1 1|
 QQucode_0x03ac		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 0|
-#QQucode_0x03ad		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 1| DECLARE_TYPE HEAP_ACCESS_CLASS,DEFINED
+#QQucode_0x03ad		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 1| DECLARE_TYPE Heap_Access,DEFINED
 QQucode_0x03ae		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 1 0|
 QQucode_0x03b5		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 0 1|
-#QQucode_0x03b6		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 0| DECLARE_VARIABLE ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE
+#QQucode_0x03b6		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 0| DECLARE_VARIABLE Access,BY_ALLOCATION,WITH_VALUE
 QQucode_0x03b7		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 1|
 QQucode_0x03b8		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 0|
 QQucode_0x03b9		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 1|
 QQucode_0x03ba		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 0|
 QQucode_0x03bb		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 1|
-#QQucode_0x03bc		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0| QQu_DECLARE_VARIABLE_with_null_value ACCESS_CLASS
+#QQucode_0x03bc		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0| QQu_DECLARE_VARIABLE_with_null_value Access
 QQucode_0x03bd		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 1|
 QQucode_0x03be		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 0|
 QQucode_0x03bf		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 1|
 QQucode_0x03c4		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 0|
 QQucode_0x03c5		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 1|
 QQucode_0x03c6		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 0|
-#QQucode_0x03c7		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS
+#QQucode_0x03c7		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1| QQu_DECLARE_TYPE Heap_Access
 QQucode_0x03cc		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 0|
-#QQucode_0x03cd		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 1| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS,IS_VISIBLE,INCOMPLETE
-#QQucode_0x03ce		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 0| QQu_DECLARE_TYPE HEAP_ACCESS_CLASS
+#QQucode_0x03cd		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 1| QQu_DECLARE_TYPE Heap_Access,IS_VISIBLE,INCOMPLETE
+#QQucode_0x03ce		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 0| QQu_DECLARE_TYPE Heap_Access
 QQucode_0x03cf		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 1|
 QQucode_0x03d1		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 0 1|
 QQucode_0x03d2		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 0|
-#QQucode_0x03d3		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 1| QQu_DECLARE_TYPE ACCESS_CLASS,DEFINED
+#QQucode_0x03d3		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 1| QQu_DECLARE_TYPE Access,DEFINED
 QQucode_0x03d4		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 0|
-#QQucode_0x03d5		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 1| DECLARE_TYPE ACCESS_CLASS,DEFINED
+#QQucode_0x03d5		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 1| DECLARE_TYPE Access,DEFINED
 QQucode_0x03d6		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 1 0|
 #QQucode_0x03d8		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 0 0| DECLARE_VARIABLE FLOAT_CLASS
 QQucode_0x03d9		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 0 1|
@@ -975,7 +975,7 @@ Action			Illegal						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
-# 93b91846e, 011e+0125		(access type)
+# 93b91846e, 011e+0125		(Access type)
 Store_Top		Heap_Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 0 1|
 Store_Top		Heap_Access,At_Offset_2				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 0|
 Store_Top		Heap_Access,At_Offset_3				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 1|
@@ -1277,7 +1277,7 @@ Execute			Entry,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|0 1 1 1|
 Execute			Select,Terminate_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 0|
 Execute			Select,Timed_Duration_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 1|
 Execute			Select,Timed_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 0|
-Execute			Select,Rendevouz				|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 1|
+Execute			Select,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 1|
 
 Execute			Discrete,Divide_And_Scale			|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 0|
 #-----------------------
@@ -1454,53 +1454,53 @@ Execute			Heap_Access,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 0|
 Execute			Heap_Access,In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 1|
 Execute			Heap_Access,Convert				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 0|
 #-----------------------
-# gc45,00a5		HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
-EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
+# gc45,00a5		Heap_Access,All_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
+Execute			Heap_Access,All_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 
-EXECUTE			HEAP_ACCESS_CLASS,ALL_WRITE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 0|
-EXECUTE			HEAP_ACCESS_CLASS,ALL_READ			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 1|
-EXECUTE			HEAP_ACCESS_CLASS,ELEMENT_TYPE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 0|
-EXECUTE			HEAP_ACCESS_CLASS,SET_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 1|
-EXECUTE			HEAP_ACCESS_CLASS,NOT_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 0|
-EXECUTE			HEAP_ACCESS_CLASS,IS_NULL			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 1|
-EXECUTE			HEAP_ACCESS_CLASS,MAXIMUM			|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 0|
-EXECUTE			HEAP_ACCESS_CLASS,EQUAL				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 1|
-EXECUTE			ACCESS,DEALLOCATE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 0|
-EXECUTE			ACCESS,ALLOW_DEALLOCATE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 1|
-EXECUTE			ACCESS,CONVERT_REFERENCE			|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 0|
-EXECUTE			ACCESS,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 1|
-EXECUTE			ACCESS,NOT_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 0|
-EXECUTE			ACCESS,IN_TYPE					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 1|
-EXECUTE			ACCESS,CONVERT					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 0|
+Execute			Heap_Access,All_Write				|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 0|
+Execute			Heap_Access,All_Read				|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 1|
+Execute			Heap_Access,Element_Type			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 0|
+Execute			Heap_Access,Set_Null				|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 1|
+Execute			Heap_Access,Not_Null				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 0|
+Execute			Heap_Access,Is_Null				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 1|
+Execute			Heap_Access,Maximum				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 0|
+Execute			Heap_Access,Equal				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 1|
+Execute			Access,Deallocate				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 0|
+Execute			Access,Allow_Deallocate				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 1|
+Execute			Access,Convert_Reference			|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 0|
+Execute			Access,Check_In_Type				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 1|
+Execute			Access,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 0|
+Execute			Access,In_Type					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 1|
+Execute			Access,Convert					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 0|
 #-----------------------
 # ⟦93b91846e⟧ @0x0149	if Ptr.Kind = Number_Kind then
-EXECUTE			ACCESS,ALL_REFERENCE_OP				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 1|
+Execute			Access,All_Reference				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 1|
 
-EXECUTE			ACCESS,ALL_WRITE				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 0|
-EXECUTE			ACCESS,ALL_READ					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 1|
-EXECUTE			ACCESS,ELEMENT_TYPE				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 0|
-EXECUTE			ACCESS,SET_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 1|
-EXECUTE			ACCESS,NOT_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 0|
-EXECUTE			ACCESS,IS_NULL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 1|
-EXECUTE			ACCESS,NOT_EQUAL				|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 0|
-EXECUTE			ACCESS,EQUAL					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 1|
+Execute			Access,All_Write				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 0|
+Execute			Access,All_Read					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 1|
+Execute			Access,Element_Type				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 0|
+Execute			Access,Set_Null					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 1|
+Execute			Access,Not_Null					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 0|
+Execute			Access,Is_Null					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 0 1|
+Execute			Access,Not_Equal				|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 0|
+Execute			Access,Equal					|0 0 0 0|0 0 1 0|0 0 1 0|1 1 1 1|
 
-EXECUTE			FLOAT,IN_RANGE					|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 0|
-EXECUTE			FLOAT,WRITE_UNCHECKED				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 1|
-EXECUTE			FLOAT,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 0|
-EXECUTE			FLOAT,NOT_IN_TYPE				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 1|
-EXECUTE			FLOAT,IN_TYPE					|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 0|
+Execute			Float,In_Range					|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 0|
+Execute			Float,Write_Unchecked				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 1|
+Execute			Float,Check_In_Type				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 0|
+Execute			Float,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 1|
+Execute			Float,In_Type					|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc4
-EXECUTE			ROUND_TO_DISCRETE				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
-EXECUTE			FLOAT,TRUNCATE_TO_DISCRETE			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 0|
+Execute			Round_To_Discrete				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
+Execute			Float,Truncate_To_Discrete			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc7
 # 85b414c73 0x055	Ymax : Float := Float (Integer (Pi * Two ** (It / 2)));
 #QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
 
-EXECUTE			FLOAT,CONVERT_FROM_DISCRETE			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
-EXECUTE			FLOAT,CONVERT					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 0|
+Execute			Float,Convert_From_Discrete			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
+Execute			Float,Convert					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 0|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
@@ -1521,31 +1521,31 @@ FLOAT_GREATER		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
 FLOAT_NOT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 0|
 FLOAT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
 
-EXECUTE			DISCRETE,CHECK_IN_INTEGER			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 0|
-EXECUTE			DISCRETE,CASE_IN_RANGE				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 1|
-EXECUTE			DISCRETE,IS_UNSIGNED				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 0|
-EXECUTE			DISCRETE,COUNT_TRAILING_ZEROS			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 1|
-EXECUTE			DISCRETE,COUNT_LEADING_ZEROS			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 0|
-EXECUTE			DISCRETE,COUNT_NONZERO_BITS			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 1|
-EXECUTE			DISCRETE,EXTRACT_BITS				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 0|
-EXECUTE			DISCRETE,INSERT_BITS				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 1|
-EXECUTE			DISCRETE,ROTATE					|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 0|
-EXECUTE			DISCRETE,LOGICAL_SHIFT				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 1|
-EXECUTE			DISCRETE,ARITMETIC_SHIFT			|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 0|
-EXECUTE			DISCRETE,BINARY_SCALE				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 1|
-EXECUTE			DISCRETE,PARTIAL_MINUS				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 0|
-EXECUTE			DISCRETE,PARTIAL_PLUS				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 1|
-EXECUTE			DISCRETE,INSTRUCTION_READ			|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 0|
-#EXECUTE		DISCRETE,RAISE					|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+Execute			Discrete,Check_In_Integer			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 0|
+Execute			Discrete,Case_In_Range				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 1|
+Execute			Discrete,Is_Unsigned				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 0|
+Execute			Discrete,Count_Trailing_Zeros			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 1 1|
+Execute			Discrete,Count_Leading_Zeros			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 0|
+Execute			Discrete,Count_Nonzero_Bits			|0 0 0 0|0 0 1 0|0 1 0 0|1 1 0 1|
+Execute			Discrete,Extract_Bits				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 0|
+Execute			Discrete,Insert_Bits				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 1|
+Execute			Discrete,Rotate					|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 0|
+Execute			Discrete,Logical_Shift				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 1|
+Execute			Discrete,Aritmetic_Shift			|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 0|
+Execute			Discrete,Binary_Scale				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 1|
+Execute			Discrete,Partial_Minus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 0|
+Execute			Discrete,Partial_Plus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 1|
+Execute			Discrete,Instruction_Read			|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 0|
+Execute			Discrete,Raise,>R				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 #-----------------------
 # 196 times followed by 0x0000
 # a dozen times right before TRAP entry /phk
-QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
+#QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
 
-EXECUTE			DISCRETE,TEST_AND_SET_NEXT			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
-EXECUTE			DISCRETE,TEST_AND_SET_PREVIOUS			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
-EXECUTE			DISCRETE,WRITE_UNCHECKED			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
-EXECUTE			DISCRETE,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
+Execute			Discrete,Test_And_Set_Next			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
+Execute			Discrete,Test_And_Set_Previous			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
+Execute			Discrete,Write_Unchecked			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
+Execute			Discrete,Check_In_Type				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
 # end of BODY_11a0
 
 #-----------------------
@@ -1744,41 +1744,41 @@ DECLARE_VARIABLE	PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
 DECLARE_TYPE		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
 
 #-----------------------
-# gc44,0074		HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-DECLARE_VARIABLE	HEAP_ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+# gc44,0074		Heap_Access,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+DECLARE_VARIABLE	Heap_Access,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
 
 #-----------------------
 # 93b91846e, 0204	Result : Item_Ptr := new Item;
-QQu_DECLARE_VARIABLE_with_null_value	ACCESS_CLASS			|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 0|
+QQu_DECLARE_VARIABLE_with_null_value	Access				|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 0|
 
 #-----------------------
-# gc44,0052		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
-DECLARE_TYPE		HEAP_ACCESS_CLASS,DEFINED			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+# gc44,0052		Heap_Access,DEFINED				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+DECLARE_TYPE		Heap_Access,DEFINED				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
 
 #-----------------------
-# 85eec923c, 0020	type List is access Listdata; (completing type List is private)
-QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
+# 85eec923c, 0020	type List is Access Listdata; (completing type List is private)
+QQu_DECLARE_TYPE	Heap_Access					|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
 
 #-----------------------
-# 85eec923c, 000c	type List is private; (type List is access Listdata;)
-QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS,IS_VISIBLE,INCOMPLETE		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
+# 85eec923c, 000c	type List is private; (type List is Access Listdata;)
+QQu_DECLARE_TYPE	Heap_Access,IS_VISIBLE,INCOMPLETE		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
 
 #-----------------------
-# 93b91846e, 0027	type Item_Ptr   is access Item; (in procedure)
-QQu_DECLARE_TYPE	HEAP_ACCESS_CLASS				|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
+# 93b91846e, 0027	type Item_Ptr   is Access Item; (in procedure)
+QQu_DECLARE_TYPE	Heap_Access					|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
 
 #-----------------------
-# gc44,0061		ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
-DECLARE_VARIABLE	ACCESS_CLASS,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
+# gc44,0061		Access,BY_ALLOCATION,WITH_VALUE			|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
+DECLARE_VARIABLE	Access,BY_ALLOCATION,WITH_VALUE			|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
 
 #-----------------------
-# (3f2fe70c1, 0033)/aa		type A_String    is access String; (in body)
-QQu_DECLARE_TYPE	ACCESS_CLASS,DEFINED                            |0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 1|
+# (3f2fe70c1, 0033)/aa		type A_String    is Access String; (in body)
+QQu_DECLARE_TYPE	Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 1|
 
 #-----------------------
-# gc44,004f		ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
-#			Type PA is access A; (in procedure)
-DECLARE_TYPE		ACCESS_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+# gc44,004f		Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+#			Type PA is Access A; (in procedure)
+DECLARE_TYPE		Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x48 /aa
@@ -1898,7 +1898,7 @@ EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
 QQu_EXECUTE_25xx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|0 1 0 1|0|       x     |
 
 #-----------------------
-# ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = access type
+# ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
 QQu_EXECUTE_2cxx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|1 1 0 0|0|       x     |
 
 #-----------------------
@@ -2166,9 +2166,6 @@ class r1000(assy.Instree_disass):
         self.add_ins(ucode_desc, ucode_ins)
         self.add_ins(r1000_desc, r1000_ins)
         self.verbatim += (
-            'ACCESS',
-            'ACCESS_CLASS',
-            'ALL_REFERENCE_OP',
             'ARRAY_CLASS',
             'AUGMENT_IMPORTS_OP',
             'BY_ALLOCATION',
@@ -2180,7 +2177,6 @@ class r1000(assy.Instree_disass):
             'FIELD_WRITE_OP',
             'FOR_CALL',
             'FOR_OUTER_CALL',
-            'HEAP_ACCESS_CLASS',
             'INCOMPLETE',
             'IS_VISIBLE',
             'NOT_ELABORATED',
