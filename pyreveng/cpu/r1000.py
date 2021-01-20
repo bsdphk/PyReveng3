@@ -128,7 +128,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 1|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 0 0 0 0 1|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0|
-QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 1|
+#QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 1| # Check if valid???
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 0|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 0|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 1 0|x  |
@@ -225,135 +225,135 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 1 0|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 1 1|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 0 0|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
-QQucode_0x0031		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 1|
-QQucode_0x0032		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 0|
-QQucode_0x0033		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1|
-QQucode_0x0034		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0|
-QQucode_0x0035		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1|
-QQucode_0x0036		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0|
+#QQucode_0x0031		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 1|
+#QQucode_0x0032		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 0|
+#QQucode_0x0033		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1|
+#QQucode_0x0034		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0|
+#QQucode_0x0035		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1|
+#QQucode_0x0036		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0|
 #QQucode_0x0039		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1| STORE_TOP ACCESS_TYPE, 1
-QQucode_0x003a		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 0|
-QQucode_0x003b		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1|
-QQucode_0x003c		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0|
-QQucode_0x003d		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1|
-QQucode_0x003e		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 0|
+#QQucode_0x003a		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 0|
+#QQucode_0x003b		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1|
+#QQucode_0x003c		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0|
+#QQucode_0x003d		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 1|
+#QQucode_0x003e		-	|0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 0|
 #QQucode_0x0041		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1| STORE_TOP_UNCHECKED FLOAT, 1
 #QQucode_0x0042		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0|                          , 2 
-QQucode_0x0043		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 1|
-QQucode_0x0044		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0|
-QQucode_0x0045		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1|
-QQucode_0x0046		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 1 0|
-QQucode_0x0049		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 1|
-QQucode_0x004a		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 1 0|
-QQucode_0x004b		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 1 1|
-QQucode_0x004c		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 0 0|
-QQucode_0x004d		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 0 1|
-QQucode_0x004e		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 1 0|
-QQucode_0x0051		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 1|
+#QQucode_0x0043		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 1|
+#QQucode_0x0044		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0|
+#QQucode_0x0045		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1|
+#QQucode_0x0046		-	|0 0 0 0 0 0 0 0 0 1 0 0 0 1 1 0|
+#QQucode_0x0049		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 1|
+#QQucode_0x004a		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 1 0|
+#QQucode_0x004b		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 0 1 1|
+#QQucode_0x004c		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 0 0|
+#QQucode_0x004d		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 0 1|
+#QQucode_0x004e		-	|0 0 0 0 0 0 0 0 0 1 0 0 1 1 1 0|
+#QQucode_0x0051		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 1|
 #QQucode_0x0052		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 0 1 0| QQu_Unknown_Store_1
-QQucode_0x0053		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 0 1 1|
-QQucode_0x0054		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0|
-QQucode_0x0055		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 1|
-QQucode_0x0056		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 1 0|
-QQucode_0x0059		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 0 0 1|
+#QQucode_0x0053		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 0 1 1|
+#QQucode_0x0054		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0|
+#QQucode_0x0055		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 1|
+#QQucode_0x0056		-	|0 0 0 0 0 0 0 0 0 1 0 1 0 1 1 0|
+#QQucode_0x0059		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 0 0 1|
 #QQucode_0x005a		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 0 1 0| QQu_Unknown_Store_2
-QQucode_0x005b		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 0 1 1|
-QQucode_0x005c		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 0 0|
-QQucode_0x005d		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 0 1|
-QQucode_0x005e		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 1 0|
-QQucode_0x0068		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 0|
-QQucode_0x0069		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 1|
-QQucode_0x006a		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0|
-QQucode_0x006b		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 1|
-QQucode_0x006c		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 0|
-QQucode_0x006d		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 1|
-QQucode_0x006e		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 1 0|
+#QQucode_0x005b		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 0 1 1|
+#QQucode_0x005c		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 0 0|
+#QQucode_0x005d		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 0 1|
+#QQucode_0x005e		-	|0 0 0 0 0 0 0 0 0 1 0 1 1 1 1 0|
+#QQucode_0x0068		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 0|
+#QQucode_0x0069		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 1|
+#QQucode_0x006a		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0|
+#QQucode_0x006b		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 1|
+#QQucode_0x006c		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 0|
+#QQucode_0x006d		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 1|
+#QQucode_0x006e		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 1 0|
 #QQucode_0x006f		-	|0 0 0 0 0 0 0 0 0 1 1 0 1 1 1 1| ACTION BREAK_UNCONDITIONAL
-QQucode_0x0070		x	|0 0 0 0 0 0 0 0 0 1 1 1 0 0|x  |
-QQucode_0x0070		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 0 0|
-QQucode_0x0075		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 0 1|
-QQucode_0x0076		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 1 0|
-QQucode_0x0080		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0|
-QQucode_0x0081		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1|
-QQucode_0x0082		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|
-QQucode_0x0087		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 1 1 1|
-QQucode_0x0088		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0|
-QQucode_0x0089		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 1|
-QQucode_0x008a		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 0|
-QQucode_0x008b		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 1|
-QQucode_0x008c		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 0 0|
-QQucode_0x008d		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 0 1|
-QQucode_0x008e		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 0|
-QQucode_0x008f		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 1|
-QQucode_0x0090		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0|
-QQucode_0x0091		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1|
-QQucode_0x0092		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0|
-QQucode_0x0093		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 1|
-QQucode_0x0095		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 0 1|
-QQucode_0x0096		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 1 0|
-QQucode_0x0097		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 1 1|
-QQucode_0x0098		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 0|
-QQucode_0x0099		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 1|
-QQucode_0x009a		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 1 0|
-QQucode_0x009b		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 1 1|
-QQucode_0x009c		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 0 0|
-QQucode_0x009d		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 0 1|
-QQucode_0x009e		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 1 0|
-QQucode_0x009f		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 1 1|
-QQucode_0x00a0		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0|
-QQucode_0x00a1		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 1|
-QQucode_0x00a2		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 1 0|
-QQucode_0x00a3		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 1 1|
-QQucode_0x00a4		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 0|
-QQucode_0x00a5		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 1|
-QQucode_0x00a6		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 1 0|
-QQucode_0x00a7		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 1 1|
-QQucode_0x00a8		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0|
-QQucode_0x00a9		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 1|
-QQucode_0x00aa		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 0|
-QQucode_0x00ab		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 1|
-QQucode_0x00ac		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 0|
-QQucode_0x00ad		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 1|
-QQucode_0x00b3		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 0 1 1|
-QQucode_0x00b4		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 0 0|
-QQucode_0x00b5		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 0 1|
-QQucode_0x00b6		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 1 0|
-QQucode_0x00b7		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 1 1|
-QQucode_0x00b8		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 0 0|
-QQucode_0x00b9		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 0 1|
-QQucode_0x00ba		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 1 0|
+#QQucode_0x0070		x	|0 0 0 0 0 0 0 0 0 1 1 1 0 0|x  |
+#QQucode_0x0070		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 0 0|
+#QQucode_0x0075		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 0 1|
+#QQucode_0x0076		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 1 0|
+#QQucode_0x0080		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0|
+#QQucode_0x0081		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1|
+#QQucode_0x0082		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|
+#QQucode_0x0087		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 1 1 1|
+#QQucode_0x0088		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0|
+#QQucode_0x0089		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 1|
+#QQucode_0x008a		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 0|
+#QQucode_0x008b		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 1|
+#QQucode_0x008c		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 0 0|
+#QQucode_0x008d		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 0 1|
+#QQucode_0x008e		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 0|
+#QQucode_0x008f		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 1|
+#QQucode_0x0090		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0|
+#QQucode_0x0091		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1|
+#QQucode_0x0092		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0|
+#QQucode_0x0093		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 1|
+#QQucode_0x0095		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 0 1|
+#QQucode_0x0096		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 1 0|
+#QQucode_0x0097		-	|0 0 0 0 0 0 0 0 1 0 0 1 0 1 1 1|
+#QQucode_0x0098		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 0|
+#QQucode_0x0099		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 0 1|
+#QQucode_0x009a		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 1 0|
+#QQucode_0x009b		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 0 1 1|
+#QQucode_0x009c		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 0 0|
+#QQucode_0x009d		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 0 1|
+#QQucode_0x009e		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 1 0|
+#QQucode_0x009f		-	|0 0 0 0 0 0 0 0 1 0 0 1 1 1 1 1|
+#QQucode_0x00a0		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0|
+#QQucode_0x00a1		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 1|
+#QQucode_0x00a2		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 1 0|
+#QQucode_0x00a3		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 0 1 1|
+#QQucode_0x00a4		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 0|
+#QQucode_0x00a5		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 1|
+#QQucode_0x00a6		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 1 0|
+#QQucode_0x00a7		-	|0 0 0 0 0 0 0 0 1 0 1 0 0 1 1 1|
+#QQucode_0x00a8		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0|
+#QQucode_0x00a9		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 1|
+#QQucode_0x00aa		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 0|
+#QQucode_0x00ab		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 1|
+#QQucode_0x00ac		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 0|
+#QQucode_0x00ad		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 1|
+#QQucode_0x00b3		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 0 1 1|
+#QQucode_0x00b4		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 0 0|
+#QQucode_0x00b5		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 0 1|
+#QQucode_0x00b6		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 1 0|
+#QQucode_0x00b7		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 1 1|
+#QQucode_0x00b8		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 0 0|
+#QQucode_0x00b9		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 0 1|
+#QQucode_0x00ba		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 1 0|
 #QQucode_0x00bb		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 0 1 1| ACTION SIGNAL_COMPLETION,>R
 #QQucode_0x00bc		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 0 0| ACTION SIGNAL_ACTIVATED
-QQucode_0x00bd		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 0 1|
-QQucode_0x00be		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 1 0|
+#QQucode_0x00bd		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 0 1|
+#QQucode_0x00be		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 1 0|
 #QQucode_0x00bf		-	|0 0 0 0 0 0 0 0 1 0 1 1 1 1 1 1| ACTION ACCEPT_ACTIVATION
-QQucode_0x00c4		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 0|
-QQucode_0x00c5		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 1|
-QQucode_0x00c6		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 0|
+#QQucode_0x00c4		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 0|
+#QQucode_0x00c5		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 0 1|
+#QQucode_0x00c6		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 0|
 #QQucode_0x00c7		-	|0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 1| ACTION ELABORATE_SUBPROGRAM
 #QQucode_0x00c8		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 0| QQu_end_in_loop
 #QQucode_0x00c9		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 0 1| QQu_end_loop
 #QQucode_0x00ca		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 0| QQu_exit_nullary_function,>R
-QQucode_0x00cb		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 1|
-QQucode_0x00cc		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|
-QQucode_0x00cd		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 1|
+#QQucode_0x00cb		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 0 1 1|
+#QQucode_0x00cc		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|
+#QQucode_0x00cd		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 1|
 #QQucode_0x00ce		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 0| QQ_reset_loop_counter
 #QQucode_0x00cf		-	|0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1| QQu_loop_start
-QQucode_0x00d0		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 0|
-QQucode_0x00d1		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 1|
-QQucode_0x00d2		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 0|
-QQucode_0x00d3		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 1|
-QQucode_0x00d4		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 0|
-QQucode_0x00d5		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1|
-QQucode_0x00d6		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 1 0|
-QQucode_0x00d7		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|
+#QQucode_0x00d0		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 0|
+#QQucode_0x00d1		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 0 1|
+#QQucode_0x00d2		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 0|
+#QQucode_0x00d3		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 1|
+#QQucode_0x00d4		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 0|
+#QQucode_0x00d5		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1|
+#QQucode_0x00d6		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 1 0|
+#QQucode_0x00d7		-	|0 0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|
 #QQucode_0x00d8		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 0 0 0| LOAD_TOP
 #QQucode_0x00d9		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 0 0 1| LOAD_TOP
 #QQucode_0x00da		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 0 1 0| LOAD_TOP
 #QQucode_0x00db		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 0 1 1| LOAD_TOP
-QQucode_0x00dc		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 0 0|
-QQucode_0x00dd		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 0 1|
-QQucode_0x00de		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 0|
+#QQucode_0x00dc		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 0 0|
+#QQucode_0x00dd		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 0 1|
+#QQucode_0x00de		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 0|
 #QQucode_0x00e0		-	|0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0| LOAD_ENCACHED
 #QQucode_0x00e1		-	|0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 1| LOAD_ENCACHED
 #QQucode_0x00e2		-	|0 0 0 0 0 0 0 0 1 1 1 0 0 0 1 0| LOAD_ENCACHED
@@ -388,85 +388,85 @@ QQucode_0x00de		-	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 0|
 #QQucode_0x00ff		-	|0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1| LOAD_ENCACHED
 #QQucode_0x0100		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0| EXECUTE EXCEPTION_CLASS,RAISE_OP,>R
 #QQucode_0x0101		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1| EXECUTE EXCEPTION_CLASS,RERAISE_OP,>R
-QQucode_0x0106		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0|
-QQucode_0x0107		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 1|
-QQucode_0x0109		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1|
-QQucode_0x010a		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 1 0|
-QQucode_0x010b		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 1 1|
-QQucode_0x010c		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 0 0|
+#QQucode_0x0106		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0|
+#QQucode_0x0107		-	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 1|
+#QQucode_0x0109		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1|
+#QQucode_0x010a		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 1 0|
+#QQucode_0x010b		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 1 1|
+#QQucode_0x010c		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 0 0|
 #QQucode_0x010d		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 0 1| IS_NUMERIC_ERROR_OP -
-QQucode_0x010e		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 1 0|
+#QQucode_0x010e		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 1 0|
 #QQucode_0x010f		-	|0 0 0 0 0 0 0 1 0 0 0 0 1 1 1 1| QQu_Is_Equal_Exception -
-QQucode_0x0110		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0|
-QQucode_0x0111		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 1|
-QQucode_0x0112		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 0|
-QQucode_0x0114		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 0|
-QQucode_0x0115		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 1|
-QQucode_0x0116		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 1 0|
-QQucode_0x0117		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 1 1|
-QQucode_0x0118		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 0 0|
-QQucode_0x0119		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 0 1|
-QQucode_0x011a		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0|
-QQucode_0x011b		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 1 1|
+#QQucode_0x0110		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0|
+#QQucode_0x0111		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 1|
+#QQucode_0x0112		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 0|
+#QQucode_0x0114		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 0|
+#QQucode_0x0115		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 1|
+#QQucode_0x0116		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 1 0|
+#QQucode_0x0117		-	|0 0 0 0 0 0 0 1 0 0 0 1 0 1 1 1|
+#QQucode_0x0118		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 0 0|
+#QQucode_0x0119		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 0 1|
+#QQucode_0x011a		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0|
+#QQucode_0x011b		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 0 1 1|
 #QQucode_0x011c		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 0 0| QQuImage -
-QQucode_0x011d		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 0 1|
-QQucode_0x011e		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 0|
-QQucode_0x011f		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 1|
-QQucode_0x0120		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0|
-QQucode_0x0121		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 1|
-QQucode_0x0122		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 0|
-QQucode_0x0123		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 1|
-QQucode_0x0124		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 0|
-QQucode_0x0125		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 1|
-QQucode_0x0126		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 1 0|
-QQucode_0x0127		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 1 1|
-QQucode_0x0128		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 0 0|
+#QQucode_0x011d		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 0 1|
+#QQucode_0x011e		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 0|
+#QQucode_0x011f		-	|0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 1|
+#QQucode_0x0120		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0|
+#QQucode_0x0121		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 1|
+#QQucode_0x0122		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 0|
+#QQucode_0x0123		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 1|
+#QQucode_0x0124		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 0|
+#QQucode_0x0125		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 1|
+#QQucode_0x0126		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 1 0|
+#QQucode_0x0127		-	|0 0 0 0 0 0 0 1 0 0 1 0 0 1 1 1|
+#QQucode_0x0128		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 0 0|
 #QQucode_0x0129		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 0 1| QQu_Execute_make_visible_op -
-QQucode_0x012a		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 1 0|
-QQucode_0x012b		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1|
-QQucode_0x012c		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 0 0|
-QQucode_0x012d		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 0 1|
-QQucode_0x012e		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 1 0|
+#QQucode_0x012a		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 1 0|
+#QQucode_0x012b		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1|
+#QQucode_0x012c		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 0 0|
+#QQucode_0x012d		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 0 1|
+#QQucode_0x012e		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 1 0|
 #QQucode_0x012f		-	|0 0 0 0 0 0 0 1 0 0 1 0 1 1 1 1| QQu_is_equal_discrete -
-QQucode_0x0132		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 1 0|
-QQucode_0x0133		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 1 1|
-QQucode_0x0136		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 1 0|
-QQucode_0x0137		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 1 1|
-QQucode_0x013c		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 0 0|
-QQucode_0x013d		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 0 1|
-QQucode_0x013e		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 0|
-QQucode_0x013f		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 1|
-QQucode_0x0140		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0|
+#QQucode_0x0132		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 1 0|
+#QQucode_0x0133		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 1 1|
+#QQucode_0x0136		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 1 0|
+#QQucode_0x0137		-	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 1 1|
+#QQucode_0x013c		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 0 0|
+#QQucode_0x013d		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 0 1|
+#QQucode_0x013e		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 0|
+#QQucode_0x013f		-	|0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 1|
+#QQucode_0x0140		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0|
 #QQucode_0x0141		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 1| QQu_int_multiply
-QQucode_0x0142		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 0|
-QQucode_0x0143		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 1|
-QQucode_0x0144		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 0 0|
-QQucode_0x0145		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 0 1|
-QQucode_0x0146		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 1 0|
-QQucode_0x0147		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 1 1|
-QQucode_0x0148		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 0|
-QQucode_0x0149		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1|
+#QQucode_0x0142		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 0|
+#QQucode_0x0143		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 0 1 1|
+#QQucode_0x0144		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 0 0|
+#QQucode_0x0145		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 0 1|
+#QQucode_0x0146		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 1 0|
+#QQucode_0x0147		-	|0 0 0 0 0 0 0 1 0 1 0 0 0 1 1 1|
+#QQucode_0x0148		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 0|
+#QQucode_0x0149		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 1|
 #QQucode_0x014a		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 1 0| QQu_float_great_equal_zero -
 #QQucode_0x014b		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 0 1 1| QQu_float_below_zero -
 #QQucode_0x014c		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 0 0| QQu_float_greater_zero -
-QQucode_0x014d		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 0 1|
-QQucode_0x014e		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 1 0|
-QQucode_0x014f		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 1 1|
-QQucode_0x015b		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 0 1 1|
-QQucode_0x015c		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 0 0|
-QQucode_0x015d		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 0 1|
-QQucode_0x015e		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 1 0|
-QQucode_0x015f		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 1 1|
-QQucode_0x0160		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 0 0|
-QQucode_0x0161		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 0 1|
-QQucode_0x0162		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 1 0|
-QQucode_0x0163		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 1 1|
-QQucode_0x0164		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 0 0|
-QQucode_0x0165		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 0 1|
-QQucode_0x0166		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 1 0|
-QQucode_0x0167		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 1 1|
-QQucode_0x0168		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 0|
-QQucode_0x0169		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 1|
+#QQucode_0x014d		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 0 1|
+#QQucode_0x014e		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 1 0|
+#QQucode_0x014f		-	|0 0 0 0 0 0 0 1 0 1 0 0 1 1 1 1|
+#QQucode_0x015b		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 0 1 1|
+#QQucode_0x015c		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 0 0|
+#QQucode_0x015d		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 0 1|
+#QQucode_0x015e		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 1 0|
+#QQucode_0x015f		-	|0 0 0 0 0 0 0 1 0 1 0 1 1 1 1 1|
+#QQucode_0x0160		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 0 0|
+#QQucode_0x0161		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 0 1|
+#QQucode_0x0162		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 1 0|
+#QQucode_0x0163		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 0 1 1|
+#QQucode_0x0164		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 0 0|
+#QQucode_0x0165		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 0 1|
+#QQucode_0x0166		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 1 0|
+#QQucode_0x0167		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 1 1|
+#QQucode_0x0168		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 0|
+#QQucode_0x0169		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 1|
 QQucode_0x016a		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 0|
 QQucode_0x016b		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 1|
 QQucode_0x016c		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 0|
@@ -533,40 +533,40 @@ QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
 #QQucode_0x01dc		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 0| QQuExecute_last_op -
 #QQucode_0x01dd		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 0 1| QQuExecute_first_op -
 QQucode_0x01de		x	|0 0 0 0 0 0 0 1 1 1 0 1 1 1 1|x|
-QQucode_0x01eb		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 0 1 1|
-QQucode_0x01ec		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 0 0|
-QQucode_0x01ed		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 0 1|
-QQucode_0x01ee		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 0|
-QQucode_0x01ef		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 1|
-QQucode_0x01f3		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 0 1 1|
-QQucode_0x01f4		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 0|
-QQucode_0x01f5		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 1|
-QQucode_0x01f6		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 1 0|
-QQucode_0x01f7		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 1 1|
-QQucode_0x01f8		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0|
-QQucode_0x01f9		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 1|
-QQucode_0x01fa		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 1 0|
-QQucode_0x01fb		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 1 1|
-QQucode_0x01fc		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0|
-QQucode_0x01fd		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 1|
-QQucode_0x01fe		x	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 1|x|
-QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1|
-QQucode_0x0206		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 1 0|
-QQucode_0x0208		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0|
-QQucode_0x0209		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 1|
-QQucode_0x020a		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 0|
-QQucode_0x020b		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 1|
-QQucode_0x020c		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 0|
-QQucode_0x020d		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1|
+#QQucode_0x01eb		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 0 1 1|
+#QQucode_0x01ec		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 0 0|
+#QQucode_0x01ed		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 0 1|
+#QQucode_0x01ee		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 0|
+#QQucode_0x01ef		-	|0 0 0 0 0 0 0 1 1 1 1 0 1 1 1 1|
+#QQucode_0x01f3		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 0 1 1|
+#QQucode_0x01f4		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 0|
+#QQucode_0x01f5		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 1|
+#QQucode_0x01f6		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 1 0|
+#QQucode_0x01f7		-	|0 0 0 0 0 0 0 1 1 1 1 1 0 1 1 1|
+#QQucode_0x01f8		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0|
+#QQucode_0x01f9		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 1|
+#QQucode_0x01fa		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 1 0|
+#QQucode_0x01fb		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 0 1 1|
+#QQucode_0x01fc		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0|
+#QQucode_0x01fd		-	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 1|
+#QQucode_0x01fe		x	|0 0 0 0 0 0 0 1 1 1 1 1 1 1 1|x|
+QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
+#QQucode_0x0206		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 1 0|
+#QQucode_0x0208		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0|
+#QQucode_0x0209		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 1|
+#QQucode_0x020a		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 0|
+#QQucode_0x020b		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 1|
+#QQucode_0x020c		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 0|
+#QQucode_0x020d		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1|
 #QQucode_0x020e		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 1 0| EXECUTE MODULE_CLASS,AUGMENT_IMPORTS_OP
 #QQucode_0x020f		-	|0 0 0 0 0 0 1 0 0 0 0 0 1 1 1 1| EXECUTE MODULE_CLASS,ACTIVATE_OP
-QQucode_0x0210		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0|
-QQucode_0x0211		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 1|
-QQucode_0x0212		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 0|
-QQucode_0x0213		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 1|
-QQucode_0x0214		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 0|
-QQucode_0x0215		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 1|
-QQucode_0x0216		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0|
+#QQucode_0x0210		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0|
+#QQucode_0x0211		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 1|
+#QQucode_0x0212		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 0|
+#QQucode_0x0213		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 1|
+#QQucode_0x0214		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 0|
+#QQucode_0x0215		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 0 1|
+#QQucode_0x0216		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0|
 #QQucode_0x0217		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 1| EXECUTE HEAP_ACCESS_CLASS,ALL_REFERENCE_OP
 #QQucode_0x0218		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 0|
 #QQucode_0x0219		-	|0 0 0 0 0 0 1 0 0 0 0 1 1 0 0 1|
@@ -636,23 +636,23 @@ QQucode_0x0216		-	|0 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0|
 #QQucode_0x0259		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 1|
 #QQucode_0x025a		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0|
 #QQucode_0x025b		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
-QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
-QQucode_0x025d		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 1|
+#QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
+#QQucode_0x025d		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 1|
 #QQucode_0x025e		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0| QQu_CONVERT_TO_INT -
-QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
+#QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
 #QQucode_0x0260		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 0| QQuEXECUTE BELOW_BOUND
-QQucode_0x0261		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 1|
+#QQucode_0x0261		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 0 1|
 #QQucode_0x0262		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 0| QQuEXECUTE IN_RANGE
 #QQucode_0x0263		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 0 1 1| QQu_is_in_range
 #QQucode_0x0264		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 0| QQu_not_in_range
-QQucode_0x0265		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 1|
+#QQucode_0x0265		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 0 1|
 #QQucode_0x0266		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 0| QQuDefine_Array_Full_Range -
-QQucode_0x0267		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 1|
-QQucode_0x0268		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 0 0|
+#QQucode_0x0267		-	|0 0 0 0 0 0 1 0 0 1 1 0 0 1 1 1|
+#QQucode_0x0268		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 0 0|
 #QQucode_0x0269		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 0 1| QQuDefine_Array_subtype_Range -
-QQucode_0x026a		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 1 0|
-QQucode_0x026b		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 1 1|
-QQucode_0x026c		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 0 0|
+#QQucode_0x026a		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 1 0|
+#QQucode_0x026b		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 0 1 1|
+#QQucode_0x026c		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 0 0|
 #QQucode_0x026d		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 0 1| QQuEXECUTE EXPONENTIATE
 #QQucode_0x026e		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 1 0| QQu_int_mod -
 #QQucode_0x026f		-	|0 0 0 0 0 0 1 0 0 1 1 0 1 1 1 1| QQu_int_rem -
@@ -965,7 +965,10 @@ QQunknown_instruction	-						| unknown			|
 
 #-----------------------
 # Very helpful, but only hypothesis /phk
-zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
+#zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
+
+# BODY_0880 start
+Action			Illegal						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
 #-----------------------
 # gc44,0076								|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
@@ -973,61 +976,146 @@ ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 
 #-----------------------
 # 93b91846e, 011e+0125		(access type)
-QQu_store_top_unchecked_ptr	x					|0 0 0 0|0 0 0 0|0 0 1 1|0|0| x |
-QQu_store_top_ptr	x						|0 0 0 0|0 0 0 0|0 0 1 1|1|0| x |
+Store_Top		Heap_Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 0 1|
+Store_Top		Heap_Access,At_Offset_2				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 0|
+Store_Top		Heap_Access,At_Offset_3				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 1|
+Store_Top		Heap_Access,At_Offset_4				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 0 0|
+Store_Top		Heap_Access,At_Offset_5				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 0 1|
+Store_Top		Heap_Access,At_Offset_6				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 1 0|
+Store_Top               Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 0 1|
+Store_Top               Access,At_Offset_2				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 1 0|
+Store_Top               Access,At_Offset_3				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 1 1|
+Store_Top               Access,At_Offset_4				|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|
+Store_Top               Access,At_Offset_5				|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 1|
+Store_Top               Access,At_Offset_6                         	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 1 0|
+Store_Top_Unchecked	Float,At_Offset_1                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 0 1|
+Store_Top_Unchecked	Float,At_Offset_2                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 1 0|
+Store_Top_Uncheched	Float,At_Offset_3                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 1 1|
+Store_Top_Unchecked	Float,At_Offset_4                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 0 0|
+Store_Top_Unchecked	Float,At_Offset_5                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 0 1|
+Store_Top_Unchecked	Float,At_Offset_6                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 1 0|
 
 #-----------------------
 # ⟦85b414c73⟧ 0x34e..34f	(Float)
-STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
+#STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
 
-#-----------------------
-# ⟦36a4ea3d7⟧
-# seems to store result to local variable. Both stores are used for same variable in 05e7 and 05ee
-QQ_store_top_unchecked_int	-					|0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
-QQ_Store_top_int	-						|0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
+Store_Top               Float,At_Offset_1                               |0 0 0 0|0 0 0 0|0 1 0 0|1 0 0 1|
+Store_Top               Float,At_Offset_2                               |0 0 0 0|0 0 0 0|0 1 0 0|1 0 1 0|
+Store_Top               Float,At_Offset_3                               |0 0 0 0|0 0 0 0|0 1 0 0|1 0 1 1|
+Store_Top               Float,At_Offset_4                               |0 0 0 0|0 0 0 0|0 1 0 0|1 1 0 0|
+Store_Top               Float,At_Offset_5                               |0 0 0 0|0 0 0 0|0 1 0 0|1 1 0 1|
+Store_Top               Float,At_Offset_6                               |0 0 0 0|0 0 0 0|0 1 0 0|1 1 1 0|
 
+Store_Top_Unchecked     Discrete,At_Offset_1                            |0 0 0 0|0 0 0 0|0 1 0 1|0 0 0 1|
+Store_Top_Unchecked     Discrete,At_Offset_2                            |0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 0|
+Store_Top_Uncheched     Discrete,At_Offset_3                            |0 0 0 0|0 0 0 0|0 1 0 1|0 0 1 1|
+Store_Top_Unchecked     Discrete,At_Offset_4                            |0 0 0 0|0 0 0 0|0 1 0 1|0 1 0 0|
+Store_Top_Unchecked     Discrete,At_Offset_5                            |0 0 0 0|0 0 0 0|0 1 0 1|0 1 0 1|
+Store_Top_Unchecked     Discrete,At_Offset_6                            |0 0 0 0|0 0 0 0|0 1 0 1|0 1 1 0|
+
+Store_Top               Discrete,At_Offset_1                            |0 0 0 0|0 0 0 0|0 1 0 1|1 0 0 1|
+Store_Top               Discrete,At_Offset_2                            |0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 0|
+Store_Top               Discrete,At_Offset_3                            |0 0 0 0|0 0 0 0|0 1 0 1|1 0 1 1|
+Store_Top               Discrete,At_Offset_4                            |0 0 0 0|0 0 0 0|0 1 0 1|1 1 0 0|
+Store_Top               Discrete,At_Offset_5                            |0 0 0 0|0 0 0 0|0 1 0 1|1 1 0 1|
+Store_Top               Discrete,At_Offset_6                            |0 0 0 0|0 0 0 0|0 1 0 1|1 1 1 0|
+
+Action			Establish_Frame					|0 0 0 0|0 0 0 0|0 1 1 0|1 0 0 0|
+Action			Query_Frame					|0 0 0 0|0 0 0 0|0 1 1 0|1 0 0 1|
+Action			Alter_Break_Mask				|0 0 0 0|0 0 0 0|0 1 1 0|1 0 1 0|
+Action			Query_Break_Address				|0 0 0 0|0 0 0 0|0 1 1 0|1 0 1 1|
+Action			Query_Break_Mask				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 0|
+Action			Query_Break_Cause				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 1| #0917
+Action			Exit_Break					|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 0| #0912
 #-----------------------
 # gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 ACTION			BREAK_UNCONDITIONAL				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 
+# End of BODY_0880
+
+# Start of BODY_0a20
+
+Action			Discrete,Diana_Spare2				|0 0 0 0|0 0 0 0|1 0 0 0|0 1 1 1|
+Action			Heap_Access,Diana_Spare2			|0 0 0 0|0 0 0 0|1 0 0 0|1 0 0 0|
+Action			Discrete,Diana_Spare1				|0 0 0 0|0 0 0 0|1 0 0 0|1 0 0 1|
+Action			Discrete,Diana_Spare0				|0 0 0 0|0 0 0 0|1 0 0 0|1 0 1 0|
+Action			Heap_Access,Diana_Seq_Type_Get_Head		|0 0 0 0|0 0 0 0|1 0 0 0|1 0 1 1|
+Action			Heap_Access,Diana_Put_Node_On_Seq_Type		|0 0 0 0|0 0 0 0|1 0 0 0|1 1 0 0|
+Action			Heap_Access,Family				|0 0 0 0|0 0 0 0|1 0 0 0|1 1 0 1|
+Action			Discrete,Diana_Arity_For_Kind			|0 0 0 0|0 0 0 0|1 0 0 0|1 1 1 0|
+Action			Discrete,Diana_Map_Kind_To_Vci			|0 0 0 0|0 0 0 0|1 0 0 0|1 1 1 1|
+Action			Store_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 0| pse                           |
+
 #-----------------------
 ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
+#Action			Push_String_Extended_Indexed			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse                           |
 
 #-----------------------
 # gc43,0029		PUSH_STRING					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0|
 ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
+# 0c4c/aa
+#Action			Push_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse                           |
+
 
 #-----------------------
 # gc43,001c comments this as "push full address of a location in current code segment"
 # XXX: it may be a bit of a stretch to assume that is a subp /phk
 push_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
+# 0c47/aa
+#Action			Spare7_Action					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1|
+
+Execute			Package,Field_Reference_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 0 1|
+Execute			Package,Entry					|0 0 0 0|0 0 0 0|1 0 0 1|0 1 1 0|
+Execute			Package,Field_Write_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 1 1|
+Execute			Package,Field_Read_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|1 0 0 0| #0c2f
+Action			Reference_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 0 0 1|
+Action			Call_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 0 1 0|
+Action			Store_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 0 1 1|
+Action			Load_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 1 0 0|
+Action			Jump_Nonzero_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 1 0 1|
+Action			Jump_Zero_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 1 1 0|
+Action			Jump_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 1 1 1|
 
 #-----------------------
 # See for instance ⟦2009596b6⟧ @b4
+#Action			Push_Structure_Extended /aa
 PUSH_STRING_EXTENDED	abs,mark					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs				|
 
 #-----------------------
 # See for instance ⟦b66a7252c⟧  /phk
+#Action 		Push_Float_Extended
 PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
 
 #-----------------------
+#Action 		Push_Discrete_Extended
 PUSH_DISCRETE_EXTENDED	abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+
+Action			Loop_Decreasing_Extended,abs,>JC		|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 1| abs                           |
 
 #-----------------------
 # XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
-QQujump_a4		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
+Action			Loop_Increasing_Extended,abs,>JC		|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
 
 #-----------------------
 # XXX: See 9739edd68 @0xf2e
-QQujump_a5		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 1| abs				|
+Action			Jump_Nonzero_Extended,abs,>JC			|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 1| abs				|
 
 #-----------------------
 # XXX: See f1ef8a8ae @0x57d
-QQujump_a6		abs,>JC						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 0| abs				|
+Action			Jump_Zero_Extended,abs,>JC			|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 0| abs				|
 
 #-----------------------
 # ⟦ed62618ed⟧ @0x1cc confirms this is unconditional /phk
-JUMP			abs,>J						|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+Action			Jump_Extended,abs,>J				|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+
+Action			Increase_Priority				|0 0 0 0|0 0 0 0|1 0 1 1|0 0 1 1|
+Action			Name_Partner					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 0 0|
+Action			Make_Parent					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 0 1|
+Action			Make_Scope					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 1 0|
+Action			Make_Self					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 1 1|
+Action			Set_Priority					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 0 0|
+Action			Get_Priority					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 0 1|
+Action			Initiate_Delay					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 0|
 
 #-----------------------
 # gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
@@ -1037,42 +1125,70 @@ ACTION			SIGNAL_COMPLETION,>R				|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
 # gc43,003c 		SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
 ACTION			SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
 
+Action			Activate_Heap_Tasks				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 1| #0b95
+Action			Activate_Tasks					|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 0|
+
 #-----------------------
 # gc42,000d		ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 
+Action			Make_Default					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 0|
+Action			Set_Block_Start					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 1|
+Action			Check_Subprogram_Elaborated			|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 0|
+
 #-----------------------
-# gc42,000f		ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
+# gc42,000f		ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1| #0b77
 ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 
 #-----------------------
 # (3f2fe70c1,02d3)	end of a loop		for J in X'range loop ... end loop;
-QQu_end_for_in_loop	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 0|
+Action			Pop_Auxiliary_Range				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 0|
 
 #-----------------------
 # (3f2fe70c1,012e)	end of a loop
-QQu_end_loop		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
+Action			Pop_Auxiliary_Loop				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
 
 #-----------------------
 # 467 times followed by 0x0000
 # many times last instruction before TRAP entry point /phk
 # Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
-QQexit_nullary_function	>R						|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+Action			Exit_Nullary_Function,>R			|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
+
+Action			Pop_Block_With_Result				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 1|
+Action			Pop_Block					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 0|
+Action			Spare6_Action					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 1|
 
 #-----------------------
 # Guess/aa Follows LOOP_INCREASING, but not LOOP_DECREASING
-QQ_reset_loop_counter	-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
+Action			Pop_Auxiliary					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
 
 #-----------------------
 # ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
 # May be conditional return? /phk
 # (93b91846e,0123)	start of a loop
-QQu_loop_start		-						|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+Action			Mark_Auxiliary					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
+
+Action			Swap_Control					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 0 0|
+Pop_Control		Pop_Count_1					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 0 1|
+Pop_Control		Pop_Count_2					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 1 0|
+Pop_Control		Pop_Count_3					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 1 1|
+Pop_Control		Pop_Count_4					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 0 0|
+Pop_Control		Pop_Count_5					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 0 1|
+Pop_Control		Pop_Count_6					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 1 0|
+Pop_Control		Pop_Count_7					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 1 1|
 
 #-----------------------
 # gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
 # /aa
-LOAD_TOP		x						|0 0 0 0|0 0 0 0|1 1 0 1|1|0| x |
+#LOAD_TOP		x						|0 0 0 0|0 0 0 0|1 1 0 1|1|0| x |
+
+Load_Top		At_Offset_0					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
+Load_Top		At_Offset_1					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 1|
+Load_Top		At_Offset_2					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 1 0|
+Load_Top		At_Offset_3					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 1 1|
+Load_Top		At_Offset_4					|0 0 0 0|0 0 0 0|1 1 0 1|1 1 0 0|
+Load_Top		At_Offset_5					|0 0 0 0|0 0 0 0|1 1 0 1|1 1 0 1|
+Load_Top		At_Offset_6					|0 0 0 0|0 0 0 0|1 1 0 1|1 1 1 0|
 
 #-----------------------
 # feh269,1c		Value_02					|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
@@ -1080,55 +1196,131 @@ LOAD_TOP		x						|0 0 0 0|0 0 0 0|1 1 0 1|1|0| x |
 # gc43,0036		2						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
 LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
 
+# end of BODY_0a20
+
+# Start of BODY_0ca0
+
+
 #-----------------------
 # g88,001e		EXCEPTION_CLASS,RAISE_OP 			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 # g28, location 4 = raise instruction					|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 
 #-----------------------
-# This is a guess, based on it occuring right before 0x0000
-# and being subsequent to RAISE_OP (0x0100) in the Machine_Code.ada
-# /phk
 EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
+
+Execute			Exception,Address				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 0|
+Execute			Exception,Get_Name				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 1|
+Execute			Exception,Is_Instruction_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 0 1|
+Execute			Exception,Is_Tasking_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 0|
+Execute			Exception,Is_Storage_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 1|
+Execute			Exception,Is_Program_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 0|
+Execute			Exception,Is_Numeric_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1| #0ee0
 
 #-----------------------
 # ⟦85b414c73⟧ @0x357
-IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
+#IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
+
+Execute			Exception,Is_Constraint_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 0|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x0366	when Calendar.Time_Error =>
-QQu_Is_Equal_Exception	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1|
+Execute			Exception,Equal					|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1| #0ed4
 
+Execute			Any,Is_Initialization_Repeated			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 0|
+Execute			Any,Has_Repeated_Initialization			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 1|
+Execute			Any,Make_Constrained				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 0|
+Execute			Heap_Access,Size				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 1|
+Execute			Access,Size					|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 0|
+Execute			Any,Structure_Clear				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 1|
+Execute			Any,Address_Of_Type				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 1 0|
+Execute			Any,Structure_Query				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 1 1|
+Execute			Any,Write_Unchecked				|0 0 0 0|0 0 0 1|0 0 0 1|1 0 0 0|
+Execute			Any,Check_In_Formal_Type			|0 0 0 0|0 0 0 1|0 0 0 1|1 0 0 1|
+Execute			Any,Not_In_Type					|0 0 0 0|0 0 0 1|0 0 0 1|1 0 1 0| #0e92
+Execute			Any,In_Type					|0 0 0 0|0 0 0 1|0 0 0 1|1 0 1 1|
+Execute			Any,Convert_Unchecked				|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x68d	Name : constant String := Months'Image (Month);
 # Used for Image function, followed by 1c00 or 1c01
-QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
+#QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
+
+Execute			Any,Convert_To_Formal				|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 1|
+Execute			Any,Convert					|0 0 0 0|0 0 0 1|0 0 0 1|1 1 1 0|
+Execute			Any,Is_Scalar					|0 0 0 0|0 0 0 1|0 0 0 1|1 1 1 1|
+Execute			Any,Is_Value					|0 0 0 0|0 0 0 1|0 0 1 0|0 0 0 0|
+Execute			Any,Is_Default					|0 0 0 0|0 0 0 1|0 0 1 0|0 0 0 1|
+Execute			Any,Make_Root_Type				|0 0 0 0|0 0 0 1|0 0 1 0|0 0 1 0|
+Execute			Any,Make_Alligned				|0 0 0 0|0 0 0 1|0 0 1 0|0 0 1 1|
+Execute			Any,Is_Constrained				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 0|
+Execute			Any,Set_Constraint				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 1|
+Execute			Any,Has_Default_Initialization			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 0|
+Execute			Any,Run_Initialization_Utility			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 1|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x000d	type Years  is new Calendar.Year_Number (in spec)
 # ⟦cb8e43375⟧ @0x0023   Pi : Float (in spec)
-QQu_Execute_make_visible_op	-					|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1|
+Execute			Any,Make_Visible				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1| #0e3e
 
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x68d	return Calendar."=" (Date, Nil);
-QQu_is_equal_discrete	-						|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
+Execute			Any,Change_Utility				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 0|
+Execute			Any,Spare14					|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 1|
+Execute			Any,Size					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 0 0|
+Execute			Any,Address					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 0 1|
+Execute			Any,Not_Equal					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 0|
+Execute			Any,Equal					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
 
+Execute			Family,Count					|0 0 0 0|0 0 0 1|0 0 1 1|0 0 1 0|
+Execute			Family,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|0 0 1 1|
+Execute			Entry,Count					|0 0 0 0|0 0 0 1|0 0 1 1|0 1 1 0|
+Execute			Entry,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|0 1 1 1|
+Execute			Select,Terminate_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 0|
+Execute			Select,Timed_Duration_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 1|
+Execute			Select,Timed_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 0|
+Execute			Select,Rendevouz				|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 1|
+
+Execute			Discrete,Divide_And_Scale			|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 0|
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x044d
-QQu_int_multiply	-						|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 1|
-
+Execute			Discrete,Multiply_And_Scale			|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 1|
+Execute			Heap_Access,Diana_Find_Permanent_Attribute	|0 0 0 0|0 0 0 1|0 1 0 0|0 0 1 0|
+Execute			Heap_Access,Adaptive_Balanced_Tree_Lookup	|0 0 0 0|0 0 0 1|0 1 0 0|0 0 1 1|
+Execute			Heap_Access,Get_Name				|0 0 0 0|0 0 0 1|0 1 0 0|0 1 0 0|
+Execute			Heap_Access,Diana_Tree_Kind			|0 0 0 0|0 0 0 1|0 1 0 0|0 1 0 1|
+Execute			Heap_Access,Hash				|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 0|
+Execute			Heap_Access,Construct_Segment			|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 1|
+Execute			Heap_Access,Get_Offset				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 0|
+Execute			Float,Less_Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 1|
 #-----------------------
 # ⟦cb8e43375⟧ @0x7c
-QQu_float_great_equal_zero	-					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
-
+Execute			Float,Greater_Equal_Zero			|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
 #-----------------------
 # ⟦85b414c73⟧ @0x349
-QQu_float_below_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
-
+Execute			Float,Less_Zero					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
 #-----------------------
 # ⟦85b414c73⟧ @0x337
-QQu_float_greater_zero	-						|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
+Execute			Float,Greater_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
+Execute			Float,Not_Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 1|
+Execute			Float,Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 1 0|
+Execute			Float,Not_In_Range				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 1 1|
+
+Execute			Variant_Record,Make_Constrained			|0 0 0 0|0 0 0 1|0 1 0 1|1 0 1 1|
+Execute			Variant_Record,Is_Constrained_Object		|0 0 0 0|0 0 0 1|0 1 0 1|1 1 0 0|
+Execute			Variant_Record,Field_Type_Dynamic		|0 0 0 0|0 0 0 1|0 1 0 1|1 1 0 1|
+Execute			Variant_Record,Field_Reference_Dynamic		|0 0 0 0|0 0 0 1|0 1 0 1|1 1 1 0|
+Execute			Variant_Record,Field_Write_Dynamic		|0 0 0 0|0 0 0 1|0 1 0 1|1 1 1 1|
+Execute			Variant_Record,Field_Read_Dynamic		|0 0 0 0|0 0 0 1|0 1 1 0|0 0 0 0|
+Execute			Variant_Record,Check_In_Formal_Type		|0 0 0 0|0 0 0 1|0 1 1 0|0 0 0 1|
+Execute			Variant_Record,Check_In_Type			|0 0 0 0|0 0 0 1|0 1 1 0|0 0 1 0|
+Execute			Variant_Record,Not_In_Type			|0 0 0 0|0 0 0 1|0 1 1 0|0 0 1 1|
+Execute			Variant_Record,In_Type				|0 0 0 0|0 0 0 1|0 1 1 0|0 1 0 0|
+Execute			Variant_Record,Convert				|0 0 0 0|0 0 0 1|0 1 1 0|0 1 0 1|
+Execute			Variant_Record,Component_Offset			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 0|
+Execute			Variant_Record,Structure_Query			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 1|
+Execute			Variant_Record,Reference_Makes_Copy		|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 0|
+Execute			Variant_Record,Read_Discriminant_Constraint	|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 1|
+
+# End of BODY_0ca0
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x05bf/aa	T  : Time    := Get_Time;
@@ -1208,29 +1400,63 @@ QQu_vector_length	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
 
 #-----------------------
 # ⟦93b91846e⟧, @0x01ac		if S'Length = 1 then
-# gæt: EXECUTE VECTOR_CLASS,LENGTH_OP
-QQuExecute_vector_length_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 1|
+Execute			Vector,Length					|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 1|
 
 #-----------------------
 # ⟦93b91846e⟧, @0x00d5		Last := S'Last;
-# gæt: EXECUTE VECTOR_CLASS,LAST_OP
-QQuExecute_vector_last_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
+Execute			Vector,Last					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
 
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
-# EXECUTE VECTOR_CLASS,FIRST_OP
-QQuExecute_vector_first_op	-					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
+Execute			Vector,First					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
+
+#-----------------------
+# Start of BODY_11a0
+Execute			Array,Check_In_Type				|0 0 0 0|0 0 0 1|1 1 1 0|1 0 1 1| #1494
+Execute			Array,Not_In_Type				|0 0 0 0|0 0 0 1|1 1 1 0|1 1 0 0|
+Execute			Array,In_Type					|0 0 0 0|0 0 0 1|1 1 1 0|1 1 0 1|
+Execute			Array,Convert_To_Formal				|0 0 0 0|0 0 0 1|1 1 1 0|1 1 1 0|
+Execute			Array,Convert					|0 0 0 0|0 0 0 1|1 1 1 0|1 1 1 1|
+
+Execute			Array,Sybarray					|0 0 0 0|0 0 0 1|1 1 1 1|0 0 1 1| #1476
+Execute			Array,Structure_Write				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 0 0|
+Execute			Array,Field_Reference				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 0 1|
+Execute			Array,Field_Write				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 1 0|
+Execute			Array,Field_Read				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 1 1|
+Execute			Array,Element_Type				|0 0 0 0|0 0 0 1|1 1 1 1|1 0 0 0| #1458
+Execute			Array,Reverse_Bounds				|0 0 0 0|0 0 0 1|1 1 1 1|1 0 0 1|
+Execute			Array,Bounds					|0 0 0 0|0 0 0 1|1 1 1 1|1 0 1 0|
+Execute			Array,Length					|0 0 0 0|0 0 0 1|1 1 1 1|1 0 1 1|
+Execute			Array,Last					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 0 0|
+Execute			Array,First					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 0 1| #143a
+Execute			Array,Not_Equal					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 1 0|
+Execute			Array,Equal					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 1 1| #142e
+Execute			Module,Check_Elaborated				|0 0 0 0|0 0 1 0|0 0 0 0|0 1 1 0| #1428
+Execute			Task,Abort_Multiple				|0 0 0 0|0 0 1 0|0 0 0 0|1 0 0 0| #1422
+Execute			Task,Abort					|0 0 0 0|0 0 1 0|0 0 0 0|1 0 0 1|
+Execute			Module,Get_Name					|0 0 0 0|0 0 1 0|0 0 0 0|1 0 1 0|
+Execute			Module,Is_Terminated				|0 0 0 0|0 0 1 0|0 0 0 0|1 0 1 1|
+Execute			Module,Is_Callable				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 0 0|
+Execute			Module,Elaborate				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
 EXECUTE			MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
 
 #-----------------------
-EXECUTE			MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
-
+#EXECUTE		MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
+Execute			Module,Activate					|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
+Execute			Heap_Access,Get_Segment				|0 0 0 0|0 0 1 0|0 0 0 1|0 0 0 0|
+Execute			Heap_Access,Convert_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 0 0 1|
+Execute			Heap_Access,Address				|0 0 0 0|0 0 1 0|0 0 0 1|0 0 1 0|
+Execute			Heap_Access,Check_In_Type			|0 0 0 0|0 0 1 0|0 0 0 1|0 0 1 1|
+Execute			Heap_Access,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 0|
+Execute			Heap_Access,In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 1|
+Execute			Heap_Access,Convert				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 0|
 #-----------------------
 # gc45,00a5		HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_REFERENCE_OP		|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
+
 EXECUTE			HEAP_ACCESS_CLASS,ALL_WRITE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 0|
 EXECUTE			HEAP_ACCESS_CLASS,ALL_READ			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 1|
 EXECUTE			HEAP_ACCESS_CLASS,ELEMENT_TYPE			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 0|
@@ -1320,7 +1546,7 @@ EXECUTE			DISCRETE,TEST_AND_SET_NEXT			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
 EXECUTE			DISCRETE,TEST_AND_SET_PREVIOUS			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
 EXECUTE			DISCRETE,WRITE_UNCHECKED			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
 EXECUTE			DISCRETE,CHECK_IN_TYPE				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
-
+# end of BODY_11a0
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x87			N := Integer (Y * One_Over_Pi);
