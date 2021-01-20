@@ -139,8 +139,8 @@ QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 1 1 1 0 0|x  |
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 1 0|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 0 0|x    |
-QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 0|
-QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 0|
+#QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 0| # ???
+#QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 0| # ???
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 1 0|x    |
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 1 0|
@@ -468,65 +468,65 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
 #QQucode_0x0168		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 0|
 #QQucode_0x0169		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 1|
 QQucode_0x016a		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 0|
-QQucode_0x016b		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 1|
-QQucode_0x016c		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 0|
-QQucode_0x016d		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 1|
-QQucode_0x016e		x	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 1|x|
-QQucode_0x0177		-	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 1 1|
-QQucode_0x0178		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0|
-QQucode_0x0179		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 1|
-QQucode_0x017a		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 1 0|
-QQucode_0x017b		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 1 1|
-QQucode_0x017c		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 1 0 0|
+#QQucode_0x016b		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 1|
+#QQucode_0x016c		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 0|
+#QQucode_0x016d		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 1|
+#QQucode_0x016e		x	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 1|x|
+#QQucode_0x0177		-	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 1 1|
+#QQucode_0x0178		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 0|
+#QQucode_0x0179		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 0 1|
+#QQucode_0x017a		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 1 0|
+#QQucode_0x017b		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 0 1 1|
+#QQucode_0x017c		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 1 0 0|
 #QQucode_0x017d		-	|0 0 0 0 0 0 0 1 0 1 1 1 1 1 0 1| QQuWrite_RECORD -
-QQucode_0x017e		x	|0 0 0 0 0 0 0 1 0 1 1 1 1 1 1|x|
-QQucode_0x0189		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 1|
-QQucode_0x018a		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 1 0|
-QQucode_0x018b		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 1 1|
-QQucode_0x018d		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 1|
-QQucode_0x018e		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 0|
-QQucode_0x018f		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 1|
-QQucode_0x019b		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 1 1|
-QQucode_0x019c		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 0 0|
-QQucode_0x019d		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 0 1|
-QQucode_0x019e		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 1 0|
-QQucode_0x019f		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 1 1|
-QQucode_0x01a3		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 0 1 1|
+#QQucode_0x017e		x	|0 0 0 0 0 0 0 1 0 1 1 1 1 1 1|x|
+#QQucode_0x0189		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 1|
+#QQucode_0x018a		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 1 0|
+#QQucode_0x018b		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 1 1|
+#QQucode_0x018d		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 1|
+#QQucode_0x018e		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 0|
+#QQucode_0x018f		-	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 1|
+#QQucode_0x019b		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 1 1|
+#QQucode_0x019c		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 0 0|
+#QQucode_0x019d		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 0 1|
+#QQucode_0x019e		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 1 0|
+#QQucode_0x019f		-	|0 0 0 0 0 0 0 1 1 0 0 1 1 1 1 1|
+#QQucode_0x01a3		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 0 1 1|
 #QQucode_0x01a4		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 0 0| QQuWrite_Full_Matrix -
-QQucode_0x01a5		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 0 1|
+#QQucode_0x01a5		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 0 1|
 #QQucode_0x01a6		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 1 0| QQuWrite_Matrix_element -
-QQucode_0x01a7		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 1 1|
-QQucode_0x01a8		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 0 0|
-QQucode_0x01a9		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 0 1|
-QQucode_0x01aa		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0|
-QQucode_0x01ab		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 1|
-QQucode_0x01ac		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 0 0|
-QQucode_0x01ad		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 0 1|
-QQucode_0x01ae		x	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|x|
-QQucode_0x01be		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 0|
-QQucode_0x01bf		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 1|
-QQucode_0x01c0		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0|
+#QQucode_0x01a7		-	|0 0 0 0 0 0 0 1 1 0 1 0 0 1 1 1|
+#QQucode_0x01a8		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 0 0|
+#QQucode_0x01a9		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 0 1|
+#QQucode_0x01aa		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0|
+#QQucode_0x01ab		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 1|
+#QQucode_0x01ac		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 0 0|
+#QQucode_0x01ad		-	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 0 1|
+#QQucode_0x01ae		x	|0 0 0 0 0 0 0 1 1 0 1 0 1 1 1|x|
+#QQucode_0x01be		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 0|
+#QQucode_0x01bf		-	|0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 1|
+#QQucode_0x01c0		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0|
 #QQucode_0x01c1		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 1| QQu_string_is_less_than
-QQucode_0x01c2		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 0|
+#QQucode_0x01c2		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 0|
 #QQucode_0x01c3		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 0 1 1| EXECUTE VECTOR_CLASS,CHECK_IN_TYPE_OP
-QQucode_0x01c4		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 0|
-QQucode_0x01c5		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 1|
-QQucode_0x01c6		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 1 0|
-QQucode_0x01c7		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 1 1|
-QQucode_0x01ca		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 0 1 0|
+#QQucode_0x01c4		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 0|
+#QQucode_0x01c5		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 0 1|
+#QQucode_0x01c6		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 1 0|
+#QQucode_0x01c7		-	|0 0 0 0 0 0 0 1 1 1 0 0 0 1 1 1|
+#QQucode_0x01ca		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 0 1 0|
 #QQucode_0x01cb		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 0 1 1| QQuLoad_Vector_Result -
 #QQucode_0x01cc		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 0 0| EXECUTE VECTOR_CLASS,CATENATE_OP
-QQucode_0x01cd		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 0 1|
-QQucode_0x01ce		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 1 0|
+#QQucode_0x01cd		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 0 1|
+#QQucode_0x01ce		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 1 0|
 #QQucode_0x01cf		-	|0 0 0 0 0 0 0 1 1 1 0 0 1 1 1 1| QQuEXECUTE VECTOR_CLASS,SUBARRAY_OP
-QQucode_0x01d0		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 0|
-QQucode_0x01d1		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 1|
-QQucode_0x01d1		x	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 1|x|
+#QQucode_0x01d0		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 0|
+#QQucode_0x01d1		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 0 1|
+#QQucode_0x01d1		x	|0 0 0 0 0 0 0 1 1 1 0 1 0 0 1|x|
 #QQucode_0x01d4		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 0 0| QQuEXECUTE VECTOR_CLASS,STRUCTURE_WRITE_OP
 #QQucode_0x01d5		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 0 1| QQuEXECUTE VECTOR_CLASS,FIELD_REFERENCE_OP
 #QQucode_0x01d6		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 0| EXECUTE VECTOR_CLASS,FIELD_WRITE_OP
 #QQucode_0x01d7		-	|0 0 0 0 0 0 0 1 1 1 0 1 0 1 1 1| QQuEXECUTE VECTOR_CLASS,FIELD_READ_OP
-QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
+#QQucode_0x01d8		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 0|
 #QQucode_0x01d9		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 0 1| QQuExecute_range_op
 #QQucode_0x01da		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0| QQu_vector_length
 #QQucode_0x01db		-	|0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1| QQuExecute_vector_length_op
@@ -660,11 +660,11 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x0271		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 0 1| QQu_int_multiply -
 #QQucode_0x0272		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 0| QQu_int_subtract -
 #QQucode_0x0273		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 0 1 1| QQu_int_add -
-QQucode_0x0274		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 0|
+#QQucode_0x0274		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 0|
 #QQucode_0x0275		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 0 1| QQu_int_neg -
-QQucode_0x0276		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 0|
-QQucode_0x0277		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 1|
-QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
+#QQucode_0x0276		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 0|
+#QQucode_0x0277		-	|0 0 0 0 0 0 1 0 0 1 1 1 0 1 1 1|
+#QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
 #QQucode_0x0279		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 1| QQu_integer_and -
 #QQucode_0x027a		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 0| QQu_less_equal -
 #QQucode_0x027b		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 1 1| QQu_greater_equal
@@ -672,28 +672,28 @@ QQucode_0x0278		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 0 0 0|
 #QQucode_0x027d		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1| QQu_greater_than
 #QQucode_0x027e		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 0| QQu_not_equal
 #QQucode_0x027f		-	|0 0 0 0 0 0 1 0 0 1 1 1 1 1 1 1| QQu_is_equal
-QQucode_0x0299		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 0 1|
-QQucode_0x029a		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 0|
-QQucode_0x029b		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 1|
-QQucode_0x029c		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 0 0|
-QQucode_0x029d		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 0 1|
-QQucode_0x029e		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 1 0|
-QQucode_0x029f		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 1 1|
+#QQucode_0x0299		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 0 1|
+#QQucode_0x029a		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 0|
+#QQucode_0x029b		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 0 1 1|
+#QQucode_0x029c		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 0 0|
+#QQucode_0x029d		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 0 1|
+#QQucode_0x029e		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 1 0|
+#QQucode_0x029f		-	|0 0 0 0 0 0 1 0 1 0 0 1 1 1 1 1|
 #QQucode_0x02a0		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 0 0 0| DECLARE_SUBPROGRAM NULL_SUBPROGRAM
-QQucode_0x02a2		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 0 1 0|
-QQucode_0x02a4		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 1 0 0|
-QQucode_0x02a5		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 1 0 1|
-QQucode_0x02a8		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 0 0|
-QQucode_0x02a9		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 0 1|
-QQucode_0x02aa		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 0|
-QQucode_0x02ab		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 1|
-QQucode_0x02be		-	|0 0 0 0 0 0 1 0 1 0 1 1 1 1 1 0|
-QQucode_0x02bf		-	|0 0 0 0 0 0 1 0 1 0 1 1 1 1 1 1|
-QQucode_0x02c6		-	|0 0 0 0 0 0 1 0 1 1 0 0 0 1 1 0|
-QQucode_0x02c7		-	|0 0 0 0 0 0 1 0 1 1 0 0 0 1 1 1|
-QQucode_0x02c9		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 0 0 1|
-QQucode_0x02cb		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 0 1 1|
-QQucode_0x02ce		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 1 1 0|
+#QQucode_0x02a2		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 0 1 0|
+#QQucode_0x02a4		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 1 0 0|
+#QQucode_0x02a5		-	|0 0 0 0 0 0 1 0 1 0 1 0 0 1 0 1|
+#QQucode_0x02a8		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 0 0|
+#QQucode_0x02a9		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 0 1|
+#QQucode_0x02aa		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 0|
+#QQucode_0x02ab		-	|0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 1|
+#QQucode_0x02be		-	|0 0 0 0 0 0 1 0 1 0 1 1 1 1 1 0|
+#QQucode_0x02bf		-	|0 0 0 0 0 0 1 0 1 0 1 1 1 1 1 1|
+#QQucode_0x02c6		-	|0 0 0 0 0 0 1 0 1 1 0 0 0 1 1 0|
+#QQucode_0x02c7		-	|0 0 0 0 0 0 1 0 1 1 0 0 0 1 1 1|
+#QQucode_0x02c9		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 0 0 1|
+#QQucode_0x02cb		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 0 1 1|
+#QQucode_0x02ce		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 1 1 0|
 #QQucode_0x02cf		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 1 1 1| QQunknown_2cf -
 QQucode_0x02fb		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 0 1 1|
 QQucode_0x02fc		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 0|
@@ -1319,96 +1319,95 @@ Execute			Variant_Record,Component_Offset			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 0|
 Execute			Variant_Record,Structure_Query			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 1|
 Execute			Variant_Record,Reference_Makes_Copy		|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 0|
 Execute			Variant_Record,Read_Discriminant_Constraint	|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 1|
-
 # End of BODY_0ca0
+# Start of BODY_0f60
+Execute			Variant_Record,Read_Variant			|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 1|
+Execute			Variant_Record,Is_Constrained			|0 0 0 0|0 0 0 1|0 1 1 0|1 1 0 0|
+Execute			Variant_Record,Structure_Write			|0 0 0 0|0 0 0 1|0 1 1 0|1 1 0 1|
+Execute			Variant_Record,Not_Equal			|0 0 0 0|0 0 0 1|0 1 1 0|1 1 1 0|
+Execute			Variant_Record,Equal				|0 0 0 0|0 0 0 1|0 1 1 0|1 1 1 1|
 
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x05bf/aa	T  : Time    := Get_Time;
-# May be EXECUTE RECORD_CLASS,STRUCTURE_WRITE_OP
-QQuWrite_RECORD		-						|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
+Execute			Record,Field_Type_Dynamic			|0 0 0 0|0 0 0 1|0 1 1 1|0 1 1 1|
+Execute			Record,Field_Reference_Dynamic			|0 0 0 0|0 0 0 1|0 1 1 1|1 0 0 0|
+Execute			Record,Field_Write_Dynamic			|0 0 0 0|0 0 0 1|0 1 1 1|1 0 0 1|
+Execute			Record,Field_Read_Dynamic			|0 0 0 0|0 0 0 1|0 1 1 1|1 0 1 0|
+Execute			Record,Convert					|0 0 0 0|0 0 0 1|0 1 1 1|1 0 1 1|
+Execute			Record,Component_Offset				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 0|
+Execute			Record,Structure_Write				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
+Execute			Record,Not_Equal				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 0|
+Execute			Record,Equal					|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
+Execute			Record,Structure_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 0| # 1145
+Execute			Record,Field_Reference				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 1|
+Execute			Record,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 0|
+Execute			Record,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 1|
+Execute			Subarray,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 0|
+Execute			Subarray,Field_Reference			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 1|
+Execute			Subarray,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 0|
+Execute			Subarray,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 1|
+Execute			Matrix,Check_In_Type				|0 0 0 0|0 0 0 1|1 0 0 1|1 0 1 1|
+Execute			Matrix,Not_In_Type				|0 0 0 0|0 0 0 1|1 0 0 1|1 1 0 0|
+Execute			Matrix,In_Type					|0 0 0 0|0 0 0 1|1 0 0 1|1 1 0 1|
+Execute			Matrix,Convert_To_Formal			|0 0 0 0|0 0 0 1|1 0 0 1|1 1 1 0|
+Execute			Matrix,Convert					|0 0 0 0|0 0 0 1|1 0 0 1|1 1 1 1|
+Execute			Matrix,Subarray					|0 0 0 0|0 0 0 1|1 0 1 0|0 0 1 1|
+Execute			Matrix,Structure_Write				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
+Execute			Matrix,Field_Reference				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 1|
+Execute			Matrix,Field_Write				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
+Execute			Matrix,Field_Read				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 1|
+Execute			Matrix,Element_Type				|0 0 0 0|0 0 0 1|1 0 1 0|1 0 0 0|
+Execute			Matrix,Reverse_Bounds				|0 0 0 0|0 0 0 1|1 0 1 0|1 0 0 1|
+Execute			Matrix,Bounds					|0 0 0 0|0 0 0 1|1 0 1 0|1 0 1 0|
+Execute			Matrix,Length					|0 0 0 0|0 0 0 1|1 0 1 0|1 0 1 1|
+Execute			Matrix,Last					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 0 0|
+Execute			Matrix,First					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 0 1|
+Execute			Matrix,Not_Equal				|0 0 0 0|0 0 0 1|1 0 1 0|1 1 1 0|
+Execute			Matrix,Equal					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 1 1|
+Execute			Vector,Hash					|0 0 0 0|0 0 0 1|1 0 1 1|1 1 1 0|
+Execute			Vector,Less_Equal				|0 0 0 0|0 0 0 1|1 0 1 1|1 1 1 1|
+Execute			Vector,Greater_Equal				|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 0|
+Execute			Vector,Less					|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 1|
+Execute			Vector,Greater					|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 0|
 
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x37d   return Date = Nil
-QQu_is_equal_record     -                                               |0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x01a7/aa	Write full 2 dim array
-# May be EXECUTE MATRIX_CLASS,STRUCTURE_WRITE_OP
-QQuWrite_Full_Matrix	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x0132/aa	Write 2 dim array value
-# May be EXECUTE MATRIX_CLASS,FIELD_WRITE_OP
-QQuWrite_Matrix_element	-						|0 0 0 0|0 0 0 1|1 0 1 0|0 1 1 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x06b2/aa	Read from 2 dim array
-# May be EXECUTE MATRIX_CLASS,FIELD_READ_OP
-QQuRead_Matrix_element	-						|1 0 0 0|0 0 0 1|1 0 1 0|0 1 1 1|
-
-#-----------------------
-# 3f2fe70c1, 04b1	Left.Values (On_Field).Subitem < Right.Values (On_Field).Subitem
-QQu_string_is_less_than	-						|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 1|
-
-#-----------------------
 # gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
-EXECUTE			VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x06ff	Load previous result?
-# Used after call to CATENATE_OP or call to Image function returning string
-QQuLoad_Vector_Result	-						|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
-
+Execute			Vector,Check_In_Type				|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
+Execute			Vector,Not_In_Type				|0 0 0 0|0 0 0 1|1 1 0 0|0 1 0 0|
+Execute			Vector,In_Type					|0 0 0 0|0 0 0 1|1 1 0 0|0 1 0 1|
+Execute			Vector,Convert_To_Formal			|0 0 0 0|0 0 0 1|1 1 0 0|0 1 1 0|
+Execute			Vector,Convert					|0 0 0 0|0 0 0 1|1 1 0 0|0 1 1 1|
+Execute			Vector,Prepend					|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 0|
+Execute			Vector,Append					|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
 #-----------------------
 # gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 # gc45,008f		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
-EXECUTE			VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
-
+Execute			Vector,Catenate					|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
+Execute			Vector,Slice_Reference				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 1|
+Execute			Vector,Slice_Write				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 0|
 #-----------------------
 # ⟦36a4ea3d7⟧, @0x06a0	return Name (Name'First .. Name'First + 2);
 # Used to get a subarray
-QQuEXECUTE		VECTOR_CLASS,SUBARRAY_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x01e4
-# Used after writing all fields in vector
-QQuEXECUTE		VECTOR_CLASS,STRUCTURE_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
-
+Execute			Vector,Slice_Read				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
+Execute			Vector,Complement				|0 0 0 0|0 0 0 1|1 1 0 1|0 0 0 0|
+Execute			Vector,Xor					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 0 1|
+Execute			Vector,Or					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 1 0|
+Execute			Vector,And					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 1 1|
+Execute			Vector,Structure_Write				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
 #-----------------------
 # ⟦3f2fe70c1⟧, @0x0219	Max   : Natural     renames Max_Width (Current_Column);
-QQuEXECUTE		VECTOR_CLASS,FIELD_REFERENCE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 1|
-
+Execute			Vector,Field_Reference				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 1|
 #-----------------------
 # gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 # gc45,00a6		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
-EXECUTE			VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
-
-#-----------------------
-# ⟦93b91846e⟧, @0x00fa		Char := S (Position);
-# read vector value
-QQuEXECUTE		VECTOR_CLASS,FIELD_READ_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
-
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x0238	for J in Line.Values'Range loop
-# gæt: EXECUTE VECTOR_CLASS,RANGE_OP
-QQuExecute_range_op	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 1|
-
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x02f1 	for J in reverse Table'Range loop
-# gæt: EXECUTE VECTOR_CLASS,LENGTH
-QQu_vector_length	-						|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
-
-#-----------------------
-# ⟦93b91846e⟧, @0x01ac		if S'Length = 1 then
+Execute			Vector,Field_Write				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
+Execute			Vector,Field_Read				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
+Execute			Vector,Element_Type				|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 0|
+Execute			Vector,Reverse_Bounds				|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 1|
+Execute			Vector,Bounds					|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 0|
 Execute			Vector,Length					|0 0 0 0|0 0 0 1|1 1 0 1|1 0 1 1|
-
-#-----------------------
-# ⟦93b91846e⟧, @0x00d5		Last := S'Last;
 Execute			Vector,Last					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x696, 		return Name (Name'First .. Name'First + 2);
 Execute			Vector,First					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
+Execute			Vector,Not_Equal				|0 0 0 0|0 0 0 1|1 1 0 1|1 1 1 0|
+Execute			Vector,Equal					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 1 1|
+# End of BODY_0f60
 
 #-----------------------
 # Start of BODY_11a0
@@ -1546,138 +1545,122 @@ Execute			Discrete,Test_And_Set_Next			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
 Execute			Discrete,Test_And_Set_Previous			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
 Execute			Discrete,Write_Unchecked			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
 Execute			Discrete,Check_In_Type				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
-# end of BODY_11a0
+# End of BODY_11a0
 
-#-----------------------
-# ⟦cb8e43375⟧ @0x87			N := Integer (Y * One_Over_Pi);
-# ⟦36a4ea3d7⟧ @0x048f	D : Duration; 	Rest : Integer32 := Integer32 (D) * Milliseconds_Per_Second
-QQu_CONVERT_TO_INT	-						|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
-
-#-----------------------
-# /aa (2fa0095f7 1c9e)
-QQuEXECUTE		BELOW_BOUND					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
-
-#-----------------------
-# /aa (3bf0c159 0236)
-QQuEXECUTE		IN_RANGE					|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
-
-#-----------------------
-# /aa (3f2fe70c1 00b0)		for I in On_Fields'Range loop
-QQu_is_in_range		-						|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
-
-#-----------------------
-# 3f2fe70c1,02f2 		for J in reverse Table'Range loop
-QQu_not_in_range	-						|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 0|
-
-#-----------------------
-# /aa (36a4ea3d7 008b)		type Number_Array is array (Positive range <>) of Natural;
-# May be EXECUTE		BOUNDS_OP
-# May be get type range
-QQuDefine_Array_Full_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
-
+# Start of BODY_14a0
+Execute			Discrete,Bounds_Check				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 0 1|
+Execute			Discrete,Convert				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
+Execute			Discrete,Not_In_Type				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 1|
+Execute			Discrete,In_Type				|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 0|
+Execute			Discrete,Not_In_Range				|0 0 0 0|0 0 1 0|0 1 1 0|0 0 0 1|
+Execute			Discrete,In_Range				|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 0|
+Execute			Discrete,Above_Bound				|0 0 0 0|0 0 1 0|0 1 1 0|0 0 1 1|
+Execute			Discrete,Below_Bound				|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 0|
+Execute			Discrete,Reverse_Bounds				|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 1|
+Execute			Discrete,Bounds					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
+Execute			Discrete,Predecessor				|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 1|
+Execute			Discrete,Successor				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 0|
 #-----------------------
 # /aa (3f2fe70c1 002b)		type Width_List is array (Column_Index) of Natural;
-# May be get_subtype_range
-QQuDefine_Array_subtype_Range	-					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
-
+Execute			Discrete,Last					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
+Execute			Discrete,First					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 0|
+Execute			Discrete,Maximum				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 1|
+Execute			Discrete.Minimum				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 0|
 #-----------------------
 # /aa (3bf0c159 00d9)
-QQuEXECUTE		EXPONENTIATE					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
+Execute			Discrete,Exponentiate				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
+Execute			Discrete,Modulo					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
+Execute			Discrete,Remainder				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
 
-#-----------------------
-# ⟦cb8e43375⟧ @0x100 /phk  not sure.
-QQu_int_mod		-						|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x02ed 		Total_Seconds := Total_Seconds rem Seconds_Per_Hour;
-QQu_int_rem             -                                               |0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
-
+Execute			Discrete,Make_Visible				|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0x107 /phk
-QQu_int_divide		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
+#QQu_int_divide		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x103 /phk  not sure.
-QQu_int_multiply	-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 1|
+Execute			Discrete,Times					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 1|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x109 /phk  not sure.
-QQu_int_subtract	-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 0|
+Execute			Discrete,Minus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 0|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x113 /phk  not sure.
-QQu_int_add		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
+Execute			Discrete,Plus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
+Execute			Discrete,Load_Top				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 0|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x171 /phk AND ?
 # Epsilon : Float := Beta ** (-It / 2); (-It, It is integer)
-QQu_int_neg		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
-
-#-----------------------
-# ⟦85b414c73⟧ @0x8e  integer AND ?
-QQu_integer_and		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 1|
-
-#-----------------------
-#  ⟦36a4ea3d7⟧, @0x00cc		if Total_Seconds < Integer32 (Seconds_Per_Half_Day) then
-QQu_less_than		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0|
-
-#-----------------------
-#  ⟦93b91846e⟧, @0x00ce		if Position <= S'Last then
-QQu_less_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 0|
-
-#-----------------------
-#  ⟦3f2fe70c1⟧, @0x01fd		if Left >= Right then
-QQu_greater_equal	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 1|
-
-#-----------------------
-# /aa (3f2fe70c1 022b)		if Width > Max then
-QQu_greater_than	-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
-
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x03a0		if J /= Column_Index'Last then
-QQu_not_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 0|
-
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x027f		if Current_Column = Column_Index'Last then
-QQu_is_equal		-						|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 1|
+Execute			Discrete,Unary_Minus				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
+Execute			Discrete,Complement				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 1 0|
+Execute			Discrete,Xor					|0 0 0 0|0 0 1 0|0 1 1 1|0 1 1 1|
+Execute			Discrete,Or					|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 0|
+Execute			Discrete,And					|0 0 0 0|0 0 1 0|0 1 1 1|1 0 0 1|
+Execute			Discrete,Less_Equal				|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 0|
+Execute			Discrete,Greater_Equal				|0 0 0 0|0 0 1 0|0 1 1 1|1 0 1 1|
+Execute			Discrete,Less					|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0|
+Execute			Discrete,Greater				|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
+Execute			Discrete,Not_Equal				|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 0|
+Execute			Discrete,Equal					|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 1|
 
 #-----------------------
 # ⟦37717da67⟧ @0x5ce4 indicates this takes an extension /phk
-QQunknown		subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
+Declare_Subprogram	subp,For_Accept					|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
 
 #-----------------------
 # gc42,000b		FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0|
-DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
+Declare_Subprogram	subp,For_Outer_Call,Visible,Unelaborated	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
 
 #-----------------------
 # ⟦a88379b5f⟧ indicates this takes an extension # /phk
-QQudeclare_subprogram	x						|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| x				|
+Declare_Subprogram	subp,For_Outer_Call,Unelaborated		|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| subp				|
 
 #-----------------------
 # gc87,000b		subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
-DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+Declare_Subprogram	subp,For_Outer_Call,Visible			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
 
 #-----------------------
 # gc43,0038		FOR_OUTER_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1|
-DECLARE_SUBPROGRAM	subp,FOR_OUTER_CALL				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
+Declare_Subprogram	subp,For_Outer_Call				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
 
 #-----------------------
 # ⟦89b72b217⟧ @0x2abd indicates this takes an extension # /phk
-QQudeclare_subprogram	subp						|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
+Declare_Subprogram	subp,For_Call,Unelaborated			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
 
 #-----------------------
 # gc44,0077		FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1|
-DECLARE_SUBPROGRAM	subp,FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
+Declare_Subprogram	subp,For_Call					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
 
 #-----------------------
 # gc43,001e		NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
-DECLARE_SUBPROGRAM	NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
+Declare_Subprogram	Null_Subprogram					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
+
+Declare_Subprogram	For_Accept,With_Address				|0 0 0 0|0 0 1 0|1 0 1 0|0 0 1 0|
+Declare_Subprogram	For_Outer_Call,Visible,With_Address		|0 0 0 0|0 0 1 0|1 0 1 0|0 1 0 0|
+Declare_Subprogram	For_Outer_Call,With_Address			|0 0 0 0|0 0 1 0|1 0 1 0|0 1 0 1|
+Declare_Subprogram	For_Call,Visible,Unelaborated,With_Address	|0 0 0 0|0 0 1 0|1 0 1 0|1 0 0 0|
+Declare_Subprogram	For_Call,Unelaborated,With_Address		|0 0 0 0|0 0 1 0|1 0 1 0|1 0 0 1|
+Declare_Subprogram	For_Call,Visible,With_Address			|0 0 0 0|0 0 1 0|1 0 1 0|1 0 1 0|
+Declare_Subprogram	For_Call,With_Address				|0 0 0 0|0 0 1 0|1 0 1 0|1 0 1 1|
+
+Declare_Variable	Float,Visible,With_Value,With_Constraint	|0 0 0 0|0 0 1 0|1 0 1 1|1 1 1 0|
+Declare_Variable	Float,With_Value,With_Constraint		|0 0 0 0|0 0 1 0|1 0 1 1|1 1 1 1|
+
+Declare_Variable	Any,Visible					|0 0 0 0|0 0 1 0|1 1 0 0|0 1 1 0|
+Declare_Variable	Any						|0 0 0 0|0 0 1 0|1 1 0 0|0 1 1 1|
+Declare_Variable	Family						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 0 1|
+Declare_Variable	Entry						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 1 1|
+Declare_Variable	Select,Choice_Open				|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 0|
 
 #-----------------------
 # See ⟦657d85b18⟧ @0x12d
 # See ⟦eecee3432⟧ @0x2f2/phk
 # See ⟦826a261d9⟧ @0x8a7/phk
-QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
+#QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
+Declare_variable	Select						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
+# End of BODY_14a0
 
 #-----------------------
 # (3f2fe70c1, 004b)/aa	type An_Item (Subitem_Length : Natural) is...  (completing an incomplete variant record)
