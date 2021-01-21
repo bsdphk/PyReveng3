@@ -695,99 +695,99 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x02cb		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 0 1 1|
 #QQucode_0x02ce		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 1 1 0|
 #QQucode_0x02cf		-	|0 0 0 0 0 0 1 0 1 1 0 0 1 1 1 1| QQunknown_2cf -
-QQucode_0x02fb		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 0 1 1|
-QQucode_0x02fc		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 0|
-QQucode_0x02fd		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 1|
-QQucode_0x02fe		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 0|
-QQucode_0x02ff		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 1|
-QQucode_0x0303		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 0 1 1|
-QQucode_0x0304		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0|
-QQucode_0x0305		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 1|
-QQucode_0x0306		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 1 0|
+#QQucode_0x02fb		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 0 1 1|
+#QQucode_0x02fc		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 0|
+#QQucode_0x02fd		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 1|
+#QQucode_0x02fe		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 0|
+#QQucode_0x02ff		-	|0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 1|
+#QQucode_0x0303		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 0 1 1|
+#QQucode_0x0304		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0|
+#QQucode_0x0305		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 1|
+#QQucode_0x0306		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 1 0|
 #QQucode_0x0307		-	|0 0 0 0 0 0 1 1 0 0 0 0 0 1 1 1| QQuDECLARE_TYPE_complete VARIANT_RECORD_CLASS
-QQucode_0x0311		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 0 0 1|
-QQucode_0x0312		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 0 1 0|
-QQucode_0x0315		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 1 0 1|
-QQucode_0x0316		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 1 1 0|
+#QQucode_0x0311		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 0 0 1|
+#QQucode_0x0312		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 0 1 0|
+#QQucode_0x0315		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 1 0 1|
+#QQucode_0x0316		-	|0 0 0 0 0 0 1 1 0 0 0 1 0 1 1 0|
 #QQucode_0x0318		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 0 0 0| QQuDECLARE_TYPE VARIANT_RECORD_CLASS,INCOMPLETE
-QQucode_0x0319		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 0 0 1|
-QQucode_0x031b		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 0 1 1|
-QQucode_0x031c		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 1 0 0|
-QQucode_0x031d		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 1 0 1|
+#QQucode_0x0319		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 0 0 1|
+#QQucode_0x031b		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 0 1 1|
+#QQucode_0x031c		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 1 0 0|
+#QQucode_0x031d		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 1 0 1|
 #QQucode_0x031e		-	|0 0 0 0 0 0 1 1 0 0 0 1 1 1 1 0| QQuDECLARE_TYPE VARIANT_RECORD_CLASS
-QQucode_0x0320		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 0 0 0|
-QQucode_0x0321		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 0 0 1|
+#QQucode_0x0320		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 0 0 0|
+#QQucode_0x0321		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 0 0 1|
 #QQucode_0x0322		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 0 1 0| QQuDECLARE_VARIABLE RECORD_CLASS
-QQucode_0x0324		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 0 0|
-QQucode_0x0325		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 0 1|
+#QQucode_0x0324		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 0 0|
+#QQucode_0x0325		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 0 1|
 #QQucode_0x0326		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 1 0| QQuDECLARE_TYPE_complete RECORD_CLASS,DEFINED
-QQucode_0x0327		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 1 1|
-QQucode_0x0328		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 0 0 0|
+#QQucode_0x0327		-	|0 0 0 0 0 0 1 1 0 0 1 0 0 1 1 1|
+#QQucode_0x0328		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 0 0 0|
 #QQucode_0x032a		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 0 1 0| QQuDECLARE_TYPE RECORD_CLASS,DEFINED,INCOMPLETE
-QQucode_0x032b		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 0 1 1|
+#QQucode_0x032b		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 0 1 1|
 #QQucode_0x032d		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 1 0 1| QQuDECLARE_TYPE         RECORD_CLASS,DEFINED
 #QQucode_0x032e		-	|0 0 0 0 0 0 1 1 0 0 1 0 1 1 1 0| QQuDECLARE_TYPE         RECORD_CLASS,DEFINED
-QQucode_0x0333		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1|
-QQucode_0x0334		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 0 0|
+#QQucode_0x0333		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1|
+#QQucode_0x0334		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 0 0|
 #QQucode_0x0335		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 0 1| QQu_DECLARE_VARIABLE_tmp_val ARRAY_CLASS
-QQucode_0x0336		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 1 0|
+#QQucode_0x0336		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 1 0|
 #QQucode_0x0337		-	|0 0 0 0 0 0 1 1 0 0 1 1 0 1 1 1| DECLARE_VARIABLE ARRAY_CLASS
-QQucode_0x0340		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 0 0|
-QQucode_0x0341		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 0 1|
-QQucode_0x0342		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 1 0|
-QQucode_0x0343		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 1 1|
-QQucode_0x0346		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 1 1 0|
-QQucode_0x0347		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 1 1 1|
-QQucode_0x0348		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 0 0|
-QQucode_0x0349		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 0 1|
-QQucode_0x034b		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 1 1|
-QQucode_0x034c		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 0 0|
-QQucode_0x034e		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 1 0|
-QQucode_0x034f		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 1 1|
+#QQucode_0x0340		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 0 0|
+#QQucode_0x0341		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 0 1|
+#QQucode_0x0342		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 1 0|
+#QQucode_0x0343		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 0 1 1|
+#QQucode_0x0346		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 1 1 0|
+#QQucode_0x0347		-	|0 0 0 0 0 0 1 1 0 1 0 0 0 1 1 1|
+#QQucode_0x0348		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 0 0|
+#QQucode_0x0349		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 0 1|
+#QQucode_0x034b		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 0 1 1|
+#QQucode_0x034c		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 0 0|
+#QQucode_0x034e		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 1 0|
+#QQucode_0x034f		-	|0 0 0 0 0 0 1 1 0 1 0 0 1 1 1 1|
 #QQucode_0x0350		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 0 0 0| QQuDECLARE_TYPE ARRAY_CLASS,UNCONSTRAINED
 #QQucode_0x0351		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 0 0 1| QQuDECLARE_TYPE ARRAY_CLASS,UNCONSTRAINED,IS_VISIBLE
-QQucode_0x0353		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 0 1 1|
-QQucode_0x0354		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 0|
-QQucode_0x0355		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1|
-QQucode_0x0356		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 1 0|
-QQucode_0x0358		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 0|
-QQucode_0x0359		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 1|
+#QQucode_0x0353		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 0 1 1|
+#QQucode_0x0354		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 0|
+#QQucode_0x0355		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1|
+#QQucode_0x0356		-	|0 0 0 0 0 0 1 1 0 1 0 1 0 1 1 0|
+#QQucode_0x0358		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 0|
+#QQucode_0x0359		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 0 1|
 #QQucode_0x035b		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
-QQucode_0x035c		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 0|
+#QQucode_0x035c		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 0|
 #QQucode_0x035d		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 0 1| DECLARE_TYPE ARRAY_CLASS,DEFINED
-QQucode_0x035e		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 1 0|
-QQucode_0x036a		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 0|
-QQucode_0x036b		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 1|
-QQucode_0x036c		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 0 0|
-QQucode_0x036d		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 0 1|
-QQucode_0x036e		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 1 0|
-QQucode_0x036f		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 1 1|
-QQucode_0x0374		-	|0 0 0 0 0 0 1 1 0 1 1 1 0 1 0 0|
-QQucode_0x0377		-	|0 0 0 0 0 0 1 1 0 1 1 1 0 1 1 1|
-QQucode_0x0378		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 0 0|
-QQucode_0x037a		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 0|
-QQucode_0x037b		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 1|
-QQucode_0x037d		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 1 0 1|
-QQucode_0x037e		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 1 1 0|
-QQucode_0x0384		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 0 0|
-QQucode_0x0385		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 0 1|
-QQucode_0x0386		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 1 0|
+#QQucode_0x035e		-	|0 0 0 0 0 0 1 1 0 1 0 1 1 1 1 0|
+#QQucode_0x036a		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 0|
+#QQucode_0x036b		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 0 1 1|
+#QQucode_0x036c		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 0 0|
+#QQucode_0x036d		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 0 1|
+#QQucode_0x036e		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 1 0|
+#QQucode_0x036f		-	|0 0 0 0 0 0 1 1 0 1 1 0 1 1 1 1|
+#QQucode_0x0374		-	|0 0 0 0 0 0 1 1 0 1 1 1 0 1 0 0|
+#QQucode_0x0377		-	|0 0 0 0 0 0 1 1 0 1 1 1 0 1 1 1|
+#QQucode_0x0378		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 0 0|
+#QQucode_0x037a		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 0|
+#QQucode_0x037b		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 0 1 1|
+#QQucode_0x037d		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 1 0 1|
+#QQucode_0x037e		-	|0 0 0 0 0 0 1 1 0 1 1 1 1 1 1 0|
+#QQucode_0x0384		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 0 0|
+#QQucode_0x0385		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 0 1|
+#QQucode_0x0386		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 1 0|
 #QQucode_0x0387		-	|0 0 0 0 0 0 1 1 1 0 0 0 0 1 1 1| DECLARE_VARIABLE PACKAGE_CLASS
-QQucode_0x038c		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 0 0|
-QQucode_0x038d		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 0 1|
+#QQucode_0x038c		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 0 0|
+#QQucode_0x038d		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 0 1|
 #QQucode_0x038e		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 1 0| DECLARE_TYPE PACKAGE_CLASS,DEFINED
-QQucode_0x038f		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 1 1|
-QQucode_0x0395		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 0 1|
+#QQucode_0x038f		-	|0 0 0 0 0 0 1 1 1 0 0 0 1 1 1 1|
+#QQucode_0x0395		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 0 1|
 #QQucode_0x0396		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 0| DECLARE_VARIABLE Heap_Access,BY_ALLOCATION,WITH_VALUE
-QQucode_0x0397		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 1|
-QQucode_0x0398		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 0|
-QQucode_0x0399		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 1|
-QQucode_0x039a		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 1 0|
-QQucode_0x039b		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 1 1|
-QQucode_0x039c		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 0 0|
-QQucode_0x039d		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 0 1|
-QQucode_0x039e		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 0|
-QQucode_0x039f		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 1|
+#QQucode_0x0397		-	|0 0 0 0 0 0 1 1 1 0 0 1 0 1 1 1|
+#QQucode_0x0398		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 0|
+#QQucode_0x0399		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 0 1|
+#QQucode_0x039a		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 1 0|
+#QQucode_0x039b		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 0 1 1|
+#QQucode_0x039c		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 0 0|
+#QQucode_0x039d		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 0 1|
+#QQucode_0x039e		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 0|
+#QQucode_0x039f		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 1|
 QQucode_0x03a0		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 0|
 QQucode_0x03a1		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 1|
 QQucode_0x03a2		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 1 0|
@@ -1661,74 +1661,127 @@ Declare_Variable	Select,Choice_Open				|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 0|
 #QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 Declare_variable	Select						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 # End of BODY_14a0
+# Start of BODY_16a8
+Declare_Variable	Variant_Record,Visible,With_Constraint		|0 0 0 0|0 0 1 0|1 1 1 1|1 0 1 1|
+Declare_Variable	Variant_Record,With_Constraint			|0 0 0 0|0 0 1 0|1 1 1 1|1 1 0 0|
+Declare_Variable	Variant_Record,Duplicate			|0 0 0 0|0 0 1 0|1 1 1 1|1 1 0 1|
+Declare_Variable	Variant_Record,Visible				|0 0 0 0|0 0 1 0|1 1 1 1|1 1 1 0|
+Declare_Variable	Variant_Record					|0 0 0 0|0 0 1 0|1 1 1 1|1 1 1 1|
 
-#-----------------------
-# (3f2fe70c1, 004b)/aa	type An_Item (Subitem_Length : Natural) is...  (completing an incomplete variant record)
-QQuDECLARE_TYPE_complete	VARIANT_RECORD_CLASS			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
+Complete_Type		Variant_Record,By_Component_Completion		|0 0 0 0|0 0 1 1|0 0 0 0|0 0 1 1|
+Complete_Type		Variant_Record,By_Completing_Constraint		|0 0 0 0|0 0 1 1|0 0 0 0|0 1 0 0|
+Complete_Type		Variant_Record,By_Constraining_Incomplete	|0 0 0 0|0 0 1 1|0 0 0 0|0 1 0 1|
+Complete_Type		Variant_Record,By_Renaming			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 0|
+Complete_Type		Variant_Record,By_Defining			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
 
-#-----------------------
-# (3f2fe70c1, 0039)/aa		type An_Item (Subitem_Length : Natural); (incomplete variant record)
-QQuDECLARE_TYPE		VARIANT_RECORD_CLASS,INCOMPLETE			|0 0 0 0|0 0 1 1|0 0 0 1|1 0 0 0|
+Declare_Type		Variant_Record,Constrained_Incomplete		|0 0 0 0|0 0 1 1|0 0 0 1|0 0 0 1|
+Declare_Type		Variant_Record,Constrained_Incomplete,Visible	|0 0 0 0|0 0 1 1|0 0 0 1|0 0 1 0|
+Declare_Type		Variant_Record,Defined_Incomplete		|0 0 0 0|0 0 1 1|0 0 0 1|0 1 0 1|
+Declare_Type		Variant_Record,Defined_Incomplete,Visible	|0 0 0 0|0 0 1 1|0 0 0 1|0 1 1 0|
+Declare_Type		Variant_Record,Incomplete			|0 0 0 0|0 0 1 1|0 0 0 1|1 0 0 0|
+Declare_Type		Variant_Record,Incomplete,Visible		|0 0 0 0|0 0 1 1|0 0 0 1|1 0 0 1|
+Declare_Type		Variant_Record,Constrained			|0 0 0 0|0 0 1 1|0 0 0 1|1 0 1 1|
+Declare_Type		Variant_Record,Constrained,Visible		|0 0 0 0|0 0 1 1|0 0 0 1|1 1 0 0|
+Declare_Type		Variant_Record,Defined				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 0 1|
+Declare_Type		Variant_Record,Defined,Visible			|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
 
-#-----------------------
-# /aa
-QQuDECLARE_TYPE		VARIANT_RECORD_CLASS				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 1 0|
+Declare_Variable	Record,Duplicate				|0 0 0 0|0 0 1 1|0 0 1 0|0 0 0 0|
+Declare_Variable	Record,Visible					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 0 1|
+Declare_Variable	Record						|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
 
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x00fa/aa	Null_Time : constant Time := Time'(Year => Years'First...
-QQuDECLARE_VARIABLE	RECORD_CLASS					|0 0 0 0|0 0 1 1|0 0 1 0|0 0 1 0|
+Complete_Type		Record,By_Component_Completion			|0 0 0 0|0 0 1 1|0 0 1 0|0 1 0 0|
+Complete_Type		Record,By_Renaming				|0 0 0 0|0 0 1 1|0 0 1 0|0 1 0 1|
+Complete_Type		Record,By_Defining				|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 0|
 
-#-----------------------
-# (3f2fe70c1, 0067)/aa	type Line is record...	Completing an incomplete record type in body
-QQuDECLARE_TYPE_complete	RECORD_CLASS,DEFINED			|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 0|
+Declare_Type		Record,Defined_Incomplete			|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 1|
+Declare_Type		Record,Defined_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 0 1 0|1 0 0 0|
+Declare_Type		Record,Incomplete				|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 0|
+Declare_Type		Record,Incomplete,Visible			|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 1|
+Declare_Type		Record,Defined					|0 0 0 0|0 0 1 1|0 0 1 0|1 1 0 1|
+Declare_Type		Record,Defined,Visible				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
 
-#-----------------------
-# (3f2fe70c1, 0054)/aa	type Line;	Incomplete record type in body
-QQuDECLARE_TYPE		RECORD_CLASS,DEFINED,INCOMPLETE			|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 0|
-
-#-----------------------
-# (93b91846e, 002d)/aa	type item s record ..	complete an incomplete record type in procedure
-QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 0 1|
-
-#-----------------------
-# /aa
-QQuDECLARE_TYPE		RECORD_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x012c	Military_Hour : constant array (Sun_Positions, Hours) of Military_Hours :=
-QQu_DECLARE_VARIABLE_tmp_val	ARRAY_CLASS				|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 1|
-
+Declare_Variable	Array,Visible,With_Constraint			|0 0 0 0|0 0 1 1|0 0 1 1|0 0 1 1|
+Declare_Variable	Array,With_Constraint				|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 0|
+Declare_Variable	Array,Duplicate					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 1|
+Declare_Variable	Array,Visible					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 0|
 #-----------------------
 # gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
-DECLARE_VARIABLE	ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
+Declare_Variable	Array						|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
 
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x008f/aa	type Number_Array is array (Positive range <>) of Natural; (in package body)
-QQuDECLARE_TYPE		ARRAY_CLASS,UNCONSTRAINED			|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
+Complete_Type		Array,By_Component_Completion			|0 0 0 0|0 0 1 1|0 1 0 0|0 0 0 0|
+Complete_Type		Array,By_Constraining				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 0 1|
+Complete_Type		Array,By_Renaming				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 1 0|
+Complete_Type		Array,By_Defining				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 1 1|
 
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x001f/aa	type Field_List is array (Integer range <>) of Positive; (in package spec)
-QQuDECLARE_TYPE		ARRAY_CLASS,UNCONSTRAINED,IS_VISIBLE		|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 1|
-
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x015e/aa	Table : Access_Line_Array (1 .. Normalize); (in procedure) variable declared later
-QQuDECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 1 1|
+Declare_Type		Array,Constrained_Incomplete,Bounds_With_Object	|1 0 0 0|0 0 1 1|0 1 0 0|0 1 1 0|
+Declare_Type		Array,Constrained_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|0 1 1 1|
+Declare_Type		Array,Defined_Incomplete,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 0|
+Declare_Type		Array,Defined_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 1|
+Declare_Type		Array,Incomplete,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 0 1 1|
+Declare_Type		Array,Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 0 0|
+# End of BODY_16a8
+# Start of BODY_1868
+Declare_Type		Array,Constrained,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 1|
+Declare_Type		Array,Defined,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
+Declare_Type		Array,Defined,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 1|
+Declare_Type		Array,Constrained_Incomplete			|0 0 0 0|0 0 1 1|0 1 0 1|0 0 1 1|
+Declare_Type		Array,Constrained_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 1 0 1|0 1 0 0|
+Declare_Type		Array,Defined_Incomplete			|0 0 0 0|0 0 1 1|0 1 0 1|0 1 0 1|#1ab4
+Declare_Type		Array,Defined_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 1 0 1|0 1 1 0|#1aad
+Declare_Type		Array,Incomplete				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 0 0|
+Declare_Type		Array,Incomplete,Visible			|0 0 0 0|0 0 1 1|0 1 0 1|1 0 0 1|
+Declare_Type		Array,Constrained				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 1 1|
+Declare_Type		Array,Constrained,Visible			|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 0|
 
 #-----------------------
 # gc44,0049		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
-DECLARE_TYPE		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
+Declare_Type		Array,Defined					|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
+Declare_Type		Array,Defined,Visible				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 1 0|
 
+Declare_Variable	Task,In_Processor,As_Component			|0 0 0 0|0 0 1 1|0 1 1 0|1 0 1 0|
+Declare_Variable	Task,As_Component				|0 0 0 0|0 0 1 1|0 1 1 0|1 0 1 1|
+Declare_Variable	Task,Visible,On_Processor			|0 0 0 0|0 0 1 1|0 1 1 0|1 1 0 0|
+Declare_Variable	Task,On_Processor				|0 0 0 0|0 0 1 1|0 1 1 0|1 1 0 1|
+Declare_Variable	Task,Visible					|0 0 0 0|0 0 1 1|0 1 1 0|1 1 1 0|
+Declare_Variable	Task						|0 0 0 0|0 0 1 1|0 1 1 0|1 1 1 1|
+
+Complete_Type		Task,By_Renaming				|0 0 0 0|0 0 1 1|0 1 1 1|0 1 0 0|
+Declare_Type		Task,Incomplete					|0 0 0 0|0 0 1 1|0 1 1 1|0 1 1 1|
+Declare_Type		Task,Incomplete,Visible				|0 0 0 0|0 0 1 1|0 1 1 1|1 0 0 0|
+Declare_Type		Task,Defined,Not_Elaborated			|0 0 0 0|0 0 1 1|0 1 1 1|1 0 1 0|
+Declare_Type		Task,Defined,Visible,Not_Elaborated		|0 0 0 0|0 0 1 1|0 1 1 1|1 0 1 1|
+Declare_Type		Task,Defined					|0 0 0 0|0 0 1 1|0 1 1 1|1 1 0 1|
+Declare_Type		Task,Defined,Visible				|0 0 0 0|0 0 1 1|0 1 1 1|1 1 1 0|
+
+Declare_Variable	Package,Visible,On_Processor			|0 0 0 0|0 0 1 1|1 0 0 0|0 1 0 0|
+Declare_Variable	Package,On_Processor				|0 0 0 0|0 0 1 1|1 0 0 0|0 1 0 1|
+Declare_Variable	Package,Visible					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 0|
 #-----------------------
 # gc43,0020		PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
-DECLARE_VARIABLE	PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
+Declare_Variable	Package						|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
+
+Declare_Type		Package,Defined,Not_Elaborated			|0 0 0 0|0 0 1 1|1 0 0 0|1 1 0 0|
+Declare_Type		Package,Defined,Visible,Not_Elaborated		|0 0 0 0|0 0 1 1|1 0 0 0|1 1 0 1|
 
 #-----------------------
 # gc43,001f		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
-DECLARE_TYPE		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
+Declare_Type		Package,Defined					|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
+Declare_Type		Package,Defined,Visible				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 1|
+
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Value	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 0 1|
 
 #-----------------------
 # gc44,0074		Heap_Access,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-DECLARE_VARIABLE	Heap_Access,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+Declare_Variable	Heap_Access,By_Allocation,With_Value		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Subtype	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Subtype		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 1|
+Declare_Variable	Heap_Access,By_Allocation			|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 0|
+Declare_Variable	Heap_Access,Duplicate				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
+Declare_Variable	Heap_Access,Visible				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
+Declare_Variable	Heap_Access					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
 
 #-----------------------
 # 93b91846e, 0204	Result : Item_Ptr := new Item;
