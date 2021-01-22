@@ -788,85 +788,85 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x039d		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 0 1|
 #QQucode_0x039e		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 0|
 #QQucode_0x039f		-	|0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 1|
-QQucode_0x03a0		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 0|
-QQucode_0x03a1		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 1|
-QQucode_0x03a2		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 1 0|
-QQucode_0x03a3		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 1 1|
-QQucode_0x03a4		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 0 0|
-QQucode_0x03a5		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 0 1|
-QQucode_0x03a6		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 1 0|
-QQucode_0x03a7		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 1 1|
-QQucode_0x03a8		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 0|
-QQucode_0x03a9		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 1|
-QQucode_0x03ab		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 1 1|
-QQucode_0x03ac		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 0|
+#QQucode_0x03a0		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 0|
+#QQucode_0x03a1		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 0 1|
+#QQucode_0x03a2		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 1 0|
+#QQucode_0x03a3		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 0 1 1|
+#QQucode_0x03a4		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 0 0|
+#QQucode_0x03a5		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 0 1|
+#QQucode_0x03a6		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 1 0|
+#QQucode_0x03a7		-	|0 0 0 0 0 0 1 1 1 0 1 0 0 1 1 1|
+#QQucode_0x03a8		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 0|
+#QQucode_0x03a9		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 0 1|
+#QQucode_0x03ab		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 0 1 1|
+#QQucode_0x03ac		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 0|
 #QQucode_0x03ad		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 0 1| DECLARE_TYPE Heap_Access,DEFINED
-QQucode_0x03ae		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 1 0|
-QQucode_0x03b5		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 0 1|
+#QQucode_0x03ae		-	|0 0 0 0 0 0 1 1 1 0 1 0 1 1 1 0|
+#QQucode_0x03b5		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 0 1|
 #QQucode_0x03b6		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 0| DECLARE_VARIABLE Access,BY_ALLOCATION,WITH_VALUE
-QQucode_0x03b7		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 1|
-QQucode_0x03b8		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 0|
-QQucode_0x03b9		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 1|
-QQucode_0x03ba		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 0|
-QQucode_0x03bb		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 1|
+#QQucode_0x03b7		-	|0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 1|
+#QQucode_0x03b8		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 0|
+#QQucode_0x03b9		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 0 1|
+#QQucode_0x03ba		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 0|
+#QQucode_0x03bb		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 0 1 1|
 #QQucode_0x03bc		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0| QQu_DECLARE_VARIABLE_with_null_value Access
-QQucode_0x03bd		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 1|
-QQucode_0x03be		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 0|
-QQucode_0x03bf		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 1|
-QQucode_0x03c4		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 0|
-QQucode_0x03c5		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 1|
-QQucode_0x03c6		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 0|
+#QQucode_0x03bd		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 1|
+#QQucode_0x03be		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 0|
+#QQucode_0x03bf		-	|0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 1|
+#QQucode_0x03c4		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 0|
+#QQucode_0x03c5		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 0 1|
+#QQucode_0x03c6		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 0|
 #QQucode_0x03c7		-	|0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1| QQu_DECLARE_TYPE Heap_Access
-QQucode_0x03cc		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 0|
+#QQucode_0x03cc		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 0|
 #QQucode_0x03cd		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 0 1| QQu_DECLARE_TYPE Heap_Access,IS_VISIBLE,INCOMPLETE
 #QQucode_0x03ce		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 0| QQu_DECLARE_TYPE Heap_Access
-QQucode_0x03cf		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 1|
-QQucode_0x03d1		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 0 1|
-QQucode_0x03d2		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 0|
+#QQucode_0x03cf		-	|0 0 0 0 0 0 1 1 1 1 0 0 1 1 1 1|
+#QQucode_0x03d1		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 0 1|
+#QQucode_0x03d2		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 0|
 #QQucode_0x03d3		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 0 1 1| QQu_DECLARE_TYPE Access,DEFINED
-QQucode_0x03d4		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 0|
+#QQucode_0x03d4		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 0|
 #QQucode_0x03d5		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 0 1| DECLARE_TYPE Access,DEFINED
-QQucode_0x03d6		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 1 0|
+#QQucode_0x03d6		-	|0 0 0 0 0 0 1 1 1 1 0 1 0 1 1 0|
 #QQucode_0x03d8		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 0 0| DECLARE_VARIABLE FLOAT_CLASS
-QQucode_0x03d9		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 0 1|
-QQucode_0x03da		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 1 0|
+#QQucode_0x03d9		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 0 1|
+#QQucode_0x03da		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 1 0|
 #QQucode_0x03db		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 0 1 1| DECLARE_VARIABLE FLOAT_CLASS,WITH_VALUE,IS_VISIBLE
-QQucode_0x03dc		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 0|
-QQucode_0x03dd		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 1|
-QQucode_0x03de		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 1 0|
+#QQucode_0x03dc		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 0|
+#QQucode_0x03dd		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 1|
+#QQucode_0x03de		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 1 0|
 #QQucode_0x03df		-	|0 0 0 0 0 0 1 1 1 1 0 1 1 1 1 1| DECLARE_VARIABLE FLOAT_CLASS,WITH_VALUE
-QQucode_0x03e0		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0|
-QQucode_0x03e1		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 1|
-QQucode_0x03e3		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 1 1|
-QQucode_0x03e4		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 0 0|
-QQucode_0x03e5		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 0 1|
-QQucode_0x03e6		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 1 0|
-QQucode_0x03e8		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 0 0|
+#QQucode_0x03e0		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0|
+#QQucode_0x03e1		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 1|
+#QQucode_0x03e3		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 1 1|
+#QQucode_0x03e4		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 0 0|
+#QQucode_0x03e5		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 0 1|
+#QQucode_0x03e6		-	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 1 0|
+#QQucode_0x03e8		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 0 0|
 #QQucode_0x03e9		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 0 1| QQuDECLARE_VARIABLE DISCRETE
-QQucode_0x03ea		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 0|
-QQucode_0x03eb		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 1|
+#QQucode_0x03ea		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 0|
+#QQucode_0x03eb		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 1|
 #QQucode_0x03ec		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 0 0| DECLARE_VARIABLE DISCRETE,WITH_VALUE,WITH_CONSTRAINT
-QQucode_0x03ed		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 0 1|
-QQucode_0x03ee		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 1 0|
-QQucode_0x03ef		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 1 1|
-QQucode_0x03f0		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0|
+#QQucode_0x03ed		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 0 1|
+#QQucode_0x03ee		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 1 0|
+#QQucode_0x03ef		-	|0 0 0 0 0 0 1 1 1 1 1 0 1 1 1 1|
+#QQucode_0x03f0		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0|
 #QQucode_0x03f1		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 1| QQuDECLARE_VARIABLE DISCRETE_CLASS,WITH_VALUE
-QQucode_0x03f2		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 1 0|
-QQucode_0x03f3		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 1 1|
-QQucode_0x03f5		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 0 1|
-QQucode_0x03f6		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 1 0|
-QQucode_0x03f7		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 1 1|
+#QQucode_0x03f2		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 1 0|
+#QQucode_0x03f3		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 0 1 1|
+#QQucode_0x03f5		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 0 1|
+#QQucode_0x03f6		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 1 0|
+#QQucode_0x03f7		-	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 1 1|
 #QQucode_0x03f8		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 0| QQuDECLARE_TYPE DISCRETE_CLASS,WITH_CONSTRAINT
 #QQucode_0x03f9		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1| QQuDECLARE_TYPE DISCRETE_CLASS,DEFINED
-QQucode_0x03fa		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 1 0|
-QQucode_0x03fb		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 1 1|
-QQucode_0x03fc		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0|
+#QQucode_0x03fa		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 1 0|
+#QQucode_0x03fb		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 0 1 1|
+#QQucode_0x03fc		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0|
 #QQucode_0x03fd		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 1| QQuDECLARE_TYPE DISCRETE_CLASS,DEFINED,ENUM
 #QQucode_0x03fe		-	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0| QQuDECLARE_TYPE DISCRETE_CLASS,DEFINED,ENUM
-QQucode_0x0400		x	|0 0 0 0 0 1 0 0|x              |
-QQucode_0x0500		x	|0 0 0 0 0 1 0 1|x              |
-QQucode_0x0600		x	|0 0 0 0 0 1 1 0|x              |
-QQucode_0x0700		x	|0 0 0 0 0 1 1 1|x              |
+#QQucode_0x0400		x	|0 0 0 0 0 1 0 0|x              |
+#QQucode_0x0500		x	|0 0 0 0 0 1 0 1|x              |
+#QQucode_0x0600		x	|0 0 0 0 0 1 1 0|x              |
+#QQucode_0x0700		x	|0 0 0 0 0 1 1 1|x              |
 #QQucode_0x0800		x	|0 0 0 0 1 0 0 0|x              | QQu_return_imm_exception s8,>R
 #QQucode_0x0900		x	|0 0 0 0 1 0 0 1 0 0|x          | BINARY_SCALE_OP
 #QQucode_0x0940		x	|0 0 0 0 1 0 0 1 0 1|x          | BINARY_SCALE_OP
@@ -879,20 +879,20 @@ QQucode_0x0700		x	|0 0 0 0 0 1 1 1|x              |
 #QQucode_0x0d00		x	|0 0 0 0 1 1 0 1|x              | QQu_int_less_than s8
 #QQucode_0x0e00		x	|0 0 0 0 1 1 1 0|x              | QQu_int_not_equal s8
 #QQucode_0x0f00		x	|0 0 0 0 1 1 1 1|x              | QQu_int_is_equal s8
-QQucode_0x1000		x	|0 0 0 1 0 0 0 0|x              |
-QQucode_0x1100		x	|0 0 0 1 0 0 0 1|x              |
-QQucode_0x1200		x	|0 0 0 1 0 0 1 0|x              |
-QQucode_0x1300		x	|0 0 0 1 0 0 1 1|x              |
-QQucode_0x1400		x	|0 0 0 1 0 1 0 0|x              |
-QQucode_0x1500		x	|0 0 0 1 0 1 0 1|x              |
-QQucode_0x1600		x	|0 0 0 1 0 1 1 0|x              |
-QQucode_0x1700		x	|0 0 0 1 0 1 1 1|x              |
-QQucode_0x1800		x	|0 0 0 1 1 0 0 0|x              |
-QQucode_0x1900		x	|0 0 0 1 1 0 0 1|x              |
-QQucode_0x1a00		x	|0 0 0 1 1 0 1 0|x              |
-QQucode_0x1b00		x	|0 0 0 1 1 0 1 1|x              |
-QQucode_0x1c00		x	|0 0 0 1 1 1 0 0|x              |
-QQucode_0x1d00		x	|0 0 0 1 1 1 0 1|x              |
+#QQucode_0x1000		x	|0 0 0 1 0 0 0 0|x              |
+#QQucode_0x1100		x	|0 0 0 1 0 0 0 1|x              |
+#QQucode_0x1200		x	|0 0 0 1 0 0 1 0|x              |
+#QQucode_0x1300		x	|0 0 0 1 0 0 1 1|x              |
+#QQucode_0x1400		x	|0 0 0 1 0 1 0 0|x              |
+#QQucode_0x1500		x	|0 0 0 1 0 1 0 1|x              |
+#QQucode_0x1600		x	|0 0 0 1 0 1 1 0|x              |
+#QQucode_0x1700		x	|0 0 0 1 0 1 1 1|x              |
+#QQucode_0x1800		x	|0 0 0 1 1 0 0 0|x              |
+#QQucode_0x1900		x	|0 0 0 1 1 0 0 1|x              |
+#QQucode_0x1a00		x	|0 0 0 1 1 0 1 0|x              |
+#QQucode_0x1b00		x	|0 0 0 1 1 0 1 1|x              |
+#QQucode_0x1c00		x	|0 0 0 1 1 1 0 0|x              |
+#QQucode_0x1d00		x	|0 0 0 1 1 1 0 1|x              |
 QQucode_0x1e00		x	|0 0 0 1 1 1 1|x                |
 QQucode_0x1e00		x	|0 0 1 1 0 0 0 1|x              |
 QQucode_0x1e00		x	|0 0 1 1 0 0 1|x                |
@@ -1783,123 +1783,162 @@ Declare_Variable	Heap_Access,Duplicate				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
 Declare_Variable	Heap_Access,Visible				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
 Declare_Variable	Heap_Access					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
 
-#-----------------------
-# 93b91846e, 0204	Result : Item_Ptr := new Item;
-QQu_DECLARE_VARIABLE_with_null_value	Access				|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 0|
+Complete_Type		Heap_Access,By_Component_Completion				|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 0|
+Complete_Type		Heap_Access,By_Constraining					|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 1|
+Complete_Type		Heap_Access,By_Renaming						|0 0 0 0|0 0 1 1|1 0 1 0|0 0 1 0|
+Complete_Type		Heap_Access,By_Defining						|0 0 0 0|0 0 1 1|1 0 1 0|0 0 1 1|
+Declare_Type		Heap_Access,Indirect_Literal,Values_Relative,With_Size		|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 0|
+Declare_Type		Heap_Access,Indirect_Literal,Values_Relative			|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 1|
+Declare_Type		Heap_Access,Indirect_Literal,Visible,Values_Relative		|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 0|
+Declare_Type		Heap_Access,Indirect_Literal,Visible,Values_Relative,With_Size	|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 1|
+Declare_Type		Heap_Access,Indirect_Literal					|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 0|
+Declare_Type		Heap_Access,Indirect_Literal,Visible				|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 1|
+Declare_Type		Heap_Access,Constrained						|0 0 0 0|0 0 1 1|1 0 1 0|1 0 1 1|
+Declare_Type		Heap_Access,Constrained,Visible					|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 0|
 
 #-----------------------
 # gc44,0052		Heap_Access,DEFINED				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
-DECLARE_TYPE		Heap_Access,DEFINED				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+Declare_Type		Heap_Access,Defined				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+Declare_Type		Heap_Access,Defined,Visible			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 1 0|
 
-#-----------------------
-# 85eec923c, 0020	type List is Access Listdata; (completing type List is private)
-QQu_DECLARE_TYPE	Heap_Access					|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
+Declare_Variable	Access,Visible,By_Allocation,With_Value		|0 0 0 0|0 0 1 1|1 0 1 1|0 1 0 1|
+Declare_Variable	Access,By_Allocation,With_Value			|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
+Declare_Variable	Access,Visible,By_Allocation,With_Subtype	|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 1|
+Declare_Variable	Access,By_Allocation,With_Subtype		|0 0 0 0|0 0 1 1|1 0 1 1|1 0 0 0|
+Declare_Variable	Access,Visible,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 1 1|1 0 0 1|
+Declare_Variable	Access,By_Allocation,With_Constraint		|0 0 0 0|0 0 1 1|1 0 1 1|1 0 1 0|
+Declare_Variable	Access,Visible,By_Allocation			|0 0 0 0|0 0 1 1|1 0 1 1|1 0 1 1|
+Declare_Variable	Access,By_Allocation				|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 0|
+Declare_Variable	Access,Duplicate				|0 0 0 0|0 0 1 1|1 0 1 1|1 1 0 1|
+Declare_Variable	Access,Visible					|0 0 0 0|0 0 1 1|1 0 1 1|1 1 1 0|
+Declare_Variable	Access						|0 0 0 0|0 0 1 1|1 0 1 1|1 1 1 1|
 
-#-----------------------
-# 85eec923c, 000c	type List is private; (type List is Access Listdata;)
-QQu_DECLARE_TYPE	Heap_Access,IS_VISIBLE,INCOMPLETE		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
+Complete_Type		Access,By_Component_Completion			|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 0|
+Complete_Type		Access,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 1|
+Complete_Type		Access,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 0|
+# End of BODY_1868
 
-#-----------------------
-# 93b91846e, 0027	type Item_Ptr   is Access Item; (in procedure)
-QQu_DECLARE_TYPE	Heap_Access					|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
+# Start of BODY_1ae0
+Declare_Type		Access,Incomplete,Accesses_Protected		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 0|
+Declare_Type		Access,Incomplete,Visible,Accesses_Protected	|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
+Declare_Type		Access,Incomplete				|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
+Declare_Type		Access,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 1|
 
-#-----------------------
-# gc44,0061		Access,BY_ALLOCATION,WITH_VALUE			|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
-DECLARE_VARIABLE	Access,BY_ALLOCATION,WITH_VALUE			|0 0 0 0|0 0 1 1|1 0 1 1|0 1 1 0|
-
-#-----------------------
-# (3f2fe70c1, 0033)/aa		type A_String    is Access String; (in body)
-QQu_DECLARE_TYPE	Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 1|
-
+Declare_Type		Access,Constrained				|0 0 0 0|0 0 1 1|1 1 0 1|0 0 0 1|
+Declare_Type		Access,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 0|
+Declare_Type		Access,Defined,Accesses_Protected		|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 1|
+Declare_Type		Access,Defined,Visible,Accesses_Protected	|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 0|
 #-----------------------
 # gc44,004f		Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
 #			Type PA is Access A; (in procedure)
-DECLARE_TYPE		Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+Declare_Type		Access,Defined					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
+Declare_Type		Access,Defined,Visible				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 1 0|
 
-#-----------------------
-# ⟦85b414c73⟧ @0x48 /aa
-DECLARE_VARIABLE	FLOAT_CLASS					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
+Declare_Variable	Float,Duplicate					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
+Declare_Variable	Float,Visible					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 1|
+Declare_Variable	Float						|0 0 0 0|0 0 1 1|1 1 0 1|1 0 1 0|
+Declare_Variable	Float,Visible,With_Value			|0 0 0 0|0 0 1 1|1 1 0 1|1 0 1 1|
+Complete_Type		Float,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 0 0|
+Complete_Type		Float,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 0 1|
+Complete_Type		Float,By_Defining				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 0|
+Declare_Variable	Float,With_Value				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
 
-#-----------------------
-# ⟦cb8e43375⟧ @0xe /aa	(In visible part of spec) Zero : Float = ...
-DECLARE_VARIABLE	FLOAT_CLASS,WITH_VALUE,IS_VISIBLE		|0 0 0 0|0 0 1 1|1 1 0 1|1 0 1 1|
-
-#-----------------------
-# ⟦85b414c73⟧ @0x57 /aa
-DECLARE_VARIABLE	FLOAT_CLASS,WITH_VALUE				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x02a0 /aa	Junk, Min, Sec : Integer32;
-QQuDECLARE_VARIABLE	DISCRETE					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
+Declare_Type		Float,Incomplete				|0 0 0 0|0 0 1 1|1 1 1 0|0 0 0 0|
+Declare_Type		Float,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 1 0|0 0 0 1|
+Declare_Type		Float,Constrained				|0 0 0 0|0 0 1 1|1 1 1 0|0 0 1 1|
+Declare_Type		Float,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 0|0 1 0 0|
+Declare_Type		Float,Defined					|0 0 0 0|0 0 1 1|1 1 1 0|0 1 0 1|
+Declare_Type		Float,Defined,Visible				|0 0 0 0|0 0 1 1|1 1 1 0|0 1 1 0|
+Declare_Variable	Discrete,Visible,With_Value,With_Constraint	|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 0|
+Declare_Variable	Discrete,Duplicate				|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
+Declare_Variable	Discrete,Visible				|0 0 0 0|0 0 1 1|1 1 1 0|1 0 1 0|
+Declare_Variable	Discrete					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 1 1|
 
 #-----------------------
 # feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
 # ⟦36a4ea3d7⟧ @0x0717	Month : Integer := Months'Pos (Date.Month) + 1;
-DECLARE_VARIABLE	DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+Declare_Variable	Discrete,With_Value,With_Constraint		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+Complete_Type		Discrete,By_Constraining			|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 1|
+Complete_Type		Discrete,By_Renaming				|0 0 0 0|0 0 1 1|1 1 1 0|1 1 1 0|
+Complete_Type		Discrete,By_Defining				|0 0 0 0|0 0 1 1|1 1 1 0|1 1 1 1|
 
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x05c3 /aa      Hr : Natural := Natural (H); (in procedure)
-QQuDECLARE_VARIABLE	DISCRETE_CLASS,WITH_VALUE			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0297/aa 	subtype Region is Integer range 0 .. 3;
-QQuDECLARE_TYPE		DISCRETE_CLASS,WITH_CONSTRAINT			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0|
-
-#-----------------------
-# /aa
-QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
-
+Declare_Variable	Discrete,Visible,With_Value			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 0|
+Declare_Variable	Discrete,With_Value				|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
+Declare_Variable	Discrete,Incomplete,Unsigned			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 0|
+Declare_Variable	Discrete,Incomplete,Visible,Unsigned		|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 1|
+Declare_Variable	Discrete,Incomplete				|0 0 0 0|0 0 1 1|1 1 1 1|0 1 0 1|
+Declare_Variable	Discrete,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 0|
+Declare_Type		Discrete,Constrained				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0|
+Declare_Type		Discrete,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
+Declare_Type		Discrete,Defined,With_Size			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 0|
+Declare_Type		Discrete,Defined,Visible,With_Size		|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 1|
 #-----------------------
 # (93b91846e, 0025)/aa		type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number); (in procedure)
-QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
+Declare_Type		Discrete,Defined				|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
 
-#-----------------------
-# /aa
-QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
+# End of BODY_1ae0
+# Start of BODY_0588
+
+Execute_Immediate	Set_Value_Visible_Unchecked,x			|0 0 0 0|0 1 0 0|       x       |
+Execute_Immediate	Set_Value_Visible,x				|0 0 0 0|0 1 0 1|       x       |
 
 #-----------------------
 # g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
-EXECUTE_IMMEDIATE	SET_VALUE_UNCHECKED_OP,x			|0 0 0 0|0 1 1 0|0 0|     x	|
-
+Execute_Immediate	Set_Value_Unchecked,x				|0 0 0 0|0 1 1 0|       x	|
+Execute_Immediate	Set_Value,x					|0 0 0 0|0 1 1 1|       x       |
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
 # ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
-QQu_return_imm_exception	s8,>R					|0 0 0 0|1 0 0 0| 	s8	|
+Execute_Immediate	Raise,s8,>R					|0 0 0 0|1 0 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x108
 # ⟦85b414c73⟧ @0x0170 /phk
 # NB: microcode splits this in four
+# Execute_Immediate	Binary_Scale	0900
+# Execute_Immediate	Logical_Shift	0940
+# Execute_Immediate	Logical_Shift	0980
+# Execute_Immedate	Binary_Scale	09c0
 BINARY_SCALE_OP		s8						|0 0 0 0|1 0 0 1|	s8	|
 
 #-----------------------
 # /aa (3bf0c159 00da )
 # NB: microcode splits this in two
-QQu_add_imm		s8						|0 0 0 0|1 0 1 0|	s8	|
+Execute_Immediate	Plus,s8						|0 0 0 0|1 0 1 0|	s8	|
 
 #-----------------------
 # See ⟦a53169a08⟧ @0x64, some kind of comparison/test
 # Almost always followed by 0x70xx conditional jump /phk
 # 93b91846e @0x0168	case Colons_Observed is 	when 2 =>
-QQu_is_equal		s8						|0 0 0 0|1 0 1 1|	s8	|
+Execute_Immediate	Compare,s8					|0 0 0 0|1 0 1 1|	s8	|
 
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
 # Almost always followed by 0x70xx or 0x68xx conditional jump /phk
 # Maybe Greater_Equal_Op  ⟦36a4ea3d7⟧ @0x0609   if Months'Pos (T.Month) >= 3 then
-QQu_greater_equal	s8						|0 0 0 0|1 1 0 0| 	s8	|
+Execute_Immediate	Greater_Equal,s8				|0 0 0 0|1 1 0 0| 	s8	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x144
-QQu_int_less_than	s8						|0 0 0 0|1 1 0 1|	s8	|
+Execute_Immediate	Less,s8						|0 0 0 0|1 1 0 1|	s8	|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x0344	if Date.Hour /= 12 then
-QQu_int_not_equal	s8						|0 0 0 0|1 1 1 0|       s8      |
+Execute_Immediate	Not_Equal,s8					|0 0 0 0|1 1 1 0|       s8      |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
-QQu_int_is_equal	s8						|0 0 0 0|1 1 1 1|       s8      |
+Execute_Immediate	Equal,s8					|0 0 0 0|1 1 1 1|       s8      |
+
+Execute			Select,Guard_Write				|0 0 0 1|0 0 0 0|       s8      |
+Execute			Select,Member_Write				|0 0 0 1|0 0 0 1|       s8      |
+Execute			Task,Family_Timed				|0 0 0 1|0 0 1 0|       s8      |
+Execute			Task,Family_Cond				|0 0 0 1|0 0 1 1|       s8      |
+Execute			Task,Family_Call				|0 0 0 1|0 1 0 0|       s8      |
+Execute			Task,Timed_Call					|0 0 0 1|0 1 0 1|       s8      |
+Execute			Task,Conditional_Call				|0 0 0 1|0 1 1 0|       s8      |
+Execute			Task,Entry_Call					|0 0 0 1|0 1 1 1|       s8      |
+
 
 #-----------------------
 # g43,002c		PACKAGE_CLASS,FIELD_EXECUTE_OP,13		|0 0 0 1|1 0 0 0|0 0 0 0|1 1 0 1|
@@ -1915,27 +1954,38 @@ EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0|       x     |
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x10b
-QQu_field_store		x						|0 0 0 1|1 0 1 0|0|       x	|
+Execute			Package,Field_Write,x				|0 0 0 1|1 0 1 0|0|       x	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0xfe
-QQu_field_load		x						|0 0 0 1|1 0 1 1|0|       x	|
+Execute			Package,Field_Read				|0 0 0 1|1 0 1 1|0|       x	|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x068e
-QQu_structure_Store	x						|0 0 0 1|1 1 0 0|0|       x     |
+Execute_Immediate	Run_Utility,x					|0 0 0 1|1 1 0 0|         x     |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
 EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
 
+Execute			Variant_Record,Set_Variant			|0 0 1 0|0 0 0 0|0|       x     |
+Execute			Variant_Record,Set_Bounds			|0 0 1 0|0 0 0 1|0|       x     |
+Execute			Variant_Record,Field_Constrain			|0 0 1 0|0 0 1 0|0|       x     |
+Execute			Variant_Record,Field_Reference,Fixed,Direct,x	|0 0 1 0|0 1 0 0|0|       x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0259	not sure /aa	return P.Subitem;	P.Subitem is a string
-QQu_EXECUTE_25xx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|0 1 0 1|0|       x     |
-
+Execute			Variant_Record,Field_Reference,Indirect,x	|0 0 1 0|0 1 0 1|0|       x     |
+Execute			Variant_Record,Field_Reference,Variant,Direct,x	|0 0 1 0|0 1 1 0|0|       x     |
+Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|0|       x     |
+Execute			Variant_Record,Field_Write,Fixed,Direct,x	|0 0 1 0|1 0 0 0|0|       x     |
+Execute			Variant_Record,Field_Write,Fixed,Indirect,x	|0 0 1 0|1 0 0 1|0|       x     |
+Execute			Variant_Record,Field_Write,Variant,Direct,x	|0 0 1 0|1 0 1 0|0|       x     |
+Execute			Varaint_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|0|       x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
-QQu_EXECUTE_2cxx	VARIANT_RECORD_CLASS,FIELD_READ_OP,x		|0 0 1 0|1 1 0 0|0|       x     |
+Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|0|       x     |
+Execute			Variant_Record,Field_Append,Fixed,Indirect,x	|0 0 1 0|1 1 0 1|0|       x     |
+Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|0|       x     |
 
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
