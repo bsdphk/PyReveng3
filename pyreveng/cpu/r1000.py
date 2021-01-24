@@ -1740,7 +1740,7 @@ Declare_Type		Array,Constrained,Visible			|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 0|
 Declare_Type		Array,Defined					|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 Declare_Type		Array,Defined,Visible				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 1 0|
 
-Declare_Variable	Task,In_Processor,As_Component			|0 0 0 0|0 0 1 1|0 1 1 0|1 0 1 0|
+Declare_Variable	Task,On_Processor,As_Component			|0 0 0 0|0 0 1 1|0 1 1 0|1 0 1 0|
 Declare_Variable	Task,As_Component				|0 0 0 0|0 0 1 1|0 1 1 0|1 0 1 1|
 Declare_Variable	Task,Visible,On_Processor			|0 0 0 0|0 0 1 1|0 1 1 0|1 1 0 0|
 Declare_Variable	Task,On_Processor				|0 0 0 0|0 0 1 1|0 1 1 0|1 1 0 1|
@@ -1914,7 +1914,7 @@ Execute_Immediate	Plus,s8						|0 0 0 0|1 0 1 0|	s8	|
 # See ⟦a53169a08⟧ @0x64, some kind of comparison/test
 # Almost always followed by 0x70xx conditional jump /phk
 # 93b91846e @0x0168	case Colons_Observed is 	when 2 =>
-Execute_Immediate	Compare,s8					|0 0 0 0|1 0 1 1|	s8	|
+Execute_Immediate	Case_Compare,s8					|0 0 0 0|1 0 1 1|	s8	|
 
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
@@ -1984,7 +1984,7 @@ Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|0| 
 Execute			Variant_Record,Field_Write,Fixed,Direct,x	|0 0 1 0|1 0 0 0|0|       x     |
 Execute			Variant_Record,Field_Write,Fixed,Indirect,x	|0 0 1 0|1 0 0 1|0|       x     |
 Execute			Variant_Record,Field_Write,Variant,Direct,x	|0 0 1 0|1 0 1 0|0|       x     |
-Execute			Varaint_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|0|       x     |
+Execute			Variant_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|0|       x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
 Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|0|       x     |
