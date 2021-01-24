@@ -185,14 +185,24 @@ Disassemblers and examples using them
   * ```CBM900/example_fdc.py```
     Commodore CBM900 - Floppy controller
 
-* Data General Nova CPU
+* (Data General) Nova CPU
 
 (No in-project examples)
+
+* Rational R1000/400
+
+  * ```R1000_400/example_ada.py```
+    This machine executes Ada in hardware(!)
 
 * Texas Instruments TMS9990
 
   * ```HP6034A/example.py```
     HP6034A System DC Power Supply
+
+* Zilog Z8
+
+  * ```OMTI_5200/example.py```
+    OMTI 5200 SCSI/ST-506/Floppy/QIC-02 controller
 
 * Zilog Z80
 
