@@ -1953,7 +1953,7 @@ Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|0|       x	|
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-Execute			Packate,Field_Reference,x		|0 0 0 1|1 0 0 1|0|       x     |
+Execute			Package,Field_Reference,x		|0 0 0 1|1 0 0 1|0|       x     |
 
 
 #-----------------------
