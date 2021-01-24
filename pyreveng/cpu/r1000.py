@@ -467,7 +467,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
 #QQucode_0x0167		-	|0 0 0 0 0 0 0 1 0 1 1 0 0 1 1 1|
 #QQucode_0x0168		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 0|
 #QQucode_0x0169		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 0 1|
-QQucode_0x016a		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 0|
+#QQucode_0x016a		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 0| # Undefined in disassembler
 #QQucode_0x016b		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 0 1 1|
 #QQucode_0x016c		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 0|
 #QQucode_0x016d		-	|0 0 0 0 0 0 0 1 0 1 1 0 1 1 0 1|
@@ -918,7 +918,7 @@ QQucode_0x2d00		x	|0 0 1 0 1 1 0 1|x              |
 QQucode_0x2d00		x	|0 0 1 0 1 1 1 1|x              |
 QQucode_0x2e00		x	|0 0 1 0 1 1 1 0|x              |
 QQucode_0x3000		x	|0 0 1 1 0 0 0 0|x              |
-QQucode_0x3400		x	|0 0 1 1 0 1 0 0|x              |
+#QQucode_0x3400		x	|0 0 1 1 0 1 0 0|x              |
 #QQucode_0x3600		x	|0 0 1 1 0 1 1|x                | QQu_LOOP_DECREASING pcrelneg,>JC
 QQucode_0x3800		x	|0 0 1 1 1 0 0 0|x              |
 QQucode_0x3c00		x	|0 0 1 1 1 1 0 0|x              |
@@ -930,7 +930,7 @@ QQucode_0x4400		x	|0 1 0 0 0 1 0 0|x              |
 QQucode_0x4500		x	|0 1 0 0 0 1 0 1|x              |
 QQucode_0x4600		x	|0 1 0 0 0 1 1|x                |
 #QQucode_0x4800		x	|0 1 0 0 1|x                    | SHORT_LITERAL slit
-QQucode_0x5000		x	|0 1 0 1 0|x                    |
+#QQucode_0x5000		x	|0 1 0 1 0|x                    |
 #QQucode_0x5800		x	|0 1 0 1 1|x                    | PUSH_DOUBLE pcrel,dbl
 #QQucode_0x6000		x	|0 1 1 0 0|x                    | INDIRECT_LITERAL pcrel,literal
 #QQucode_0x6800		x	|0 1 1 0 1|x                    | QQujump_if_not pcrel,>JC
@@ -1319,6 +1319,8 @@ Execute			Variant_Record,Component_Offset			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 0|
 Execute			Variant_Record,Structure_Query			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 1|
 Execute			Variant_Record,Reference_Makes_Copy		|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 0|
 Execute			Variant_Record,Read_Discriminant_Constraint	|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 1|
+# 016a undefined in disassembler
+QQ_execute		Variant_Record,XXX				|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 0|
 # End of BODY_0ca0
 # Start of BODY_0f60
 Execute			Variant_Record,Read_Variant			|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 1|
@@ -1659,7 +1661,7 @@ Declare_Variable	Select,Choice_Open				|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 0|
 # See ⟦eecee3432⟧ @0x2f2/phk
 # See ⟦826a261d9⟧ @0x8a7/phk
 #QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
-Declare_variable	Select						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
+Declare_Variable	Select						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
 # End of BODY_14a0
 # Start of BODY_16a8
 Declare_Variable	Variant_Record,Visible,With_Constraint		|0 0 0 0|0 0 1 0|1 1 1 1|1 0 1 1|
@@ -1875,6 +1877,8 @@ Declare_Type		Discrete,Defined,Visible,With_Size		|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1
 #-----------------------
 # (93b91846e, 0025)/aa		type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number); (in procedure)
 Declare_Type		Discrete,Defined				|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
+# Not defined in disassembler (03fe)
+QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 
 # End of BODY_1ae0
 # Start of BODY_0588
@@ -1945,11 +1949,11 @@ Execute			Task,Entry_Call					|0 0 0 1|0 1 1 1|       s8      |
 # g44,0071		PACKAGE_CLASS,FIELD_EXECUTE_OP,17		|0 0 0 1|1 0 0 0|0 0 0 1|0 0 0 1|
 # g45,008e		PACKAGE_CLASS,FIELD_EXECUTE_OP,24		|0 0 0 1|1 0 0 0|0 0 0 1|1 0 0 0|
 # g45,0091		PACKAGE_CLASS,FIELD_EXECUTE_OP,100		|0 0 0 1|1 0 0 0|0 1 1 0|0 1 0 0|
-EXECUTE			PACKAGE_CLASS,FIELD_EXECUTE_OP,x		|0 0 0 1|1 0 0 0|0|       x	|
+Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|0|       x	|
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-EXECUTE			PACKAGE_CLASS,FIELD_REFERENCE_OP,x		|0 0 0 1|1 0 0 1|0|       x     |
+Execute			Packate,Field_Reference,x		|0 0 0 1|1 0 0 1|0|       x     |
 
 
 #-----------------------
@@ -1966,7 +1970,7 @@ Execute_Immediate	Run_Utility,x					|0 0 0 1|1 1 0 0|         x     |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
-EXECUTE_IMMEDIATE	REFERENCE_LEX_1_OP,x				|0 0 0 1|1 1 0 1|0|       x	|
+Execute_Immeddate	Reference_Lex_1,x				|0 0 0 1|1 1 0 1|0|       x	|
 
 Execute			Variant_Record,Set_Variant			|0 0 1 0|0 0 0 0|0|       x     |
 Execute			Variant_Record,Set_Bounds			|0 0 1 0|0 0 0 1|0|       x     |
@@ -1986,63 +1990,66 @@ Execute			Varaint_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|0|     
 Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|0|       x     |
 Execute			Variant_Record,Field_Append,Fixed,Indirect,x	|0 0 1 0|1 1 0 1|0|       x     |
 Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|0|       x     |
+Execute			Variant_Record,Field_Append,Variant,Indirect,x	|0 0 1 0|1 1 1 1|0|       x     |
+
+Execute			Record,Field_Type				|0 0 1 1|0 0 0 0|0|       x     |
 
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
-QQu_EXECUTE		RECORD_CLASS,STRUCTURE_READ_OP,x		|0 0 1 1|0 1 0 0|0|       x     |
-
-#-----------------------
-# 93b91846e, 02fd	for J in reverse Table'Range loop
-QQu_LOOP_DECREASING	pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
-
+Execute			Record,Field_Reference,x			|0 0 1 1|0 1 0 0|         x     |
+Loop_Decreasing		pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
-QQu_EXECUTE		RECORD_CLASS,FIELD_WRITE_OP,x			|0 0 1 1|1 0 0 0|0|       x     |
+Execute			Record,Field_Write,x				|0 0 1 1|1 0 0 0|0|       x     |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x0608, read record field values in function Day_Of_Week
-QQu_EXECUTE		RECORD_CLASS,FIELD_READ_OP,x			|0 0 1 1|1 1 0 0|0|       x     |
+Execute			Record,Field_Read,x				|0 0 1 1|1 1 0 0|0|       x     |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
-LOOP_INCREASING		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
+Loop_Increasing		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
 
 #-----------------------
 # phk
-QQunknown_return_1	>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
+End_Rendezvous		>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQ_exit_subprogram_from_utility_with_value	>R,x			|0 1 0 0|0 0 1 0|0 0 0| x	|
+Exit_Subprogram		From_Utility,With_Result,>R,x			|0 1 0 0|0 0 1 0|0 0 0| x	|
 
 #-----------------------
 # phk
-QQ_exit_subprogram_from_utility	>R,x					|0 1 0 0|0 0 1 1|0 0 0| x	|
+Exit_Subprogram		From_Utility,>R,x				|0 1 0 0|0 0 1 1|0 0 0| x	|
 
 #-----------------------
 # phk
-QQ_exit_subprogram_with_value	>R,x					|0 1 0 0|0 1 0 0|0 0 0| x	|
+Exit_Subprogram		With_Value,>R,x					|0 1 0 0|0 1 0 0|0 0 0| x	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
 # g44,0080		2						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0|
 # feh269,1e		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
-EXIT_SUBPROGRAM		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
+Exit_Suprogram		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
 
 #-----------------------
 # ⟦fad6fc6ba⟧ limits the argument to 8 bits
 # /phk
-JUMP_CASE		case_max					|0 1 0 0|0 1 1|0| case_max	|
+Jump_Case		case_max					|0 1 0 0|0 1 1|0| case_max	|
 
 #-----------------------
 # g43,001b		0						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 0 0|
 # g43,0024		3						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 1 1|
 # g44,0045		10						|0 1 0 0|1 0 0 0|0 0 0 0 1 0 1 1|
 # g44,004e		24						|0 1 0 0|1 0 0 0|0 0 0 1 1 0 0 0|
-SHORT_LITERAL		slit						|0 1 0 0|1| slit		|
+Short_Literal		slit						|0 1 0 0|1| slit		|
+
+# Any type
+Indirect_Literal	Any,pcrel,literal				|0 1 0 1|0| pcrel               |
 
 #-----------------------
 # ⟦85b414c73⟧ (sin/cos/tan) @0x42b...
+# Indirect_Literal	Float
 PUSH_DOUBLE		pcrel,dbl					|0 1 0 1|1| pcrel		|
 
 #-----------------------
@@ -2053,36 +2060,37 @@ PUSH_DOUBLE		pcrel,dbl					|0 1 0 1|1| pcrel		|
 INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
 
 #-----------------------
-QQujump_if_not		pcrel,>JC					|0 1 1 0|1| pcrel		|
+# jump_if_not		pcrel,>JC
+Jump_Zero		pcrel,>JC					|0 1 1 0|1| pcrel		|
 
 #-----------------------
-# /aa Sandsynligvis jump_zero
 # ⟦85b414c73⟧ @0x326
 # (93b91846e, 0087	function Is_Digit, case Char is when '0'..'9' => return True;
-QQu_jump_if_true	pcrel,>JC					|0 1 1 1|0| pcrel		|
+# jump_if_true
+Jump_Nonzero		pcrel,>JC					|0 1 1 1|0| pcrel		|
 
 #-----------------------
 # XXX: Not obvious if "1" and "2" is count of extension words or if and why those words are jumped over
 # g88,001a		1						|0 1 1 1|1 0 0 0|0 0 0 0|0 0 0 1|
 # g88,0047		2						|0 1 1 1|1 0 0 0|0 0 0 0|0 0 1 0|
-JUMP			pcrel,>J					|0 1 1 1|1| pcrel		|
+Jump			pcrel,>J					|0 1 1 1|1| pcrel		|
 
 #-----------------------
 # g44,007d		1,15						|1 0 0 0|0 0 1|0 0 0 0 0 1 1 1 1|
 # g44,007f		2,9						|1 0 0 0|0 1 0|0 0 0 0 0 1 0 0 1|
 # feh269,22		0						|1 0 0 0|0 0 0|0 0 0 0 0 0 0 0 0|
-CALL			llvl,ldelta					|1 0 0| llvl  | ldelta		|
+Call			llvl,ldelta					|1 0 0| llvl  | ldelta		|
 
 #-----------------------
 # g45,009d		2,2						|1 0 1 0|0 1 0|0 0 0 0 0 0 0 1 0|
 # g45,009f		3,2						|1 0 1 0|0 1 1|0 0 0 0 0 0 0 1 0|
 # g45,00a1		1,14						|1 0 1 0|0 0 1|0 0 0 0 0 1 1 1 0|
-STORE_UNCHECKED		llvl,ldelta					|1 0 1| llvl  | ldelta		|
+Sture_Unchecked		llvl,ldelta					|1 0 1| llvl  | ldelta		|
 
 #-----------------------
 # g44,0062		2,7						|1 1 0 0|0 1 0 0|0 0 0 0|0 1 1 1|
 # g44,0075		2,8						|1 1 0 0|0 1 0 0|0 0 0 0|1 0 0 0|
-STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
+Store			llvl,ldelta					|1 1 0| llvl  | ldelta		|
 
 #-----------------------
 # g43,0021		0,1						|1 1 1 0|0 0 0|0 0 0 0 0 0 0 0 1|
@@ -2092,7 +2100,7 @@ STORE			llvl,ldelta					|1 1 0| llvl  | ldelta		|
 # g44,004c		2,3						|1 1 1 0|0 1 0|0 0 0 0 0 0 0 1 1|
 # g44,0079		2,-1						|1 1 1 0|0 1 0|1 1 1 1 1 1 1 1 1|
 # g45,00a0		3,-1						|1 1 1 0|0 1 1|1 1 1 1 1 1 1 1 1|
-LOAD			llvl,ldelta					|1 1 1| llvl  | ldelta		|
+Load			llvl,ldelta					|1 1 1| llvl  | ldelta		|
 """
 
 class ucode_ins(assy.Instree_ins):
@@ -2226,7 +2234,7 @@ class r1000_ins(assy.Instree_ins):
             return False
         if len(l) != 4 + 2 * l[-1]:
             return False
-        self.mne = "QQu_02CF"
+        self.mne = "Declare_Variable	Select"
         self.hi = a + 1
         self.oper.append(assy.Arg_verbatim("0x%03x, 0x%03x" % (l[-2], l[-1])))
         l.pop(-1)
