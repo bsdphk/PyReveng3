@@ -76,7 +76,7 @@ QQucode_0x0004		-	|0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0|
 QQucode_0x0005		-	|0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1|
 QQucode_0x0006		-	|0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0|
 #QQucode_0x0007		-	|0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1| ACTION BREAK_OPTIONAL
-QQucode_0x0008		-	|0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0|
+#QQucode_0x0008		-	|0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0|
 QQucode_0x0009		-	|0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1|
 QQucode_0x0009		-	|0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 1|
 QQucode_0x0009		-	|0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1|
@@ -901,33 +901,33 @@ QQucode_0x1e00		x	|0 0 1 1 1 0 0 1|x              |
 QQucode_0x1e00		x	|0 0 1 1 1 0 1|x                |
 QQucode_0x1e00		x	|0 0 1 1 1 1 0 1|x              |
 QQucode_0x1e00		x	|0 1 0 0 0 0 0 0|x              |
-QQucode_0x2000		x	|0 0 1 0 0 0 0 0|x              |
-QQucode_0x2100		x	|0 0 1 0 0 0 0 1|x              |
-QQucode_0x2200		x	|0 0 1 0 0 0 1 0|x              |
-QQucode_0x2300		x	|0 0 1 0 0 0 1 1|x              |
-QQucode_0x2400		x	|0 0 1 0 0 1 0 0|x              |
-QQucode_0x2500		x	|0 0 1 0 0 1 0 1|x              |
-QQucode_0x2600		x	|0 0 1 0 0 1 1 0|x              |
-QQucode_0x2700		x	|0 0 1 0 0 1 1 1|x              |
-QQucode_0x2800		x	|0 0 1 0 1 0 0 0|x              |
-QQucode_0x2900		x	|0 0 1 0 1 0 0 1|x              |
-QQucode_0x2a00		x	|0 0 1 0 1 0 1 0|x              |
-QQucode_0x2b00		x	|0 0 1 0 1 0 1 1|x              |
-QQucode_0x2c00		x	|0 0 1 0 1 1 0 0|x              |
-QQucode_0x2d00		x	|0 0 1 0 1 1 0 1|x              |
-QQucode_0x2d00		x	|0 0 1 0 1 1 1 1|x              |
-QQucode_0x2e00		x	|0 0 1 0 1 1 1 0|x              |
-QQucode_0x3000		x	|0 0 1 1 0 0 0 0|x              |
+#QQucode_0x2000		x	|0 0 1 0 0 0 0 0|x              |
+#QQucode_0x2100		x	|0 0 1 0 0 0 0 1|x              |
+#QQucode_0x2200		x	|0 0 1 0 0 0 1 0|x              |
+#QQucode_0x2300		x	|0 0 1 0 0 0 1 1|x              |
+#QQucode_0x2400		x	|0 0 1 0 0 1 0 0|x              |
+#QQucode_0x2500		x	|0 0 1 0 0 1 0 1|x              |
+#QQucode_0x2600		x	|0 0 1 0 0 1 1 0|x              |
+#QQucode_0x2700		x	|0 0 1 0 0 1 1 1|x              |
+#QQucode_0x2800		x	|0 0 1 0 1 0 0 0|x              |
+#QQucode_0x2900		x	|0 0 1 0 1 0 0 1|x              |
+#QQucode_0x2a00		x	|0 0 1 0 1 0 1 0|x              |
+#QQucode_0x2b00		x	|0 0 1 0 1 0 1 1|x              |
+#QQucode_0x2c00		x	|0 0 1 0 1 1 0 0|x              |
+#QQucode_0x2d00		x	|0 0 1 0 1 1 0 1|x              |
+#QQucode_0x2d00		x	|0 0 1 0 1 1 1 1|x              |
+#QQucode_0x2e00		x	|0 0 1 0 1 1 1 0|x              |
+#QQucode_0x3000		x	|0 0 1 1 0 0 0 0|x              |
 #QQucode_0x3400		x	|0 0 1 1 0 1 0 0|x              |
 #QQucode_0x3600		x	|0 0 1 1 0 1 1|x                | QQu_LOOP_DECREASING pcrelneg,>JC
-QQucode_0x3800		x	|0 0 1 1 1 0 0 0|x              |
-QQucode_0x3c00		x	|0 0 1 1 1 1 0 0|x              |
+#QQucode_0x3800		x	|0 0 1 1 1 0 0 0|x              |
+#QQucode_0x3c00		x	|0 0 1 1 1 1 0 0|x              |
 #QQucode_0x3e00		x	|0 0 1 1 1 1 1|x                | LOOP_INCREASING pcrelneg,>JC
-QQucode_0x4100		x	|0 1 0 0 0 0 0 1|x              |
-QQucode_0x4200		x	|0 1 0 0 0 0 1 0|x              |
-QQucode_0x4300		x	|0 1 0 0 0 0 1 1|x              |
-QQucode_0x4400		x	|0 1 0 0 0 1 0 0|x              |
-QQucode_0x4500		x	|0 1 0 0 0 1 0 1|x              |
+#QQucode_0x4100		x	|0 1 0 0 0 0 0 1|x              |
+#QQucode_0x4200		x	|0 1 0 0 0 0 1 0|x              |
+#QQucode_0x4300		x	|0 1 0 0 0 0 1 1|x              |
+#QQucode_0x4400		x	|0 1 0 0 0 1 0 0|x              |
+#QQucode_0x4500		x	|0 1 0 0 0 1 0 1|x              |
 QQucode_0x4600		x	|0 1 0 0 0 1 1|x                |
 #QQucode_0x4800		x	|0 1 0 0 1|x                    | SHORT_LITERAL slit
 #QQucode_0x5000		x	|0 1 0 1 0|x                    |
@@ -972,8 +972,8 @@ Action			Illegal						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
 #-----------------------
 # gc44,0076								|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
-ACTION			BREAK_OPTIONAL					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
-
+Action			Break_Optional					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
+Action			Idle						|0 0 0 0|0 0 0 0|0 0 0 0|1 0 0 0|
 #-----------------------
 # 93b91846e, 011e+0125		(Access type)
 Store_Top		Heap_Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 0 1|
@@ -1029,7 +1029,7 @@ Action			Query_Break_Cause				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 1| #0917
 Action			Exit_Break					|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 0| #0912
 #-----------------------
 # gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
-ACTION			BREAK_UNCONDITIONAL				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
+Action			Break_Unconditional				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 
 # End of BODY_0880
 
@@ -1061,7 +1061,7 @@ ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 # gc43,001c comments this as "push full address of a location in current code segment"
 # XXX: it may be a bit of a stretch to assume that is a subp /phk
 push_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
-# 0c47/aa
+# 0c47/aa should not a subp (2fa0095f7, 0361, 0x90-0x92), but using a space action does not seem correct
 #Action			Spare7_Action					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1|
 
 Execute			Package,Field_Reference_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 0 1|
@@ -1119,18 +1119,18 @@ Action			Initiate_Delay					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 0|
 
 #-----------------------
 # gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
-ACTION			SIGNAL_COMPLETION,>R				|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
+Action			Signal_Completion,>R				|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
 
 #-----------------------
 # gc43,003c 		SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
-ACTION			SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
+Action			Signal_Activated				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
 
 Action			Activate_Heap_Tasks				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 1| #0b95
 Action			Activate_Tasks					|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 0|
 
 #-----------------------
 # gc42,000d		ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
-ACTION			ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
+Action			Accept_Activation				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 
 Action			Make_Default					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 0|
 Action			Set_Block_Start					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 1|
@@ -1138,7 +1138,7 @@ Action			Check_Subprogram_Elaborated			|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 0|
 
 #-----------------------
 # gc42,000f		ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1| #0b77
-ACTION			ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
+Action			Elaborate_Subprogram				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
 
 #-----------------------
 # (3f2fe70c1,02d3)	end of a loop		for J in X'range loop ... end loop;
@@ -1194,7 +1194,7 @@ Load_Top		At_Offset_6					|0 0 0 0|0 0 0 0|1 1 0 1|1 1 1 0|
 # feh269,1c		Value_02					|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
 # gc44,0046		1						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 0 1|
 # gc43,0036		2						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
-LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
+Load_Encached		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
 
 # end of BODY_0a20
 
@@ -1204,10 +1204,10 @@ LOAD_ENCACHED		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
 #-----------------------
 # g88,001e		EXCEPTION_CLASS,RAISE_OP 			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 # g28, location 4 = raise instruction					|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
-EXECUTE			EXCEPTION_CLASS,RAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
+Execute			Exception,Raise,>R				|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 
 #-----------------------
-EXECUTE			EXCEPTION_CLASS,RERAISE_OP,>R			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
+Execute			Exception,Reraise,>R				|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 
 Execute			Exception,Address				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 0|
 Execute			Exception,Get_Name				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 1|
@@ -1567,7 +1567,7 @@ Execute			Discrete,Successor				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 0|
 Execute			Discrete,Last					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
 Execute			Discrete,First					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 0|
 Execute			Discrete,Maximum				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 1|
-Execute			Discrete.Minimum				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 0|
+Execute			Discrete,Minimum				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 0|
 #-----------------------
 # /aa (3bf0c159 00d9)
 Execute			Discrete,Exponentiate				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
@@ -1721,7 +1721,12 @@ Declare_Type		Array,Defined_Incomplete,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0
 Declare_Type		Array,Defined_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 1|
 Declare_Type		Array,Incomplete,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 0 1 1|
 Declare_Type		Array,Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 0 0|
+
+# Guess, undefined in disassembler
+QQ_Declare_Type		Array,Constrained,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 0|
+
 # End of BODY_16a8
+
 # Start of BODY_1868
 Declare_Type		Array,Constrained,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 1|
 Declare_Type		Array,Defined,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
@@ -1818,6 +1823,9 @@ Declare_Variable	Access						|0 0 0 0|0 0 1 1|1 0 1 1|1 1 1 1|
 Complete_Type		Access,By_Component_Completion			|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 0|
 Complete_Type		Access,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 1|
 Complete_Type		Access,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 0|
+
+# 85eec923c, 0020	type List is Access Listdata; (completing type List is private)
+QQ_Complete_Type	Access						|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
 # End of BODY_1868
 
 # Start of BODY_1ae0
@@ -1870,6 +1878,10 @@ Declare_Variable	Discrete,Incomplete,Unsigned			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 0
 Declare_Variable	Discrete,Incomplete,Visible,Unsigned		|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 1|
 Declare_Variable	Discrete,Incomplete				|0 0 0 0|0 0 1 1|1 1 1 1|0 1 0 1|
 Declare_Variable	Discrete,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 0|
+
+# Guess, used after defining Discrete type
+QQ_Declare_Variable	Discrete,XXX					|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 1|
+
 Declare_Type		Discrete,Constrained				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0|
 Declare_Type		Discrete,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
 Declare_Type		Discrete,Defined,With_Size			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 0|
@@ -1883,7 +1895,9 @@ QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 # End of BODY_1ae0
 # Start of BODY_0588
 
+# 0400	UNSIGNED_IMMEDIATE
 Execute_Immediate	Set_Value_Visible_Unchecked,x			|0 0 0 0|0 1 0 0|       x       |
+# 0500	UNSIGNED_IMMEDIATE
 Execute_Immediate	Set_Value_Visible,x				|0 0 0 0|0 1 0 1|       x       |
 
 #-----------------------
@@ -1893,21 +1907,27 @@ Execute_Immediate	Set_Value,x					|0 0 0 0|0 1 1 1|       x       |
 #-----------------------
 # ⟦28af5d09d⟧ @0xd2
 # ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
-Execute_Immediate	Raise,s8,>R					|0 0 0 0|1 0 0 0| 	s8	|
+Execute_Immediate	Raise,x,>R					|0 0 0 0|1 0 0 0| 	x 	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x108
 # ⟦85b414c73⟧ @0x0170 /phk
-# NB: microcode splits this in four
-# Execute_Immediate	Binary_Scale	0900
-# Execute_Immediate	Logical_Shift	0940
-# Execute_Immediate	Logical_Shift	0980
-# Execute_Immedate	Binary_Scale	09c0
-BINARY_SCALE_OP		s8						|0 0 0 0|1 0 0 1|	s8	|
+# NB: microcode splits this in four:
+# Execute_Immediate	Binary_Scale	0900 LIMITED_POSITIVE
+# Execute_Immediate	Logical_Shift	0940 LIMITED_NEGATIVE
+# Execute_Immediate	Logical_Shift	0980 LIMITED_POSITIVE
+# Execute_Immedate	Binary_Scale	09c0 LIMITED_NEGATIVE
+#BINARY_SCALE_OP	s8						|0 0 0 0|1 0 0 1|	s8	|
+Execute_Immediate	Binary_Scale,x					|0 0 0 0|1 0 0 1|0 0|    x      |
+Execute_Immediate	Logical_Shift,limneg				|0 0 0 0|1 0 0 1|0 1|  limneg   |
+Execute_Immedate	Logical_Shift,x					|0 0 0 0|1 0 0 1|1 0|    x      |
+Execute_Immediate	Binary_Scale,limneg				|0 0 0 0|1 0 0 1|1 1|  limneg   |
 
 #-----------------------
 # /aa (3bf0c159 00da )
-# NB: microcode splits this in two
+# NB: microcode splits this in two:
+# Execute_Immediate	Plus	0a00	POSITIVE_IMMEDIATE
+# Execute_Immediate	Plus	0a80	NEGATIVE_IMMEDIATE
 Execute_Immediate	Plus,s8						|0 0 0 0|1 0 1 0|	s8	|
 
 #-----------------------
@@ -1934,6 +1954,7 @@ Execute_Immediate	Not_Equal,s8					|0 0 0 0|1 1 1 0|       s8      |
 # ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
 Execute_Immediate	Equal,s8					|0 0 0 0|1 1 1 1|       s8      |
 
+# 1000	FIELD_NUMBER
 Execute			Select,Guard_Write				|0 0 0 1|0 0 0 0|       s8      |
 Execute			Select,Member_Write				|0 0 0 1|0 0 0 1|       s8      |
 Execute			Task,Family_Timed				|0 0 0 1|0 0 1 0|       s8      |
@@ -1949,20 +1970,20 @@ Execute			Task,Entry_Call					|0 0 0 1|0 1 1 1|       s8      |
 # g44,0071		PACKAGE_CLASS,FIELD_EXECUTE_OP,17		|0 0 0 1|1 0 0 0|0 0 0 1|0 0 0 1|
 # g45,008e		PACKAGE_CLASS,FIELD_EXECUTE_OP,24		|0 0 0 1|1 0 0 0|0 0 0 1|1 0 0 0|
 # g45,0091		PACKAGE_CLASS,FIELD_EXECUTE_OP,100		|0 0 0 1|1 0 0 0|0 1 1 0|0 1 0 0|
-Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|0|       x	|
+Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|       x  	|
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-Execute			Package,Field_Reference,x		|0 0 0 1|1 0 0 1|0|       x     |
+Execute			Package,Field_Reference,x		|0 0 0 1|1 0 0 1|       x       |
 
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x10b
-Execute			Package,Field_Write,x				|0 0 0 1|1 0 1 0|0|       x	|
+Execute			Package,Field_Write,x				|0 0 0 1|1 0 1 0|         x	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0xfe
-Execute			Package,Field_Read				|0 0 0 1|1 0 1 1|0|       x	|
+Execute			Package,Field_Read				|0 0 0 1|1 0 1 1|         x	|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x068e
@@ -1970,29 +1991,30 @@ Execute_Immediate	Run_Utility,x					|0 0 0 1|1 1 0 0|         x     |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
-Execute_Immeddate	Reference_Lex_1,x				|0 0 0 1|1 1 0 1|0|       x	|
+Execute_Immeddate	Reference_Lex_1,x				|0 0 0 1|1 1 0 1|         x	|
 
-Execute			Variant_Record,Set_Variant			|0 0 1 0|0 0 0 0|0|       x     |
-Execute			Variant_Record,Set_Bounds			|0 0 1 0|0 0 0 1|0|       x     |
-Execute			Variant_Record,Field_Constrain			|0 0 1 0|0 0 1 0|0|       x     |
-Execute			Variant_Record,Field_Reference,Fixed,Direct,x	|0 0 1 0|0 1 0 0|0|       x     |
+Execute			Variant_Record,Set_Variant			|0 0 1 0|0 0 0 0|         x     |
+Execute			Variant_Record,Set_Bounds			|0 0 1 0|0 0 0 1|         x     |
+Execute			Variant_Record,Field_Constrain			|0 0 1 0|0 0 1 0|         x     |
+Execute			Variant_Record,Field_Type			|0 0 1 0|0 0 1 1|         x     |
+Execute			Variant_Record,Field_Reference,Fixed,Direct,x	|0 0 1 0|0 1 0 0|         x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0259	not sure /aa	return P.Subitem;	P.Subitem is a string
-Execute			Variant_Record,Field_Reference,Indirect,x	|0 0 1 0|0 1 0 1|0|       x     |
-Execute			Variant_Record,Field_Reference,Variant,Direct,x	|0 0 1 0|0 1 1 0|0|       x     |
-Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|0|       x     |
-Execute			Variant_Record,Field_Write,Fixed,Direct,x	|0 0 1 0|1 0 0 0|0|       x     |
-Execute			Variant_Record,Field_Write,Fixed,Indirect,x	|0 0 1 0|1 0 0 1|0|       x     |
-Execute			Variant_Record,Field_Write,Variant,Direct,x	|0 0 1 0|1 0 1 0|0|       x     |
-Execute			Variant_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|0|       x     |
+Execute			Variant_Record,Field_Reference,Indirect,x	|0 0 1 0|0 1 0 1|         x     |
+Execute			Variant_Record,Field_Reference,Variant,Direct,x	|0 0 1 0|0 1 1 0|         x     |
+Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|         x     |
+Execute			Variant_Record,Field_Write,Fixed,Direct,x	|0 0 1 0|1 0 0 0|         x     |
+Execute			Variant_Record,Field_Write,Fixed,Indirect,x	|0 0 1 0|1 0 0 1|         x     |
+Execute			Variant_Record,Field_Write,Variant,Direct,x	|0 0 1 0|1 0 1 0|         x     |
+Execute			Variant_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|         x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
-Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|0|       x     |
-Execute			Variant_Record,Field_Append,Fixed,Indirect,x	|0 0 1 0|1 1 0 1|0|       x     |
-Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|0|       x     |
-Execute			Variant_Record,Field_Append,Variant,Indirect,x	|0 0 1 0|1 1 1 1|0|       x     |
+Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|         x     |
+Execute			Variant_Record,Field_Append,Fixed,Indirect,x	|0 0 1 0|1 1 0 1|         x     |
+Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|         x     |
+Execute			Variant_Record,Field_Append,Variant,Indirect,x	|0 0 1 0|1 1 1 1|         x     |
 
-Execute			Record,Field_Type				|0 0 1 1|0 0 0 0|0|       x     |
+Execute			Record,Field_Type				|0 0 1 1|0 0 0 0|         x     |
 
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
@@ -2000,11 +2022,11 @@ Execute			Record,Field_Reference,x			|0 0 1 1|0 1 0 0|         x     |
 Loop_Decreasing		pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
-Execute			Record,Field_Write,x				|0 0 1 1|1 0 0 0|0|       x     |
+Execute			Record,Field_Write,x				|0 0 1 1|1 0 0 0|         x     |
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x0608, read record field values in function Day_Of_Week
-Execute			Record,Field_Read,x				|0 0 1 1|1 1 0 0|0|       x     |
+Execute			Record,Field_Read,x				|0 0 1 1|1 1 0 0|         x     |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
@@ -2012,29 +2034,32 @@ Loop_Increasing		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
 
 #-----------------------
 # phk
-End_Rendezvous		>R,x						|0 1 0 0|0 0 0 1|0 0 0| x	|
+# 4100 PARAMETER_COUNT
+End_Rendezvous		>R,x						|0 1 0 0|0 0 0 1|       x	|
 
 #-----------------------
 # phk
-Exit_Subprogram		From_Utility,With_Result,>R,x			|0 1 0 0|0 0 1 0|0 0 0| x	|
+# 4200 NEW_TOP_OFFSET
+Exit_Subprogram		From_Utility,With_Result,>R,x			|0 1 0 0|0 0 1 0|       x	|
 
 #-----------------------
 # phk
-Exit_Subprogram		From_Utility,>R,x				|0 1 0 0|0 0 1 1|0 0 0| x	|
+Exit_Subprogram		From_Utility,>R,x				|0 1 0 0|0 0 1 1|       x	|
 
 #-----------------------
 # phk
-Exit_Subprogram		With_Value,>R,x					|0 1 0 0|0 1 0 0|0 0 0| x	|
+Exit_Subprogram		With_Value,>R,x					|0 1 0 0|0 1 0 0|       x	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
 # g44,0080		2						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0|
 # feh269,1e		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
-Exit_Suprogram		>R						|0 1 0 0|0 1 0 1|0 0|   x	|
+Exit_Suprogram		>R						|0 1 0 0|0 1 0 1|       x	|
 
 #-----------------------
 # ⟦fad6fc6ba⟧ limits the argument to 8 bits
 # /phk
+# 4e00 CASE_MAXIMUM (and 0x1ff) = 9 bits (2fa0095f7)
 Jump_Case		case_max					|0 1 0 0|0 1 1|0| case_max	|
 
 #-----------------------
@@ -2085,7 +2110,7 @@ Call			llvl,ldelta					|1 0 0| llvl  | ldelta		|
 # g45,009d		2,2						|1 0 1 0|0 1 0|0 0 0 0 0 0 0 1 0|
 # g45,009f		3,2						|1 0 1 0|0 1 1|0 0 0 0 0 0 0 1 0|
 # g45,00a1		1,14						|1 0 1 0|0 0 1|0 0 0 0 0 1 1 1 0|
-Sture_Unchecked		llvl,ldelta					|1 0 1| llvl  | ldelta		|
+Store_Unchecked		llvl,ldelta					|1 0 1| llvl  | ldelta		|
 
 #-----------------------
 # g44,0062		2,7						|1 1 0 0|0 1 0 0|0 0 0 0|0 1 1 1|
@@ -2163,6 +2188,11 @@ class r1000_ins(assy.Instree_ins):
 
     def assy_x(self):
         v = self['x']
+        return "0x%x" % v
+
+    def assy_limneg(self):
+        v = self['limneg']
+        return "-0x%x" % (0x040 - v)
         return "0x%x" % v
 
     def assy_s8(self):
