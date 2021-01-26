@@ -928,7 +928,7 @@ QQucode_0x1e00		x	|0 1 0 0 0 0 0 0|x              |
 #QQucode_0x4300		x	|0 1 0 0 0 0 1 1|x              |
 #QQucode_0x4400		x	|0 1 0 0 0 1 0 0|x              |
 #QQucode_0x4500		x	|0 1 0 0 0 1 0 1|x              |
-QQucode_0x4600		x	|0 1 0 0 0 1 1|x                |
+#QQucode_0x4600		x	|0 1 0 0 0 1 1|x                |
 #QQucode_0x4800		x	|0 1 0 0 1|x                    | SHORT_LITERAL slit
 #QQucode_0x5000		x	|0 1 0 1 0|x                    |
 #QQucode_0x5800		x	|0 1 0 1 1|x                    | PUSH_DOUBLE pcrel,dbl
@@ -1856,6 +1856,7 @@ Declare_Type		Discrete,Constrained				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0|
 Declare_Type		Discrete,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
 Declare_Type		Discrete,Defined,With_Size			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 0|
 Declare_Type		Discrete,Defined,Visible,With_Size		|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 1|
+QQ_Declare_Type		Discrete,XXX					|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 0|
 #-----------------------
 # (93b91846e, 0025)/aa		type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number); (in procedure)
 Declare_Type		Discrete,Defined				|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
@@ -2011,7 +2012,7 @@ Exit_Suprogram		>R						|0 1 0 0|0 1 0 1|       x	|
 # ⟦fad6fc6ba⟧ limits the argument to 8 bits
 # /phk
 # 4e00 CASE_MAXIMUM (and 0x1ff) = 9 bits (2fa0095f7)
-Jump_Case		case_max					|0 1 0 0|0 1 1|0| case_max	|
+Jump_Case		case_max					|0 1 0 0|0 1 1|   case_max	|
 
 #-----------------------
 # g43,001b		0						|0 1 0 0|1 0 0 0|0 0 0 0 0 0 0 0|
@@ -2094,9 +2095,8 @@ class r1000_ins(assy.Instree_ins):
 
     def assy_case_max(self):
         i = 1 + self['case_max']
-        self += code.Jump(cond="default", to=self.hi)
         for j in range(i):
-            self += code.Jump(cond="#0x%x" % j, to=self.hi + 1 + j)
+            self += code.Jump(cond="#0x%x" % j, to=self.hi + j)
             self.lang.m.set_line_comment(self.hi + j, "case 0x%x" % j)
         return "0x%x" % i
 
