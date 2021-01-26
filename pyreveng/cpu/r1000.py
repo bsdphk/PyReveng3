@@ -968,7 +968,7 @@ QQunknown_instruction	-						| unknown			|
 #zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
 # BODY_0880 start
-Action			Illegal						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
+Action			Illegal,>R					|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
 #-----------------------
 # gc44,0076								|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
@@ -1047,14 +1047,14 @@ Action			Discrete,Diana_Map_Kind_To_Vci			|0 0 0 0|0 0 0 0|1 0 0 0|1 1 1 1|
 Action			Store_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 0| pse                           |
 
 #-----------------------
-ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
-#Action			Push_String_Extended_Indexed			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse                           |
+#ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
+Action			Push_String_Extended_Indexed,pse		|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse                           |
 
 #-----------------------
 # gc43,0029		PUSH_STRING					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0|
-ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
+#ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
 # 0c4c/aa
-#Action			Push_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse                           |
+Action			Push_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse                           |
 
 
 #-----------------------
@@ -1078,17 +1078,17 @@ Action			Jump_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 1 1 1|
 
 #-----------------------
 # See for instance ⟦2009596b6⟧ @b4
-#Action			Push_Structure_Extended /aa
-PUSH_STRING_EXTENDED	abs,mark					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs				|
+#PUSH_STRING_EXTENDED	abs,mark					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs				|
+Action			Push_Structure_Extended,abs,mark		|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs                           |
 
 #-----------------------
 # See for instance ⟦b66a7252c⟧  /phk
-#Action 		Push_Float_Extended
-PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
+#PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
+Action			Push_Float_Extended				|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs                           |
 
 #-----------------------
-#Action 		Push_Discrete_Extended
-PUSH_DISCRETE_EXTENDED	abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+#PUSH_DISCRETE_EXTENDED	abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
+Action			Push_Discrete_Extended				|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs                           |
 
 Action			Loop_Decreasing_Extended,abs,>JC		|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 1| abs                           |
 
@@ -1157,9 +1157,6 @@ Action			Exit_Nullary_Function,>R			|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
 Action			Pop_Block_With_Result				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 1|
 Action			Pop_Block					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 0|
 Action			Spare6_Action					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 1|
-
-#-----------------------
-# Guess/aa Follows LOOP_INCREASING, but not LOOP_DECREASING
 Action			Pop_Auxiliary					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
 
 #-----------------------
@@ -1216,11 +1213,6 @@ Execute			Exception,Is_Tasking_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 0|
 Execute			Exception,Is_Storage_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 1|
 Execute			Exception,Is_Program_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 0|
 Execute			Exception,Is_Numeric_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1| #0ee0
-
-#-----------------------
-# ⟦85b414c73⟧ @0x357
-#IS_NUMERIC_ERROR_OP	-						|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
-
 Execute			Exception,Is_Constraint_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 0|
 
 #-----------------------
@@ -1291,14 +1283,8 @@ Execute			Heap_Access,Hash				|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 0|
 Execute			Heap_Access,Construct_Segment			|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 1|
 Execute			Heap_Access,Get_Offset				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 0|
 Execute			Float,Less_Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 1|
-#-----------------------
-# ⟦cb8e43375⟧ @0x7c
 Execute			Float,Greater_Equal_Zero			|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
-#-----------------------
-# ⟦85b414c73⟧ @0x349
 Execute			Float,Less_Zero					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
-#-----------------------
-# ⟦85b414c73⟧ @0x337
 Execute			Float,Greater_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 0|
 Execute			Float,Not_Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 0 1|
 Execute			Float,Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 1 1 0|
@@ -1442,7 +1428,7 @@ Execute			Module,Elaborate				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 0 1|
 
 #-----------------------
 # gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
-EXECUTE			MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
+Execute			Module,Augment_Imports				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
 
 #-----------------------
 #EXECUTE		MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
@@ -1493,7 +1479,7 @@ Execute			Float,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 1|
 Execute			Float,In_Type					|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc4
-Execute			Round_To_Discrete				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
+Execute			Float,Round_To_Discrete				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
 Execute			Float,Truncate_To_Discrete			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 0|
 #-----------------------
 # ⟦cb8e43375⟧ @0xc7
@@ -1506,21 +1492,21 @@ Execute			Float,Convert					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 0|
 #-----------------------
 # ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
 # Assembler instruction is EXECUTE, Float_Class, op
-FLOAT_**		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
-FLOAT_DIVIDE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
-FLOAT_MULTIPLY		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
-FLOAT_SUBTRACT		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|
-FLOAT_ADD		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
-FLOAT_ABS		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 0|
-FLOAT_NEGATE		-						|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 1|
-FLOAT_FIRST		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 0|
-FLOAT_LAST		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 1|
-FLOAT_LESS_EQUAL	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 0|
-FLOAT_GREATER_EQUAL	-						|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 1|
-FLOAT_LESS		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
-FLOAT_GREATER		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
-FLOAT_NOT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 0|
-FLOAT_EQUAL		-						|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
+Execute			Float,Exponentiate				|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
+Execute			Float,Divide					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
+Execute			Float,Times					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
+Execute			Float,Minus					|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 0|
+Execute			Float,Plus					|0 0 0 0|0 0 1 0|0 0 1 1|1 1 0 1|
+Execute			Float,Absolute_Value				|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 0|
+Execute			Float,Unary_Minus				|0 0 0 0|0 0 1 0|0 0 1 1|1 1 1 1|
+Execute			Float,Last					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 0|
+Execute			Float,First					|0 0 0 0|0 0 1 0|0 1 0 0|0 0 0 1|
+Execute			Float,Less_Equal				|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 0|
+Execute			Float,Greater_Equal				|0 0 0 0|0 0 1 0|0 1 0 0|0 0 1 1|
+Execute			Float,Less					|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 0|
+Execute			Float,Greater					|0 0 0 0|0 0 1 0|0 1 0 0|0 1 0 1|
+Execute			Float,Not_Equal					|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 0|
+Execute			Float,Equal					|0 0 0 0|0 0 1 0|0 1 0 0|0 1 1 1|
 
 Execute			Discrete,Check_In_Integer			|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 0|
 Execute			Discrete,Case_In_Range				|0 0 0 0|0 0 1 0|0 1 0 0|1 0 0 1|
@@ -1562,35 +1548,19 @@ Execute			Discrete,Reverse_Bounds				|0 0 0 0|0 0 1 0|0 1 1 0|0 1 0 1|
 Execute			Discrete,Bounds					|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 0|
 Execute			Discrete,Predecessor				|0 0 0 0|0 0 1 0|0 1 1 0|0 1 1 1|
 Execute			Discrete,Successor				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 0|
-#-----------------------
-# /aa (3f2fe70c1 002b)		type Width_List is array (Column_Index) of Natural;
 Execute			Discrete,Last					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 0 1|
 Execute			Discrete,First					|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 0|
 Execute			Discrete,Maximum				|0 0 0 0|0 0 1 0|0 1 1 0|1 0 1 1|
 Execute			Discrete,Minimum				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 0|
-#-----------------------
-# /aa (3bf0c159 00d9)
 Execute			Discrete,Exponentiate				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 Execute			Discrete,Modulo					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
 Execute			Discrete,Remainder				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
 
-Execute			Discrete,Make_Visible				|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
-#-----------------------
-# ⟦cb8e43375⟧ @0x107 /phk
-#QQu_int_divide		-						|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
-
-#-----------------------
-# ⟦cb8e43375⟧ @0x103 /phk  not sure.
+Execute			Discrete,Divide					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
 Execute			Discrete,Times					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 1|
-
-#-----------------------
-# ⟦cb8e43375⟧ @0x109 /phk  not sure.
 Execute			Discrete,Minus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 0|
-
-#-----------------------
-# ⟦cb8e43375⟧ @0x113 /phk  not sure.
 Execute			Discrete,Plus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
-Execute			Discrete,Load_Top				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 0|
+Execute			Discrete,Absolute_Value				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 0|
 
 #-----------------------
 # ⟦85b414c73⟧ @0x171 /phk AND ?
@@ -1715,12 +1685,12 @@ Complete_Type		Array,By_Constraining				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 0 1|
 Complete_Type		Array,By_Renaming				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 1 0|
 Complete_Type		Array,By_Defining				|0 0 0 0|0 0 1 1|0 1 0 0|0 0 1 1|
 
-Declare_Type		Array,Constrained_Incomplete,Bounds_With_Object	|1 0 0 0|0 0 1 1|0 1 0 0|0 1 1 0|
+Declare_Type		Array,Constrained_Incomplete,Bounds_With_Object		|1 0 0 0|0 0 1 1|0 1 0 0|0 1 1 0|
 Declare_Type		Array,Constrained_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|0 1 1 1|
-Declare_Type		Array,Defined_Incomplete,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 0|
+Declare_Type		Array,Defined_Incomplete,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 0|
 Declare_Type		Array,Defined_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 1|
-Declare_Type		Array,Incomplete,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 0 1 1|
-Declare_Type		Array,Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 0 0|
+Declare_Type		Array,Incomplete,Bounds_With_Object			|0 0 0 0|0 0 1 1|0 1 0 0|1 0 1 1|
+Declare_Type		Array,Incomplete,Visible,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 0 0|
 
 # Guess, undefined in disassembler
 QQ_Declare_Type		Array,Constrained,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 0|
@@ -1778,17 +1748,17 @@ Declare_Type		Package,Defined,Visible				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 1|
 Declare_Variable	Heap_Access,Visible,By_Allocation,With_Value	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 0 1|
 
 #-----------------------
-# gc44,0074		Heap_Access,BY_ALLOCATION,WITH_VALUE		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-Declare_Variable	Heap_Access,By_Allocation,With_Value		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation,With_Subtype	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 1|
-Declare_Variable	Heap_Access,By_Allocation,With_Subtype		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 1|
-Declare_Variable	Heap_Access,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 1|
-Declare_Variable	Heap_Access,By_Allocation			|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 0|
-Declare_Variable	Heap_Access,Duplicate				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
-Declare_Variable	Heap_Access,Visible				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
-Declare_Variable	Heap_Access					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
+# gc44,0074		Heap_Access,BY_ALLOCATION,WITH_VALUE				|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+Declare_Variable	Heap_Access,By_Allocation,With_Value				|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Subtype			|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Subtype				|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Constraint		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Constraint			|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation				|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 1|
+Declare_Variable	Heap_Access,By_Allocation					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 0|
+Declare_Variable	Heap_Access,Duplicate						|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
+Declare_Variable	Heap_Access,Visible						|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
+Declare_Variable	Heap_Access							|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
 
 Complete_Type		Heap_Access,By_Component_Completion				|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 0|
 Complete_Type		Heap_Access,By_Constraining					|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 1|
@@ -1889,8 +1859,8 @@ Declare_Type		Discrete,Defined,Visible,With_Size		|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1
 #-----------------------
 # (93b91846e, 0025)/aa		type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number); (in procedure)
 Declare_Type		Discrete,Defined				|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
-# Not defined in disassembler (03fe)
-QQuDECLARE_TYPE		DISCRETE_CLASS,DEFINED,ENUM			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
+# Not defined in disassembler (03fe), assume same as 03fd, but visible
+Declare_Type		Discrete,Defined,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 
 # End of BODY_1ae0
 # Start of BODY_0588
@@ -1904,9 +1874,6 @@ Execute_Immediate	Set_Value_Visible,x				|0 0 0 0|0 1 0 1|       x       |
 # g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
 Execute_Immediate	Set_Value_Unchecked,x				|0 0 0 0|0 1 1 0|       x	|
 Execute_Immediate	Set_Value,x					|0 0 0 0|0 1 1 1|       x       |
-#-----------------------
-# ⟦28af5d09d⟧ @0xd2
-# ⟦36a4ea3d7⟧ @0x0c9e/aa	May be raise Constraint_Error
 Execute_Immediate	Raise,x,>R					|0 0 0 0|1 0 0 0| 	x 	|
 
 #-----------------------
@@ -1942,16 +1909,8 @@ Execute_Immediate	Case_Compare,s8					|0 0 0 0|1 0 1 1|	s8	|
 # Maybe Greater_Equal_Op  ⟦36a4ea3d7⟧ @0x0609   if Months'Pos (T.Month) >= 3 then
 Execute_Immediate	Greater_Equal,s8				|0 0 0 0|1 1 0 0| 	s8	|
 
-#-----------------------
-# ⟦cb8e43375⟧ @0x144
 Execute_Immediate	Less,s8						|0 0 0 0|1 1 0 1|	s8	|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x0344	if Date.Hour /= 12 then
 Execute_Immediate	Not_Equal,s8					|0 0 0 0|1 1 1 0|       s8      |
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x06bc	if Time_Style = Ada then
 Execute_Immediate	Equal,s8					|0 0 0 0|1 1 1 1|       s8      |
 
 # 1000	FIELD_NUMBER
@@ -1974,7 +1933,7 @@ Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|       x  	|
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-Execute			Package,Field_Reference,x		|0 0 0 1|1 0 0 1|       x       |
+Execute			Package,Field_Reference,x			|0 0 0 1|1 0 0 1|       x       |
 
 
 #-----------------------
@@ -2000,13 +1959,13 @@ Execute			Variant_Record,Field_Type			|0 0 1 0|0 0 1 1|         x     |
 Execute			Variant_Record,Field_Reference,Fixed,Direct,x	|0 0 1 0|0 1 0 0|         x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0259	not sure /aa	return P.Subitem;	P.Subitem is a string
-Execute			Variant_Record,Field_Reference,Indirect,x	|0 0 1 0|0 1 0 1|         x     |
-Execute			Variant_Record,Field_Reference,Variant,Direct,x	|0 0 1 0|0 1 1 0|         x     |
+Execute			Variant_Record,Field_Reference,Indirect,x		|0 0 1 0|0 1 0 1|         x     |
+Execute			Variant_Record,Field_Reference,Variant,Direct,x		|0 0 1 0|0 1 1 0|         x     |
 Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|         x     |
-Execute			Variant_Record,Field_Write,Fixed,Direct,x	|0 0 1 0|1 0 0 0|         x     |
-Execute			Variant_Record,Field_Write,Fixed,Indirect,x	|0 0 1 0|1 0 0 1|         x     |
-Execute			Variant_Record,Field_Write,Variant,Direct,x	|0 0 1 0|1 0 1 0|         x     |
-Execute			Variant_Record,Field_Write,Variant,Indirect,x	|0 0 1 0|1 0 1 1|         x     |
+Execute			Variant_Record,Field_Write,Fixed,Direct,x		|0 0 1 0|1 0 0 0|         x     |
+Execute			Variant_Record,Field_Write,Fixed,Indirect,x		|0 0 1 0|1 0 0 1|         x     |
+Execute			Variant_Record,Field_Write,Variant,Direct,x		|0 0 1 0|1 0 1 0|         x     |
+Execute			Variant_Record,Field_Write,Variant,Indirect,x		|0 0 1 0|1 0 1 1|         x     |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
 Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|         x     |
@@ -2015,17 +1974,9 @@ Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|         x
 Execute			Variant_Record,Field_Append,Variant,Indirect,x	|0 0 1 0|1 1 1 1|         x     |
 
 Execute			Record,Field_Type				|0 0 1 1|0 0 0 0|         x     |
-
-#-----------------------
-# ⟦3f2fe70c1⟧ @0x0275	Read record, not sure /aa
 Execute			Record,Field_Reference,x			|0 0 1 1|0 1 0 0|         x     |
 Loop_Decreasing		pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x00fa-010f, write record field values
 Execute			Record,Field_Write,x				|0 0 1 1|1 0 0 0|         x     |
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x0608, read record field values in function Day_Of_Week
 Execute			Record,Field_Read,x				|0 0 1 1|1 1 0 0|         x     |
 
 #-----------------------
@@ -2075,14 +2026,14 @@ Indirect_Literal	Any,pcrel,literal				|0 1 0 1|0| pcrel               |
 #-----------------------
 # ⟦85b414c73⟧ (sin/cos/tan) @0x42b...
 # Indirect_Literal	Float
-PUSH_DOUBLE		pcrel,dbl					|0 1 0 1|1| pcrel		|
+Indirect_Literal	Float,pcrel,dbl					|0 1 0 1|1| pcrel		|
 
 #-----------------------
 # g88,0026		Discrete_Class,57				|0 1 1 0|0 0 0 0|0 0 1 1 1 0 0 1|
 # g88,0027		Discrete_Class,52				|0 1 1 0|0 0 0 0|0 0 1 1 0 1 0 0|
 # g88,002d		Discrete_Class,42				|0 1 1 0|0 0 0 0|0 0 1 0 1 0 1 0|
 # feh269,1b		Discrete, #0020					|0 1 1 0|0 0 0 0|0 0 0 0 0 1 0 0|
-INDIRECT_LITERAL	pcrel,literal					|0 1 1 0|0| pcrel		|
+Indirect_Literal	Discrete,pcrel,literal				|0 1 1 0|0| pcrel		|
 
 #-----------------------
 # jump_if_not		pcrel,>JC
@@ -2142,12 +2093,11 @@ class r1000_ins(assy.Instree_ins):
     ''' '''
 
     def assy_case_max(self):
-        i = self['case_max']
+        i = 1 + self['case_max']
         self += code.Jump(cond="default", to=self.hi)
-        self.lang.m.set_line_comment(self.hi, "case default")
         for j in range(i):
             self += code.Jump(cond="#0x%x" % j, to=self.hi + 1 + j)
-            self.lang.m.set_line_comment(self.hi + 1 + j, "case 0x%x" % j)
+            self.lang.m.set_line_comment(self.hi + j, "case 0x%x" % j)
         return "0x%x" % i
 
     def assy_skip(self):
@@ -2290,55 +2240,6 @@ class r1000(assy.Instree_disass):
         self.add_ins(ucode_desc, ucode_ins)
         self.add_ins(r1000_desc, r1000_ins)
         self.verbatim += (
-            'ARRAY_CLASS',
-            'AUGMENT_IMPORTS_OP',
-            'BY_ALLOCATION',
-            'CATENATE_OP',
-            'CHECK_IN_TYPE_OP',
-            'DEFINED',
-            'FIELD_EXECUTE_OP',
-            'FIELD_READ_OP',
-            'FIELD_WRITE_OP',
-            'FOR_CALL',
-            'FOR_OUTER_CALL',
-            'INCOMPLETE',
-            'IS_VISIBLE',
-            'NOT_ELABORATED',
-            'NULL_SUBPROGRAM',
-            'PACKAGE_CLASS',
-            'REFERENCE_LEX_1_OP',
-            'SET_VALUE_UNCHECKED_OP',
-            'STRUCTURE_READ_OP',
-            'STRUCTURE_WRITE_OP',
-            'SUBARRAY_OP',
-            'WITH_VALUE',
-            'UNCONSTRAINED',
-            'MODULE_CLASS',
-            'WITH_CONSTRAINT',
-            'ACTIVATE_OP',
-            'DISCRETE',
-            'RAISE_OP',
-            'RERAISE_OP',
-            'EXCEPTION_CLASS',
-            'DISCRETE_CLASS',
-            'RECORD_CLASS',
-            'VECTOR_CLASS',
-            'SIGNAL_ACTIVATED',
-            'SIGNAL_COMPLETION',
-            'ACCEPT_ACTIVATION',
-            'ELABORATE_SUBPROGRAM',
-            'BREAK_UNCONDITIONAL',
-            'FIELD_REFERENCE_OP',
-            'PUSH_STRING',
-            'PUSH_STRING_INDEXED',
-            'BREAK_OPTIONAL',
-            'ENUM',
-            'IN_RANGE',
-            'BELOW_BOUND',
-            'VARIANT_RECORD_CLASS',
-            'EXPONENTIATE',
-            'MINUS',
-            'FLOAT_CLASS',
             'XXX',
             'Value_05',
             'Value_15',
