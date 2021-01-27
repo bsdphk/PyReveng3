@@ -128,7 +128,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 0 0 1 1 0 1 1 1 1 1|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 0 0 0 0 1|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0|
-#QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 1| # Check if valid???
+QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 1| # Execute Heap_Access,Size
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 0 0 0|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 0 1 0|x|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 0 1 1 1 0|x  |
@@ -139,8 +139,8 @@ QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 1 1 1 0 0|x  |
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 0 1 1 1 0 1 1 0|
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 0 0|x    |
-#QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 0| # ???
-#QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 0| # ???
+QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 0 0 0| # Execute Record,Structure_Write
+QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 0 1 1 0 0| # Execute Subarray,Structure_Write
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 1 0|x    |
 QQucode_bogus		i,x	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 0|x|
 QQucode_bogus		i	|0 0 0 0 0 0 0 1 1 0 0 1 1 0 1 0|
@@ -275,7 +275,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
 #QQucode_0x0076		-	|0 0 0 0 0 0 0 0 0 1 1 1 0 1 1 0|
 #QQucode_0x0080		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0|
 #QQucode_0x0081		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1|
-#QQucode_0x0082		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|
+QQucode_0x0082		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0|
 #QQucode_0x0087		-	|0 0 0 0 0 0 0 0 1 0 0 0 0 1 1 1|
 #QQucode_0x0088		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0|
 #QQucode_0x0089		-	|0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 1|
@@ -311,8 +311,8 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
 #QQucode_0x00a8		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0|
 #QQucode_0x00a9		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 1|
 #QQucode_0x00aa		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 0|
-#QQucode_0x00ab		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 1|
-#QQucode_0x00ac		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 0|
+QQucode_0x00ab		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 1|
+QQucode_0x00ac		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 0|
 #QQucode_0x00ad		-	|0 0 0 0 0 0 0 0 1 0 1 0 1 1 0 1|
 #QQucode_0x00b3		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 0 1 1|
 #QQucode_0x00b4		-	|0 0 0 0 0 0 0 0 1 0 1 1 0 1 0 0|
@@ -636,7 +636,7 @@ QQucode_0x0205		-	|0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 1| #Not handled by disassembler
 #QQucode_0x0259		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 0 1|
 #QQucode_0x025a		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0|
 #QQucode_0x025b		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 1| QQuDECLARE_TYPE ARRAY_CLASS,DEFINED
-#QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
+QQucode_0x025c		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 0|
 #QQucode_0x025d		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 0 1|
 #QQucode_0x025e		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0| QQu_CONVERT_TO_INT -
 #QQucode_0x025f		-	|0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 1|
@@ -1061,7 +1061,7 @@ Action			Push_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse       
 # gc43,001c comments this as "push full address of a location in current code segment"
 # XXX: it may be a bit of a stretch to assume that is a subp /phk
 push_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
-# 0c47/aa should not a subp (2fa0095f7, 0361, 0x90-0x92), but using a space action does not seem correct
+# 0c47/aa does not have a subp in idsassembler (2fa0095f7, 0361, 0x90-0x92), but push_full_address is a better guess than Spare7_Action
 #Action			Spare7_Action					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1|
 
 Execute			Package,Field_Reference_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 0 1|
@@ -1107,6 +1107,10 @@ Action			Jump_Zero_Extended,abs,>JC			|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 0| abs				|
 #-----------------------
 # ⟦ed62618ed⟧ @0x1cc confirms this is unconditional /phk
 Action			Jump_Extended,abs,>J				|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
+
+# Guess, Fits parameters, Field_Execute_Dynamic is not used elsewhere.
+# Terminal_Essai.Recoit.Nouveau_Caractere (No, C); (785f3e358,2c9c18aad)
+QQ_Action		Package,Field_Execute_Dynamic			|0 0 0 0|0 0 0 0|1 0 1 0|1 1 0 1|
 
 Action			Increase_Priority				|0 0 0 0|0 0 0 0|1 0 1 1|0 0 1 1|
 Action			Name_Partner					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 0 0|
@@ -1222,7 +1226,9 @@ Execute			Exception,Equal					|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1| #0ed4
 Execute			Any,Is_Initialization_Repeated			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 0|
 Execute			Any,Has_Repeated_Initialization			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 1|
 Execute			Any,Make_Constrained				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 0|
-Execute			Heap_Access,Size				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 1|
+
+# Decoded by disassembler, but not by microcode
+#Execute		Heap_Access,Size				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 1|
 Execute			Access,Size					|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 0|
 Execute			Any,Structure_Clear				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 1|
 Execute			Any,Address_Of_Type				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 1 0|
@@ -1324,11 +1330,15 @@ Execute			Record,Component_Offset				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 0|
 Execute			Record,Structure_Write				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
 Execute			Record,Not_Equal				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 0|
 Execute			Record,Equal					|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
-Execute			Record,Structure_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 0| # 1145
+
+# Decoded by disassembler, but not by microcode
+#Execute		Record,Structure_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 0| # 1145
 Execute			Record,Field_Reference				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 1|
 Execute			Record,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 0|
 Execute			Record,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 1|
-Execute			Subarray,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 0|
+
+# Decoded by disassembler, but not by microcode
+#Execute		Subarray,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 0|
 Execute			Subarray,Field_Reference			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 1|
 Execute			Subarray,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 0|
 Execute			Subarray,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 1|
@@ -1795,7 +1805,8 @@ Complete_Type		Access,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 1|
 Complete_Type		Access,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 0|
 
 # 85eec923c, 0020	type List is Access Listdata; (completing type List is private)
-QQ_Complete_Type	Access						|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
+# Guess /aa. By_Defining follows By_Renaming for other types
+Complete_Type		Access,By_Defining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
 # End of BODY_1868
 
 # Start of BODY_1ae0
