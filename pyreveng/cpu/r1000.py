@@ -225,6 +225,7 @@ QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 0 0 0 1 0|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 0 0 1 1 1|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 0 1 0 0|
 QQucode_bogus		i	|0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1|
+QQucode_bugus		i,x	|0 0 0 0 1 0 0 1 1 0|x          |
 #QQucode_0x0031		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 1|
 #QQucode_0x0032		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 0|
 #QQucode_0x0033		-	|0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1|
@@ -1250,7 +1251,7 @@ Execute			Any,Is_Scalar					|0 0 0 0|0 0 0 1|0 0 0 1|1 1 1 1|
 Execute			Any,Is_Value					|0 0 0 0|0 0 0 1|0 0 1 0|0 0 0 0|
 Execute			Any,Is_Default					|0 0 0 0|0 0 0 1|0 0 1 0|0 0 0 1|
 Execute			Any,Make_Root_Type				|0 0 0 0|0 0 0 1|0 0 1 0|0 0 1 0|
-Execute			Any,Make_Alligned				|0 0 0 0|0 0 0 1|0 0 1 0|0 0 1 1|
+Execute			Any,Make_Aligned				|0 0 0 0|0 0 0 1|0 0 1 0|0 0 1 1|
 Execute			Any,Is_Constrained				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 0|
 Execute			Any,Set_Constraint				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 1|
 Execute			Any,Has_Default_Initialization			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 0|
@@ -1415,7 +1416,7 @@ Execute			Array,In_Type					|0 0 0 0|0 0 0 1|1 1 1 0|1 1 0 1|
 Execute			Array,Convert_To_Formal				|0 0 0 0|0 0 0 1|1 1 1 0|1 1 1 0|
 Execute			Array,Convert					|0 0 0 0|0 0 0 1|1 1 1 0|1 1 1 1|
 
-Execute			Array,Sybarray					|0 0 0 0|0 0 0 1|1 1 1 1|0 0 1 1| #1476
+Execute			Array,Subarray					|0 0 0 0|0 0 0 1|1 1 1 1|0 0 1 1| #1476
 Execute			Array,Structure_Write				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 0 0|
 Execute			Array,Field_Reference				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 0 1|
 Execute			Array,Field_Write				|0 0 0 0|0 0 0 1|1 1 1 1|0 1 1 0|
@@ -1528,7 +1529,7 @@ Execute			Discrete,Extract_Bits				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 0|
 Execute			Discrete,Insert_Bits				|0 0 0 0|0 0 1 0|0 1 0 0|1 1 1 1|
 Execute			Discrete,Rotate					|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 0|
 Execute			Discrete,Logical_Shift				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 0 1|
-Execute			Discrete,Aritmetic_Shift			|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 0|
+Execute			Discrete,Arithmetic_Shift			|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 0|
 Execute			Discrete,Binary_Scale				|0 0 0 0|0 0 1 0|0 1 0 1|0 0 1 1|
 Execute			Discrete,Partial_Minus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 0|
 Execute			Discrete,Partial_Plus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 1|
@@ -1878,15 +1879,15 @@ Declare_Type		Discrete,Defined,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 # Start of BODY_0588
 
 # 0400	UNSIGNED_IMMEDIATE
-Execute_Immediate	Set_Value_Visible_Unchecked,x			|0 0 0 0|0 1 0 0|       x       |
+Execute_Immediate	Set_Value_Visible_Unchecked,uimmediate		|0 0 0 0|0 1 0 0|   uimmediate  |
 # 0500	UNSIGNED_IMMEDIATE
-Execute_Immediate	Set_Value_Visible,x				|0 0 0 0|0 1 0 1|       x       |
+Execute_Immediate	Set_Value_Visible,uimmediate			|0 0 0 0|0 1 0 1|   uimmediate  |
 
 #-----------------------
 # g43,0037		SET_VALUE_UNCHECKED_OP,33			|0 0 0 0|0 1 1 0|0 0 1 0|0 0 0 1|
-Execute_Immediate	Set_Value_Unchecked,x				|0 0 0 0|0 1 1 0|       x	|
-Execute_Immediate	Set_Value,x					|0 0 0 0|0 1 1 1|       x       |
-Execute_Immediate	Raise,x,>R					|0 0 0 0|1 0 0 0| 	x 	|
+Execute_Immediate	Set_Value_Unchecked,uimmediate			|0 0 0 0|0 1 1 0|   uimmediate	|
+Execute_Immediate	Set_Value,uimmediate				|0 0 0 0|0 1 1 1|   uimmediate  |
+Execute_Immediate	Raise,uimmediate,>R				|0 0 0 0|1 0 0 0|   uimmediate  |
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x108
@@ -1894,13 +1895,13 @@ Execute_Immediate	Raise,x,>R					|0 0 0 0|1 0 0 0| 	x 	|
 # NB: microcode splits this in four:
 # Execute_Immediate	Binary_Scale	0900 LIMITED_POSITIVE
 # Execute_Immediate	Logical_Shift	0940 LIMITED_NEGATIVE
-# Execute_Immediate	Logical_Shift	0980 LIMITED_POSITIVE
+# Execute_Immediate	Logical_Shift	0980 LIMITED_POSITIVE	Not decoded by microcode
 # Execute_Immedate	Binary_Scale	09c0 LIMITED_NEGATIVE
 #BINARY_SCALE_OP	s8						|0 0 0 0|1 0 0 1|	s8	|
-Execute_Immediate	Binary_Scale,x					|0 0 0 0|1 0 0 1|0 0|    x      |
-Execute_Immediate	Logical_Shift,limneg				|0 0 0 0|1 0 0 1|0 1|  limneg   |
-Execute_Immedate	Logical_Shift,x					|0 0 0 0|1 0 0 1|1 0|    x      |
-Execute_Immediate	Binary_Scale,limneg				|0 0 0 0|1 0 0 1|1 1|  limneg   |
+Execute_Immediate	Binary_Scale,limitedpos				|0 0 0 0|1 0 0 1|0 0| limitedpos|
+Execute_Immediate	Logical_Shift,limitedneg			|0 0 0 0|1 0 0 1|0 1| limitedneg|
+#Execute_Immedate	Logical_Shift,limitedpos			|0 0 0 0|1 0 0 1|1 0| limitedpos|
+Execute_Immediate	Binary_Scale,limitedneg				|0 0 0 0|1 0 0 1|1 1| limitedneg|
 
 #-----------------------
 # /aa (3bf0c159 00da )
@@ -1913,7 +1914,7 @@ Execute_Immediate	Plus,s8						|0 0 0 0|1 0 1 0|	s8	|
 # See ⟦a53169a08⟧ @0x64, some kind of comparison/test
 # Almost always followed by 0x70xx conditional jump /phk
 # 93b91846e @0x0168	case Colons_Observed is 	when 2 =>
-Execute_Immediate	Case_Compare,s8					|0 0 0 0|1 0 1 1|	s8	|
+Execute_Immediate	Case_Compare,uimmediate				|0 0 0 0|1 0 1 1|   uimmediate	|
 
 #-----------------------
 # See ⟦657fb377c⟧ @0x1d7c, some kind of comparison/test
@@ -1926,14 +1927,14 @@ Execute_Immediate	Not_Equal,s8					|0 0 0 0|1 1 1 0|       s8      |
 Execute_Immediate	Equal,s8					|0 0 0 0|1 1 1 1|       s8      |
 
 # 1000	FIELD_NUMBER
-Execute			Select,Guard_Write				|0 0 0 1|0 0 0 0|       s8      |
-Execute			Select,Member_Write				|0 0 0 1|0 0 0 1|       s8      |
-Execute			Task,Family_Timed				|0 0 0 1|0 0 1 0|       s8      |
-Execute			Task,Family_Cond				|0 0 0 1|0 0 1 1|       s8      |
-Execute			Task,Family_Call				|0 0 0 1|0 1 0 0|       s8      |
-Execute			Task,Timed_Call					|0 0 0 1|0 1 0 1|       s8      |
-Execute			Task,Conditional_Call				|0 0 0 1|0 1 1 0|       s8      |
-Execute			Task,Entry_Call					|0 0 0 1|0 1 1 1|       s8      |
+Execute			Select,Guard_Write,fieldnum			|0 0 0 1|0 0 0 0|    fieldnum   |
+Execute			Select,Member_Write,fieldnum			|0 0 0 1|0 0 0 1|    fieldnum   |
+Execute			Task,Family_Timed,fieldnum			|0 0 0 1|0 0 1 0|    fieldnum   |
+Execute			Task,Family_Cond,fieldnum			|0 0 0 1|0 0 1 1|    fieldnum   |
+Execute			Task,Family_Call,fieldnum			|0 0 0 1|0 1 0 0|    fieldnum   |
+Execute			Task,Timed_Call,fieldnum			|0 0 0 1|0 1 0 1|    fieldnum   |
+Execute			Task,Conditional_Call,fieldnum			|0 0 0 1|0 1 1 0|    fieldnum   |
+Execute			Task,Entry_Call,fieldnum			|0 0 0 1|0 1 1 1|    fieldnum   |
 
 
 #-----------------------
@@ -1941,55 +1942,55 @@ Execute			Task,Entry_Call					|0 0 0 1|0 1 1 1|       s8      |
 # g44,0071		PACKAGE_CLASS,FIELD_EXECUTE_OP,17		|0 0 0 1|1 0 0 0|0 0 0 1|0 0 0 1|
 # g45,008e		PACKAGE_CLASS,FIELD_EXECUTE_OP,24		|0 0 0 1|1 0 0 0|0 0 0 1|1 0 0 0|
 # g45,0091		PACKAGE_CLASS,FIELD_EXECUTE_OP,100		|0 0 0 1|1 0 0 0|0 1 1 0|0 1 0 0|
-Execute			Package,Field_Execute,x				|0 0 0 1|1 0 0 0|       x  	|
+Execute			Package,Field_Execute,fieldnum			|0 0 0 1|1 0 0 0|    fieldnum   |
 
 #-----------------------
 # g88,0032		PACKAGE_CLASS,FIELD_REFERENCE_OP,13		|0 0 0 1|1 0 0 1|0 0 0 0|1 1 0 1|
-Execute			Package,Field_Reference,x			|0 0 0 1|1 0 0 1|       x       |
+Execute			Package,Field_Reference,fieldnum		|0 0 0 1|1 0 0 1|    fieldnum   |
 
 
 #-----------------------
 # ⟦cb8e43375⟧ @0x10b
-Execute			Package,Field_Write,x				|0 0 0 1|1 0 1 0|         x	|
+Execute			Package,Field_Write,fieldnum			|0 0 0 1|1 0 1 0|    fieldnum	|
 
 #-----------------------
 # ⟦cb8e43375⟧ @0xfe
-Execute			Package,Field_Read				|0 0 0 1|1 0 1 1|         x	|
+Execute			Package,Field_Read,fieldnum			|0 0 0 1|1 0 1 1|    fieldnum	|
 
 #-----------------------
 # ⟦36a4ea3d7⟧ @0x068e
-Execute_Immediate	Run_Utility,x					|0 0 0 1|1 1 0 0|         x     |
+Execute_Immediate	Run_Utility,uimmediate				|0 0 0 1|1 1 0 0|   uimmediate  |
 
 #-----------------------
 # g42,000e		REFERENCE_LEX_1_OP,13				|0 0 0 1|1 1 0 1|0 0 0 0|1 1 0 1|
-Execute_Immeddate	Reference_Lex_1,x				|0 0 0 1|1 1 0 1|         x	|
+Execute_Immediate	Reference_Lex_1,uimmediate			|0 0 0 1|1 1 0 1|   uimmediate	|
 
-Execute			Variant_Record,Set_Variant			|0 0 1 0|0 0 0 0|         x     |
-Execute			Variant_Record,Set_Bounds			|0 0 1 0|0 0 0 1|         x     |
-Execute			Variant_Record,Field_Constrain			|0 0 1 0|0 0 1 0|         x     |
-Execute			Variant_Record,Field_Type			|0 0 1 0|0 0 1 1|         x     |
-Execute			Variant_Record,Field_Reference,Fixed,Direct,x	|0 0 1 0|0 1 0 0|         x     |
+Execute			Variant_Record,Set_Variant,fieldnum			|0 0 1 0|0 0 0 0|    fieldnum   |
+Execute			Variant_Record,Set_Bounds,fieldnum			|0 0 1 0|0 0 0 1|    fieldnum   |
+Execute			Variant_Record,Field_Constrain,fieldnum			|0 0 1 0|0 0 1 0|    fieldnum   |
+Execute			Variant_Record,Field_Type,fieldnum			|0 0 1 0|0 0 1 1|    fieldnum   |
+Execute			Variant_Record,Field_Reference,Fixed,Direct,fieldnum	|0 0 1 0|0 1 0 0|    fieldnum   |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0259	not sure /aa	return P.Subitem;	P.Subitem is a string
-Execute			Variant_Record,Field_Reference,Indirect,x		|0 0 1 0|0 1 0 1|         x     |
-Execute			Variant_Record,Field_Reference,Variant,Direct,x		|0 0 1 0|0 1 1 0|         x     |
-Execute			Variant_Record,Field_Reference,Variant,Indirect,x	|0 0 1 0|0 1 1 1|         x     |
-Execute			Variant_Record,Field_Write,Fixed,Direct,x		|0 0 1 0|1 0 0 0|         x     |
-Execute			Variant_Record,Field_Write,Fixed,Indirect,x		|0 0 1 0|1 0 0 1|         x     |
-Execute			Variant_Record,Field_Write,Variant,Direct,x		|0 0 1 0|1 0 1 0|         x     |
-Execute			Variant_Record,Field_Write,Variant,Indirect,x		|0 0 1 0|1 0 1 1|         x     |
+Execute			Variant_Record,Field_Reference,Indirect,fieldnum	|0 0 1 0|0 1 0 1|    fieldnum   |
+Execute			Variant_Record,Field_Reference,Variant,Direct,fieldnum	|0 0 1 0|0 1 1 0|    fieldnum   |
+Execute			Variant_Record,Field_Reference,Variant,Indirect,fieldnum|0 0 1 0|0 1 1 1|    fieldnum   |
+Execute			Variant_Record,Field_Write,Fixed,Direct,fieldnum	|0 0 1 0|1 0 0 0|    fieldnum   |
+Execute			Variant_Record,Field_Write,Fixed,Indirect,fieldnum	|0 0 1 0|1 0 0 1|    fieldnum   |
+Execute			Variant_Record,Field_Write,Variant,Direct,fieldnum	|0 0 1 0|1 0 1 0|    fieldnum   |
+Execute			Variant_Record,Field_Write,Variant,Indirect,fieldnum	|0 0 1 0|1 0 1 1|    fieldnum   |
 #-----------------------
 # ⟦3f2fe70c1⟧ @0x0245	not sure/aa		if P.Next = null then	P.Next = Access type
-Execute			Variant_Record,Field_Read,Fixed,Direct,x	|0 0 1 0|1 1 0 0|         x     |
-Execute			Variant_Record,Field_Append,Fixed,Indirect,x	|0 0 1 0|1 1 0 1|         x     |
-Execute			Variant_Record,Field_Read,Variant,Direct,x	|0 0 1 0|1 1 1 0|         x     |
-Execute			Variant_Record,Field_Append,Variant,Indirect,x	|0 0 1 0|1 1 1 1|         x     |
+Execute			Variant_Record,Field_Read,Fixed,Direct,fieldnum		|0 0 1 0|1 1 0 0|    fieldnum   |
+Execute			Variant_Record,Field_Append,Fixed,Indirect,fieldnum	|0 0 1 0|1 1 0 1|    fieldnum   |
+Execute			Variant_Record,Field_Read,Variant,Direct,fieldnum	|0 0 1 0|1 1 1 0|    fieldnum   |
+Execute			Variant_Record,Field_Append,Variant,Indirect,fieldnum	|0 0 1 0|1 1 1 1|    fieldnum   |
 
-Execute			Record,Field_Type				|0 0 1 1|0 0 0 0|         x     |
-Execute			Record,Field_Reference,x			|0 0 1 1|0 1 0 0|         x     |
+Execute			Record,Field_Type,fieldnum			|0 0 1 1|0 0 0 0|    fieldnum   |
+Execute			Record,Field_Reference,fieldnum			|0 0 1 1|0 1 0 0|    fieldnum   |
 Loop_Decreasing		pcrelneg,>JC					|0 0 1 1|0 1 1| pcrelneg        |
-Execute			Record,Field_Write,x				|0 0 1 1|1 0 0 0|         x     |
-Execute			Record,Field_Read,x				|0 0 1 1|1 1 0 0|         x     |
+Execute			Record,Field_Write,fieldnum			|0 0 1 1|1 0 0 0|    fieldnum   |
+Execute			Record,Field_Read,fieldnum			|0 0 1 1|1 1 0 0|    fieldnum   |
 
 #-----------------------
 # g44,005d		-5						|0 0 1 1|1 1 1 1|1 1 1 1|1 0 1 1|
@@ -1998,26 +1999,26 @@ Loop_Increasing		pcrelneg,>JC					|0 0 1 1|1 1 1| pcrelneg	|
 #-----------------------
 # phk
 # 4100 PARAMETER_COUNT
-End_Rendezvous		>R,x						|0 1 0 0|0 0 0 1|       x	|
+End_Rendezvous		>R,parmcnt					|0 1 0 0|0 0 0 1|    parmcnt	|
 
 #-----------------------
 # phk
 # 4200 NEW_TOP_OFFSET
-Exit_Subprogram		From_Utility,With_Result,>R,x			|0 1 0 0|0 0 1 0|       x	|
+Exit_Subprogram		From_Utility,With_Result,>R,topoffset		|0 1 0 0|0 0 1 0|   topoffset	|
 
 #-----------------------
 # phk
-Exit_Subprogram		From_Utility,>R,x				|0 1 0 0|0 0 1 1|       x	|
+Exit_Subprogram		From_Utility,>R,topoffset			|0 1 0 0|0 0 1 1|   topoffset	|
 
 #-----------------------
 # phk
-Exit_Subprogram		With_Value,>R,x					|0 1 0 0|0 1 0 0|       x	|
+Exit_Subprogram		With_Value,>R,topoffset				|0 1 0 0|0 1 0 0|   topoffset	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
 # g44,0080		2						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0|
 # feh269,1e		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
-Exit_Suprogram		>R						|0 1 0 0|0 1 0 1|       x	|
+Exit_Suprogram		topoffset,>R					|0 1 0 0|0 1 0 1|   topoffset	|
 
 #-----------------------
 # ⟦fad6fc6ba⟧ limits the argument to 8 bits
@@ -2151,16 +2152,35 @@ class r1000_ins(assy.Instree_ins):
         v = self['x']
         return "0x%x" % v
 
-    def assy_limneg(self):
-        v = self['limneg']
+    def assy_limitedneg(self):
+        v = self['limitedneg']
         return "-0x%x" % (0x040 - v)
+
+    def assy_limitedpos(self):
+        v = self['limitedpos']
         return "0x%x" % v
+
+    def assy_fieldnum(self):
+        v = self['fieldnum']
+        return "Field_Number 0x%x" % v
 
     def assy_s8(self):
         v = self['s8']
         if v & 0x80:
             return "-0x%x" % (0x100 - v)
         return "0x%x" % v
+
+    def assy_uimmediate(self):
+        v = self['uimmediate']
+        return "0x%x" % v
+
+    def assy_parmcnt(self):
+        v = self['parmcnt']
+        return "0x%x" % v
+
+    def assy_topoffset(self):
+        v = self['topoffset']
+        return "New_Top_Offset 0x%x" % v
 
     def assy_literal(self):
         y = self.lang.literal(self.dstadr)
@@ -2197,6 +2217,9 @@ class r1000_ins(assy.Instree_ins):
     def assy_ldelta(self):
         # Lexical_Delta [-256..511]
         v = self['ldelta']
+        y = self['llvl']
+        if y == 1:
+            return "0x%x" % v
         if v & 0x100:
             return "-0x%x" % (0x200 - v)
         return "0x%x" % v
