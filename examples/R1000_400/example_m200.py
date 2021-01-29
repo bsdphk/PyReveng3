@@ -26,79 +26,15 @@
 #
 # JSR 0x10284 followed by string 'Words error :_' in DISK_GEOMETRY.M200
 
-from pyreveng import mem, listing, data, assy
+from pyreveng import mem, listing
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 
+import m200_pushtxt
+import m200_syscall
+
 FILENAME = "CLI.M200"
 BASE = 0x20000
-
-#######################################################################
-
-m200_syscall_desc = '''
-SYSJMP		sc		| 4E | F9 | 00 | 01 |
-SYSJMP		sc		| 4E | F9 | 80 | 00 |
-SYSCALL		sc		| 4E | B9 | 00 | 01 |
-SYSCALL		sc		| 4E | B9 | 80 | 00 |
-STRING		str		| 43 | FA |
-'''
-
-class m200_syscall_ins(m68020.m68020_ins):
-
-    def assy_str(self):
-        a = self.lo
-        m = self.lang.m
-        for o, i in (
-            (4, (0x70, 0x72,)),
-            (6, (0x10,)),
-            (7, (0xd9,)),
-            (8, (0x51,)),
-            (9, (0xc8, 0xc9,)),
-            (10, (0xff,)),
-            (11, (0xfc,)),
-        ):
-            if m[a + o] not in i:
-                # print(self, "@%x" % o, i, "0x%x" % m[a + o])
-                raise assy.Invalid()
-        d = a + 2 + m.bs16(a + 2)
-        i = m[a + 5] + 1
-        a = self.lo
-        m = self.lang.m
-        for j in range(d, d + i):
-            if not 0x20 <= m[j] <= 0x7e and m[j] not in (9, 10, 12, 13):
-                raise assy.Invalid()
-        y = data.Txt(m, d, d + i, label=False)
-        m.set_line_comment(a, '"' + y.txt + '"')
-        raise assy.Invalid()
-
-
-    def assy_sc(self):
-        self.syscall = self.lang.m.bu16(self.hi)
-        self.syscall |= self.lang.m.bu16(self.hi - 2) << 16
-        self.hi += 2
-        j = "syscall_%x" % self.syscall
-        if hasattr(self, j):
-            return getattr(self, j)()
-        if self.lang.m[self.lo + 1] == 0xf9:
-            self.flow_J()
-        return "0x%x" % self.syscall
-
-    def syscall_10284(self):
-        self.flow_J()
-        return "0x%x" % self.syscall
-
-    def syscall_10568(self):
-        l = self.lang.m[self.hi + 2]
-        data.Txt(self.lang.m, self.hi + 3, self.hi + 3 + l, label=False)
-        self.flow_J()
-        return "0x%x" % self.syscall
-
-class m200_68k(m68020.m68020):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_ins(m200_syscall_desc, m200_syscall_ins)
-
-#######################################################################
 
 def head1_indir(cx, adr):
     if cx.m[adr] != 0x4f:
@@ -112,9 +48,10 @@ def head1_indir(cx, adr):
 
 def m200_file(m0):
 
-    #cx = m68020.m68020()
-    cx = m200_68k()
+    cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
+    m200_syscall.add_syscall(cx)
+    m200_pushtxt.add_pushtxt(cx)
     cx.m.map(m0, BASE)
 
     head = []
