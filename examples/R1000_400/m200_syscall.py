@@ -31,6 +31,8 @@
 from pyreveng import data, assy
 import pyreveng.cpu.m68020 as m68020
 
+import dfs_experiments
+
 M200_SYSCALL_DESC = '''
 SYSJMP		sc		| 4E | F9 | 00 | 01 |
 SYSJMP		sc		| 4E | F9 | 80 | 00 |
@@ -40,6 +42,7 @@ SYSCALL		sc		| 4E | B9 | 80 | 00 |
 
 class M200SyscallIns(m68020.m68020_ins):
     ''' Syscall pseudo-instructions '''
+
     def assy_sc(self):
         self.syscall = self.lang.m.bu16(self.hi)
         self.syscall |= self.lang.m.bu16(self.hi - 2) << 16
@@ -65,21 +68,28 @@ class M200SyscallIns(m68020.m68020_ins):
         return "0x%x = flush_console?" % self.syscall
 
     def syscall_10568(self):
-        l = self.lang.m[self.hi + 2]
+        ''' Generated wrappers to call an experiment with parameters? '''
+        exp_name_len = self.lang.m[self.hi + 2]
         self.oper.append(assy.Arg_dst(self.lang.m, self.syscall))
-        narg = self.lang.m[self.hi + 1]
-        for i in range(3):
+        for _i in range(3):
             self.oper.append(assy.Arg_imm(self.lang.m[self.hi]))
             self.hi += 1
-        _j, txt = data.stringify(self.lang.m, self.hi, l)
+        _j, txt = data.stringify(self.lang.m, self.hi, exp_name_len)
         self.oper.append(assy.Arg_verbatim("'" + txt + "'"))
-        self.hi += l
-        for i in range(narg // 2):
+        self.hi += exp_name_len
+        narg = self.lang.m[self.hi + 2] + self.lang.m[self.hi + 3]
+        for _i in range(4 + narg):
             self.oper.append(assy.Arg_imm(self.lang.m[self.hi]))
             self.hi += 1
         self.flow_J()
-        self.lang.m.set_label(self.lo, "exp_" + txt + "()")
+        lbl = "exp_" + txt + "("
+        args = dfs_experiments.EXPERIMENTS.get(txt)
+        if args:
+            lbl += ", ".join(b + "{" + a + "}" for a, b in args)
+        self.lang.m.set_label(self.lo, lbl + ")")
         self.compact = True
+        if self.hi & 1 and not self.lang.m[self.hi]:
+            self.hi += 1
 
 def add_syscall(cx):
     ''' Add ourselves to a m68k disassembler '''
