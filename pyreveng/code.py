@@ -192,10 +192,9 @@ class Decoder():
             return None
         assert isinstance(x, Code)
         for i in asp.find(lo=x.lo, hi=x.hi):
-            if isinstance(i, Code):
+            if isinstance(i, Code) and i.lo == x.lo:
                 return i
-            print("Would overlap", self.name, asp.afmt(adr), i, src)
-            return None
+            print("Will overlap", self.name, asp.afmt(adr), i, src)
         x.commit(asp)
         return x
 
