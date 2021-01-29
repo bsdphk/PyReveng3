@@ -40,6 +40,13 @@ SYSCALL		sc		| 4E | B9 | 00 | 01 |
 SYSCALL		sc		| 4E | B9 | 80 | 00 |
 '''
 
+SYSCALL_NAME = {
+    0x10284: "string_lit2something",	# ref: DBUSULOAD.M200
+    0x10384: "read_from_file",		# ref: DBUSULOAD.M200
+    0x103d8: "flush_console?",		# ref: DBUSULOAD.M200
+    0x1056e: "open_file",		# ref: BOOTINFO.M200
+}
+
 class M200SyscallIns(m68020.m68020_ins):
     ''' Syscall pseudo-instructions '''
 
@@ -52,20 +59,14 @@ class M200SyscallIns(m68020.m68020_ins):
             return getattr(self, j)()
         if self.lang.m[self.lo + 1] == 0xf9:
             self.flow_J()
+        nm = SYSCALL_NAME.get(self.syscall)
+        if nm:
+            return "0x%x_" % self.syscall + nm
         return "0x%x" % self.syscall
 
     def syscall_10284(self):
         self.flow_J()
         return "0x%x" % self.syscall
-
-    def syscall_102c4(self):
-        return "0x%x = something_string" % self.syscall
-
-    def syscall_10384(self):
-        return "0x%x = read_from_file" % self.syscall
-
-    def syscall_103d8(self):
-        return "0x%x = flush_console?" % self.syscall
 
     def syscall_10568(self):
         ''' Generated wrappers to call an experiment with parameters? '''
@@ -90,6 +91,9 @@ class M200SyscallIns(m68020.m68020_ins):
         self.compact = True
         if self.hi & 1 and not self.lang.m[self.hi]:
             self.hi += 1
+
+    def syscall_103d8(self):
+        return "0x%x = flush_console?" % self.syscall
 
 def add_syscall(cx):
     ''' Add ourselves to a m68k disassembler '''
