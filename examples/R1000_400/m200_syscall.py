@@ -28,7 +28,7 @@
    DFS system calls
 '''
 
-from pyreveng import data
+from pyreveng import data, assy
 import pyreveng.cpu.m68020 as m68020
 
 M200_SYSCALL_DESC = '''
@@ -66,9 +66,20 @@ class M200SyscallIns(m68020.m68020_ins):
 
     def syscall_10568(self):
         l = self.lang.m[self.hi + 2]
-        data.Txt(self.lang.m, self.hi + 3, self.hi + 3 + l, label=False)
+        self.oper.append(assy.Arg_dst(self.lang.m, self.syscall))
+        narg = self.lang.m[self.hi + 1]
+        for i in range(3):
+            self.oper.append(assy.Arg_imm(self.lang.m[self.hi]))
+            self.hi += 1
+        _j, txt = data.stringify(self.lang.m, self.hi, l)
+        self.oper.append(assy.Arg_verbatim("'" + txt + "'"))
+        self.hi += l
+        for i in range(narg // 2):
+            self.oper.append(assy.Arg_imm(self.lang.m[self.hi]))
+            self.hi += 1
         self.flow_J()
-        return "0x%x" % self.syscall
+        self.lang.m.set_label(self.lo, "exp_" + txt + "()")
+        self.compact = True
 
 def add_syscall(cx):
     ''' Add ourselves to a m68k disassembler '''
