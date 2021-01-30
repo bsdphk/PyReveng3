@@ -32,39 +32,35 @@ from pyreveng import data, assy
 import pyreveng.cpu.m68020 as m68020
 
 import dfs_experiments
+import ioc_m200_exports
 
 M200_SYSCALL_DESC = '''
 SYSJMP		sc		| 4E | F9 | 00 | 01 |
 SYSJMP		sc		| 4E | F9 | 80 | 00 |
 SYSCALL		sc		| 4E | B9 | 00 | 01 |
 SYSCALL		sc		| 4E | B9 | 80 | 00 |
+STACKCHECK	-		| BF | D5 | 62 | 06 | 44 | FC | 00 | 02 | 4E | 76 |
 '''
-
-SYSCALL_NAME = {
-    0x10284: "string_lit2something",	# ref: DBUSULOAD.M200
-    0x10384: "read_from_file",		# ref: DBUSULOAD.M200
-    0x103d8: "flush_console?",		# ref: DBUSULOAD.M200
-    0x1056e: "open_file",		# ref: BOOTINFO.M200
-}
 
 class M200SyscallIns(m68020.m68020_ins):
     ''' Syscall pseudo-instructions '''
 
     def assy_sc(self):
+        ''' Call into FS (or KERNEL via FS) '''
         self.syscall = self.lang.m.bu16(self.hi)
         self.syscall |= self.lang.m.bu16(self.hi - 2) << 16
         self.hi += 2
+        self.mne = ioc_m200_exports.fscall_name(self.syscall)
         j = "syscall_%x" % self.syscall
         if hasattr(self, j):
             return getattr(self, j)()
+
         if self.lang.m[self.lo + 1] == 0xf9:
             self.flow_J()
-        nm = SYSCALL_NAME.get(self.syscall)
-        if nm:
-            return "0x%x_" % self.syscall + nm
-        return "0x%x" % self.syscall
+        return None
 
     def syscall_10284(self):
+        ''' Does not seem to come back '''
         self.flow_J()
         return "0x%x" % self.syscall
 
@@ -91,9 +87,6 @@ class M200SyscallIns(m68020.m68020_ins):
         self.compact = True
         if self.hi & 1 and not self.lang.m[self.hi]:
             self.hi += 1
-
-    def syscall_103d8(self):
-        return "0x%x = flush_console?" % self.syscall
 
 def add_syscall(cx):
     ''' Add ourselves to a m68k disassembler '''
