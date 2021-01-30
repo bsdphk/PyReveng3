@@ -37,14 +37,19 @@ IOC_EEPROM_PART1_EXPORTS = {
 
 IOC_EEPROM_PART2_EXPORTS = {
     0x80002004: "IOC_EEPROM_PART2_EXPORT_2004",
+    0x80002008: "IOC_EEPROM_PART2_EXPORT_2008",
+    0x8000200c: "IOC_EEPROM_PART2_EXPORT_200c",
+    0x80002010: "IOC_EEPROM_PART2_EXPORT_2010",
     0x80002014: "IOC_EEPROM_PART2_EXPORT_2014",
     0x80002018: "IOC_EEPROM_PART2_EXPORT_2018",
     0x80002028: "IOC_EEPROM_PART2_EXPORT_2028",
     0x8000202c: "IOC_EEPROM_PART2_EXPORT_202c",
     0x80002030: "IOC_EEPROM_PART2_EXPORT_2030",
+    0x8000203c: "IOC_EEPROM_PART2_EXPORT_203c",
     0x80002050: "IOC_EEPROM_PART2_EXPORT_2050",
     0x8000205c: "IOC_EEPROM_PART2_EXPORT_205c",
     0x80002060: "IOC_EEPROM_PART2_EXPORT_2060",
+    0x80002064: "IOC_EEPROM_PART2_EXPORT_2064",
     0x80002068: "IOC_EEPROM_PART2_EXPORT_2068",
 }
 
@@ -71,11 +76,13 @@ def add_exports(asp, exports):
 def flow_check(asp, ins):
     ''' Flow-check to capture inline strings '''
     if ins.lo in (
+        0x80002010,
         0x80002028,
     ):
         return
     for f in ins.flow_out:
         if f.to in (
+           0x80002010,
            0x80002028,
            0x80002aa8
         ):
@@ -169,10 +176,17 @@ def ioc_eeprom_flow_check(asp, ins):
     ):
         return
     for f in ins.flow_out:
-        if f.to in (0x8000001c, 0x80002028, 0x800000e2, 0x80002aa8):
+        print("FC", f.to)
+        if f.to in (
+            0x8000001c,
+            0x80002010,
+            0x80002028,
+            0x800000e2,
+            0x80002aa8
+        ):
             y = data.Txt(asp, ins.hi, label=False, align=2, splitnl=True)
             ins.dstadr = y.hi
-            ins.flow_out.pop(-1)
+            ins.flow_out = []
             ins += code.Jump(cond=True, to=ins.dstadr)
         elif f.to in (0x80001010, 0x80001122,):
             if asp.bu16(ins.lo - 6) == 0x43f9:
