@@ -165,16 +165,22 @@ class SRecordSet():
             b = srec.address + len(srec.octets)
         yield a, b
 
-    def map(self, asp):
+    def map(self, asp, lo=0, hi=(1<<32)):
         ''' Map a set of S-records into an address space '''
         chunks = []
-        for lo, hi in self.sections():
-            m = mem.ByteMem(lo, hi)
-            asp.map(m, lo, hi, lo)
+        for slo, shi in self.sections():
+            if shi <= lo or slo >= hi:
+                continue
+            slo = max(lo, slo)
+            shi = min(hi, shi)
+            m = mem.ByteMem(slo, shi)
+            asp.map(m, slo, shi, slo)
             chunks.append(m)
         cur = chunks.pop(0)
         for srec in self:
             if not srec.isdata():
+                continue
+            if srec.end <= lo or srec.address >= hi:
                 continue
             while not (cur.lo <= srec.address and srec.end <= cur.hi):
                 chunks.append(cur)
