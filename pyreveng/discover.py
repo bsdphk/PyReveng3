@@ -80,15 +80,10 @@ class Discover():
             for adr in range(lx, hx):
                 try:
                     x = self.cx.decode(self.cx.m, adr)
-                except code.Undefined:
+                except:
                     continue
-                except code.Invalid:
+                if x is None:
                     continue
-                except mem.MemError:
-                    continue
-                except assy.Missing:
-                    continue
-                assert x is not None
                 for a in range(x.lo + 1, x.hi):
                     if list(self.cx.m.get_labels(a)):
                         break
