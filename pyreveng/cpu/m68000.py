@@ -30,6 +30,10 @@
 from pyreveng import assy, code, data, mem
 
 m68000_desc = """
+
+# Strictly speaking this is "ORI.B #0x00, D0"
+invalid		>U			|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
+
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
 aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
