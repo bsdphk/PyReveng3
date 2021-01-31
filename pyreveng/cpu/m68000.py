@@ -720,917 +720,917 @@ cond_code = (
 #######################################################################
 
 class m68000_ins(assy.Instree_ins):
-	def __init__(self, lim, lang):
-		super().__init__(lim, lang)
-		if self.lo & 1:
-			raise assy.Invalid("Odd Address")
-		self.ea = {}
-		self.isz = "i32"
-		self.icache = {}
-		self.ea_fullext = lang.ea_fullext
-		self.ea_scale = lang.ea_scale
-
-	def subr_rlist(self):
-		v = self['rlist']
-		l = []
-		if (self['ea'] >> 3) == 4:
-			for r in ("A", "D"):
-				for n in range(7, -1, -1):
-					if v & 0x0001:
-						l.append(r + "%d" % n)
-					v >>= 1
-		else:
-			for r in ("D", "A"):
-				for n in range(0, 8):
-					if v & 0x0001:
-						l.append(r + "%d" % n)
-					v >>= 1
-		return l
-
-	def assy_An(self):
-		return "A%d" % self['An']
-
-	def assy_decAx(self):
-		return "-(A%d)" % self['Ax']
-
-	def assy_Axinc(self):
-		return "(A%d)+" % self['Ax']
-
-	def assy_Ax(self):
-		return "A%d" % self['Ax']
-
-	def assy_decAy(self):
-		return "-(A%d)" % self['Ay']
-
-	def assy_Ayinc(self):
-		return "(A%d)+" % self['Ay']
-
-	def assy_Ay(self):
-		return "A%d" % self['Ay']
-
-	def assy_B(self):
-		self.sz = 1
-		self.isz = "i8"
-		self.imsk = 0xff
-		self.mne += ".B"
-
-	def assy_bn(self):
-		return "#0x%x" % (self['bn'] % (self.sz*8))
-
-	def assy_cc(self):
-		c = cond_code[self['cc']]
-		if c != 'T':
-			self.mne += c
-		# XXX: remove flow
-
-	def assy_const(self):
-		o = self['const']
-		if o == 0:
-			o = 8
-		return "#0x%x" % o
-
-	def assy_data(self):
-		if self.sz == 1:
-			self.v = self.lang.m.bu16(self.hi)
-		elif self.sz == 2:
-			self.v = self.lang.m.bu16(self.hi)
-		elif self.sz == 4:
-			self.v = self.lang.m.bu32(self.hi)
-		else:
-			assert False
-		self.hi += self.sz
-		if self.sz == 1:
-			self.hi += 1
-		return "#0x%0*x" % (self.sz * 2, self.v)
-
-	def assy_data8(self):
-		i = self['data8']
-		if i & 0x80:
-			i -= 256
-		if i < 0:
-			return "#-0x%02x" % (-i)
-		else:
-			return "#0x%02x" % (i)
-
-	def assy_disp16(self):
-		o = self['disp16']
-		if o & 0x8000:
-			o -= 1 << 16
-		self.dstadr = self.hi + o - 2
-		return assy.Arg_dst(self.lang.m, self.dstadr)
-
-	def assy_Andisp16(self):
-		o = self['disp16']
-		if o & 0x8000:
-			o -= 1 << 16
-			return "A%d" % self['An'] + "-0x%x" % -o
-		else:
-			return "A%d" % self['An'] + "+0x%x" % o
-
-	def assy_Dn(self):
-		return "D%d" % self['Dn']
-
-	def assy_dst(self):
-		x = self['disp8']
-		if x == 0x00:
-			self.dstadr = self.hi + self.lang.m.bs16(self.hi)
-			self.hi += 2
-		elif x == 0xff:
-			self.dstadr = self.hi + self.lang.m.bs32(self.hi)
-			self.hi += 4
-		elif x & 0x01:
-			raise assy.Invalid("Odd numbered destination address")
-		elif x & 0x80:
-			self.dstadr = self.hi + x - 0x100
-		else:
-			self.dstadr = self.hi + x
-		return assy.Arg_dst(self.lang.m, self.dstadr)
-
-	def assy_Dx(self):
-		return "D%d" % self['Dx']
-
-	def assy_Dy(self):
-		return "D%d" % self['Dy']
-
-	def assy_eaxt(self, id, ref):
-		'''Extension Word Controlled Address Mode'''
-
-		ew = self.lang.m.bu16(self.hi)
-		self.hi += 2
-
-		if ew & 0x100 and not self.ea_fullext:
-			raise assy.Invalid("Full extension word")
-
-		if ew & 0x600 and not self.ea_scale:
-			raise assy.Invalid("Non-zero scale in extension word")
-
-		if ew & 0x100:
-			return self.assy_eaxt_f(id, ref, ew)
-		else:
-			return self.assy_eaxt_s(id, ref, ew)
-
-	def assy_eaxt_s(self, id, ref, ew):
-		'''Short Extension Word Controlled Address Mode'''
-
-		basedisp = ew & 0xff
-		if basedisp & 0x80:
-			basedisp -= 0x100
-
-		if ew & 0x8000:
-			reg = "A"
-		else:
-			reg = "D"
-		reg = reg + "%d" % ((ew >> 12) & 7)
-
-		if ew & 0x800:
-			wl = ".L"
-		else:
-			wl = ".W"
-
-		xr = "+" + reg + wl
-
-		scale = (ew >> 9) & 3
-		if scale:
-			xr += "*%d" % (1 << scale)
-
-		s = "("
-		if ref == "PC":
-			s += "#0x%x" % (basedisp + self.hi - 2) + xr
-		elif basedisp < 0:
-			s += ref + xr + "-#0x%x" % (- basedisp)
-		elif basedisp > 0:
-			s += ref + xr + "+#0x%x" % basedisp
-		else:
-			s += ref + xr
-		s += ")"
-
-		# XXX: IL part needs review
-		il = self.ea[id]
-		iltyp = self.isz + "*"
-		ll = [None]
-
-		if ew & 0x800:
-			wl = ".L"
-			ll.append(
-				["%2", "=", iltyp, "%" + reg]
-			)
-		else:
-			ll.append(
-				["%1", "=", "trunc", "i32", "%" + reg,
-				    "to", "i16"]
-			)
-			ll.append(
-				["%2", "=", "sext", "i16", "%1",
-				    "to", iltyp]
-			)
-			wl = ".W"
-		ll[0] = "%2"
-
-		if scale != 0:
-			ll.append(
-				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
-			)
-			ll[0] = "%3"
-
-		if basedisp > 0:
-			ll.append(
-				["%4", "=", "add", iltyp, ll[0], ",",
-				    "0x%x" % basedisp]
-			)
-			ll[0] = "%4"
-		if basedisp < 0:
-			ll.append(
-				["%4", "=", "sub", iltyp, ll[0], ",",
-				    "0x%x" % -basedisp]
-			)
-			ll[0] = "%4"
-
-		ll.append(
-		    ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
-		)
-		ll[0] = "%5"
-
-		il += [ll[0], ll[1:]]
-		return s
-
-
-	def assy_eaxt_f(self, id, ref, ew):
-		'''Full Extension Word Controlled Address Mode'''
-
-		self.lcmt += " LEW=%04x" % ew
-		nobase = 0
-		noidx = 0
-		pc = self.hi - 2
-
-		if ew & 0x47 in (0x04, 0x44, 0x45, 0x46, 0x47):
-			raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
-			    self.lo, ew), self.im)
-
-		if not (ew & 0x30): 
-			raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
-			    self.lo, ew), self.im)
-
-		if ref != "PC" and not (ew & 0x80):	# Base Supress
-			lan = [ref]
-		else:
-			lan = []
-
-		if ew & 0x8000:
-			reg = "A"
-		else:
-			reg = "D"
-
-		reg = reg + "%d" % ((ew >> 12) & 7)
-
-		if ew & 0x800:
-			wl = ".L"
-		else:
-			wl = ".W"
-
-		xr = reg + wl
-
-		scale = (ew >> 9) & 3
-		if scale:
-			xr += "*%d" % (1 << scale)
-
-		if not (ew & 0x40):			# Index Supress
-			lxr = [xr]
-		else:
-			lxr = []
-
-		bd = (ew >> 4) & 3
-		if bd == 2:
-			basedisp = self.lang.m.bs16(self.hi)
-			self.hi += 2
-		elif bd == 3:
-			basedisp = self.lang.m.bu32(self.hi)
-			self.hi += 4
-		else:
-			basedisp = 0
-
-		if ref == "PC" and not (ew & 0x80):	# Base Supress
-			basedisp += pc
-
-		if ew & 2:
-			if ew & 1:
-				outherdisp = self.lang.m.bu32(self.hi)
-				self.hi += 4
-			else:
-				outherdisp = self.lang.m.bs16(self.hi)
-				self.hi += 2
-		else:
-			outherdisp = 0
-
-		if not (ew & 7):
-			# No index
-			s = "(" + "+".join(lan + lxr)
-			if basedisp < 0:
-				s += "-#%x" % (-basedisp)
-			elif basedisp and s == "(":
-				s += "#%x" % basedisp
-			elif basedisp:
-				s += "+#%x" % basedisp
-			s += ")"
-		else:
-			if ew & 4:
-				# Post index
-				s = "((" + lan[0]
-				if basedisp < 0:
-					s += "-#%x" % (-basedisp)
-				elif basedisp and s == "((":
-					s += "#%x" % basedisp
-				elif basedisp:
-					s += "+#%x" % basedisp
-				s += ")"
-				if lxr:
-					s += "+" + lxr[0]
-			else:
-				# Pre index
-				s = "((" + "+".join(lan + lxr)
-				if basedisp < 0:
-					s += "-#%x" % (-basedisp)
-				elif basedisp and s == "((":
-					s += "#%x" % basedisp
-				elif basedisp:
-					s += "+#%x" % basedisp
-				s += ")"
-			if outherdisp < 0:
-				s += "-#%x" % (-outherdisp)
-			elif outherdisp:
-				s += "+#%x" % outherdisp
-			s += ")"
-
-		IS = (ew >> 6) & 1
-		IIS = (ew & 7)
-
-		il = self.ea[id]
-		iltyp = self.isz + "*"
-		ll = [None]
-
-		if ew & 0x800:
-			wl = ".L"
-			ll.append(
-				["%2", "=", iltyp, "%" + reg]
-			)
-		else:
-			ll.append(
-				["%1", "=", "trunc", "i32", "%" + reg,
-				    "to", "i16"]
-			)
-			ll.append(
-				["%2", "=", "sext", "i16", "%1",
-				    "to", iltyp]
-			)
-			wl = ".W"
-		ll[0] = "%2"
-
-		if scale != 0:
-			ll.append(
-				["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
-			)
-			ll[0] = "%3"
-
-		if basedisp > 0:
-			ll.append(
-				["%4", "=", "add", iltyp, ll[0], ",",
-				    "0x%x" % basedisp]
-			)
-			ll[0] = "%4"
-		if basedisp < 0:
-			ll.append(
-				["%4", "=", "sub", iltyp, ll[0], ",",
-				    "0x%x" % -basedisp]
-			)
-			ll[0] = "%4"
-
-		ll.append(
-		    ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
-		)
-		ll[0] = "%5"
-
-		il += [ll[0], ll[1:]]
-		return s
-
-	def assy_eax(self, id, eam, ear):
-		il = []
-		self.ea[id] = il
-		eax = 1 << eam
-		if eax > 0x40:
-			eax = 0x100 << ear
-		eamask = int(self.im.assy[-1], 16)
-		if not eax & eamask:
-			raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
-			    self.lo, eam, ear), self.im)
-		if eax == 0x0001:
-			il += ["%%D%d" % ear]
-			return "D%d" % ear
-		if eax == 0x0002:
-			il += ["%%A%d" % ear]
-			return "A%d" % ear
-		if eax == 0x0004:
-			il += [ "%%A%d" % ear, []]
-			return "(A%d)" % ear
-		if eax == 0x0008:
-			r = "A%d" % ear
-			il += [ "%0", [
-			    ["%0", "=", self.isz + "*", "%" + r],
-			    ["%" + r, "=", "add", "i32",
-				"%" + r, ",", "%d" % self.sz],
-			]]
-			return "(A%d)+" % ear
-		if eax == 0x0010:
-			'''Address Register Indirect with Predecrement'''
-			r = "A%d" % ear
-			il += [ "%0", [
-			    ["%" + r, "=", "sub", "i32",
-				"%" + r, ",", "%d" % self.sz],
-			    ["%0", "=", "i32", "%" + r],
-			]]
-			return "-(%s)" % r
-		if eax == 0x0020:
-			'''Address Register Indirect with Displacement'''
-			o = self.lang.m.bs16(self.hi)
-			self.hi += 2
-			if o < 0:
-				il += [ "%0", [
-				    ["%0", "=", "sub", self.isz + "*",
-					"%%A%d" % ear, ",", "0x%x" % -o],
-				]]
-				return "(A%d-0x%x)" % (ear, -o)
-			else:
-				il += [ "%0", [
-				    ["%0", "=", "add", self.isz + "*",
-					"%%A%d" % ear, ",", "0x%x" % o],
-				]]
-				return "(A%d+0x%x)" % (ear, o)
-		if eax == 0x0040:
-			return self.assy_eaxt(id, "A%d" % ear)
-		if eax == 0x0100:
-			o = self.lang.m.bu16(self.hi)
-			self.hi += 2
-			if o & 0x8000:
-				o |= 0xffff0000
-			self.dstadr = o
-			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(self.lang.m, o)
-		if eax == 0x0200:
-			o = self.lang.m.bu32(self.hi)
-			self.hi += 4
-			self.dstadr = o
-			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(self.lang.m, o)
-		if eax == 0x0400:
-			o = self.hi + self.lang.m.bs16(self.hi)
-			self.hi += 2
-			self.dstadr = o
-			il += [ "0x%x" % o, [] ]
-			return assy.Arg_dst(self.lang.m, o)
-		if eax == 0x0800:
-			return self.assy_eaxt(id, "PC")
-		if eax == 0x1000 and self.sz == 1:
-			v = self.lang.m[self.hi+1]
-			self.hi += 2
-			il += ["0x%x" % v]
-			return "#0x%02x" % v
-		if eax == 0x1000 and self.sz == 2:
-			v = self.lang.m.bu16(self.hi)
-			self.hi += 2
-			il += ["0x%x" % v]
-			return "#0x%04x" % v
-		if eax == 0x1000 and self.sz == 4:
-			v = self.lang.m.bu32(self.hi)
-			self.hi += 4
-			il += ["0x%x" % v]
-			return "#0x%08x" % v
-		raise assy.Invalid(
-		    "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
-
-	def assy_ea(self):
-		try:
-			j = self['ea']
-		except KeyError as e:
-			raise assy.Invalid("0x%x no EA?" % self.lo, e, self.lim)
-		return self.assy_eax("s", j >> 3, j & 7)
-
-	def assy_ead(self):
-		j = self['ead']
-		return self.assy_eax("d", j & 7, j >> 3)
-
-	def assy_L(self):
-		self.sz = 4
-		self.isz = "i32"
-		self.imsk = 0xffffffff
-		self.mne += ".L"
-
-	def assy_rlist(self):
-		return "+".join(self.subr_rlist())
-
-	def assy_rot(self):
-		a = self['rot']
-		if a == 0:
-			a = 8
-		return "#0x%x" % a
-
-	def assy_vect(self):
-		if self.lang.trap_returns.get(self['vect']):
-			self += code.Flow()
-		return "#%d" % self['vect']
-
-	def assy_W(self):
-		self.sz = 2
-		self.isz = "i16"
-		self.imsk = 0xffff
-		self.mne += ".W"
-
-	def assy_long(self):
-		return "#0x%08x" % ((self['word1'] << 16) | self['word2'])
-
-	def assy_word(self):
-		return "#0x%04x" % self['word']
-
-	def assy_Z(self):
-		if self['sz'] == 3:
-			raise assy.Invalid('0x%x F_sz == 3' % self.lo, self.lim)
-		i, j, m = [
-			[1, ".B", 0xff],
-			[2, ".W", 0xffff],
-			[4, ".L", 0xffffffff],
-		] [self['sz']]
-		self.sz = i
-		self.isz = "i%d" % (i*8)
-		self.imsk = m
-		self.mne += j
-
-	def pilmacro_AN(self):
-		return "%%A%d" % self['An']
-
-	def pilmacro_AX(self):
-		return "%%A%d" % self['Ax']
-
-	def pilmacro_AY(self):
-		return "%%A%d" % self['Ay']
-
-	def pilmacro_BN(self):
-		j = self['bn'] % (self.sz*8)
-		return "0x%x" % (1 << j)
-
-	def pilmacro_CC(self):
-		cc = self['cc']
-		if cc == 0:
-			return "1"
-		if cc == 1:
-			return "0"
-		f = {
-		4: "%SR.c",
-		6: "%SR.z",
-		8: "%SR.v",
-		10: "%SR.n",
-		}.get(cc & 0xe)
-		if cc == 2 or cc == 3: # XXX check this
-			f = self.add_il([
-			    ["%0", "=", "or", "i1", "%SR.c", ",", "%SR.z"],
-			], "%0")
-		if cc == 12 or cc == 13:
-			f = self.add_il([
-			    ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
-			], "%0")
-		if cc == 14 or cc == 15:
-			f = self.add_il([
-			    ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
-			    ["%1", "=", "or", "i1", "%SR.z", ",", "%0"],
-			], "%1")
-		assert f is not None
-		if cc & 1:
-			return f
-		return self.add_il([
-		    ["%0", "=", "xor", "i1", f, ",", "1"],
-		], "%0")
-
-	def pilmacro_HI(self):
-		return "0x%x" % self.hi
-
-	def pilmacro_IBN(self):
-		j = self['bn'] % (self.sz*8)
-		return "0x%x" % (self.imsk ^ (1 << j))
-
-	def pilmacro_CONST(self):
-		i = self['const']
-		if i == 0:
-			i = 0
-		return "0x%x" % i
-
-	def pilmacro_DATA(self):
-		return "0x%x" % self.v
-
-	def pilmacro_DATA8(self):
-		i = self['data8']
-		if i & 0x80:
-			i -= 256
-			return "-0x%x" % (-i)
-		else:
-			return "0x%x" % i
-
-	def pilmacro_DN(self):
-		return "%%D%d" % self['Dn']
-
-	def pilmacro_DX(self):
-		return "%%D%d" % self['Dx']
-
-	def pilmacro_DY(self):
-		return "%%D%d" % self['Dy']
-
-	def pilmacro_DST(self):
-		return "0x%x" % self.dstadr
-
-	def pilmacro_EA(self):
-		il = self.ea["s"]
-		if len(il) == 1:
-			return il[0]
-		j = self.icache.get("EA")
-		if j is not None:
-			return j
-		if len(il[1]) > 0:
-			j = self.add_il(il[1], il[0])
-		else:
-			j = il[0]
-		self.icache["EAs"] = j
-		j = self.add_il([
-			[ "%0", "=", "load", self.isz, ",", self.isz + "*", j ],
-		], "%0")
-		self.icache["EA"] = j
-		return j
-
-	def pilmacro_PTR_EA(self):
-		il = self.ea["s"]
-		assert len(il) == 2
-		if len(il[1]) > 0:
-			return self.add_il(il[1], il[0])
-		else:
-			return il[0]
-
-	def pilmacro_ROT(self):
-		a = self['rot']
-		if a == 0:
-			a = 8
-		return "0x%x" % a
-
-	def pilmacro_SZ(self):
-		return self.isz
-
-	def pilmacro_WORDSGN(self):
-		i = self['word']
-		if i & 0x8000:
-			i -= 65536
-		if i < 0:
-			return "-0x%x" % (-i)
-		else:
-			return "0x%x" % i
-
-	def pilmacro_WORD(self):
-		return "0x%x" % self['word']
-
-	def isubr_LEA(self, arg, which):
-		if not which in self.ea:
-			raise assy.Invalid("0x%x No '%s' in EA %s" % (self.lo, which, str(self.im)))
-		il = self.ea[which]
-		if len(il) == 1:
-			self.add_il([
-			    [ il[0], "=", self.isz, arg[0]],
-			])
-			return
-		assert len(il) == 2
-		j = self.icache.get("EA" + which)
-		if j is None:
-			self.icache["EA" + which] = il[0]
-			ll = []
-			ll += il[1]
-			ll.append(
-			    [ "store", self.isz, arg[0], ",",
-				self.isz + "*", il[0]],
-			)
-			self.add_il(ll)
-		else:
-			self.add_il([
-			    [ "store", self.isz, arg[0], ",",
-				self.isz + "*", j],
-			])
-
-	def pilfunc_LEAD(self, arg):
-		self.isubr_LEA(arg, "d")
-
-	def pilfunc_LEAS(self, arg):
-		self.isubr_LEA(arg, "s")
-
-	def pilfunc_MOVEM_RM(self, arg):
-		ll = []
-		eam = self['ea'] >> 3
-		if eam == 3:
-			raise assy.Invalid(
-			    "0x%x MOVEM r->m predecrement" % (self.lo))
-		elif eam == 4:
-			dr = "%%A%d" % (self['ea'] & 7)
-			rl = self.subr_rlist()
-			if dr[1:] in rl:
-				return
-				raise assy.Missing(
-				    "0x%x MOVEM push(SP)" % (self.lo))
-			for r in self.subr_rlist():
-				ll += [
-					[ dr, "=", "sub", "i32", dr, ",",
-					    "%d" % self.sz],
-					[ "store", "SZ", "%" + r, ",",
-					    self.isz + "*", dr],
-				]
-		else:
-			x = self.pilmacro_PTR_EA()
-			ll += [
-				[ "%0", "=", "SZ", x ],
-			]
-			for r in self.subr_rlist():
-				ll += [
-					[ "store", "SZ", "%" + r, ",",
-					    self.isz + "*", "%0"],
-					[ "%0", "=", "add", "i32","%0",",",
-					    "%d" % self.sz],
-				]
-		self.add_il(ll)
-
-	def pilfunc_MOVEM_MR(self, arg):
-		ll = []
-		eam = self['ea'] >> 3
-		if eam == 3:
-			sr = "%%A%d" % (self['ea'] & 7)
-			for r in self.subr_rlist():
-				if r == sr[1:]:
-					ll += [
-						[ sr, "=", "add", "i32", sr,",",
-						    "%d" % self.sz],
-					]
-					continue
-				ll += [
-					[ "%" + r, "=", "load", self.isz, ",",
-					    self.isz + "*", sr ],
-					[ sr, "=", "add", "i32", sr,",",
-					    "%d" % self.sz],
-				]
-				if self.sz == 4:
-					continue
-				ll += [
-					[ "%" + r, "=", "sext", self.isz,
-					    "%" + r, "to", "i32"],
-				]
-		elif eam == 4:
-			raise assy.Invalid(
-			    "0x%x MOVEM m->r postincrement" % (self.lo))
-		else:
-			x = self.pilmacro_PTR_EA()
-			ll += [
-				[ "%0", "=", self.isz + "*", x ],
-			]
-			for r in self.subr_rlist():
-				ll += [
-					[ "%" + r, "=", "load", self.isz, ",",
-					    self.isz + "*", "%0" ],
-					[ "%0", "=", "add", "i32", "%0",",",
-					    "%d" % self.sz],
-				]
-				if self.sz == 4:
-					continue
-				ll += [
-					[ "%" + r, "=", "sext", self.isz,
-					    "%" + r, "to", "i32"],
-				]
-		self.add_il(ll)
-
-	def pilfunc_STDF4(self, arg):
-		self.add_il([
-			["%SR.n", "=", "icmp", "slt","SZ",arg[0],",","0"],
-			["%SR.z", "=", "icmp", "eq","SZ",arg[0],",","0"],
-			["%SR.v", "=", "i1", "0"],
-			["%SR.c", "=", "i1", "0"],
-		])
-
-	def pilfunc_MOVEP1(self, arg):
-		o = self['disp16']
-		if o & 0x8000:
-			o -= 1 << 16
-			oo = "-0x%x" % -o
-		else:
-			oo = "0x%x" % o
-		l = [
-			["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
-			["%1", "=", self.isz, "%%D%d" % self['Dn']],
-		]
-		for i in range(0, self.sz):
-			l.append(["%2", "=", "trunc", self.isz, "%1", "to", "i8"])
-			l.append(["%1", "=", "lshr", self.isz, "%1", ",", "8"])
-			l.append(["store", "i8", "%2", ",", "i8*", "%0"])
-			l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
-		self.add_il(l)
-
-	def pilfunc_MOVEP2(self, arg):
-		o = self['disp16']
-		if o & 0x8000:
-			o -= 1 << 16
-			oo = "-0x%x" % -o
-		else:
-			oo = "0x%x" % o
-		l = [
-			["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
-			["%1", "=", self.isz, "0"],
-		]
-		for i in range(0, self.sz):
-			l.append(["%2", "=", "load", "i8", ",", "i8*", "%0"])
-			l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
-			l.append(["%1", "=", "shl", self.isz, "%1", ",", "8"])
-			l.append(["%1", "=", "or", self.isz, "%1", ",", "%2"])
-
-		l.append(["%%D%d" % self['Dn'], "=", self.isz, "%1"])
-		self.add_il(l)
+    def __init__(self, lim, lang):
+        super().__init__(lim, lang)
+        if self.lo & 1:
+            raise assy.Invalid("Odd Address")
+        self.ea = {}
+        self.isz = "i32"
+        self.icache = {}
+        self.ea_fullext = lang.ea_fullext
+        self.ea_scale = lang.ea_scale
+
+    def subr_rlist(self):
+        v = self['rlist']
+        l = []
+        if (self['ea'] >> 3) == 4:
+            for r in ("A", "D"):
+                for n in range(7, -1, -1):
+                    if v & 0x0001:
+                        l.append(r + "%d" % n)
+                    v >>= 1
+        else:
+            for r in ("D", "A"):
+                for n in range(0, 8):
+                    if v & 0x0001:
+                        l.append(r + "%d" % n)
+                    v >>= 1
+        return l
+
+    def assy_An(self):
+        return "A%d" % self['An']
+
+    def assy_decAx(self):
+        return "-(A%d)" % self['Ax']
+
+    def assy_Axinc(self):
+        return "(A%d)+" % self['Ax']
+
+    def assy_Ax(self):
+        return "A%d" % self['Ax']
+
+    def assy_decAy(self):
+        return "-(A%d)" % self['Ay']
+
+    def assy_Ayinc(self):
+        return "(A%d)+" % self['Ay']
+
+    def assy_Ay(self):
+        return "A%d" % self['Ay']
+
+    def assy_B(self):
+        self.sz = 1
+        self.isz = "i8"
+        self.imsk = 0xff
+        self.mne += ".B"
+
+    def assy_bn(self):
+        return "#0x%x" % (self['bn'] % (self.sz*8))
+
+    def assy_cc(self):
+        c = cond_code[self['cc']]
+        if c != 'T':
+            self.mne += c
+        # XXX: remove flow
+
+    def assy_const(self):
+        o = self['const']
+        if o == 0:
+            o = 8
+        return "#0x%x" % o
+
+    def assy_data(self):
+        if self.sz == 1:
+            self.v = self.lang.m.bu16(self.hi)
+        elif self.sz == 2:
+            self.v = self.lang.m.bu16(self.hi)
+        elif self.sz == 4:
+            self.v = self.lang.m.bu32(self.hi)
+        else:
+            assert False
+        self.hi += self.sz
+        if self.sz == 1:
+            self.hi += 1
+        return "#0x%0*x" % (self.sz * 2, self.v)
+
+    def assy_data8(self):
+        i = self['data8']
+        if i & 0x80:
+            i -= 256
+        if i < 0:
+            return "#-0x%02x" % (-i)
+        else:
+            return "#0x%02x" % (i)
+
+    def assy_disp16(self):
+        o = self['disp16']
+        if o & 0x8000:
+            o -= 1 << 16
+        self.dstadr = self.hi + o - 2
+        return assy.Arg_dst(self.lang.m, self.dstadr)
+
+    def assy_Andisp16(self):
+        o = self['disp16']
+        if o & 0x8000:
+            o -= 1 << 16
+            return "A%d" % self['An'] + "-0x%x" % -o
+        else:
+            return "A%d" % self['An'] + "+0x%x" % o
+
+    def assy_Dn(self):
+        return "D%d" % self['Dn']
+
+    def assy_dst(self):
+        x = self['disp8']
+        if x == 0x00:
+            self.dstadr = self.hi + self.lang.m.bs16(self.hi)
+            self.hi += 2
+        elif x == 0xff:
+            self.dstadr = self.hi + self.lang.m.bs32(self.hi)
+            self.hi += 4
+        elif x & 0x01:
+            raise assy.Invalid("Odd numbered destination address")
+        elif x & 0x80:
+            self.dstadr = self.hi + x - 0x100
+        else:
+            self.dstadr = self.hi + x
+        return assy.Arg_dst(self.lang.m, self.dstadr)
+
+    def assy_Dx(self):
+        return "D%d" % self['Dx']
+
+    def assy_Dy(self):
+        return "D%d" % self['Dy']
+
+    def assy_eaxt(self, id, ref):
+        '''Extension Word Controlled Address Mode'''
+
+        ew = self.lang.m.bu16(self.hi)
+        self.hi += 2
+
+        if ew & 0x100 and not self.ea_fullext:
+            raise assy.Invalid("Full extension word")
+
+        if ew & 0x600 and not self.ea_scale:
+            raise assy.Invalid("Non-zero scale in extension word")
+
+        if ew & 0x100:
+            return self.assy_eaxt_f(id, ref, ew)
+        else:
+            return self.assy_eaxt_s(id, ref, ew)
+
+    def assy_eaxt_s(self, id, ref, ew):
+        '''Short Extension Word Controlled Address Mode'''
+
+        basedisp = ew & 0xff
+        if basedisp & 0x80:
+            basedisp -= 0x100
+
+        if ew & 0x8000:
+            reg = "A"
+        else:
+            reg = "D"
+        reg = reg + "%d" % ((ew >> 12) & 7)
+
+        if ew & 0x800:
+            wl = ".L"
+        else:
+            wl = ".W"
+
+        xr = "+" + reg + wl
+
+        scale = (ew >> 9) & 3
+        if scale:
+            xr += "*%d" % (1 << scale)
+
+        s = "("
+        if ref == "PC":
+            s += "#0x%x" % (basedisp + self.hi - 2) + xr
+        elif basedisp < 0:
+            s += ref + xr + "-#0x%x" % (- basedisp)
+        elif basedisp > 0:
+            s += ref + xr + "+#0x%x" % basedisp
+        else:
+            s += ref + xr
+        s += ")"
+
+        # XXX: IL part needs review
+        il = self.ea[id]
+        iltyp = self.isz + "*"
+        ll = [None]
+
+        if ew & 0x800:
+            wl = ".L"
+            ll.append(
+                ["%2", "=", iltyp, "%" + reg]
+            )
+        else:
+            ll.append(
+                ["%1", "=", "trunc", "i32", "%" + reg,
+                    "to", "i16"]
+            )
+            ll.append(
+                ["%2", "=", "sext", "i16", "%1",
+                    "to", iltyp]
+            )
+            wl = ".W"
+        ll[0] = "%2"
+
+        if scale != 0:
+            ll.append(
+                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
+            )
+            ll[0] = "%3"
+
+        if basedisp > 0:
+            ll.append(
+                ["%4", "=", "add", iltyp, ll[0], ",",
+                    "0x%x" % basedisp]
+            )
+            ll[0] = "%4"
+        if basedisp < 0:
+            ll.append(
+                ["%4", "=", "sub", iltyp, ll[0], ",",
+                    "0x%x" % -basedisp]
+            )
+            ll[0] = "%4"
+
+        ll.append(
+            ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
+        )
+        ll[0] = "%5"
+
+        il += [ll[0], ll[1:]]
+        return s
+
+
+    def assy_eaxt_f(self, id, ref, ew):
+        '''Full Extension Word Controlled Address Mode'''
+
+        self.lcmt += " LEW=%04x" % ew
+        nobase = 0
+        noidx = 0
+        pc = self.hi - 2
+
+        if ew & 0x47 in (0x04, 0x44, 0x45, 0x46, 0x47):
+            raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
+                self.lo, ew), self.im)
+
+        if not (ew & 0x30):
+            raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
+                self.lo, ew), self.im)
+
+        if ref != "PC" and not (ew & 0x80):    # Base Supress
+            lan = [ref]
+        else:
+            lan = []
+
+        if ew & 0x8000:
+            reg = "A"
+        else:
+            reg = "D"
+
+        reg = reg + "%d" % ((ew >> 12) & 7)
+
+        if ew & 0x800:
+            wl = ".L"
+        else:
+            wl = ".W"
+
+        xr = reg + wl
+
+        scale = (ew >> 9) & 3
+        if scale:
+            xr += "*%d" % (1 << scale)
+
+        if not (ew & 0x40):            # Index Supress
+            lxr = [xr]
+        else:
+            lxr = []
+
+        bd = (ew >> 4) & 3
+        if bd == 2:
+            basedisp = self.lang.m.bs16(self.hi)
+            self.hi += 2
+        elif bd == 3:
+            basedisp = self.lang.m.bu32(self.hi)
+            self.hi += 4
+        else:
+            basedisp = 0
+
+        if ref == "PC" and not (ew & 0x80):    # Base Supress
+            basedisp += pc
+
+        if ew & 2:
+            if ew & 1:
+                outherdisp = self.lang.m.bu32(self.hi)
+                self.hi += 4
+            else:
+                outherdisp = self.lang.m.bs16(self.hi)
+                self.hi += 2
+        else:
+            outherdisp = 0
+
+        if not (ew & 7):
+            # No index
+            s = "(" + "+".join(lan + lxr)
+            if basedisp < 0:
+                s += "-#%x" % (-basedisp)
+            elif basedisp and s == "(":
+                s += "#%x" % basedisp
+            elif basedisp:
+                s += "+#%x" % basedisp
+            s += ")"
+        else:
+            if ew & 4:
+                # Post index
+                s = "((" + lan[0]
+                if basedisp < 0:
+                    s += "-#%x" % (-basedisp)
+                elif basedisp and s == "((":
+                    s += "#%x" % basedisp
+                elif basedisp:
+                    s += "+#%x" % basedisp
+                s += ")"
+                if lxr:
+                    s += "+" + lxr[0]
+            else:
+                # Pre index
+                s = "((" + "+".join(lan + lxr)
+                if basedisp < 0:
+                    s += "-#%x" % (-basedisp)
+                elif basedisp and s == "((":
+                    s += "#%x" % basedisp
+                elif basedisp:
+                    s += "+#%x" % basedisp
+                s += ")"
+            if outherdisp < 0:
+                s += "-#%x" % (-outherdisp)
+            elif outherdisp:
+                s += "+#%x" % outherdisp
+            s += ")"
+
+        IS = (ew >> 6) & 1
+        IIS = (ew & 7)
+
+        il = self.ea[id]
+        iltyp = self.isz + "*"
+        ll = [None]
+
+        if ew & 0x800:
+            wl = ".L"
+            ll.append(
+                ["%2", "=", iltyp, "%" + reg]
+            )
+        else:
+            ll.append(
+                ["%1", "=", "trunc", "i32", "%" + reg,
+                    "to", "i16"]
+            )
+            ll.append(
+                ["%2", "=", "sext", "i16", "%1",
+                    "to", iltyp]
+            )
+            wl = ".W"
+        ll[0] = "%2"
+
+        if scale != 0:
+            ll.append(
+                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
+            )
+            ll[0] = "%3"
+
+        if basedisp > 0:
+            ll.append(
+                ["%4", "=", "add", iltyp, ll[0], ",",
+                    "0x%x" % basedisp]
+            )
+            ll[0] = "%4"
+        if basedisp < 0:
+            ll.append(
+                ["%4", "=", "sub", iltyp, ll[0], ",",
+                    "0x%x" % -basedisp]
+            )
+            ll[0] = "%4"
+
+        ll.append(
+            ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
+        )
+        ll[0] = "%5"
+
+        il += [ll[0], ll[1:]]
+        return s
+
+    def assy_eax(self, id, eam, ear):
+        il = []
+        self.ea[id] = il
+        eax = 1 << eam
+        if eax > 0x40:
+            eax = 0x100 << ear
+        eamask = int(self.im.assy[-1], 16)
+        if not eax & eamask:
+            raise assy.Invalid("0x%x Wrong EA mode m=%d/r=%d" % (
+                self.lo, eam, ear), self.im)
+        if eax == 0x0001:
+            il += ["%%D%d" % ear]
+            return "D%d" % ear
+        if eax == 0x0002:
+            il += ["%%A%d" % ear]
+            return "A%d" % ear
+        if eax == 0x0004:
+            il += [ "%%A%d" % ear, []]
+            return "(A%d)" % ear
+        if eax == 0x0008:
+            r = "A%d" % ear
+            il += [ "%0", [
+                ["%0", "=", self.isz + "*", "%" + r],
+                ["%" + r, "=", "add", "i32",
+                "%" + r, ",", "%d" % self.sz],
+            ]]
+            return "(A%d)+" % ear
+        if eax == 0x0010:
+            '''Address Register Indirect with Predecrement'''
+            r = "A%d" % ear
+            il += [ "%0", [
+                ["%" + r, "=", "sub", "i32",
+                "%" + r, ",", "%d" % self.sz],
+                ["%0", "=", "i32", "%" + r],
+            ]]
+            return "-(%s)" % r
+        if eax == 0x0020:
+            '''Address Register Indirect with Displacement'''
+            o = self.lang.m.bs16(self.hi)
+            self.hi += 2
+            if o < 0:
+                il += [ "%0", [
+                    ["%0", "=", "sub", self.isz + "*",
+                    "%%A%d" % ear, ",", "0x%x" % -o],
+                ]]
+                return "(A%d-0x%x)" % (ear, -o)
+            else:
+                il += [ "%0", [
+                    ["%0", "=", "add", self.isz + "*",
+                    "%%A%d" % ear, ",", "0x%x" % o],
+                ]]
+                return "(A%d+0x%x)" % (ear, o)
+        if eax == 0x0040:
+            return self.assy_eaxt(id, "A%d" % ear)
+        if eax == 0x0100:
+            o = self.lang.m.bu16(self.hi)
+            self.hi += 2
+            if o & 0x8000:
+                o |= 0xffff0000
+            self.dstadr = o
+            il += [ "0x%x" % o, [] ]
+            return assy.Arg_dst(self.lang.m, o)
+        if eax == 0x0200:
+            o = self.lang.m.bu32(self.hi)
+            self.hi += 4
+            self.dstadr = o
+            il += [ "0x%x" % o, [] ]
+            return assy.Arg_dst(self.lang.m, o)
+        if eax == 0x0400:
+            o = self.hi + self.lang.m.bs16(self.hi)
+            self.hi += 2
+            self.dstadr = o
+            il += [ "0x%x" % o, [] ]
+            return assy.Arg_dst(self.lang.m, o)
+        if eax == 0x0800:
+            return self.assy_eaxt(id, "PC")
+        if eax == 0x1000 and self.sz == 1:
+            v = self.lang.m[self.hi+1]
+            self.hi += 2
+            il += ["0x%x" % v]
+            return "#0x%02x" % v
+        if eax == 0x1000 and self.sz == 2:
+            v = self.lang.m.bu16(self.hi)
+            self.hi += 2
+            il += ["0x%x" % v]
+            return "#0x%04x" % v
+        if eax == 0x1000 and self.sz == 4:
+            v = self.lang.m.bu32(self.hi)
+            self.hi += 4
+            il += ["0x%x" % v]
+            return "#0x%08x" % v
+        raise assy.Invalid(
+            "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
+
+    def assy_ea(self):
+        try:
+            j = self['ea']
+        except KeyError as e:
+            raise assy.Invalid("0x%x no EA?" % self.lo, e, self.lim)
+        return self.assy_eax("s", j >> 3, j & 7)
+
+    def assy_ead(self):
+        j = self['ead']
+        return self.assy_eax("d", j & 7, j >> 3)
+
+    def assy_L(self):
+        self.sz = 4
+        self.isz = "i32"
+        self.imsk = 0xffffffff
+        self.mne += ".L"
+
+    def assy_rlist(self):
+        return "+".join(self.subr_rlist())
+
+    def assy_rot(self):
+        a = self['rot']
+        if a == 0:
+            a = 8
+        return "#0x%x" % a
+
+    def assy_vect(self):
+        if self.lang.trap_returns.get(self['vect']):
+            self += code.Flow()
+        return "#%d" % self['vect']
+
+    def assy_W(self):
+        self.sz = 2
+        self.isz = "i16"
+        self.imsk = 0xffff
+        self.mne += ".W"
+
+    def assy_long(self):
+        return "#0x%08x" % ((self['word1'] << 16) | self['word2'])
+
+    def assy_word(self):
+        return "#0x%04x" % self['word']
+
+    def assy_Z(self):
+        if self['sz'] == 3:
+            raise assy.Invalid('0x%x F_sz == 3' % self.lo, self.lim)
+        i, j, m = [
+            [1, ".B", 0xff],
+            [2, ".W", 0xffff],
+            [4, ".L", 0xffffffff],
+        ] [self['sz']]
+        self.sz = i
+        self.isz = "i%d" % (i*8)
+        self.imsk = m
+        self.mne += j
+
+    def pilmacro_AN(self):
+        return "%%A%d" % self['An']
+
+    def pilmacro_AX(self):
+        return "%%A%d" % self['Ax']
+
+    def pilmacro_AY(self):
+        return "%%A%d" % self['Ay']
+
+    def pilmacro_BN(self):
+        j = self['bn'] % (self.sz*8)
+        return "0x%x" % (1 << j)
+
+    def pilmacro_CC(self):
+        cc = self['cc']
+        if cc == 0:
+            return "1"
+        if cc == 1:
+            return "0"
+        f = {
+        4: "%SR.c",
+        6: "%SR.z",
+        8: "%SR.v",
+        10: "%SR.n",
+        }.get(cc & 0xe)
+        if cc == 2 or cc == 3: # XXX check this
+            f = self.add_il([
+                ["%0", "=", "or", "i1", "%SR.c", ",", "%SR.z"],
+            ], "%0")
+        if cc == 12 or cc == 13:
+            f = self.add_il([
+                ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
+            ], "%0")
+        if cc == 14 or cc == 15:
+            f = self.add_il([
+                ["%0", "=", "xor", "i1", "%SR.v", ",", "%SR.n"],
+                ["%1", "=", "or", "i1", "%SR.z", ",", "%0"],
+            ], "%1")
+        assert f is not None
+        if cc & 1:
+            return f
+        return self.add_il([
+            ["%0", "=", "xor", "i1", f, ",", "1"],
+        ], "%0")
+
+    def pilmacro_HI(self):
+        return "0x%x" % self.hi
+
+    def pilmacro_IBN(self):
+        j = self['bn'] % (self.sz*8)
+        return "0x%x" % (self.imsk ^ (1 << j))
+
+    def pilmacro_CONST(self):
+        i = self['const']
+        if i == 0:
+            i = 0
+        return "0x%x" % i
+
+    def pilmacro_DATA(self):
+        return "0x%x" % self.v
+
+    def pilmacro_DATA8(self):
+        i = self['data8']
+        if i & 0x80:
+            i -= 256
+            return "-0x%x" % (-i)
+        else:
+            return "0x%x" % i
+
+    def pilmacro_DN(self):
+        return "%%D%d" % self['Dn']
+
+    def pilmacro_DX(self):
+        return "%%D%d" % self['Dx']
+
+    def pilmacro_DY(self):
+        return "%%D%d" % self['Dy']
+
+    def pilmacro_DST(self):
+        return "0x%x" % self.dstadr
+
+    def pilmacro_EA(self):
+        il = self.ea["s"]
+        if len(il) == 1:
+            return il[0]
+        j = self.icache.get("EA")
+        if j is not None:
+            return j
+        if len(il[1]) > 0:
+            j = self.add_il(il[1], il[0])
+        else:
+            j = il[0]
+        self.icache["EAs"] = j
+        j = self.add_il([
+            [ "%0", "=", "load", self.isz, ",", self.isz + "*", j ],
+        ], "%0")
+        self.icache["EA"] = j
+        return j
+
+    def pilmacro_PTR_EA(self):
+        il = self.ea["s"]
+        assert len(il) == 2
+        if len(il[1]) > 0:
+            return self.add_il(il[1], il[0])
+        else:
+            return il[0]
+
+    def pilmacro_ROT(self):
+        a = self['rot']
+        if a == 0:
+            a = 8
+        return "0x%x" % a
+
+    def pilmacro_SZ(self):
+        return self.isz
+
+    def pilmacro_WORDSGN(self):
+        i = self['word']
+        if i & 0x8000:
+            i -= 65536
+        if i < 0:
+            return "-0x%x" % (-i)
+        else:
+            return "0x%x" % i
+
+    def pilmacro_WORD(self):
+        return "0x%x" % self['word']
+
+    def isubr_LEA(self, arg, which):
+        if not which in self.ea:
+            raise assy.Invalid("0x%x No '%s' in EA %s" % (self.lo, which, str(self.im)))
+        il = self.ea[which]
+        if len(il) == 1:
+            self.add_il([
+                [ il[0], "=", self.isz, arg[0]],
+            ])
+            return
+        assert len(il) == 2
+        j = self.icache.get("EA" + which)
+        if j is None:
+            self.icache["EA" + which] = il[0]
+            ll = []
+            ll += il[1]
+            ll.append(
+                [ "store", self.isz, arg[0], ",",
+                self.isz + "*", il[0]],
+            )
+            self.add_il(ll)
+        else:
+            self.add_il([
+                [ "store", self.isz, arg[0], ",",
+                self.isz + "*", j],
+            ])
+
+    def pilfunc_LEAD(self, arg):
+        self.isubr_LEA(arg, "d")
+
+    def pilfunc_LEAS(self, arg):
+        self.isubr_LEA(arg, "s")
+
+    def pilfunc_MOVEM_RM(self, arg):
+        ll = []
+        eam = self['ea'] >> 3
+        if eam == 3:
+            raise assy.Invalid(
+                "0x%x MOVEM r->m predecrement" % (self.lo))
+        elif eam == 4:
+            dr = "%%A%d" % (self['ea'] & 7)
+            rl = self.subr_rlist()
+            if dr[1:] in rl:
+                return
+                raise assy.Missing(
+                    "0x%x MOVEM push(SP)" % (self.lo))
+            for r in self.subr_rlist():
+                ll += [
+                    [ dr, "=", "sub", "i32", dr, ",",
+                        "%d" % self.sz],
+                    [ "store", "SZ", "%" + r, ",",
+                        self.isz + "*", dr],
+                ]
+        else:
+            x = self.pilmacro_PTR_EA()
+            ll += [
+                [ "%0", "=", "SZ", x ],
+            ]
+            for r in self.subr_rlist():
+                ll += [
+                    [ "store", "SZ", "%" + r, ",",
+                        self.isz + "*", "%0"],
+                    [ "%0", "=", "add", "i32","%0",",",
+                        "%d" % self.sz],
+                ]
+        self.add_il(ll)
+
+    def pilfunc_MOVEM_MR(self, arg):
+        ll = []
+        eam = self['ea'] >> 3
+        if eam == 3:
+            sr = "%%A%d" % (self['ea'] & 7)
+            for r in self.subr_rlist():
+                if r == sr[1:]:
+                    ll += [
+                        [ sr, "=", "add", "i32", sr,",",
+                            "%d" % self.sz],
+                    ]
+                    continue
+                ll += [
+                    [ "%" + r, "=", "load", self.isz, ",",
+                        self.isz + "*", sr ],
+                    [ sr, "=", "add", "i32", sr,",",
+                        "%d" % self.sz],
+                ]
+                if self.sz == 4:
+                    continue
+                ll += [
+                    [ "%" + r, "=", "sext", self.isz,
+                        "%" + r, "to", "i32"],
+                ]
+        elif eam == 4:
+            raise assy.Invalid(
+                "0x%x MOVEM m->r postincrement" % (self.lo))
+        else:
+            x = self.pilmacro_PTR_EA()
+            ll += [
+                [ "%0", "=", self.isz + "*", x ],
+            ]
+            for r in self.subr_rlist():
+                ll += [
+                    [ "%" + r, "=", "load", self.isz, ",",
+                        self.isz + "*", "%0" ],
+                    [ "%0", "=", "add", "i32", "%0",",",
+                        "%d" % self.sz],
+                ]
+                if self.sz == 4:
+                    continue
+                ll += [
+                    [ "%" + r, "=", "sext", self.isz,
+                        "%" + r, "to", "i32"],
+                ]
+        self.add_il(ll)
+
+    def pilfunc_STDF4(self, arg):
+        self.add_il([
+            ["%SR.n", "=", "icmp", "slt","SZ",arg[0],",","0"],
+            ["%SR.z", "=", "icmp", "eq","SZ",arg[0],",","0"],
+            ["%SR.v", "=", "i1", "0"],
+            ["%SR.c", "=", "i1", "0"],
+        ])
+
+    def pilfunc_MOVEP1(self, arg):
+        o = self['disp16']
+        if o & 0x8000:
+            o -= 1 << 16
+            oo = "-0x%x" % -o
+        else:
+            oo = "0x%x" % o
+        l = [
+            ["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
+            ["%1", "=", self.isz, "%%D%d" % self['Dn']],
+        ]
+        for i in range(0, self.sz):
+            l.append(["%2", "=", "trunc", self.isz, "%1", "to", "i8"])
+            l.append(["%1", "=", "lshr", self.isz, "%1", ",", "8"])
+            l.append(["store", "i8", "%2", ",", "i8*", "%0"])
+            l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
+        self.add_il(l)
+
+    def pilfunc_MOVEP2(self, arg):
+        o = self['disp16']
+        if o & 0x8000:
+            o -= 1 << 16
+            oo = "-0x%x" % -o
+        else:
+            oo = "0x%x" % o
+        l = [
+            ["%0", "=", "add", "i32*", "%%A%d" % self['An'], ",", oo],
+            ["%1", "=", self.isz, "0"],
+        ]
+        for i in range(0, self.sz):
+            l.append(["%2", "=", "load", "i8", ",", "i8*", "%0"])
+            l.append(["%0", "=", "add", "i32*", "%0", ",", "2"])
+            l.append(["%1", "=", "shl", self.isz, "%1", ",", "8"])
+            l.append(["%1", "=", "or", self.isz, "%1", ",", "%2"])
+
+        l.append(["%%D%d" % self['Dn'], "=", self.isz, "%1"])
+        self.add_il(l)
 
 
 class m68000(assy.Instree_disass):
-	def __init__(self, lang="m68000"):
-		super().__init__(
-		    lang,
-		    ins_word=16,
-		    mem_word=8,
-		    endian=">",
+    def __init__(self, lang="m68000"):
+        super().__init__(
+            lang,
+            ins_word=16,
+            mem_word=8,
+            endian=">",
                     abits=32,
                 )
-		self.it.load_string(m68000_desc, m68000_ins)
-		self.il = None
-		self.verbatim += ("CCR", "SR", "USP")
-		self.ea_fullext = False
-		self.ea_scale = False
-		self.trap_returns = {}
+        self.it.load_string(m68000_desc, m68000_ins)
+        self.il = None
+        self.verbatim += ("CCR", "SR", "USP")
+        self.ea_fullext = False
+        self.ea_scale = False
+        self.trap_returns = {}
 
-	def vector_name(self, v):
-		n = {
-			1: "RESET",
-			2: "BUS_ERROR",
-			3: "ADDRESS_ERROR",
-			4: "ILLEGAL_INSTRUCTION",
-			5: "ZERO_DIVIDE",
-			6: "CHK",
-			7: "TRAPV",
-			8: "PRIV_VIOLATION",
-			9: "TRACE",
-			10: "LINE_A",
-			11: "LINE_F",
-			15: "UNINIT_VEC",
-			24: "SPURIOUS_IRQ",
-		}.get(v)
-		if n != None:
-			return "VECTOR_" + n
-		if v >= 25 and v <= 31:
-			return "VECTOR_IRQ_LEVEL_%d" % (v - 24)
-		if v >= 32 and v <= 47:
-			return "VECTOR_TRAP_%d" % (v - 32)
-		return "VECTOR_%d" % v
+    def vector_name(self, v):
+        n = {
+            1: "RESET",
+            2: "BUS_ERROR",
+            3: "ADDRESS_ERROR",
+            4: "ILLEGAL_INSTRUCTION",
+            5: "ZERO_DIVIDE",
+            6: "CHK",
+            7: "TRAPV",
+            8: "PRIV_VIOLATION",
+            9: "TRACE",
+            10: "LINE_A",
+            11: "LINE_F",
+            15: "UNINIT_VEC",
+            24: "SPURIOUS_IRQ",
+        }.get(v)
+        if n != None:
+            return "VECTOR_" + n
+        if v >= 25 and v <= 31:
+            return "VECTOR_IRQ_LEVEL_%d" % (v - 24)
+        if v >= 32 and v <= 47:
+            return "VECTOR_TRAP_%d" % (v - 32)
+        return "VECTOR_%d" % v
 
-	def vectors(self, hi=0x400):
-		y = self.dataptr(0)
-		y.lcmt = "Reset SP"
-		vn = {}
-		vi = {}
-		a = 0x4
-		while a < hi:
-			x = self.m.bu32(a)
-			if x in (0x0, 0xffffffff):
-				y = self.dataptr(a)
-				#y = data.Const(self.m, a, a + 4,
-				#    "0x%04x", self.m.bu32, 4)
-			else:
-				if x not in vn:
-					try:
-						vi[x] = self.disass(x)
-						vn[x] = []
-						vn[x].append(a >> 2)
-					except assy.Invalid:
-						pass
-					except mem.MemError:
-						pass
-				if x > a:
-					y = self.codeptr(a)
-			y.lcmt = self.vector_name(a >> 2)
-			hi = min(hi, x)
-			a += 4
-		mv = 0
-		for i in vn:
-			for v in vn[i]:
-				k = self.vector_name(v)
-				if isinstance(vi[i], m68000_ins):
-					vi[i].lcmt += "--> " + k + "\n"
+    def vectors(self, hi=0x400):
+        y = self.dataptr(0)
+        y.lcmt = "Reset SP"
+        vn = {}
+        vi = {}
+        a = 0x4
+        while a < hi:
+            x = self.m.bu32(a)
+            if x in (0x0, 0xffffffff):
+                y = self.dataptr(a)
+                #y = data.Const(self.m, a, a + 4,
+                #    "0x%04x", self.m.bu32, 4)
+            else:
+                if x not in vn:
+                    try:
+                        vi[x] = self.disass(x)
+                        vn[x] = []
+                        vn[x].append(a >> 2)
+                    except assy.Invalid:
+                        pass
+                    except mem.MemError:
+                        pass
+                if x > a:
+                    y = self.codeptr(a)
+            y.lcmt = self.vector_name(a >> 2)
+            hi = min(hi, x)
+            a += 4
+        mv = 0
+        for i in vn:
+            for v in vn[i]:
+                k = self.vector_name(v)
+                if isinstance(vi[i], m68000_ins):
+                    vi[i].lcmt += "--> " + k + "\n"
 
-			if len(vn[i]) == 1:
-				k = self.vector_name(vn[i][0])
-				self.m.set_label(i, k)
-			else:
-				self.m.set_label(i, "VECTORS_%d" % mv)
-				mv += 1
+            if len(vn[i]) == 1:
+                k = self.vector_name(vn[i][0])
+                self.m.set_label(i, k)
+            else:
+                self.m.set_label(i, "VECTORS_%d" % mv)
+                mv += 1
 
-	def dataptr(self, adr):
-		return data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr))
-		
+    def dataptr(self, adr):
+        return data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr))
+
 
