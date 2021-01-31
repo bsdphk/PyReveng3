@@ -35,6 +35,7 @@ import os
 from pyreveng import mem, listing, data, code
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
+import pyreveng.toolchest.srecords as srecords
 
 import ioc_hardware
 import ioc_eeprom_exports
@@ -60,14 +61,18 @@ def flow_check(asp, ins):
                 a = asp.bu32(ins.lo - 4)
                 y = data.Txt(asp, a, splitnl=True)
 
-def example():
-    ''' First part of IOC eeprom '''
+def ioc_eeprom_part1(m0, _ident=None):
+    ''' First part of an IOC eeprom '''
+
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     cx.flow_check.append(flow_check)
 
-    m = mem.Stackup((FILENAME,))
-    cx.m.map(m, 0x80000000, 0x80002000)
+    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        srec = srecords.SRecordSet().from_mem(m0)
+        srec.map(cx.m, lo=0x80000000, hi=0x80002000)
+    else:
+        cx.m.map(m0, 0x80000000, 0x80002000)
 
     m2 = mem.ByteMem(0x0, 0x8)
     for i in range(8):
@@ -106,11 +111,8 @@ the CPU to fetch the stack and reset vectors
     cx.vectors(0x8)
 
     for a, b in (
-        (0x8000000c, "REPORT_OK"),
         (0x80000010, "TEST_FAILED"),
         (0x80000014, "IOC_14_XXX"),
-        (0x80000018, "iOUTSTR_PRESERVE_D0(A0)"),
-        (0x8000001c, "OUTSTR_INLINE_CONTINUE()"),
         (0x80000020, "IOC_20_XXX"),
         (0x80000088, "_TEST_FAILED"),
         (0x800000d8, "OUTSTR_PRESERVE_D0(A0)"),
@@ -137,11 +139,27 @@ the CPU to fetch the stack and reset vectors
         if b:
             cx.m.set_label(a, b)
 
+
     ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART1_EXPORTS)
+    return cx
+
+def example():
+    ''' First part of IOC eeprom '''
+
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_eeprom_part1(m0)
 
     return NAME, (cx.m,)
 
 #######################################################################
 
 if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        mb = mem.Stackup((sys.argv[3],))
+        cx = ioc_eeprom_part1(mb, sys.argv[2])
+        listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
+        exit(0)
+
     listing.Example(example, ncol=8)

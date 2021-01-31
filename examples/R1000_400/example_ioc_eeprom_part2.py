@@ -35,6 +35,7 @@ import os
 from pyreveng import mem, listing, data
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
+import pyreveng.toolchest.srecords as srecords
 
 import ioc_hardware
 import ioc_eeprom_exports
@@ -80,16 +81,19 @@ def boot_reason(cx, a):
     y = data.Txt(cx.m, a+1, a+i, label=False)
     return y.hi
 
-def example():
-    ''' Second part of IOC eeprom '''
+def ioc_eeprom_part2(m0, _ident=None):
+    ''' Second part of an IOC eeprom '''
+
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     cx.add_ins(IOC_INSTRUCTION_SPEC, IocInstructionIns)
     cx.flow_check.append(flow_check)
 
-    m = mem.Stackup((FILENAME,))
-    # The two middle quarters of this image are swapped
-    cx.m.map(m, 0x80002000, 0x80004000, 0x4000)
+    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        srec = srecords.SRecordSet().from_mem(m0)
+        srec.map(cx.m, lo=0x80002000, hi=0x80004000)
+    else:
+        cx.m.map(m0, 0x80002000, 0x80004000, 0x4000)
 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
@@ -115,7 +119,7 @@ def example():
         data.Txt(cx.m, a, splitnl=True)
 
     a = 0x8000228f
-    while cx.m[a]:
+    while cx.m[a] & 0x80:
         a = boot_reason(cx, a)
     data.Const(cx.m, a, a + 1)
     data.Txt(cx.m, a+1, label=False)
@@ -149,9 +153,25 @@ def example():
 
     ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART2_EXPORTS)
 
+    return cx
+
+def example():
+    ''' Second part of IOC eeprom '''
+
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_eeprom_part2(m0)
+
     return NAME, (cx.m,)
 
 #######################################################################
 
 if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        mb = mem.Stackup((sys.argv[3],))
+        cx = ioc_eeprom_part2(mb, sys.argv[2])
+        listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
+        exit(0)
+
     listing.Example(example, ncol=8)

@@ -32,7 +32,7 @@
 
 import os
 
-from pyreveng import mem, listing, data, assy
+from pyreveng import mem, listing, data, assy, discover
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 
@@ -51,9 +51,10 @@ PANIC.W tvect,>R        |0 1 0 1|0 0 0 0|1 1 1 1|1 0 1 0| w                     
 
 class KernelIns(m68020.m68020_ins):
     ''' Kernel specific (pseudo-)instructions'''
+
     def assy_tvect(self):
-        w= self['w']
-        return assy.Arg_imm(w)
+        ''' vector number/message '''
+        return assy.Arg_imm(self['w'])
 
 def vector_line_a(cx):
     ''' Follow the LINE_A vector to find KERNCALL entrypoints '''
@@ -83,6 +84,26 @@ def vector_line_a(cx):
             "PTR @ 0x%x %s" % (i, ioc_m200_exports.kerncall_name(sc))
         )
 
+def hunt_vectors(cx):
+    ''' hunt code pointed to by dynamic assignment to vectors '''
+    cand = set()
+    cands = -1
+    while len(cand) != cands:
+        cands = len(cand)
+        for node in cx.m:
+            if cx.m.bu16(node.lo) != 0x21fc:
+                continue
+            src = cx.m.bu32(node.lo + 2)
+            dst = cx.m.bu16(node.lo + 6)
+            if dst & 0x8000:
+                continue
+            if dst > 0x400 or dst & 3:
+                continue
+            cx.disass(src)
+            cand.add((src, dst))
+    for i,j in cand:
+        cx.m.set_line_comment(i, "Via vector at 0x%x" % j)
+
 def ioc_kernel(m0, ident=None):
     ''' A generic IOC Kernel '''
 
@@ -98,8 +119,12 @@ def ioc_kernel(m0, ident=None):
 
     vector_line_a(cx)
 
+    cx.vectors(0x400)
+
     if ident:
-        cx.vectors(0x400)
+        discover.Discover(cx)
+
+    hunt_vectors(cx)
 
     return cx
 
@@ -108,15 +133,6 @@ def example():
 
     m0 = mem.Stackup((FILENAME,))
     cx = ioc_kernel(m0)
-
-    # Stop disassembler
-    for a in (
-        0x492,
-        0x754,
-        0xf2c,
-        0xf4c,
-    ):
-        data.Const(cx.m, a)
 
     for a in (
         0x000004ec,
@@ -135,8 +151,6 @@ def example():
     for a in range(0x0000a3c8, 0x0000a3d8, 4):
         y = cx.dataptr(a)
         data.Txt(cx.m, y.dst, term=(0x01,))
-
-    cx.vectors(0x400)
 
     for a, b, c in (
         (0x2448, 0x2454, 4),

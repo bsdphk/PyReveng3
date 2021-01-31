@@ -26,13 +26,13 @@
 #
 
 '''
-   The hardware self-test part of the IOC EEPROM
-   ---------------------------------------------
+   The RESHA eeprom
+   ----------------
 '''
 
 import os
 
-from pyreveng import mem, listing, data
+from pyreveng import mem, listing, data, code, discover
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 import pyreveng.toolchest.srecords as srecords
@@ -40,85 +40,36 @@ import pyreveng.toolchest.srecords as srecords
 import ioc_hardware
 import ioc_eeprom_exports
 
-NAME = "IOC_EEPROM_PART3"
+NAME = "RESHA_EEPROM"
 
-FILENAME = os.path.join(os.path.split(__file__)[0], "IOC_EEPROM.bin")
+FILENAME = os.path.join(os.path.split(__file__)[0], "RESHA_EEPROM.bin")
 
-def ioc_eeprom_part3(m0, _ident=None):
-    ''' Third part of IOC eeprom '''
-
+def ioc_resha(m0, ident=None):
+    ''' A RESHA eeprom '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
+    ioc_eeprom_exports.add_flow_check(cx)
 
     if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        print("SRECS!")
         srec = srecords.SRecordSet().from_mem(m0)
-        srec.map(cx.m, lo=0x80004000)
+        srec.map(cx.m)
     else:
-        # The two middle quarters of this image are swapped
-        cx.m.map(m0, 0x80004000, 0x80006000, 0x2000)
-        # Also map the last quarter with the configuration values
-        cx.m.map(m0, 0x80006000, 0x80008000, 0x6000)
+        cx.m.map(m0, 0x00070000)
 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
-    ioc_eeprom_exports.add_flow_check(cx)
 
-    for a in (
-        0x80004afe,
-        0x80004b42,
-        0x80004b68,
-        0x80004ece,
-        0x80004eeb,
-        0x80004f17,
-        0x80004f2c,
-        0x80004f40,
-        0x80004f56,
-        0x80004f74,
-        0x80004f8a,
-        0x80004f95,
-        0x80004fac,
-    ):
-        data.Txt(cx.m, a, splitnl=True)
-
-    for a in range(0x80004000, 0x80004008, 4):
-        cx.disass(a)
-
-    for a, b in (
-        (0x800040a0, None),
-        (0x80004498, None),
-        (0x800044a4, None),
-        (0x800044c8, None),
-        (0x800044f8, None),
-        (0x80004510, None),
-        (0x8000456c, None),
-        (0x80004578, None),
-        (0x80004648, None),
-        (0x800046aa, None),
-        (0x800046c2, None),
-        (0x800046d0, None),
-        (0x80004730, None),
-        (0x80004862, None),
-        (0x80004912, None),
-        (0x80004ad2, None),
-        (0x80004ae8, None),
-        (0x80004b10, None),
-        (0x80004b8c, None),
-        (0x80004cd0, None),
-    ):
-        cx.disass(a)
-        cx.m.set_line_comment(a, "MANUAL")
-        if b:
-            cx.m.set_label(a, b)
-
-    ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART3_EXPORTS)
+    cx.disass(0x00070022)
+    discover.Discover(cx)
 
     return cx
 
 def example():
-    ''' Third part of IOC eeprom '''
+    ''' Specific RESHA eeprom '''
 
-    m0 = mem.Stackup((FILENAME,))
-    cx = ioc_eeprom_part3(m0)
+    m = mem.Stackup((FILENAME,))
+    cx = ioc_resha(m)
 
     return NAME, (cx.m,)
 
@@ -129,7 +80,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
         mb = mem.Stackup((sys.argv[3],))
-        cx = ioc_eeprom_part3(mb, sys.argv[2])
+        cx = ioc_resha(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
         exit(0)
 

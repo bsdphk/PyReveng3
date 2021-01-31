@@ -48,6 +48,7 @@ FILENAME = os.path.join(os.path.split(__file__)[0], "FS_0.M200")
 KERNEL_DESC = '''
 KERNCALL	vect,>J         |1 0 1 0 0 0 0 0| vect          |
 PANIC.W		tvect,>R        |0 1 0 1|0 0 0 0|1 1 1 1|1 0 1 0| w                             |
+TRAP12		tvect		|0 1 0 0|1 1 1 0|0 1 0 0|1 1 0 0| w				|
 '''
 
 class KernelIns(m68020.m68020_ins):

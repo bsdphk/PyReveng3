@@ -33,6 +33,10 @@
 from pyreveng import data, code
 
 IOC_EEPROM_PART1_EXPORTS = {
+    0x8000000c: "IOC_EEPROM_PART1_REPORT_OK",
+    0x80000014: "IOC_EEPROM_PART1_EXPORT_0014",
+    0x80000018: "IOC_EEPROM_PART1_OUTSTR_PRESERVE_D0(A0)",
+    0x8000001c: "IOC_EEPROM_PART1_OUTSTR_INLINE",
 }
 
 IOC_EEPROM_PART2_EXPORTS = {
@@ -42,10 +46,16 @@ IOC_EEPROM_PART2_EXPORTS = {
     0x80002010: "IOC_EEPROM_PART2_EXPORT_2010",
     0x80002014: "IOC_EEPROM_PART2_EXPORT_INCHAR()",
     0x80002018: "IOC_EEPROM_PART2_EXPORT_OUTCHAR(D0)",
+    0x8000201c: "IOC_EEPROM_PART2_EXPORT_201c",
+    0x80002024: "IOC_EEPROM_PART2_EXPORT_2024",
     0x80002028: "IOC_EEPROM_PART2_EXPORT_OUTTEXT()",
     0x8000202c: "IOC_EEPROM_PART2_EXPORT_OUTTEXT(A3)",
     0x80002030: "IOC_EEPROM_PART2_EXPORT_OUTCRNL()",
+    0x80002034: "IOC_EEPROM_PART2_EXPORT_2034",
     0x8000203c: "IOC_EEPROM_PART2_EXPORT_203c",
+    0x80002040: "IOC_EEPROM_PART2_EXPORT_2040",
+    0x80002044: "IOC_EEPROM_PART2_EXPORT_2044",
+    0x80002048: "IOC_EEPROM_PART2_EXPORT_2048",
     0x8000204c: "IOC_EEPROM_PART2_EXPORT_BREAK_KEY_MENU()",
     0x80002050: "IOC_EEPROM_PART2_EXPORT_2050",
     0x8000205c: "IOC_EEPROM_PART2_EXPORT_205c",
@@ -60,6 +70,8 @@ IOC_EEPROM_PART3_EXPORTS = {
 
 def add_symbols(asp):
     ''' Add all exported symbols '''
+    for a, b in IOC_EEPROM_PART1_EXPORTS.items():
+        asp.set_label(a, b)
     for a, b in IOC_EEPROM_PART2_EXPORTS.items():
         asp.set_label(a, b)
     for a, b in IOC_EEPROM_PART3_EXPORTS.items():
@@ -86,6 +98,20 @@ def flow_check(asp, ins):
            0x80002010,
            0x80002028,
            0x80002aa8
+        ):
+            y = data.Txt(asp, ins.hi, label=False, align=2, splitnl=True)
+            ins.dstadr = y.hi
+            ins.flow_out.pop(-1)
+            ins += code.Jump(cond=True, to=ins.dstadr)
+        elif f.to in (
+            0x80000018,
+        ):
+            if asp.bu16(ins.lo - 6) == 0x41f9:
+                a = asp.bu32(ins.lo - 4)
+                y = data.Txt(asp, a, splitnl=True)
+        elif f.to in (
+            0x8000001c,
+            0x800000e2
         ):
             y = data.Txt(asp, ins.hi, label=False, align=2, splitnl=True)
             ins.dstadr = y.hi
