@@ -126,6 +126,25 @@ class SRecordSet():
                     print(err)
         return self
 
+    def from_string(self, string):
+        ''' Load S-records from file '''
+        for i in string.split('\n'):
+            try:
+                self.add_record(i)
+            except IgnoredLine as err:
+                if not self.quiet:
+                    print(err)
+        return self
+
+    def from_mem(self, mem, lo=None, hi=None):
+        ''' Load S-records from a pyreveng.mem '''
+        if lo is None:
+            lo = mem.lo
+        if hi is None:
+            hi = mem.hi
+        self.from_string(mem.bytearray(lo, hi-lo).decode("ASCII"))
+        return self
+
     def add_record(self, text):
         ''' Add a record '''
         self.records.append(SRecord(text))
