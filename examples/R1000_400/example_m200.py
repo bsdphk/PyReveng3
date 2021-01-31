@@ -23,8 +23,11 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
-# JSR 0x10284 followed by string 'Words error :_' in DISK_GEOMETRY.M200
+
+'''
+   DFS .M200 binary files
+   ----------------------
+'''
 
 from pyreveng import mem, listing
 import pyreveng.cpu.m68020 as m68020
@@ -46,8 +49,8 @@ def head1_indir(cx, adr):
     b = cx.m.bs16(adr)
     cx.disass(adr + b)
 
-def m200_file(m0):
-
+def m200_file(m0, _ident=None):
+    ''' A generic .M200 file '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     m200_syscall.add_syscall(cx)
@@ -83,6 +86,7 @@ def m200_file(m0):
     return cx
 
 def example():
+    ''' Follow the example protocol '''
     m0 = mem.Stackup((FILENAME,), nextto=__file__)
     cx = m200_file(m0)
     return "R1K_M200", (cx.m,)
@@ -92,10 +96,10 @@ def example():
 if __name__ == '__main__':
     import sys
 
-    if len(sys.argv) == 3:
-        mb = mem.Stackup((sys.argv[1],))
-        cx = m200_file(mb)
-        listing.Listing(cx.m, fn=sys.argv[2], ncol=8, leaf_width=72)
+    if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        mb = mem.Stackup((sys.argv[3],))
+        cx = m200_file(mb, sys.argv[2])
+        listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
         exit(0)
 
     listing.Example(example)

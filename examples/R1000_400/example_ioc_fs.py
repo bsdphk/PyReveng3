@@ -57,21 +57,17 @@ class KernelIns(m68020.m68020_ins):
         ''' A-Line trap into kernel '''
         return assy.Arg_imm(self['w'])
 
-def example():
-    ''' IOC FS program '''
+def ioc_fs_file(m0, ident=None):
+    ''' Generic IOC FS program '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     cx.it.load_string(KERNEL_DESC, KernelIns)
 
-    cx.m.map(mem.Stackup((FILENAME,)), 0x00010000)
+    cx.m.map(m0, 0x00010000)
 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
     ioc_m200_exports.add_symbols(cx.m)
-
-    for a in (
-    ):
-        data.Txt(cx.m, a, splitnl=True)
 
     cx.codeptr(0x10004)
 
@@ -81,6 +77,17 @@ def example():
         i = list(cx.m.get_labels(a))[0]
         if i and j:
             cx.m.set_label(j, "_" + i)
+
+    return cx
+
+def example():
+    ''' Specific IOC FS program '''
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_fs_file(m0)
+
+    for a in (
+    ):
+        data.Txt(cx.m, a, splitnl=True)
 
     for a, b in (
         (0x118a2, "see 0x11914"),
@@ -94,4 +101,12 @@ def example():
 #######################################################################
 
 if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        mb = mem.Stackup((sys.argv[3],))
+        cx = ioc_fs_file(mb, sys.argv[2])
+        listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
+        exit(0)
+
     listing.Example(example, ncol=8)

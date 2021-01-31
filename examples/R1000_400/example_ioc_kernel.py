@@ -32,7 +32,7 @@
 
 import os
 
-from pyreveng import mem, listing, data, code, assy
+from pyreveng import mem, listing, data, assy
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 
@@ -49,24 +49,65 @@ MYTRAP  vect,>J         |1 0 1 0 0 0 0 0| vect          |
 PANIC.W tvect,>R        |0 1 0 1|0 0 0 0|1 1 1 1|1 0 1 0| w                             |
 '''
 
-class kernel_ins(m68020.m68020_ins):
-
+class KernelIns(m68020.m68020_ins):
+    ''' Kernel specific (pseudo-)instructions'''
     def assy_tvect(self):
         w= self['w']
         return assy.Arg_imm(w)
 
-def example():
-    ''' First part of IOC eeprom '''
+def vector_line_a(cx):
+    ''' Follow the LINE_A vector to find KERNCALL entrypoints '''
+    a = cx.m.bu32(0x28)
+    for i, j in (
+        (0x00, 0x48), (0x01, 0xe7), (0x02, 0x80), (0x03, 0x04),
+        (0x1a, 0x4e), (0x1b, 0xb0), (0x1c, 0x05),
+    ):
+        if cx.m[a + i] != j:
+            print("Line_a mismatch", "0x%x" % i, "0x%x" % j, "0x%x" % cx.m[a+i])
+            return
+    if cx.m[a + 0x1d] == 0xa1:
+        tbl = cx.m.bu16(a + 0x1e)
+    elif cx.m[a + 0x1d] == 0xb1:
+        tbl = cx.m.bu32(a + 0x1e)
+    else:
+        print("Line_a mismatch", "0x1d", "(0xa1/0xb1)", "0x%x" % cx.m[a+0x1d])
+        return
+
+    cx.m.set_label(tbl, "KERNCALL_VECTORS")
+    for sc in range(32):
+        i = tbl + sc * 4
+        y = cx.codeptr(i)
+        cx.m.set_label(y.dst, "_" + ioc_m200_exports.kerncall_name(sc))
+        cx.m.set_block_comment(
+            y.dst,
+            "PTR @ 0x%x %s" % (i, ioc_m200_exports.kerncall_name(sc))
+        )
+
+def ioc_kernel(m0, ident=None):
+    ''' A generic IOC Kernel '''
+
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
-    cx.it.load_string(KERNEL_DESC, kernel_ins)
+    cx.it.load_string(KERNEL_DESC, KernelIns)
 
-    m = mem.Stackup((FILENAME,))
-    cx.m.map(m, 0x00000000)
+    cx.m.map(m0, 0x00000000)
 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
     ioc_eeprom_exports.add_flow_check(cx)
+
+    vector_line_a(cx)
+
+    if ident:
+        cx.vectors(0x400)
+
+    return cx
+
+def example():
+    ''' A specific IOC kernel '''
+
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_kernel(m0)
 
     # Stop disassembler
     for a in (
@@ -105,8 +146,8 @@ def example():
         (0xa19c, 0xa1b4, 4),
     ):
         for i in range(a, b, c):
-                cx.disass(i)
-                cx.m.set_block_comment(i, "TBL @ 0x%x" % i)
+            cx.disass(i)
+            cx.m.set_block_comment(i, "TBL @ 0x%x" % i)
 
     for a, b in (
         (0x6962, 0x6972),
@@ -132,14 +173,6 @@ def example():
         for i in range(a, b, 4):
             y = cx.codeptr(i)
             cx.m.set_block_comment(y.dst, "PTR @ 0x%x" % i)
-
-    if True:
-        cx.m.set_label(0xa7f4, "KERNCALL_VECTORS")
-        for sc in range(32):
-            i = 0xa7f4 + sc * 4
-            y = cx.codeptr(i)
-            cx.m.set_label(y.dst, "_" + ioc_m200_exports.kerncall_name(sc))
-            cx.m.set_block_comment(y.dst, "PTR @ 0x%x %s" % (i, ioc_m200_exports.kerncall_name(sc)))
 
     for a, b in (
         (0xa21c, 0xa246),
@@ -219,4 +252,12 @@ def example():
 #######################################################################
 
 if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        mb = mem.Stackup((sys.argv[3],))
+        cx = ioc_kernel(mb, sys.argv[2])
+        listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
+        exit(0)
+
     listing.Example(example, ncol=8)
