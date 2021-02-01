@@ -131,7 +131,7 @@ def ioc_eeprom_part2(m0, _ident=None):
 
     for a in range(0x800036e8, 0x800036fc, 4):
         y = cx.dataptr(a)
-        data.Txt(cx.m, y.dst)
+        data.Txt(cx.m, y.dst, label=False)
 
     for a in range(0x80002000, 0x80002074, 4):
         cx.disass(a)
@@ -160,6 +160,42 @@ def example():
 
     m0 = mem.Stackup((FILENAME,))
     cx = ioc_eeprom_part2(m0)
+
+    # EEprom writing trampoline
+    data.Const(cx.m, 0x80003a2a, 0x80003a2c)
+    cx.disass(0x80003a2c)
+
+    for a, b in (
+        (0x800025ce, "ask_which_boot_device"),
+        (0x80002634, "boot_L"),
+        (0x80002642, "boot_tape"),
+        (0x800026a2, "boot_disk"),
+        (0x800026d6, "boot_400S"),
+        (0x8000271a, "boot_default_device"),
+        (0x80002e22, "show_boot_menu"),
+        (0x80002f2c, "menu_change_boot_crash_maint"),
+        (0x80002f58, "menu_change_iop_config"),
+        (0x80002e8c, "menu_enable_manual_crash_debugging"),
+        (0x80002e84, "menu_boot_iop_ask_media"),
+        (0x80003344, "REPORT_BOOT_IP_TAPE_CONFIG"),
+        (0x80003526, "REPORT_TAPE_DRIVES"),
+        (0x8000366e, "OUTPUT_IP_NUMBER(A1)"),
+        (0x800036e8, "machine_type_table"),
+        (0x8000386c, "whine_on_duarts"),
+        (0x800038b0, "duart_loop"),
+        (0x800038ee, "duart_step_a"),
+        (0x80003914, "duart_step_b"),
+        (0x8000394c, "duart_step_c"),
+        (0x80003950, "duart_step_d"),
+        (0x8000396c, "duart_modem_rxchar(->D0)"),
+        (0x8000397a, "duart_modem_txchar(D0)"),
+        (0x80003988, "duart_diag_rxchar(->D0)"),
+        (0x80003996, "duart_diag_tx_mode_1b_char(D0)"),
+        (0x800039b0, "duart_diag_tx_mode_1f_char(D0)"),
+        (0x80003a2a, "eeprom_trampoline_magic"),
+        (0x80003a2c, "eeprom_write_trampoline"),
+    ):
+        cx.m.set_label(a, b)
 
     return NAME, (cx.m,)
 

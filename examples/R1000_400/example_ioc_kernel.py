@@ -261,6 +261,23 @@ def example():
         cx.disass(a)
         cx.m.set_block_comment(a, b)
 
+    for a, b in (
+        (0x9c40,"INIT_KERNEL"),
+        (0x9cee,"INIT_KERNEL_01"),
+        (0x9e6a,"INIT_KERNEL_02"),
+        (0x8eb4,"INIT_KERNEL_03"),
+        (0x8acc,"INIT_KERNEL_04"),
+        (0x32f4,"INIT_KERNEL_05"),
+        (0x5b98,"INIT_KERNEL_06"),
+        (0x9ad0,"INIT_KERNEL_07"),
+        (0x9f0e,"INIT_KERNEL_08"),
+        (0x9fde,"INIT_KERNEL_09"),
+        (0x66a8,"INIT_KERNEL_10"),
+        (0x5f74,"INIT_KERNEL_11"),
+    ):
+        cx.m.set_label(a, b)
+
+
     return NAME, (cx.m,)
 
 #######################################################################

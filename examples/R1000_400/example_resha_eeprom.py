@@ -32,7 +32,7 @@
 
 import os
 
-from pyreveng import mem, listing, data, code, discover
+from pyreveng import mem, listing, data, discover
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 import pyreveng.toolchest.srecords as srecords
@@ -60,8 +60,23 @@ def ioc_resha(m0, ident=None):
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
 
-    cx.disass(0x00070022)
-    discover.Discover(cx)
+    for n, a in enumerate(range(0x70000,0x78000,0x2000)):
+        cx.m.set_block_comment(a, "PROGRAM VECTORS")
+        data.Const(cx.m, a, a + 2)
+
+    for key, desc in ioc_eeprom_exports.RESHA_PROGRAMS.items():
+        a = 0x70000 + 0x2000 * (key & 0xff)
+        ptr = a + (key >> 7)
+        data.Const(cx.m, ptr, ptr + 2, func=cx.m.bu16, size=2)
+        prog = a + cx.m.bu16(ptr)
+        cx.disass(prog)
+        cx.m.set_label(prog, "RESHA_PROGRAM_%04x" % key)
+        t = "RESHA PROGRAM 0x%04x - " % key + desc
+        cx.m.set_block_comment(prog, t)
+        cx.m.set_line_comment(ptr, t)
+
+    if ident is not None:
+        discover.Discover(cx)
 
     return cx
 
@@ -70,6 +85,61 @@ def example():
 
     m = mem.Stackup((FILENAME,))
     cx = ioc_resha(m)
+
+    for a in range(0x734ea, 0x73542, 4):
+        b = cx.m.bu32(a)
+        if 0x72000 <= b <= 0x74000:
+            cx.codeptr(a)
+
+    for a, b in (
+        (0x76040, 0x76084),
+        (0x767f2, 0x767fe),
+    ):
+        for i in range(a, b, 4):
+            cx.codeptr(i)
+
+    for a, b in (
+        (0x76084, 0x760c8),
+    ):
+        for i in range(a, b, 4):
+            y = cx.dataptr(i)
+            data.Txt(cx.m, y.dst)
+
+    for a in (
+        0x730a8,
+        0x73258,
+        0x733a2,
+        0x73396,
+        0x77662,
+    ):
+        cx.disass(a)
+
+    for a, b in (
+        (0x7063e, 0x70708),
+        (0x71025, 0x71060),
+        (0x712a6, 0x7130c),
+        (0x719f2, 0x71a99),
+        (0x74006, 0x7412e),
+        (0x76248, 0x765e3),
+    ):
+        i = a
+        while i < b:
+            y = data.Txt(cx.m, i, splitnl=True)
+            i = y.hi
+
+    for a in (
+        0x7200a,
+        0x769ce,
+        0x769ec,
+        0x76a0a,
+        0x76a28,
+    ):
+        data.Txt(cx.m, a, splitnl=True)
+
+    for a in range(0x765e4, 0x76652, 6):
+        cx.codeptr(a + 2)
+
+    discover.Discover(cx)
 
     return NAME, (cx.m,)
 

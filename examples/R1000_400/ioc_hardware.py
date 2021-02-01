@@ -75,7 +75,7 @@ DEVICE_SYMBOLS = {
     0xffff8006: "IO_RTC_COUNTER_MONTHDAY",
     0xffff8007: "IO_RTC_COUNTER_MONTH",
     0xffff8008: "IO_RTC_RAM_M_SEC",
-    0xffff8009: "IO_RTC_RAM_H_T_SEC",
+    0xffff8009: "IO_RTC_RAM_YEAR",
     0xffff800a: "IO_RTC_RAM_SEC",
     0xffff800b: "IO_RTC_RAM_MIN",
     0xffff800c: "IO_RTC_RAM_HOUR",
@@ -91,10 +91,32 @@ DEVICE_SYMBOLS = {
     0xffff8016: "IO_RTC_STANDBY_INTERRUPT",
     0xffff801f: "IO_RTC_TEST_MODE",
 
+    # SCN2661 UART
     0xffff9000: "IO_UART_DATA",
     0xffff9001: "IO_UART_STATUS",
     0xffff9002: "IO_UART_MODE",
     0xffff9003: "IO_UART_COMMAND",
+
+    # SCN2681 DUART
+    0xffffa000: "IO_DUART_MODEM_MODE",
+    0xffffa001: "IO_DUART_MODEM_STATUS",
+    0xffffa002: "IO_DUART_MODEM_COMMAND",
+    0xffffa003: "IO_DUART_MODEM_HOLDING",
+    0xffffa004: "IO_DUART_MODEM_AUX",
+    0xffffa005: "IO_DUART_MODEM_INTERRUPT",
+    0xffffa006: "IO_DUART_MODEM_COUNTER_HIGH",
+    0xffffa007: "IO_DUART_MODEM_COUNTER_LOW",
+    0xffffa008: "IO_DUART_DIAG_MODE",
+    0xffffa009: "IO_DUART_DIAG_STATUS",
+    0xffffa00a: "IO_DUART_DIAG_COMMAND",
+    0xffffa00b: "IO_DUART_DIAG_HOLDING",
+    0xffffa00c: "IO_DUART_DIAG_AUX",
+    0xffffa00d: "IO_DUART_DIAG_INTERRUPT",
+    0xffffa00e: "IO_DUART_DIAG_COUNTER_HIGH",
+    0xffffa00f: "IO_DUART_DIAG_COUNTER_LOW",
+
+    # 0xffffbxxx = DEV.EXTERNAL signal, modem ?
+
     0xfffff300: "IO_SENREG_p25",
     0xfffff400: "IO_DREG5_p24",
     0xfffffe00: "IO_BREG4_p23",

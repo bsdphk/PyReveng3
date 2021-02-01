@@ -101,5 +101,6 @@ if __name__ == '__main__':
         cx = m200_file(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
         exit(0)
+    assert "-AutoArchaeologist" not in sys.argv
 
     listing.Example(example)

@@ -53,7 +53,7 @@ FSCALLS = {
 
 def fscall_name(a):
     ''' Name of fscall by address '''
-    if 0x10200 <= a <= 0x10280:
+    if 0x10200 <= a < 0x10280:
         return kerncall_name((a - 0x10200) >> 1)
     t = FSCALLS.get(a)
     if t:
