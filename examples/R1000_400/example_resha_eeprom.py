@@ -44,7 +44,7 @@ NAME = "RESHA_EEPROM"
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "RESHA_EEPROM.bin")
 
-def ioc_resha(m0, ident=None):
+def ioc_resha(m0, _ident=None):
     ''' A RESHA eeprom '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
@@ -60,7 +60,7 @@ def ioc_resha(m0, ident=None):
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
 
-    for n, a in enumerate(range(0x70000,0x78000,0x2000)):
+    for a in range(0x70000,0x78000,0x2000):
         cx.m.set_block_comment(a, "PROGRAM VECTORS")
         data.Const(cx.m, a, a + 2)
 
@@ -74,17 +74,6 @@ def ioc_resha(m0, ident=None):
         t = "RESHA PROGRAM 0x%04x - " % key + desc
         cx.m.set_block_comment(prog, t)
         cx.m.set_line_comment(ptr, t)
-
-    if ident is not None:
-        discover.Discover(cx)
-
-    return cx
-
-def example():
-    ''' Specific RESHA eeprom '''
-
-    m = mem.Stackup((FILENAME,))
-    cx = ioc_resha(m)
 
     for a in range(0x734ea, 0x73542, 4):
         b = cx.m.bu32(a)
@@ -140,6 +129,14 @@ def example():
         cx.codeptr(a + 2)
 
     discover.Discover(cx)
+
+    return cx
+
+def example():
+    ''' Specific RESHA eeprom '''
+
+    m = mem.Stackup((FILENAME,))
+    cx = ioc_resha(m)
 
     return NAME, (cx.m,)
 
