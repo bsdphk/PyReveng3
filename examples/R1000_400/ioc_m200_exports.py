@@ -33,6 +33,8 @@
 # Calls into KERNEL through A-Line vectors in FS
 KERNCALLS = {
     0x10: "Panic",
+    0x16: "ClockMargin",
+    0x17: "PsuMargin",
 }
 
 def kerncall_name(a):
@@ -46,8 +48,13 @@ def kerncall_name(a):
 
 FSCALLS = {
     0x10284: "string_lit2something",    # ref: DBUSULOAD.M200
+    0x1028c: "muls_d3_d4_to_d3",    	# ref: FS.0 0x107ea
+    0x10290: "mulu_d3_d4_to_d3",    	# ref: FS.0 0x107f4
+    0x10294: "divs_d3_d4",    		# ref: FS.0 0x1080a
+    0x10298: "divu_d3_d4",    		# ref: FS.0 0x10816
     0x10384: "read_from_file",          # ref: DBUSULOAD.M200
     0x103d8: "flush_console?",          # ref: DBUSULOAD.M200
+    0x10496: "experiment_close",        # ref: FS.0 0x18f4e
     0x1056e: "open_file",               # ref: BOOTINFO.M200
 }
 
