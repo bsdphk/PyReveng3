@@ -31,6 +31,7 @@
 '''
 
 import os
+import hashlib
 
 from pyreveng import mem, listing, data, discover
 import pyreveng.cpu.m68020 as m68020
@@ -44,7 +45,7 @@ NAME = "RESHA_EEPROM"
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "RESHA_EEPROM.bin")
 
-def ioc_resha(m0, _ident=None):
+def ioc_resha(m0, ident=None):
     ''' A RESHA eeprom '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
@@ -57,6 +58,9 @@ def ioc_resha(m0, _ident=None):
     else:
         cx.m.map(m0, 0x00070000)
 
+    digest = hashlib.sha256(cx.m.bytearray(0x70000, 0x8000)).hexdigest()
+    print("DD", __file__, digest[:16], ident)
+ 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
 
@@ -146,6 +150,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        print(__file__, sys.argv)
         mb = mem.Stackup((sys.argv[3],))
         cx = ioc_resha(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)

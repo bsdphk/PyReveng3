@@ -31,6 +31,7 @@
 '''
 
 import os
+import hashlib
 
 from pyreveng import mem, listing, data
 import pyreveng.cpu.m68020 as m68020
@@ -44,22 +45,8 @@ NAME = "IOC_EEPROM_PART3"
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "IOC_EEPROM.bin")
 
-def ioc_eeprom_part3(m0, _ident=None):
-    ''' Third part of IOC eeprom '''
+def artifact_232718caeffce073(cx):
 
-    cx = m68020.m68020()
-    m68000_switches.m68000_switches(cx)
-
-    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
-        srec = srecords.SRecordSet().from_mem(m0)
-        srec.map(cx.m, lo=0x80004000)
-    else:
-        # The two middle quarters of this image are swapped
-        cx.m.map(m0, 0x80004000, 0x80006000, 0x2000)
-        # Also map the last quarter with the configuration values
-        cx.m.map(m0, 0x80006000, 0x80008000, 0x6000)
-
-    ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
     ioc_eeprom_exports.add_flow_check(cx)
 
@@ -112,6 +99,32 @@ def ioc_eeprom_part3(m0, _ident=None):
 
     ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART3_EXPORTS)
 
+def ioc_eeprom_part3(m0, ident=None):
+    ''' Third part of IOC eeprom '''
+
+    cx = m68020.m68020()
+    m68000_switches.m68000_switches(cx)
+
+    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        srec = srecords.SRecordSet().from_mem(m0)
+        srec.map(cx.m, lo=0x80004000)
+    else:
+        # The two middle quarters of this image are swapped
+        cx.m.map(m0, 0x80004000, 0x80006000, 0x2000)
+        # Also map the last quarter with the configuration values
+        cx.m.map(m0, 0x80006000, 0x80008000, 0x6000)
+
+    ioc_hardware.add_symbols(cx.m)
+
+    digest = hashlib.sha256(cx.m.bytearray(0x80004000, 0x2000)).hexdigest()[:16]
+    print("DD", __file__, digest, ident)
+
+    if digest == "232718caeffce073":
+        artifact_232718caeffce073(cx)
+    else:
+        for a in range(0x80004000, 0x80004008, 4):
+            cx.disass(a)
+
     return cx
 
 def example():
@@ -128,6 +141,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        print(__file__, sys.argv)
         mb = mem.Stackup((sys.argv[3],))
         cx = ioc_eeprom_part3(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)

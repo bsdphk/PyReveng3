@@ -31,6 +31,7 @@
 '''
 
 import os
+import hashlib
 
 from pyreveng import mem, listing, data
 import pyreveng.cpu.m68020 as m68020
@@ -81,21 +82,8 @@ def boot_reason(cx, a):
     y = data.Txt(cx.m, a+1, a+i, label=False)
     return y.hi
 
-def ioc_eeprom_part2(m0, _ident=None):
-    ''' Second part of an IOC eeprom '''
+def artifact_1e86e987852d2e14(cx):
 
-    cx = m68020.m68020()
-    m68000_switches.m68000_switches(cx)
-    cx.add_ins(IOC_INSTRUCTION_SPEC, IocInstructionIns)
-    cx.flow_check.append(flow_check)
-
-    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
-        srec = srecords.SRecordSet().from_mem(m0)
-        srec.map(cx.m, lo=0x80002000, hi=0x80004000)
-    else:
-        cx.m.map(m0, 0x80002000, 0x80004000, 0x4000)
-
-    ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
     ioc_eeprom_exports.add_flow_check(cx)
 
@@ -151,16 +139,6 @@ def ioc_eeprom_part2(m0, _ident=None):
     for a in range(0x8000310e, 0x80003122, 4):
         cx.codeptr(a)
 
-    ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART2_EXPORTS)
-
-    return cx
-
-def example():
-    ''' Second part of IOC eeprom '''
-
-    m0 = mem.Stackup((FILENAME,))
-    cx = ioc_eeprom_part2(m0)
-
     # EEprom writing trampoline
     data.Const(cx.m, 0x80003a2a, 0x80003a2c)
     cx.disass(0x80003a2c)
@@ -197,6 +175,42 @@ def example():
     ):
         cx.m.set_label(a, b)
 
+
+    ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART2_EXPORTS)
+
+
+def ioc_eeprom_part2(m0, ident=None):
+    ''' Second part of an IOC eeprom '''
+
+    cx = m68020.m68020()
+    m68000_switches.m68000_switches(cx)
+    cx.add_ins(IOC_INSTRUCTION_SPEC, IocInstructionIns)
+    cx.flow_check.append(flow_check)
+
+    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        srec = srecords.SRecordSet().from_mem(m0)
+        srec.map(cx.m, lo=0x80002000, hi=0x80004000)
+    else:
+        cx.m.map(m0, 0x80002000, 0x80004000, 0x4000)
+
+    ioc_hardware.add_symbols(cx.m)
+
+    digest = hashlib.sha256(cx.m.bytearray(0x80002000, 0x2000)).hexdigest()[:16]
+    print("DD", __file__, digest, ident)
+
+    if digest == "1e86e987852d2e14":
+         artifact_1e86e987852d2e14(cx)
+    else:
+         for a in range(0x80002000, 0x80002074, 4):
+             cx.disass(a)
+    return cx
+
+def example():
+    ''' Second part of IOC eeprom '''
+
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_eeprom_part2(m0)
+
     return NAME, (cx.m,)
 
 #######################################################################
@@ -205,6 +219,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        print(__file__, sys.argv)
         mb = mem.Stackup((sys.argv[3],))
         cx = ioc_eeprom_part2(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)

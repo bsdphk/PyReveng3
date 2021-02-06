@@ -31,6 +31,7 @@
 '''
 
 import os
+import hashlib
 
 from pyreveng import mem, listing, data, code
 import pyreveng.cpu.m68020 as m68020
@@ -61,33 +62,8 @@ def flow_check(asp, ins):
                 a = asp.bu32(ins.lo - 4)
                 y = data.Txt(asp, a, splitnl=True)
 
-def ioc_eeprom_part1(m0, _ident=None):
-    ''' First part of an IOC eeprom '''
+def artifact_a17915e91cbe29ca(cx):
 
-    cx = m68020.m68020()
-    m68000_switches.m68000_switches(cx)
-    cx.flow_check.append(flow_check)
-
-    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
-        srec = srecords.SRecordSet().from_mem(m0)
-        srec.map(cx.m, lo=0x80000000, hi=0x80002000)
-    else:
-        cx.m.map(m0, 0x80000000, 0x80002000)
-
-    m2 = mem.ByteMem(0x0, 0x8)
-    for i in range(8):
-        m2[i] = cx.m[0x80000000 + i]
-
-    cx.m.map(m2, 0x00000000, 0x00000008)
-
-    cx.m.set_block_comment(0x0, '''
-For the first few clock-cycles the 'IPCNT1' counter on:
-        R1000_SCHEMATIC_IOC.PDF p13
-inverts the MSB address line, mapping the EEPROM to 0x0 just long enough for
-the CPU to fetch the stack and reset vectors
-''')
-
-    ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
 
     y = data.Txt(cx.m, 0x8000015b)
@@ -148,9 +124,48 @@ the CPU to fetch the stack and reset vectors
     cx.m.set_block_comment(0x80000314, 'IOC SELFTEST')
     cx.m.set_block_comment(0x80000ddc, 'Clock / Calendar SELFTEST')
     cx.m.set_block_comment(0x80000eca, 'Checking for RESHA board')
-
+    cx.m.set_block_comment(0x80000bf8, 'Modem DUART channel')
+    cx.m.set_block_comment(0x80000d26, 'Diagnostic DUART channel')
 
     ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART1_EXPORTS)
+
+
+def ioc_eeprom_part1(m0, ident=None):
+    ''' First part of an IOC eeprom '''
+
+    cx = m68020.m68020()
+    m68000_switches.m68000_switches(cx)
+    cx.flow_check.append(flow_check)
+
+    if m0[0] == 0x53 and 0x30 <= m0[1] <= 0x39:
+        srec = srecords.SRecordSet().from_mem(m0)
+        srec.map(cx.m, lo=0x80000000, hi=0x80002000)
+    else:
+        cx.m.map(m0, 0x80000000, 0x80002000)
+
+    m2 = mem.ByteMem(0x0, 0x8)
+    for i in range(8):
+        m2[i] = cx.m[0x80000000 + i]
+
+    cx.m.map(m2, 0x00000000, 0x00000008)
+
+    cx.m.set_block_comment(0x0, '''
+For the first few clock-cycles the 'IPCNT1' counter on:
+        R1000_SCHEMATIC_IOC.PDF p13
+inverts the MSB address line, mapping the EEPROM to 0x0 just long enough for
+the CPU to fetch the stack and reset vectors
+''')
+
+    ioc_hardware.add_symbols(cx.m)
+
+    digest = hashlib.sha256(cx.m.bytearray(0x80000000, 0x2000)).hexdigest()[:16]
+    print("DD", __file__, digest, ident)
+
+    if digest == "a17915e91cbe29ca":
+         artifact_a17915e91cbe29ca(cx)
+    else:
+         cx.vectors(0x8)
+
     return cx
 
 def example():
@@ -167,6 +182,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 5 and sys.argv[1] == "-AutoArchaeologist":
+        print(__file__, sys.argv)
         mb = mem.Stackup((sys.argv[3],))
         cx = ioc_eeprom_part1(mb, sys.argv[2])
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
