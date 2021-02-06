@@ -139,6 +139,16 @@ the CPU to fetch the stack and reset vectors
         if b:
             cx.m.set_label(a, b)
 
+    cx.m.set_block_comment(0x80000222, 'CONSOLE_UART Test Mode registers')
+    cx.m.set_block_comment(0x8000025c, 'CONSOLE_UART Local Loopback')
+    cx.m.set_line_comment(0x80000266, '16x N81')
+    cx.m.set_line_comment(0x8000026c, '1X,BKDET,async 9600')
+    cx.m.set_line_comment(0x80000272, 'Local Loopback -RTS RxEN +DTR TxEN')
+    cx.m.set_block_comment(0x800002c4, 'CONSOLE_UART')
+    cx.m.set_block_comment(0x80000314, 'IOC SELFTEST')
+    cx.m.set_block_comment(0x80000ddc, 'Clock / Calendar SELFTEST')
+    cx.m.set_block_comment(0x80000eca, 'Checking for RESHA board')
+
 
     ioc_eeprom_exports.add_exports(cx.m, ioc_eeprom_exports.IOC_EEPROM_PART1_EXPORTS)
     return cx
