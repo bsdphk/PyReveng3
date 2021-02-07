@@ -40,6 +40,8 @@ import pyreveng.cpu.m68000_switches as m68000_switches
 import ioc_hardware
 import ioc_eeprom_exports
 import ioc_m200_exports
+import m200_pushtxt
+import m200_syscall
 
 NAME = "IOC_FS"
 
@@ -63,6 +65,8 @@ def ioc_fs_file(m0, ident=None):
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     cx.it.load_string(KERNEL_DESC, KernelIns)
+    m200_pushtxt.add_pushtxt(cx)
+    #m200_syscall.add_syscall(cx)
 
     cx.m.map(m0, 0x00010000)
 
@@ -86,9 +90,27 @@ def example():
     m0 = mem.Stackup((FILENAME,))
     cx = ioc_fs_file(m0)
 
-    for a in (
+    for a, b in (
+        (0x00017c4a, "something_dir_read()"),
+        (0x0001857e, "HexDigitToBin()"),
+        (0x0001061c, "MAIN()"),
+        (0x00010648, "BOUNCE_TO_PROOGRAM()"),
     ):
-        data.Txt(cx.m, a, splitnl=True)
+        if b is None:
+            b = "L_%08x" % a
+        cx.m.set_label(a, b)
+
+    for a,b in (
+        (0x15106, 0x1510c),
+        (0x1510c, 0x15114),
+        (0x15ca8, 0x15cc2),
+        (0x1745c, 0x1746c),
+        (0x18204, 0x18222),
+        (0x18222, 0x18238),
+        (0x19794, 0x197a4),
+        (0x1a254, 0x1a282),
+    ):
+        data.Txt(cx.m, a, b, splitnl=True)
 
     for a, b in (
         (0x118a2, "see 0x11914"),
@@ -110,4 +132,4 @@ if __name__ == '__main__':
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
         exit(0)
 
-    listing.Example(example, ncol=8)
+    listing.Example(example, ncol=8, leaf_width=48)

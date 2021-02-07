@@ -31,6 +31,7 @@
 '''
 
 import os
+import hashlib
 
 from pyreveng import mem, listing, data, assy, discover
 import pyreveng.cpu.m68020 as m68020
@@ -39,14 +40,16 @@ import pyreveng.cpu.m68000_switches as m68000_switches
 import ioc_hardware
 import ioc_eeprom_exports
 import ioc_m200_exports
+import scsi_cmds
 
 NAME = "IOC_KERNEL"
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "KERNEL_0.M200")
 
 KERNEL_DESC = '''
-MYTRAP  vect,>J         |1 0 1 0 0 0 0 0| vect          |
-PANIC.W tvect,>R        |0 1 0 1|0 0 0 0|1 1 1 1|1 0 1 0| w                             |
+MYTRAP  	vect,>J         |1 0 1 0 0 0 0 0| vect          |
+PANIC.W 	tvect,>R        |0 1 0 1|0 0 0 0|1 1 1 1|1 0 1 0| w                             |
+SCSI_CMD	scsi		| 13 | FC | 00 |    scsi       | 93 | 03 | E8 | 03 |
 '''
 
 class KernelIns(m68020.m68020_ins):
@@ -55,6 +58,12 @@ class KernelIns(m68020.m68020_ins):
     def assy_tvect(self):
         ''' vector number/message '''
         return assy.Arg_imm(self['w'])
+
+    def assy_scsi(self):
+        i = scsi_cmds.SCSI_CMDS.get(self['scsi'])
+        if i:
+            self.lang.m.set_label(self.lo, "SCSI_" + i)
+        raise assy.Invalid()
 
 def vector_line_a(cx):
     ''' Follow the LINE_A vector to find KERNCALL entrypoints '''
@@ -112,6 +121,13 @@ def ioc_kernel(m0, ident=None):
     cx.it.load_string(KERNEL_DESC, KernelIns)
 
     cx.m.map(m0, 0x00000000)
+    digest = hashlib.sha256(m0.bytearray(m0.lo, m0.hi - m0.lo)).hexdigest()[:16]
+    print("DD", __file__, digest, ident)
+
+    if digest == "77d6c327745440f4":
+        artifact_77d6c327745440f4(cx)
+    else:
+        cx.vectors(0x8)
 
     ioc_hardware.add_symbols(cx.m)
     ioc_eeprom_exports.add_symbols(cx.m)
@@ -128,12 +144,8 @@ def ioc_kernel(m0, ident=None):
 
     return cx
 
-def example():
-    ''' A specific IOC kernel '''
-
-    m0 = mem.Stackup((FILENAME,))
-    cx = ioc_kernel(m0)
-
+def artifact_77d6c327745440f4(cx):
+    ''' KERNEL.0 on https://datamuseum.dk/wiki/Bits:30000551 '''
     for a in (
         0x000004ec,
         0x0000800c,
@@ -142,6 +154,15 @@ def example():
         0x0000a53b,
     ):
         data.Txt(cx.m, a, splitnl=True)
+
+    for a in (
+        0xa580,
+        0xa585,
+        0xa58f,
+        0xa59c,
+        0xa5a6,
+    ):
+        data.Txt(cx.m, a, splitnl=True, term=(255,))
 
     a = 0xa24e
     while a < 0xa35d:
@@ -204,12 +225,14 @@ def example():
         (0x2602, "via 0x09c4()"),
         (0x263e, "via 0x118"),
         (0x2694, "via 0x128"),
+        (0x2e04, "See 00002bb6"),
         (0x2f02, "via 0x147d"),
         (0x3180, "via 0x09c4()"),
         (0x31c4, "via 0x12c"),
         (0x36aa, "via 0x09c4()"),
         (0x3b3e, "via 0x130"),
         (0x3b4a, "via 0x1438"),
+        (0x3b58, "See 0000354e"),
         (0x3ed2, "via 0x143c"),
         (0x3ee0, "via 0x143c"),
         (0x3eee, "via 0x1440"),
@@ -226,10 +249,14 @@ def example():
         (0x440e, "via 0x09c4()"),
         (0x4544, "via 0x147d"),
         (0x4548, "via 0x147d"),
+        (0x46a0, "MANUAL"),
         (0x46aa, "via 0x147d"),
+        (0x46c8, "MANUAL"),
         (0x49ba, "via 0x128"),
+        (0x50b8, "MANUAL"),
         (0x6246, "via 0x177c"),
         (0x6312, "via 0x520"),
+        (0x6738, "MANUAL"),
         (0x6940, "via 0x09c4()"),
         (0x6a0e, "via 0x520"),
         (0x6b8e, "via 0x09c4()"),
@@ -237,46 +264,88 @@ def example():
         (0x8208, "via 0x520"),
         (0x82bc, "Via 0x8"),
         (0x8480, "via 0x09c4()"),
-        (0x9cb8, "via 0x520"),
-        (0x9f0e, "via 0x09c4()"),
-        (0x2e04, "See 00002bb6"),
-        (0x3b58, "See 0000354e"),
-        (0xac06, "MANUAL"),
         (0x8d72, "MANUAL"),
+        (0x9cb8, "via 0x520"),
         (0x9cc0, "MANUAL"),
-        (0x46a0, "MANUAL"),
-        (0x50b8, "MANUAL"),
-        (0x6738, "MANUAL"),
-        (0x46c8, "MANUAL"),
-        (0xad58, "MANUAL"),
-        (0xad6e, "MANUAL"),
-        (0xae90, "MANUAL"),
-        (0xafd8, "MANUAL"),
-        (0xb458, "MANUAL"),
-        (0xb5f6, "MANUAL"),
-        (0xb8ca, "MANUAL"),
-        (0xbbe8, "MANUAL"),
-        (0xbc28, "MANUAL"),
+        (0x9f0e, "via 0x09c4()"),
+        #(0xac06, "MANUAL"),
+        #(0xad58, "MANUAL"),
+        #(0xad6e, "MANUAL"),
+        #(0xae90, "MANUAL"),
+        #(0xafd8, "MANUAL"),
+        #(0xb458, "MANUAL"),
+        #(0xb5f6, "MANUAL"),
+        #(0xb8ca, "MANUAL"),
+        #(0xbbe8, "MANUAL"),
+        #(0xbc28, "MANUAL"),
+        #(0x62c6, "MANUAL"),
+        #(0x9756, "MANUAL"),
+        #(0x9756, "MANUAL"),
+
     ):
         cx.disass(a)
         cx.m.set_block_comment(a, b)
 
     for a, b in (
-        (0x9c40,"INIT_KERNEL"),
-        (0x9cee,"INIT_KERNEL_01"),
-        (0x9e6a,"INIT_KERNEL_02"),
-        (0x8eb4,"INIT_KERNEL_03"),
-        (0x8acc,"INIT_KERNEL_04"),
-        (0x32f4,"INIT_KERNEL_05"),
-        (0x5b98,"INIT_KERNEL_06"),
-        (0x9ad0,"INIT_KERNEL_07"),
-        (0x9f0e,"INIT_KERNEL_08"),
-        (0x9fde,"INIT_KERNEL_09"),
-        (0x66a8,"INIT_KERNEL_10"),
-        (0x5f74,"INIT_KERNEL_11"),
+        (0x1429, "XE1201_CTRL_COPY"),
+        (0x1434, "PHONE_NUMBER_PTR"),
+        (0x1438, "MODEM_VEC_1"),
+        (0x143c, "MODEM_VEC_2"),
+        (0x1440, "MODEM_VEC_3"),
+        (0x1444, "MODEM_VEC_4_RAISE_DTR"),
+        (0x1448, "MODEM_VEC_5_LOWER_DTR"),
+        (0x144c, "MODEM_VEC_6"),
+        (0x32f4, "INIT_KERNEL_05_UARTS"),
+        (0x3b4a, "MODEM_VEC_1_XE1201"),
+        (0x3b58, "MODEM_VEC_1_DUART"),
+        (0x3ede, "MODEM_VEC_2_XE1201"),
+        (0x3ee0, "MODEM_VEC_2_DUART"),
+        (0x3eee, "MODEM_VEC_3_XE1201"),
+        (0x3efc, "MODEM_VEC_3_DUART"),
+        (0x3f08, "MODEM_VEC_4_XE1201"),
+        (0x3f16, "MODEM_VEC_4_DUART"),
+        (0x3f24, "MODEM_VEC_5_XE1201"),
+        (0x3f32, "MODEM_VEC_5_DUART"),
+        (0x4208, "MODEM_VEC_6_XE1201"),
+        (0x4214, "MODEM_VEC_6_DUART"),
+        (0x4b0a, "MAYBE_DISK_IO_THING()"),
+        (0x4cdc, "SCSI_DISK_OPERATION()"),
+        (0x520c, "SCSI_D_REQ_SENSE(scsi_id=D2)"),
+        (0x5b98, "INIT_KERNEL_06_REHSA_0202"),
+        (0x5d14, "DELAY_LOOP(D1)"),
+        (0x5db0, "SCSI_D_MODE_SENSE_3(scsi_id=D2)"),
+        (0x5dca, "SCSI_D_MODE_SENSE_4(scsi_id=D2)"),
+        (0x5e6a, "SCSI_D_WAIT_STATUS(timeout=D2)"),
+        (0x5e8a, "SCSI_D_WAIT_COMPLETE(timeout=D2)"),
+        (0x5f16, "SCSI_D_TEST_UNIT_READY()"),
+        (0x5f74, "INIT_KERNEL_11"),
+        (0x5f7a, "SAVECORE()"),
+        (0x6072, "SCSI_D_WRITE_10_SOMETHING(scsi_id=D0,src=D4,blockno=D6)"),
+        (0x66a8, "INIT_KERNEL_10"),
+        (0x8398, "BOUNCE_TO_FS"),
+        (0x8acc, "INIT_KERNEL_04"),
+        (0x8df0, "GET_SECTOR_BUFFER([A0+0x13].B => A1)"),
+        (0x8eb4, "INIT_KERNEL_03_FIFO"),
+        (0x9ad0, "INIT_KERNEL_07"),
+        (0x9c40, "INIT_KERNEL"),
+        (0x9cee, "INIT_KERNEL_01"),
+        (0x9e6a, "INIT_KERNEL_02"),
+        (0x9f0e, "INIT_KERNEL_08"),
+        (0x9fde, "INIT_KERNEL_09"),
+        (0xa710, "SCSI_DISK_OPS"),
     ):
         cx.m.set_label(a, b)
 
+
+    cx.m.set_label(0xa878, "Month_Table")
+    for a in range(0xa878, 0x0a8a0, 2):
+        data.Const(cx.m, a, a + 2)
+
+def example():
+    ''' A specific IOC kernel '''
+
+    m0 = mem.Stackup((FILENAME,))
+    cx = ioc_kernel(m0)
 
     return NAME, (cx.m,)
 
@@ -291,4 +360,4 @@ if __name__ == '__main__':
         listing.Listing(cx.m, fn=sys.argv[4], ncol=8, leaf_width=72)
         exit(0)
 
-    listing.Example(example, ncol=8)
+    listing.Example(example, ncol=8, leaf_width=48)

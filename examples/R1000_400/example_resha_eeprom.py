@@ -98,14 +98,19 @@ def ioc_resha(m0, ident=None):
             y = cx.dataptr(i)
             data.Txt(cx.m, y.dst)
 
-    for a in (
-        0x730a8,
-        0x73258,
-        0x733a2,
-        0x73396,
-        0x77662,
+    for a, b in (
+        (0x730a8, None),
+        (0x73258, None),
+        (0x733a2, None),
+        (0x73396, None),
+        (0x74266, "SCSI_D_TEST_UNIT_READY"),
+        (0x743dc, "SCSI_D_SOFT_RESET()"),
+        (0x7459a, "SCSI_D_AWAIT_INTERRUPT()"),
+        (0x77662, None),
     ):
         cx.disass(a)
+        if b:
+            cx.m.set_label(a, b)
 
     for a, b in (
         (0x7063e, 0x70708),
@@ -133,6 +138,12 @@ def ioc_resha(m0, ident=None):
         cx.codeptr(a + 2)
 
     discover.Discover(cx)
+
+    for a, b in (
+        (0x000743e6, "SCSI_ID=7, EnableAdvancedFeatures"),
+        (0x000743ee, "CMD=Soft Reset"),
+    ):
+        cx.m.set_line_comment(a, b)
 
     return cx
 
