@@ -1584,10 +1584,10 @@ class m68000(assy.Instree_disass):
         if n != None:
             return "VECTOR_" + n
         if v >= 25 and v <= 31:
-            return "VECTOR_IRQ_LEVEL_%d" % (v - 24)
+            return "VECTOR_IRQ_LEVEL_0x%x" % (v - 24)
         if v >= 32 and v <= 47:
-            return "VECTOR_TRAP_%d" % (v - 32)
-        return "VECTOR_%d" % v
+            return "VECTOR_TRAP_0x%x" % (v - 32)
+        return "VECTOR_0x%x" % v
 
     def vectors(self, hi=0x400):
         y = self.dataptr(0)
