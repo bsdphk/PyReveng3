@@ -29,6 +29,8 @@
    ----------------------
 '''
 
+import hashlib
+
 from pyreveng import mem, listing
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
@@ -49,13 +51,17 @@ def head1_indir(cx, adr):
     b = cx.m.bs16(adr)
     cx.disass(adr + b)
 
-def m200_file(m0, _ident=None):
+def m200_file(m0, ident=None):
     ''' A generic .M200 file '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
     m200_syscall.add_syscall(cx)
     m200_pushtxt.add_pushtxt(cx)
     cx.m.map(m0, BASE)
+
+    cx.m.map(m0, 0x00000000)
+    digest = hashlib.sha256(m0.bytearray(m0.lo, m0.hi - m0.lo)).hexdigest()[:16]
+    print("DD", __file__, digest, ident)
 
     head = []
     for a in range(BASE, BASE+0x20, 4):

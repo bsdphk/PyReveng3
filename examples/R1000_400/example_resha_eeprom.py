@@ -75,7 +75,7 @@ def ioc_resha(m0, ident=None):
         prog = a + cx.m.bu16(ptr)
         cx.disass(prog)
         cx.m.set_label(prog, "RESHA_PROGRAM_%04x" % key)
-        t = "RESHA PROGRAM 0x%04x - " % key + desc
+        t = "RESHA PROGRAM 0x%04x @0x%08x - " % (key, prog) + desc
         cx.m.set_block_comment(prog, t)
         cx.m.set_line_comment(ptr, t)
 
@@ -114,11 +114,11 @@ def ioc_resha(m0, ident=None):
 
     for a, b in (
         (0x7063e, 0x70708),
-        (0x71025, 0x71060),
+        (0x71025, 0x7105f),
         (0x712a6, 0x7130c),
         (0x719f2, 0x71a99),
         (0x74006, 0x7412e),
-        (0x76248, 0x765e3),
+        (0x76248, 0x763b1),
     ):
         i = a
         while i < b:
@@ -134,14 +134,19 @@ def ioc_resha(m0, ident=None):
     ):
         data.Txt(cx.m, a, splitnl=True)
 
-    for a in range(0x765e4, 0x76652, 6):
-        cx.codeptr(a + 2)
+    for a in range(0x765e4, 0x76650, 6):
+        y = cx.dataptr(a + 2)
+        data.Txt(cx.m, y.dst)
 
-    discover.Discover(cx)
+    if False:
+        discover.Discover(cx)
 
     for a, b in (
         (0x000743e6, "SCSI_ID=7, EnableAdvancedFeatures"),
         (0x000743ee, "CMD=Soft Reset"),
+        (0x71206, "????"),
+        (0x71212, "B#13 = GOOD_PARITY"),
+        (0x714da, "B#13 = GOOD_PARITY"),
     ):
         cx.m.set_line_comment(a, b)
 

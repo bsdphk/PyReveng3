@@ -295,6 +295,7 @@ def artifact_77d6c327745440f4(cx):
         (0x1444, "MODEM_VEC_4_RAISE_DTR"),
         (0x1448, "MODEM_VEC_5_LOWER_DTR"),
         (0x144c, "MODEM_VEC_6"),
+        (0x2374, "TEXT_TO_CONSOLE()"),
         (0x32f4, "INIT_KERNEL_05_UARTS"),
         (0x3b4a, "MODEM_VEC_1_XE1201"),
         (0x3b58, "MODEM_VEC_1_DUART"),
@@ -336,10 +337,19 @@ def artifact_77d6c327745440f4(cx):
     ):
         cx.m.set_label(a, b)
 
-
     cx.m.set_label(0xa878, "Month_Table")
     for a in range(0xa878, 0x0a8a0, 2):
         data.Const(cx.m, a, a + 2)
+
+    cx.m.set_block_comment(0x263e, "(Vector 0x46) MODEM.RXRDY Interrupt")
+    cx.m.set_block_comment(0x2b82, "(Vector 0x42) CONSOLE.BREAK Interrupt")
+    cx.m.set_block_comment(0x2ab0, "(Vector 0x49) CONSOLE.TXRDY Interrupt")
+    cx.m.set_block_comment(0x2ada, "(Vector 0x45) CONSOLE.RXRDY Interrupt")
+    cx.m.set_block_comment(0x36b0, "(Vector 0x48) DIAG_BUS.TXRDY Interrupt")
+    cx.m.set_block_comment(0x370c, "(Vector 0x44) DIAG_BUS.RXRDY Interrupt")
+    cx.m.set_block_comment(0x5a02, "(Vector 0x91) SCSI_D Interrupt")
+    cx.m.set_block_comment(0x98aa, "(Vector 0x92) SCSI_T Interrupt")
+    cx.m.set_block_comment(0x9e30, "(Vector 0x4f) PIT Interrupt")
 
 def example():
     ''' A specific IOC kernel '''

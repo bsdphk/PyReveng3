@@ -32,6 +32,7 @@
 
 # Calls into KERNEL through A-Line vectors in FS
 KERNCALLS = {
+    0x05: "WriteConsole",
     0x10: "Panic",
     0x16: "ClockMargin",
     0x17: "PsuMargin",
@@ -53,7 +54,7 @@ FSCALLS = {
     0x10294: "divs_d3_d4",    		# ref: FS.0 0x1080a
     0x10298: "divu_d3_d4",    		# ref: FS.0 0x10816
     0x10384: "read_from_file",          # ref: DBUSULOAD.M200
-    0x103d8: "flush_console?",          # ref: DBUSULOAD.M200
+    0x103d8: "write_console" ,          # ref: DBUSULOAD.M200
     0x10496: "experiment_close",        # ref: FS.0 0x18f4e
     0x1056e: "open_file",               # ref: BOOTINFO.M200
 }
