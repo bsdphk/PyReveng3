@@ -214,7 +214,9 @@ class IocStartup(ioc_utils.IocJob):
     def round_1(self):
         ''' Let the disassembler loose '''
         cx = self.cx
-        cx.codeptr(0x20004)
+        y = cx.codeptr(0x20004)
+        cx.disass(y.dst + 10)
+        cx.m.set_label(y.dst, "MAIN()")
 
 #######################################################################
  
