@@ -36,6 +36,9 @@ import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 
 import ioc_utils
+import ioc_hardware
+import ioc_eeprom_exports
+import ioc_m200_exports
 import m200_pushtxt
 import m200_syscall
 
@@ -198,6 +201,11 @@ class IocStartup(ioc_utils.IocJob):
 
     def config_cx(self):
         ''' Add global symbol sets etc. '''
+        cx = self.cx
+        ioc_hardware.add_symbols(cx.m)
+        ioc_eeprom_exports.add_symbols(cx.m)
+        ioc_m200_exports.add_symbols(cx.m)
+        m200_pushtxt.add_pushtxt(cx)
 
     def round_0(self):
         ''' Things to do before the disassembler is let loose '''
