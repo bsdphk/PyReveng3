@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012-2021 Poul-Henning Kamp <phk@phk.freebsd.dk>
+# Copyright (c) 2012-2014 Poul-Henning Kamp <phk@phk.freebsd.dk>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -23,37 +23,48 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#
 
 '''
-   Third quarter of the IOC EEPROM
+   DFS_BOOTSTRAP.M200 binary files
    -------------------------------
+
+   This lives in sector #0 on the harddisk(s?)
 '''
 
 import os
 
 from pyreveng import mem, data
 
-import ioc_utils
-import ioc_hardware
 import ioc_eeprom_exports
+import ioc_hardware
+import ioc_utils
 
-NAME = "IOC_EEPROM_PART3"
-BASE = 0x80004000
-SIZE = 0x2000
+NAME = "IOC_DFS_BOOTSTRAP"
+BASE = 0x54000
+FILENAME = os.path.join(os.path.split(__file__)[0], "M400_DFS_BOOTSTRAP.M200")
 
-FILENAME = os.path.join(os.path.split(__file__)[0], "IOC_EEPROM.bin")
+def flow_check(asp, ins):
+    ''' Flow-check to capture inline strings '''
+    for flow in ins.flow_out:
+        if flow.to in (
+            0x5403e,
+        ):
+            y = data.Txt(asp, ins.hi, label=False, align=2, splitnl=True)
+            ins.dstadr = y.hi
+            ins.flow_out.pop(-1)
+
 #######################################################################
 
-class IocEepromPart3(ioc_utils.IocJob):
-    ''' Third quarter of IOC EEPROM image '''
+class DfsBootstrap(ioc_utils.IocJob):
+
+    ''' A First sector DFS bootstrap code '''
 
     def __init__(self, **kwargs):
-        super().__init__(BASE, BASE+SIZE, name=NAME, **kwargs)
+        super().__init__(BASE, name=NAME, **kwargs)
 
     def default_image(self):
         ''' Load default image '''
-        self.map(mem.Stackup((FILENAME,)), offset=0x2000)
+        self.map(mem.Stackup((FILENAME,)))
 
     def config_cx(self):
         ''' Add global symbol sets etc. '''
@@ -64,81 +75,42 @@ class IocEepromPart3(ioc_utils.IocJob):
 
     def round_0(self):
         ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        cx.flow_check.append(flow_check)
+        cx.m.set_label(0x5403e, "BAIL_OUT")
+        cx.m.set_label(0x5405e, "DEVICE_TYPE_2")
 
     def round_1(self):
         ''' Let the disassembler loose '''
         cx = self.cx
-        for a in range(0x80004000, 0x80004008, 4):
-            cx.disass(a)
+        cx.disass(BASE)
 
-    def round_2(self):
-        ''' Spelunking in what we alrady found '''
-        cx = self.cx
-        ioc_eeprom_exports.add_exports(
-             cx.m,
-             ioc_eeprom_exports.IOC_EEPROM_PART3_EXPORTS
-        )
-
-    def round_0_232718caeffce073(self):
+    def round_0_c665a17f1e356161(self):
         ''' Things to do before the disassembler is let loose '''
         cx = self.cx
+        cx.m.set_label(0x540fc, "READ_DISK_FILE")
+        cx.m.set_label(0x5424c, "DEVICE_TYPE_3")
 
-        for a in (
-            0x80004afe,
-            0x80004b42,
-            0x80004b68,
-            0x80004ece,
-            0x80004eeb,
-            0x80004f17,
-            0x80004f2c,
-            0x80004f40,
-            0x80004f56,
-            0x80004f74,
-            0x80004f8a,
-            0x80004f95,
-            0x80004fac,
-        ):
-            data.Txt(cx.m, a, splitnl=True)
-
-    def round_1_232718caeffce073(self):
-        ''' Let the disassembler loose '''
+    def round_0_82a46de15cfc64d0(self):
+        ''' Things to do before the disassembler is let loose '''
         cx = self.cx
+        cx.m.set_label(0x540fc, "READ_DISK_FILE")
+        cx.m.set_label(0x5424c, "DEVICE_TYPE_3")
 
-        for a, b in (
-            (0x800040a0, None),
-            (0x80004498, None),
-            (0x800044a4, None),
-            (0x800044c8, None),
-            (0x800044f8, None),
-            (0x80004510, None),
-            (0x8000456c, None),
-            (0x80004578, None),
-            (0x80004648, None),
-            (0x800046aa, None),
-            (0x800046c2, None),
-            (0x800046d0, None),
-            (0x80004730, None),
-            (0x80004862, None),
-            (0x80004912, None),
-            (0x80004ad2, None),
-            (0x80004ae8, None),
-            (0x80004b10, None),
-            (0x80004b8c, None),
-            (0x80004cd0, None),
-        ):
-            cx.disass(a)
-            cx.m.set_line_comment(a, "MANUAL")
-            if b:
-                cx.m.set_label(a, b)
-
+    def round_0_131ecee574f7c0d5(self):
+        ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        cx.m.set_label(0x5410e, "READ_DISK_FILE")
+        cx.m.set_label(0x54206, "DEVICE_TYPE_3")
+        data.Txt(cx.m, 0x5437a)
 
 #######################################################################
 
 def example():
     ''' Follow the example protocol '''
-    return IocEepromPart3().example()
+    return DfsBootstrap().example()
 
 #######################################################################
 
 if __name__ == '__main__':
-    ioc_utils.mainfunc(__file__, example, IocEepromPart3)
+    ioc_utils.mainfunc(__file__, example, DfsBootstrap)

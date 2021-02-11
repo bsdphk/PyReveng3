@@ -24,121 +24,59 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-
 '''
-   Third quarter of the IOC EEPROM
-   -------------------------------
+   Fourth quarter of the IOC EEPROM
+   --------------------------------
+
+   Per-site/machine Configuration Data
 '''
 
 import os
 
-from pyreveng import mem, data
+from pyreveng import mem
 
 import ioc_utils
-import ioc_hardware
 import ioc_eeprom_exports
 
-NAME = "IOC_EEPROM_PART3"
-BASE = 0x80004000
+NAME = "IOC_EEPROM_PART4"
+BASE = 0x80006000
 SIZE = 0x2000
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "IOC_EEPROM.bin")
+
 #######################################################################
 
-class IocEepromPart3(ioc_utils.IocJob):
-    ''' Third quarter of IOC EEPROM image '''
+class IocEepromPart4(ioc_utils.IocJob):
+    ''' Fourth quarter of IOC EEPROM image '''
 
     def __init__(self, **kwargs):
         super().__init__(BASE, BASE+SIZE, name=NAME, **kwargs)
 
     def default_image(self):
         ''' Load default image '''
-        self.map(mem.Stackup((FILENAME,)), offset=0x2000)
+        self.map(mem.Stackup((FILENAME,)), offset=0x6000)
 
     def config_cx(self):
         ''' Add global symbol sets etc. '''
-        cx = self.cx
-        ioc_eeprom_exports.add_flow_check(cx)
-        ioc_eeprom_exports.add_symbols(cx.m)
-        ioc_hardware.add_symbols(cx.m)
 
     def round_0(self):
         ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        ioc_eeprom_exports.add_exports(
+            cx.m,
+            ioc_eeprom_exports.IOC_EEPROM_PART4_EXPORTS
+        )
 
     def round_1(self):
         ''' Let the disassembler loose '''
-        cx = self.cx
-        for a in range(0x80004000, 0x80004008, 4):
-            cx.disass(a)
-
-    def round_2(self):
-        ''' Spelunking in what we alrady found '''
-        cx = self.cx
-        ioc_eeprom_exports.add_exports(
-             cx.m,
-             ioc_eeprom_exports.IOC_EEPROM_PART3_EXPORTS
-        )
-
-    def round_0_232718caeffce073(self):
-        ''' Things to do before the disassembler is let loose '''
-        cx = self.cx
-
-        for a in (
-            0x80004afe,
-            0x80004b42,
-            0x80004b68,
-            0x80004ece,
-            0x80004eeb,
-            0x80004f17,
-            0x80004f2c,
-            0x80004f40,
-            0x80004f56,
-            0x80004f74,
-            0x80004f8a,
-            0x80004f95,
-            0x80004fac,
-        ):
-            data.Txt(cx.m, a, splitnl=True)
-
-    def round_1_232718caeffce073(self):
-        ''' Let the disassembler loose '''
-        cx = self.cx
-
-        for a, b in (
-            (0x800040a0, None),
-            (0x80004498, None),
-            (0x800044a4, None),
-            (0x800044c8, None),
-            (0x800044f8, None),
-            (0x80004510, None),
-            (0x8000456c, None),
-            (0x80004578, None),
-            (0x80004648, None),
-            (0x800046aa, None),
-            (0x800046c2, None),
-            (0x800046d0, None),
-            (0x80004730, None),
-            (0x80004862, None),
-            (0x80004912, None),
-            (0x80004ad2, None),
-            (0x80004ae8, None),
-            (0x80004b10, None),
-            (0x80004b8c, None),
-            (0x80004cd0, None),
-        ):
-            cx.disass(a)
-            cx.m.set_line_comment(a, "MANUAL")
-            if b:
-                cx.m.set_label(a, b)
-
 
 #######################################################################
 
 def example():
     ''' Follow the example protocol '''
-    return IocEepromPart3().example()
+    return IocEepromPart4().example()
 
 #######################################################################
 
 if __name__ == '__main__':
-    ioc_utils.mainfunc(__file__, example, IocEepromPart3)
+    ioc_utils.mainfunc(__file__, example, IocEepromPart4)

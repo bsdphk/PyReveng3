@@ -135,6 +135,7 @@ def add_exports(asp, exports):
 def flow_check(asp, ins):
     ''' Flow-check to capture inline strings '''
     if ins.lo in (
+        0x8000001c,
         0x80002010,
         0x80002028,
     ):
