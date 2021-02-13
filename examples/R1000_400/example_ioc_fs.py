@@ -32,7 +32,7 @@
 
 import os
 
-from pyreveng import mem, data
+from pyreveng import mem, data, assy, code
 
 import ioc_utils
 import ioc_hardware
@@ -40,10 +40,55 @@ import ioc_eeprom_exports
 import ioc_m200_exports
 import example_ioc_kernel
 import m200_pushtxt
+import dfs_experiments
 
 NAME = "IOC_FS"
 BASE = 0x10000
 FILENAME = os.path.join(os.path.split(__file__)[0], "FS_0.M200")
+
+#######################################################################
+
+def fc_10280(asp, ins):
+    ''' Seems to be "crt0" '''
+    if asp.bu32(ins.lo - 4) == 0x4ffa0008:
+        ins.flow_out = []
+        ins += code.Flow(to=ins.hi)
+
+def fc_10568(asp, ins):
+    ''' FS-call to run an Experiment '''
+    print("H", asp, ins)
+    exp_name_len = asp[ins.hi + 2]
+    for _i in range(3):
+        ins.oper.append(assy.Arg_imm(asp[ins.hi]))
+        ins.hi += 1
+    _j, txt = data.stringify(asp, ins.hi, exp_name_len)
+    ins.oper.append(assy.Arg_verbatim("'" + txt + "'"))
+    ins.hi += exp_name_len
+    narg = asp[ins.hi + 2] + asp[ins.hi + 3]
+    for _i in range(4 + narg):
+        ins.oper.append(assy.Arg_imm(asp[ins.hi]))
+        ins.hi += 1
+    ins.flow_out = []
+    ins.flow_J()
+    lbl = "exp_" + txt + "("
+    args = dfs_experiments.EXPERIMENTS.get(txt)
+    if args:
+        lbl += ", ".join(b + "{" + a + "}" for a, b in args)
+    asp.set_label(ins.lo, lbl + ")")
+    ins.compact = True
+    if ins.hi & 1 and not asp[ins.hi]:
+        ins.hi += 1
+
+FLOW_CHECKS = {
+    0x10280: fc_10280,
+    0x10568: fc_10568,
+}
+
+def flow_check(asp, ins):
+    for flow in ins.flow_out:
+        i = FLOW_CHECKS.get(flow.to)
+        if i:
+             i(asp, ins)
 
 #######################################################################
 
@@ -52,6 +97,10 @@ class IocFs(ioc_utils.IocJob):
 
     def __init__(self, **kwargs):
         super().__init__(BASE, name=NAME, **kwargs)
+
+    def augment_cx(self):
+        ''' Add Capabilities to cx '''
+        self.cx.flow_check.append(flow_check)
 
     def default_image(self):
         ''' Load default image '''

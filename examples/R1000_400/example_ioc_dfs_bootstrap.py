@@ -94,7 +94,9 @@ class DfsBootstrap(ioc_utils.IocJob):
     def round_0_82a46de15cfc64d0(self):
         ''' Things to do before the disassembler is let loose '''
         cx = self.cx
+        cx.m.set_label(0x54058, "PUTCHAR")
         cx.m.set_label(0x540fc, "READ_DISK_FILE")
+        cx.m.set_label(0x54172, "READ_SECTOR")
         cx.m.set_label(0x5424c, "DEVICE_TYPE_3")
 
     def round_0_131ecee574f7c0d5(self):

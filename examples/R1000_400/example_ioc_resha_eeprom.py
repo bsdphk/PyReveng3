@@ -139,6 +139,7 @@ class ReshaEeprom(ioc_utils.IocJob):
             (0x74266, "SCSI_D_TEST_UNIT_READY"),
             (0x743dc, "SCSI_D_SOFT_RESET()"),
             (0x7459a, "SCSI_D_AWAIT_INTERRUPT()"),
+            (0x77386, "SCSI_T_AWAIT_INTERRUPT()"),
             (0x77662, None),
         ):
             cx.disass(a)

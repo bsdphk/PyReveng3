@@ -136,6 +136,17 @@ class IocKernel(ioc_utils.IocJob):
         ioc_eeprom_exports.add_symbols(cx.m)
         ioc_eeprom_exports.add_flow_check(cx)
 
+    def round_0(self):
+        ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        cx.dataptr(0x408)
+        y = data.Const(cx.m, 0x410, 0x416, "%d", cx.m.bu16, 2)
+        cx.m.set_line_comment(y.lo, "Version number")
+        cx.dataptr(0x416)
+        for a in range(0x418, 0x500):
+            if cx.m.bu32(a) == 0x40282329:
+                data.Txt(cx.m, a, term=(0x5c,))
+
     def round_1(self):
         ''' Let the disassembler loose '''
         cx = self.cx
@@ -151,7 +162,6 @@ class IocKernel(ioc_utils.IocJob):
         ''' Things to do before the disassembler is let loose '''
         cx = self.cx
         for a in (
-            0x000004ec,
             0x0000800c,
             0x0000a46a,
             0x0000a518,

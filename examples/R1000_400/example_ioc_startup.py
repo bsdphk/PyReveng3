@@ -31,7 +31,7 @@
 
 import os
 
-from pyreveng import mem, listing
+from pyreveng import mem, listing, data
 import pyreveng.cpu.m68020 as m68020
 import pyreveng.cpu.m68000_switches as m68000_switches
 
@@ -39,8 +39,8 @@ import ioc_utils
 import ioc_hardware
 import ioc_eeprom_exports
 import ioc_m200_exports
+import example_ioc_fs
 import m200_pushtxt
-import m200_syscall
 
 FILENAME = os.path.join(os.path.split(__file__)[0], "PROGRAM_0.M200")
 NAME="IOC_PROGRAM_0"
@@ -149,7 +149,6 @@ def m200_file(m0, ident=None):
     ''' A generic .M200 file '''
     cx = m68020.m68020()
     m68000_switches.m68000_switches(cx)
-    m200_syscall.add_syscall(cx)
     m200_pushtxt.add_pushtxt(cx)
     cx.m.map(m0, BASE)
 
@@ -206,17 +205,57 @@ class IocStartup(ioc_utils.IocJob):
         ioc_eeprom_exports.add_symbols(cx.m)
         ioc_m200_exports.add_symbols(cx.m)
         m200_pushtxt.add_pushtxt(cx)
+        example_ioc_fs.IocFs(cx=cx).augment_cx()
 
     def round_0(self):
         ''' Things to do before the disassembler is let loose '''
         cx = self.cx
+        cx.dataptr(0x20000)
+        cx.dataptr(0x20008)	# Probably code-ptr for exception?
+        cx.dataptr(0x2000c)
+        cx.dataptr(0x20010)
+        cx.codeptr(0x20018)
  
     def round_1(self):
         ''' Let the disassembler loose '''
         cx = self.cx
         y = cx.codeptr(0x20004)
-        cx.disass(y.dst + 10)
         cx.m.set_label(y.dst, "MAIN()")
+        y = cx.codeptr(0x2001c)
+        cx.m.set_label(y.dst, "FAILURE()")
+
+    def round_0_f15447000232a02a(self):
+        ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        data.Txt(cx.m, 0x2010a, term=(0x5c,))
+        data.Txt(cx.m, 0x240c0, 0x240c6)
+        data.Txt(cx.m, 0x240c6, 0x240cc)
+
+        cx.m.set_label(0x2126e, "MENU_2126e_TEXT")
+        for i in range(6):
+            data.Txt(cx.m, 0x2126e + i * 30, 0x2126e + (i+1) * 30, label=False)
+
+        cx.m.set_label(0x21343, "MENU_21343_TEXT")
+        for i in range(14):
+            data.Txt(cx.m, 0x21343 + i * 50, 0x21343 + (i+1) * 50, label=False)
+
+        data.Txt(cx.m, 0x201e0, 0x201f0)
+
+    def round_1_f15447000232a02a(self):
+        ''' Let the disassembler loose '''
+        cx = self.cx
+        for a in (
+            0x2418e,
+            0x241b8,
+            0x241e2,
+            0x2420c,
+            0x24234,
+            0x2425c,
+        ):
+            cx.disass(a)
+            cx.m.set_line_comment(a, "MANUAL")
+
+ 
 
 #######################################################################
  

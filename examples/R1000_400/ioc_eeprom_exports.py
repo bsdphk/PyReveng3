@@ -99,7 +99,7 @@ RESHA_PROGRAMS = {
     0x0300: "Selftest LANCE",
     0x0400: "Selftest Disk SCSI",
     0x0500: "Selftest Tape SCSI",
-    0x0600: "Selftext SCSI loop-back",
+    0x0600: "Selftest SCSI loop-back",
     0x0101: "Network Boot",
     0x0201: "",
     0x0301: "Crash Dump",
