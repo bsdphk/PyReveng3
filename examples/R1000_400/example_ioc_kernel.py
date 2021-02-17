@@ -169,6 +169,13 @@ class IocKernel(ioc_utils.IocJob):
         ):
             data.Txt(cx.m, a, splitnl=True)
 
+        cx.m.set_label(0x9e74, "STOP_UNTIL_IRQ()")
+        for a in range(0x0000a9a4, 0x0000a9e0, 4):
+            cx.m.set_label(a, "REG_SAVE_%X" % cx.m[a])
+            data.Const(cx.m, a, a + 4)
+
+        
+
         for a in (
             0xa580,
             0xa585,
@@ -403,6 +410,7 @@ class IocKernel(ioc_utils.IocJob):
             (0x8398, "BOUNCE_TO_FS"),
             (0x8acc, "INIT_KERNEL_04"),
             (0x8df0, "GET_SECTOR_BUFFER([A0+0x13].B => A1)"),
+            (0x8e12, "CONFIG_IO_MAP()"),
             (0x8eb4, "INIT_KERNEL_03_FIFO"),
             (0x9ad0, "INIT_KERNEL_07"),
             (0x9c40, "INIT_KERNEL"),
@@ -411,8 +419,19 @@ class IocKernel(ioc_utils.IocJob):
             (0x9f0e, "INIT_KERNEL_08"),
             (0x9fde, "INIT_KERNEL_09"),
             (0xa710, "SCSI_OPS_TABLE"),
+            (0x4b20, "CHS512_TO_LBA1024()"),
         ):
             cx.m.set_label(a, b)
+
+        for a, b in (
+            (0x4b32, "must be <= n_cyl"),
+            (0x4b3a, "multiply by n_heads"),
+            (0x4b44, "must be <= n_heads"),
+            (0x4b5e, "multiply by n_sect.512"),
+            (0x4b68, "must be <= n_sect.512"),
+            (0x4b72, "sect.512 -> sect.1024"),
+        ):
+            cx.m.set_line_comment(a, b)
 
         cx.m.set_label(0xa878, "Month_Table")
         for a in range(0xa878, 0x0a8a0, 2):
@@ -427,6 +446,20 @@ class IocKernel(ioc_utils.IocJob):
         cx.m.set_block_comment(0x5a02, "(Vector 0x91) SCSI_D Interrupt")
         cx.m.set_block_comment(0x98aa, "(Vector 0x92) SCSI_T Interrupt")
         cx.m.set_block_comment(0x9e30, "(Vector 0x4f) PIT Interrupt")
+
+
+    def blob(self, cx):
+        cx.m.set_label(0xbbc, "SCSI_T_DESC")
+        y = cx.dataptr(0xbbc)
+        if y.dst:
+            cx.m.set_label(y.dst, "CUR_SCSI_T_DESC")
+
+        try:
+            for a in range(0xe800, 0xec00, 0x20):
+                data.Const(cx.m, a, a + 0x20, fmt="%02x")
+        except mem.MemError:
+            pass
+
 
 #######################################################################
 

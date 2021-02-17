@@ -40,11 +40,16 @@ M200_PUSHTXT_DESC = '''
 +PTDW-		-		|0 0 1 1|sreg |1|0 0 1 0|0|areg |
 +PTDL-		-		|0 0 1 0|sreg |1|0 0 1 0|0|areg |
 PUSHTXT		pushtxt		|0 1 0 1|0 0 0 1|1 1 0 0 1|dreg | FF | FC |
-
+CHKSTR		areg		|1 0 1 1| a   |1|1 1 1 0|1| b   | FF | FC | 67 | 02 | 4E | 4D |
 '''
 
 class M200PushtxtIns(m68020.m68020_ins):
     ''' pushtxt pseudo-instructions '''
+
+    def assy_areg(self):
+        if self['a'] != self['b']:
+            raise assy.Invalid()
+        return "A%d" % self['a']
 
     def assy_pushtxt(self):
         if len(self.lim) == 5 and self.lim[0].assy[0] == "+PTA":

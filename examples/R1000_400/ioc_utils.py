@@ -98,6 +98,20 @@ class IocJob():
         ).hexdigest()[:16]
         print("Digest", self.digest, self.ident)
 
+        d2 = 0x56
+        a = self.lo
+        for i in range(0x1ffa):
+            d2 += self.cx.m[a]
+            a += 1
+        print("D2_1 0x%x" % d2, "A %x" % a)
+        a += 1
+        for i in range(0x5):
+            print("a %x" % a)
+            d2 += self.cx.m[a]
+            a += 1
+        print("CHECKSUM 0x%x" % (d2 & 0xff))
+
+
     def ponder_round(self, turnus):
         ''' Ponder one round, generic [and specific] '''
         i = "round_%d" % turnus

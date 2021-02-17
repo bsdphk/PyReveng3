@@ -32,10 +32,12 @@
 
 # Calls into KERNEL through A-Line vectors in FS
 KERNCALLS = {
+    0x02: "Disk_I_O",
     0x05: "WriteConsole",
     0x10: "Panic",
     0x16: "ClockMargin",
     0x17: "PsuMargin",
+    0x1c: "memcpy_protected(src, dst, len)",
 }
 
 def kerncall_name(a):
@@ -53,8 +55,14 @@ FSCALLS = {
     0x10290: "mulu_d3_d4_to_d3",    	# ref: FS.0 0x107f4
     0x10294: "divs_d3_d4",    		# ref: FS.0 0x1080a
     0x10298: "divu_d3_d4",    		# ref: FS.0 0x10816
+    0x1029c: "malloc(LONG)",   		# ref: FS.0 0x10816
+    0x102a8: "free(LONG, PTR)",
+    0x102b8: "alloc_str()",
+    0x102c4: "fill_str(WORD, WORD, PTR)",
+    0x102d0: "strcat(STR, STR)",
     0x10384: "read_from_file",          # ref: DBUSULOAD.M200
-    0x103d8: "write_console" ,          # ref: DBUSULOAD.M200
+    0x103b0: "exec_command()",          # 
+    0x103d8: "wrcons(STR)",
     0x10496: "experiment_close",        # ref: FS.0 0x18f4e
     0x1056e: "open_file",               # ref: BOOTINFO.M200
 }

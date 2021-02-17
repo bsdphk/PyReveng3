@@ -92,6 +92,35 @@ def flow_check(asp, ins):
 
 #######################################################################
 
+def fs_call_doc(asp):
+
+    asp.set_block_comment(0x10204,'''DISK-I/O
+========
+
+D1 = 2 -> READ
+D1 = 3 -> WRITE
+(Other registers may be significant too)
+
+STACK+a: LWORD desc pointer
+STACK+6: LWORD src/dst pointer
+STACK+4: WORD (zero)
+
+Desc+00:	0x0100
+Desc+02:	0x0000
+Desc+04:	0x0002
+Desc+06:	0x0000
+Desc+08:	0x0080
+Desc+0a:	0x0002
+Desc+0c:	0x____ cylinder
+Desc+0e:	0x__ head
+Desc+0f:	0x__ sector
+
+CHS is 512 byte sectors
+''')
+
+
+#######################################################################
+
 class IocFs(ioc_utils.IocJob):
     ''' A FS_[012].M200 program '''
 
@@ -113,6 +142,11 @@ class IocFs(ioc_utils.IocJob):
         ioc_hardware.add_symbols(cx.m)
         ioc_eeprom_exports.add_symbols(cx.m)
         ioc_m200_exports.add_symbols(cx.m)
+
+    def round_0(self):
+        ''' Things to do before the disassembler is let loose '''
+        cx = self.cx
+        fs_call_doc(cx.m)
 
     def round_1(self):
         ''' Let the disassembler loose '''
