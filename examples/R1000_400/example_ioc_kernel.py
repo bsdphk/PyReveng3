@@ -247,6 +247,11 @@ class IocKernel(ioc_utils.IocJob):
                 cx.disass(i)
                 cx.m.set_block_comment(i, "TBL @ 0x%x" % i)
 
+        cx.m.set_label(0xa494, "KC_15_Board_Commands")
+        for n, a in enumerate(range(0xa494, 0xa4b4, 4)):
+            y = cx.codeptr(a)
+            cx.m.set_block_comment(y.dst, "KC_15 BoardCommand=0x%x" % n)
+
         for a, b in (
             (0x6962, 0x6972),
             (0x6720, 0x6734),
@@ -255,7 +260,6 @@ class IocKernel(ioc_utils.IocJob):
             (0x7e1e, 0x7e3a),
             (0x8188, 0x81a0),
             (0x8234, 0x824c),
-            (0xa494, 0xa4b4),
             (0xa4e0, 0xa518),
             (0xa5b1, 0xa688),
             (0xa68c, 0xa710),
@@ -420,6 +424,10 @@ class IocKernel(ioc_utils.IocJob):
             (0x9fde, "INIT_KERNEL_09"),
             (0xa710, "SCSI_OPS_TABLE"),
             (0x4b20, "CHS512_TO_LBA1024()"),
+            (0x374c, "DO_KC_15_DiagBus(D0,A0)"),
+            (0x362c, "DiagBusResponse(D2)"),
+            (0x9dc4, "ArmTimeout?"),
+            (0x9e00, "CancelTimeout?"),
         ):
             cx.m.set_label(a, b)
 
@@ -430,6 +438,13 @@ class IocKernel(ioc_utils.IocJob):
             (0x4b5e, "multiply by n_sect.512"),
             (0x4b68, "must be <= n_sect.512"),
             (0x4b72, "sect.512 -> sect.1024"),
+            (0x1a120, "A1 = return address"),
+            (0x1a12a, "length of exp name"),
+            (0x1a130, "A1 now after string"),
+            (0x1a14a, "1st byte after string"),
+            (0x1a14c, "2nd byte after string"),
+            (0x1a15a, "3rd byte after string"),
+            (0x1a15c, "4th byte after string"),
         ):
             cx.m.set_line_comment(a, b)
 

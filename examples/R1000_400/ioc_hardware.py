@@ -133,13 +133,13 @@ DEVICE_SYMBOLS = {
     0xffff8016: "IO_RTC_STANDBY_INTERRUPT",
     0xffff801f: "IO_RTC_TEST_MODE",
 
-    # SCN2661 UART
+    # SCN2661 UART (BVDEC0p18/15)
     0xffff9000: "IO_UART_DATA",
     0xffff9001: "IO_UART_STATUS",
     0xffff9002: "IO_UART_MODE",
     0xffff9003: "IO_UART_COMMAND",
 
-    # SCN2681 DUART
+    # SCN2681 DUART (BVDEC0p18/14)
     0xffffa000: "IO_DUART_MODEM_MODE",
     0xffffa001: "IO_DUART_MODEM_STATUS",
     0xffffa002: "IO_DUART_MODEM_COMMAND",
@@ -157,15 +157,16 @@ DEVICE_SYMBOLS = {
     0xffffa00e: "IO_DUART_SET_OPC_START_COUNTER",
     0xffffa00f: "IO_DUART_CLR_OPC_STOP_COUNTER",
 
+    # EXT MODEM  (BVDEC0p18/13)
     0xffffb002: "IO_EXT_MODEM_DATA",
     0xffffb003: "IO_EXT_MODEM_CONTROL",
 
     # BVDEC1 @p18
-    0xfffff000: "IO_CLR_RUN",
+    0xfffff000: "IO_CLR_RUN_LED_p16",
     0xfffff100: "IO_GET_REQUEST_p69",
-    0xfffff200: "IO_FRONT_PANEL_LED_p27",
-    0xfffff300: "IO_SENREG_p25",
-    0xfffff400: "IO_DREG5_p24",
+    0xfffff200: "IO_FRONT_PANEL_p27",
+    0xfffff300: "IO_SENSE_TEST_p25",
+    0xfffff400: "IO_WRITE_CONTROL_p24",
     0xfffff500: "IO_FIFO_INIT_p68_p69",
     0xfffff600: "IO_CPU_RESPONSE_p68",
     0xfffff700: "IO_CPU_REQUEST_p69",

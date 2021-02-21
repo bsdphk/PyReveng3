@@ -35,6 +35,7 @@ KERNCALLS = {
     0x02: "Disk_I_O",
     0x05: "WriteConsole",
     0x10: "Panic",
+    0x15: "DiagBus",
     0x16: "ClockMargin",
     0x17: "PsuMargin",
     0x1c: "memcpy_protected(src, dst, len)",
@@ -62,7 +63,9 @@ FSCALLS = {
     0x102d0: "strcat(STR, STR)",
     0x10384: "read_from_file",          # ref: DBUSULOAD.M200
     0x103b0: "exec_command()",          # 
-    0x103d8: "wrcons(STR)",
+    0x103d0: "wr_console_c(CHAR)",
+    0x103d8: "wr_console_s(STR)",
+    0x1047e: "send_experiment",
     0x10496: "experiment_close",        # ref: FS.0 0x18f4e
     0x1056e: "open_file",               # ref: BOOTINFO.M200
 }
