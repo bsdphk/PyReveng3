@@ -225,6 +225,9 @@ class PIL_Ins():
         self.pil = []
         self.pil_c = 0
 
+    def __iter__(self):
+        yield from self.pil
+
     def pil_reg(self, r, d):
         if r[0] != "%":
             return r
