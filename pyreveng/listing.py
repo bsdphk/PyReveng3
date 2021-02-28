@@ -285,7 +285,8 @@ class Listing():
             while i.lo > last:
                 last = self.gap(last, i.lo)
             last = i.hi
-            i.render(self.fo, self)
+            if self.lo <= i.lo and i.hi <= self.hi:
+                i.render(self.fo, self)
         self.fo.flush()
 
     def fmt_adr(self, lo, hi):
