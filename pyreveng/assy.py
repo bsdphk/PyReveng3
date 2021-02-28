@@ -249,6 +249,8 @@ class Instree_disass(code.Decoder):
             self.codeptr = self.codeptr_lu32
         elif endian == ">" and abits == 32:
             self.codeptr = self.codeptr_bu32
+        elif abits == 8:
+            self.codeptr = self.codeptr_8
 
         self.flow_check = []
         self.verbatim = ()
@@ -258,6 +260,14 @@ class Instree_disass(code.Decoder):
         self.aspace = {}
         if abits is not None:
             self.add_as("mem", "Memory", bits = abits)
+
+    def codeptr_8(self, adr, asp=None):
+        if asp is None:
+            asp = self.m
+        t = asp[adr]
+        c = data.Codeptr(asp, adr, adr + 1, t)
+        self.disass(t, asp=asp)
+        return c
 
     def codeptr_lu16(self, adr, asp=None):
         if asp is None:
