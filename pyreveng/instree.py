@@ -24,37 +24,35 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-"""
-InsTree -- A class for disassembling
+'''
+    InsTree -- A class for disassembling
+    ====================================
 
-This class turns a textual description close to what is typically used
-for documenting CPUs into a skeleton disassembler.
+    This is the fundamental syntax in Bill Fenner approved ABNF:
 
-    instree = * (
-        (assypart (wordmap/bitmap) [pilspec]) \
-        ('#' comment NL)
-    )
+	spec = *(blankline / comment / specline)
+	blankline = *WSP LF
+	comment = *WSP "#" *(VCHAR / WSP) LF
+	specline = mnemonic 1*WSP operands 1*WSP wordspec 1*WSP [ pilspec ] LF
+	mnemonic = 1*VCHAR
+	operands = operand *( "," operand )
+	operand = 1*( %x21-2B / %x2D-7E )
+	wordspec = "|" 1*field
+	field = bitfield / hexfield / varfield / linebreak
+	bit = ( "0" / "1" / "?" )
+	bitfield = bit *( " " bit ) "|"
+	hexfield = *WSP 1*( DIGIT / %x41-46 ) *WSP "|"
+	varfield = *WSP %x61-7A 1*( %x61-7A / %x30-39 / "_" ) *WSP "|"
+	linebreak = *WSP "&" LF *WSP "|"
+	pilspec = *WSP "{" LF *pillines "}" LF
+	pillines = (HTAB / %x20-7C / "~") 1*(WSP / VCHAR ) LF
 
-    assypart = * (nonspacenonpipe WSP)
-
-    delim    = ' ' / '|'
-
-    wordmap = '|' *(delim (hex|field)) '|'
-
-    bitmap = '|' bit *(delim (field|bit)) '|'
-
-    bit = '?' / '0' / '1'
-
-    hex = 2* ( bit / '2' / '3' / ... 'D' / 'E' / 'F' )
-    # Always upper case, at least two digits
-
-    pilspec = '{' NL IL_specificatoin NL '}' NL
-
-XXX: wordmap has yet to be implemented
+    On top of this are other requirements, in particular the widths of fields.
 
 """
 
 import sys
+import re
 
 class UsageTrouble(Exception):
     pass
@@ -350,6 +348,10 @@ class InsTree():
         i = 0
         banned = False
         s = s.expandtabs()
+
+        # Join continuation lines
+        s = re.sub("\\|\\s*&\n\\s*\\|", "|", s)
+
         last = ''
         while i < len(s):
 
@@ -468,5 +470,7 @@ Foo_01	|1 1 0 0|1 0 0 1| data		|0 0 0 0|foo	| {
 Foo   |0 1 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
 Foo2  |0 ? 0 1 0 1 0 1|1 1 1 1 1 1 1 1|
 #Foo_05	| ca | data		|0 0 0 0|foo	|
+Foo5  |0 ? 0 1 0 1 0 1| \
+	|1 1 1 1 1 1 1 1|
 """)
     IT.dump()
