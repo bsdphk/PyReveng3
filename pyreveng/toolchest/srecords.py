@@ -41,6 +41,7 @@ class BadSet(Exception):
     ''' Bad Set of S-records '''
 
 def truncate(x):
+    ''' ellipsis text after 20 char '''
     if len(x) < 20:
         return x
     return x[:20] + "…"
@@ -49,6 +50,8 @@ class SRecord():
     ''' A single S-Record '''
     def __init__(self, text):
         text = text.rstrip()
+        if not text:
+            raise IgnoredLine("Blank line")
         if text[0] != 'S':
             raise IgnoredLine("S-rec line must start with 'S' (not '%s')" % truncate(text))
         if text[1] not in '012356789':
@@ -62,7 +65,17 @@ class SRecord():
         self.address = 0
         self.end = 0
         if not self.stype:
-            self.octets = bytes()
+            i = bytes.fromhex(text[2:])
+            if sum(i) & 0xff != 0xff:
+                self.octets = text.strip()
+            elif i[0] + 1 != len(i):
+                self.octets = text.strip()
+            else:
+                j = i[1:].strip(b'\x00')
+                if min(j) < 0x20 or max(j) > 0x7e:
+                    self.octets = text.strip()
+                else:
+                    self.octets = j.decode("ASCII")
             self.length = 0
             self.address = 0
             return
@@ -95,6 +108,10 @@ class SRecord():
     def __lt__(self, other):
         return self.address < other.address
 
+    def iscomment(self):
+        ''' This is a comment record '''
+        return not self.stype
+
     def isdata(self):
         ''' This is a data record '''
         return self.stype in (1, 2, 3)
@@ -112,6 +129,9 @@ class SRecordSet():
     def __init__(self, quiet=False):
         self.records = []
         self.quiet = quiet
+
+    def __getitem__(self, idx):
+        return self.records[idx]
 
     def __iter__(self):
         yield from self.records
@@ -133,16 +153,16 @@ class SRecordSet():
                 self.add_record(i)
             except IgnoredLine as err:
                 if not self.quiet:
-                    print(err)
+                    raise
         return self
 
-    def from_mem(self, mem, lo=None, hi=None):
+    def from_mem(self, asp, lo=None, hi=None):
         ''' Load S-records from a pyreveng.mem '''
         if lo is None:
-            lo = mem.lo
+            lo = asp.lo
         if hi is None:
-            hi = mem.hi
-        self.from_string(mem.bytearray(lo, hi-lo).decode("ASCII"))
+            hi = asp.hi
+        self.from_string(asp.bytearray(lo, hi-lo).decode("ASCII"))
         return self
 
     def add_record(self, text):
@@ -206,3 +226,15 @@ class SRecordSet():
                 cur = chunks.pop(0)
             for n, i in enumerate(srec.octets):
                 cur[srec.address + n] = i
+
+if __name__ == "__main__":
+
+    import sys
+
+    for fn in sys.argv[1:]:
+        for line in open(fn):
+            print(line)
+            r = SRecord(line)
+            if r.stype == 0:
+                print(r.octets.decode('ascii'))
+                print(r.octets)
