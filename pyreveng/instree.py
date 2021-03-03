@@ -49,7 +49,7 @@
 
     On top of this are other requirements, in particular the widths of fields.
 
-"""
+'''
 
 import sys
 import re
