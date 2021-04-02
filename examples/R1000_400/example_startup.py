@@ -130,4 +130,4 @@ if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == "-ram":
         listing.Example(Startup("/tmp/_.ram").example, ncol=8)
     else:
-        listing.Example(example, ncol=8)
+        listing.Example(example, ncol=8, pil=True)

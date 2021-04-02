@@ -169,12 +169,20 @@ class IocKernel(ioc_utils.IocJob):
         ):
             data.Txt(cx.m, a, splitnl=True)
 
+        cx.m.set_label(0x18479, "ExpDestinations[16]")
+        if False:
+            for a in range(0x18479, 0x18519, 10):
+                data.Txt(cx.m, a, a + 10, label=False)
+
+        cx.m.set_label(0x18519, "ExpStatus[10]")
+        if False:
+            for a in range(0x18519, 0x1857d, 10):
+                data.Txt(cx.m, a, a + 10, label=False)
+
         cx.m.set_label(0x9e74, "STOP_UNTIL_IRQ()")
         for a in range(0x0000a9a4, 0x0000a9e0, 4):
             cx.m.set_label(a, "REG_SAVE_%X" % cx.m[a])
             data.Const(cx.m, a, a + 4)
-
-        
 
         for a in (
             0xa580,

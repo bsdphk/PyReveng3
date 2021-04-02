@@ -2099,7 +2099,7 @@ class ucode_ins(assy.Instree_ins):
         return "0x%x" % v
 
     def assy_i(self):
-        print("microcode does not like", self)
+        # print("microcode does not like", self)
         raise assy.Invalid("Invalid Instruction")
 
 class r1000_ins(assy.Instree_ins):

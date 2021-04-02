@@ -65,7 +65,7 @@ FSCALLS = {
     0x103b0: "exec_command()",          # 
     0x103d0: "wr_console_c(CHAR)",
     0x103d8: "wr_console_s(STR)",
-    0x1047e: "send_experiment",
+    0x1047e: "exp_xmit(EXP.L,NODE.B)",
     0x10496: "experiment_close",        # ref: FS.0 0x18f4e
     0x1056e: "open_file",               # ref: BOOTINFO.M200
 }
