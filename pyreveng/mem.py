@@ -95,11 +95,10 @@ class AddressSpace():
         self.lcmt_d = dict()
         self.rangelist = []
         self.t = tree.Tree(self.lo, self.hi)
-        self.line_comment_prefix = "; "
-        self.line_comment_col = 88
-        self.apfx = apfx
-        self.asfx = asfx
-        self.hex_format()
+        nxdig = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
+        self.afmtpct = apfx + "%%0%dx" % nxdig + asfx
+        self.apct = apfx + "0x%%0%dx" % nxdig + asfx
+        self.apct = apfx + "0x%x" + asfx
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (
@@ -117,14 +116,6 @@ class AddressSpace():
     def __iter__(self):
         for i in self.t:
             yield i
-
-    def hex_format(self, pos=None):
-        ''' Render stuff in hex '''
-        if pos is None:
-            pos = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
-        self.afmtpct = self.apfx + "%%0%dx" % pos + self.asfx
-        self.apct = self.apfx + "0x%%0%dx" % pos + self.asfx
-        self.apct = self.apfx + "0x%x" + self.asfx
 
     def adr(self, dst):
         ''' Render an address '''
@@ -269,8 +260,6 @@ class MemMapper(AddressSpace):
         assert hi > lo
         self.seglist.append([lo, hi, offset, mem, shared])
         self.mapping.append([lo, hi, offset, mem, shared])
-
-        self.hex_format()
 
         if len(self.mapping) == 1:
             self.xlat = self.xlat1
