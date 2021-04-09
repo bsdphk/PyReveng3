@@ -190,7 +190,7 @@ class StringTable():
 
 def segment_file(mb):
 
-    m = mem.WordMem(0, mb.hi >> 1, bits=16, ncol=1)
+    m = mem.WordMem(0, mb.hi >> 1, bits=16)
     for i in range(0, mb.hi, 2):
         m[i >> 1] = (mb[i] << 8) | mb[i + 1]
 

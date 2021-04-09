@@ -1063,7 +1063,7 @@ def common(fwfile):
 
     cx = HP48_Saturn()
 
-    m = mem.WordMem(0, 1<<20, bits=4, ncol=5)
+    m = mem.WordMem(0, 1<<20, bits=4)
     fw = open(fwfile, "rb").read()
     for i in range(len(fw)):
         m[0 + (i << 1)] = fw[i] & 0xf

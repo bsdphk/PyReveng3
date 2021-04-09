@@ -85,14 +85,11 @@ class AddressSpace():
     address-spaces and memory types.
     '''
 
-    def __init__(self, lo, hi, name="", ncol=None, apfx="", asfx=""):
+    def __init__(self, lo, hi, name="", apfx="", asfx=""):
         assert lo <= hi
         self.lo = lo
         self.hi = hi
         self.name = name
-        if ncol is None:
-            ncol = 4
-        self.ncol = ncol
         self.lbl_d = dict()
         self.bcmt_d = dict()
         self.lcmt_d = dict()
@@ -100,7 +97,6 @@ class AddressSpace():
         self.t = tree.Tree(self.lo, self.hi)
         self.line_comment_prefix = "; "
         self.line_comment_col = 88
-        self.has_pil = False
         self.apfx = apfx
         self.asfx = asfx
         self.hex_format()
@@ -111,11 +107,11 @@ class AddressSpace():
         )
 
     def __getitem__(self, adr):
-        b = self._off(adr)
+        _b = self._off(adr)
         raise MemError(adr, "Undefined")
 
     def __setitem__(self, adr, data):
-        b = self._off(adr)
+        _b = self._off(adr)
         raise MemError(adr, "Undefined")
 
     def __iter__(self):
@@ -483,16 +479,14 @@ class WordMem(AddressSpace):
     Largest supported word-width is 64 bits and 8 attributes.
     """
 
-    def __init__(self, lo, hi, bits=8, attr=0, ncol=None, **kwargs):
+    def __init__(self, lo, hi, bits=8, attr=0, **kwargs):
         assert lo < hi
         assert bits > 0
         assert bits <= 64
         assert attr >= 0
         assert attr <= 7
 
-        if ncol is None and bits != 8:
-            ncol = 1
-        super().__init__(lo, hi, ncol=ncol, **kwargs)
+        super().__init__(lo, hi, **kwargs)
 
         self.bits = bits
         self.fmt = "%" + "0%dx" % ((bits + 3) // 4)

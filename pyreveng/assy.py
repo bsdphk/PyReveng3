@@ -379,7 +379,6 @@ class Instree_disass(code.Decoder):
 
             z = y.im.pil.pilspec
             if z is not None:
-                asp.has_pil = True
                 y.add_il(z.split("\n"))
             else:
                 y.pildefault()
