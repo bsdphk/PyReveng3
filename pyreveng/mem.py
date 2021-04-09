@@ -617,123 +617,123 @@ class ByteMem(WordMem):
             return (None,)
 
     @mapped
-    def u8(self, a):
+    def u8(self, adr):
         """Unsigned 8-bit byte"""
-        return self[a]
+        return self[adr]
 
     @mapped
-    def bu16(self, a):
+    def bu16(self, adr):
         """Big Endian Unsigned 16-bit half-word"""
-        b = self[a] << 8
-        b |= self[a + 1]
-        return b
+        retval = self[adr] << 8
+        retval |= self[adr + 1]
+        return retval
 
     @mapped
-    def bu32(self, a):
+    def bu32(self, adr):
         """Big Endian Unsigned 32-bit word"""
-        b = self[a] << 24
-        b |= self[a + 1] << 16
-        b |= self[a + 2] << 8
-        b |= self[a + 3]
-        return b
+        retval = self[adr] << 24
+        retval |= self[adr + 1] << 16
+        retval |= self[adr + 2] << 8
+        retval |= self[adr + 3]
+        return retval
 
     @mapped
-    def bu64(self, a):
+    def bu64(self, adr):
         """Big Endian Unsigned 64-bit double-word"""
-        b = self[a] << 56
-        b |= self[a + 1] << 48
-        b |= self[a + 2] << 40
-        b |= self[a + 3] << 32
-        b |= self[a + 4] << 24
-        b |= self[a + 5] << 16
-        b |= self[a + 6] << 8
-        b |= self[a + 7]
-        return b
+        retval = self[adr] << 56
+        retval |= self[adr + 1] << 48
+        retval |= self[adr + 2] << 40
+        retval |= self[adr + 3] << 32
+        retval |= self[adr + 4] << 24
+        retval |= self[adr + 5] << 16
+        retval |= self[adr + 6] << 8
+        retval |= self[adr + 7]
+        return retval
 
     @mapped
-    def lu16(self, a):
+    def lu16(self, adr):
         """Little Endian Unsigned 16-bit half-word"""
-        b = self[a]
-        b |= self[a + 1] << 8
-        return b
+        retval = self[adr]
+        retval |= self[adr + 1] << 8
+        return retval
 
     @mapped
-    def lu32(self, a):
+    def lu32(self, adr):
         """Little Endian Unsigned 32-bit word"""
-        b = self[a]
-        b |= self[a + 1] << 8
-        b |= self[a + 2] << 16
-        b |= self[a + 3] << 24
-        return b
+        retval = self[adr]
+        retval |= self[adr + 1] << 8
+        retval |= self[adr + 2] << 16
+        retval |= self[adr + 3] << 24
+        return retval
 
     @mapped
-    def lu64(self, a):
+    def lu64(self, adr):
         """Little Endian Unsigned 64-bit double-word"""
-        b = self[a]
-        b |= self[a + 1] << 8
-        b |= self[a + 2] << 16
-        b |= self[a + 3] << 24
-        b |= self[a + 4] << 32
-        b |= self[a + 5] << 40
-        b |= self[a + 6] << 48
-        b |= self[a + 7] << 56
-        return b
+        retval = self[adr]
+        retval |= self[adr + 1] << 8
+        retval |= self[adr + 2] << 16
+        retval |= self[adr + 3] << 24
+        retval |= self[adr + 4] << 32
+        retval |= self[adr + 5] << 40
+        retval |= self[adr + 6] << 48
+        retval |= self[adr + 7] << 56
+        return retval
 
     @mapped
-    def s8(self, a):
+    def s8(self, adr):
         """Signed 8-bit byte"""
-        b = self[a]
-        if b & 0x80:
-            b -= 256
-        return b
+        retval = self[adr]
+        if retval & 0x80:
+            retval -= 256
+        return retval
 
     @mapped
-    def bs16(self, a):
+    def bs16(self, adr):
         """Big Endian Signed 16-bit half-word"""
-        b = self.bu16(a)
-        if b & 0x8000:
-            b -= 0x10000
-        return b
+        retval = self.bu16(adr)
+        if retval & 0x8000:
+            retval -= 0x10000
+        return retval
 
     @mapped
-    def ls16(self, a):
+    def ls16(self, adr):
         """Little Endian Signed 16-bit half-word"""
-        b = self.lu16(a)
-        if b & 0x8000:
-            b -= 0x10000
-        return b
+        retval = self.lu16(adr)
+        if retval & 0x8000:
+            retval -= 0x10000
+        return retval
 
     @mapped
-    def bs32(self, a):
+    def bs32(self, adr):
         """Big Endian Signed 32-bit word"""
-        b = self.bu32(a)
-        if b & 0x80000000:
-            b -= 0x100000000
-        return b
+        retval = self.bu32(adr)
+        if retval & 0x80000000:
+            retval -= 0x100000000
+        return retval
 
     @mapped
-    def ls32(self, a):
+    def ls32(self, adr):
         """Little Endian Signed 32-bit word"""
-        b = self.lu32(a)
-        if b & 0x80000000:
-            b -= 0x100000000
-        return b
+        retval = self.lu32(adr)
+        if retval & 0x80000000:
+            retval -= 0x100000000
+        return retval
 
     @mapped
-    def bs64(self, a):
+    def bs64(self, adr):
         """Big Endian Signed 64-bit double-word"""
-        b = self.bu64(a)
-        if b & 0x8000000000000000:
-            b -= 0x10000000000000000
-        return b
+        retval = self.bu64(adr)
+        if retval & 0x8000000000000000:
+            retval -= 0x10000000000000000
+        return retval
 
     @mapped
-    def ls64(self, a):
+    def ls64(self, adr):
         """Little Endian Signed 64-bit double-word"""
-        b = self.lu64(a)
-        if b & 0x8000000000000000:
-            b -= 0x10000000000000000
-        return b
+        retval = self.lu64(adr)
+        if retval & 0x8000000000000000:
+            retval -= 0x10000000000000000
+        return retval
 
     def load_data(self, first, step, dat):
         for i in dat:

@@ -221,7 +221,7 @@ class Listing():
 
         self.in_seg = None
         if self.ncol is None:
-            self.ncol = self.asp.ncol
+            self.ncol = 4
         if self.blanks is None:
             self.blanks = self.ncol * 2
 
