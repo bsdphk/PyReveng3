@@ -330,6 +330,7 @@ class m68000_switch_ins(assy.Instree_ins):
     def dst(self, pj, no, dst):
         # XXX: Add flow
         self.lang.disass(dst)
+        self += code.Jump(cond="0x%x" % no, to=dst)
         pj.m.set_label(dst, self.nm + "_CASE_%d" % no)
 
 def m68000_switches(disass):
