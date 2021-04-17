@@ -311,17 +311,12 @@ CMPI		Z,data,ea	0f7d	|0 0 0 0|1 1 0 0| sz| ea	| {
 # 185/4-81
 CMPM		Z,Ayinc,Axinc	0000	|1 0 1 1| Ax  |1| sz|0 0 1| Ay  |
 # 194/4-90
-DBF		Dn,disp16,>JC	0000	|0 1 0 1|0 0 0 1|1 1 0 0 1| Dn  | disp16			| {
-	DN = sub i32 DN , 1
-	%0 = icmp ne i32 DN , -1
-	br i1 %0 label DST , label HI
-}
 DB		cc,Dn,disp16,>JC	0000	|0 1 0 1| cc    |1 1 0 0 1| Dn  | disp16			| {
 	br i1 CC label HI , label %0
-%0:
 	DN = sub i16 DN , 1
 	%2 = icmp eq i16 DN , 0xffff
 	br i1 %2 label DST , label HI
+%0:
 }
 # 196/4-92
 DIVS		W,ea,Dn		1f7d	|1 0 0 0| Dn  |1 1 1| ea	|
@@ -779,9 +774,19 @@ class m68000_ins(assy.Instree_ins):
 
     def assy_cc(self):
         c = cond_code[self['cc']]
-        if c != 'T':
+        if c == 'T':
+            self.cc = True
+        elif c == 'F':
+            if self.mne == "DB":
+                self.cc = "CNT=-1"
+            else:
+                self.cc = False
             self.mne += c
-        # XXX: remove flow
+        else:
+            self.cc = c 
+            if self.mne == "DB":
+                self.cc += "|CNT=-1"
+            self.mne += c
 
     def assy_const(self):
         o = self['const']
