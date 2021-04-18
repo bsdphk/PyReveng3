@@ -471,7 +471,7 @@ class WordMem(AddressSpace):
     def __init__(self, lo, hi, bits=8, attr=0, **kwargs):
         assert lo < hi
         assert bits > 0
-        assert bits <= 64
+        # assert bits <= 64
         assert attr >= 0
         assert attr <= 7
 
@@ -491,14 +491,19 @@ class WordMem(AddressSpace):
 
         if bits <= 8:
             self.mt = ctypes.c_uint8
+            self.m = (self.mt * ln)()
         elif bits <= 16:
             self.mt = ctypes.c_uint16
+            self.m = (self.mt * ln)()
         elif bits <= 32:
             self.mt = ctypes.c_uint32
-        else:
+            self.m = (self.mt * ln)()
+        elif bits <= 64:
             self.mt = ctypes.c_uint64
-
-        self.m = (self.mt * ln)()
+            self.m = (self.mt * ln)()
+        else:
+            self.mt = int
+            self.m = [None] * ln
 
         self.at = ctypes.c_uint8
         self.a = (self.at * ln)()
