@@ -52,7 +52,7 @@ def fc_10280(asp, ins):
     ''' Seems to be "crt0" '''
     if asp.bu32(ins.lo - 4) == 0x4ffa0008:
         ins.flow_out = []
-        ins += code.Flow(to=ins.hi)
+        ins += code.Jump(to=ins.hi)
 
 def fc_10568(asp, ins):
     ''' FS-call to run an Experiment '''
