@@ -459,7 +459,7 @@ def tramp(cx):
             continue
         if len(i.flow_out) != 1:
             continue
-        if i.flow_out[0].typ != ">":
+        if i.flow_out[0].typ != "J":
             continue
         if i.flow_out[0].cond is not True:
             continue

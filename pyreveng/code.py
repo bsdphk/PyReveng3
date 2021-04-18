@@ -31,7 +31,7 @@ The code object represents an amount of memory content which is executed
 somehow.  Code objects tie together with "flow" objects, which tell
 where execution will continue.
 
-It is imortant to understand that 'code' is not just assembler code
+It is important to understand that 'code' is not just assembler code
 but also semi-digested token-sequences in interpreted languages, for
 instance the CHIP-8 'language' on RCA1802 CPUs or the RPN code of a
 HP 48 Calculator.
@@ -48,7 +48,7 @@ class Flow():
     Flows connect code leaves together and captures where
     execution can go next and under what condition.
     '''
-    def __init__(self, typ=True, cond=True, to=None, lang=None):
+    def __init__(self, typ="N", cond=True, to=None, lang=None):
         self.fm = None
         self.lang = lang
         self.typ = typ
@@ -59,7 +59,8 @@ class Flow():
     def come_from(self, fm):
         self.fm = fm
 
-        if self.typ is True:
+        if self.typ == "N":
+            assert self.to is None
             self.to = fm.hi
 
         if self.lang is None:
@@ -80,7 +81,7 @@ class Flow():
         return s
 
     def lcmt(self, leaf):
-        if self.typ is True:
+        if self.typ == "N":
             return
         s = "Flow %s" % self.typ
         if self.cond not in (True, None):
@@ -92,7 +93,7 @@ class Flow():
 class Jump(Flow):
     ''' Transfer of control with no return/link address '''
     def __init__(self, **kwargs):
-        super().__init__(typ='>', **kwargs)
+        super().__init__(typ='J', **kwargs)
 
 class Call(Flow):
     ''' Transfer of control with return/link address '''
@@ -103,6 +104,11 @@ class Return(Flow):
     ''' Transfer of control to canonical link address '''
     def __init__(self, **kwargs):
         super().__init__(typ='R', **kwargs)
+
+class Dispatch(Flow):
+    ''' Transfer of control to different executor '''
+    def __init__(self, **kwargs):
+        super().__init__(typ='D', **kwargs)
 
 
 #######################################################################
