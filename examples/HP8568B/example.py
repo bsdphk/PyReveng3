@@ -475,7 +475,7 @@ def flow_post_arg(asp, ins):
         else:
             l.append(i)
     ins.oper.append(assy.Arg_verbatim("(" + ",".join(l) + ")"))
-    ins += code.Flow()
+    ins += code.Next(to=ins.hi)
 
 ###############################################################
 
@@ -492,7 +492,7 @@ def flow_switch(asp, ins):
     if ins.dstadr != 0x2f38:
         return
     ins.flow_out.pop(0)
-    ins += code.Flow(cond="?")
+    ins += code.Jump(cond="?")
     asp.set_label(ins.hi, "break_%04x" % ins.lo)
 
     y = data.Const(asp, ins.lo - 2, ins.lo)

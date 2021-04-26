@@ -106,17 +106,17 @@ class Instree_ins(Assy):
         if self.cc is not False:
             self += code.Return(cond=str(self.cc))
         if self.cc is not True:
-            self += code.Flow(cond="!" + str(self.cc))
+            self += code.Next(to=self.hi, cond="!" + str(self.cc))
 
     def flow_JC(self):
         if self.cc is not False:
             self += code.Jump(cond=str(self.cc), to=self.dstadr)
         if self.cc is not True:
-            self += code.Flow(cond="!" + str(self.cc))
+            self += code.Next(to=self.hi, cond="!" + str(self.cc))
 
     def flow_C(self):
         self += code.Call(to=self.dstadr)
-        self += code.Flow()
+        self += code.Next(to=self.hi)
 
     def arg(self, arg):
         if arg in self.lang.verbatim:
@@ -192,7 +192,7 @@ class Instree_ins(Assy):
         self.args_done()
 
         if not self.flow_out:
-            self += code.Flow()
+            self += code.Next(to=self.hi)
 
     def get(self, f):
         return self.lim[-1].get(f)

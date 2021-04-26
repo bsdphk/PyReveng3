@@ -534,7 +534,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
             cond = self['cond']
             self.mne += CC[cond]
             if self['cond'] != 14:
-                self += code.Flow(cond="?")
+                self += code.Next(to=self.hi, cond="?")
 
     def assy_UN(self):
         raise assy.Invalid("UNPREDICTABLE")
@@ -597,7 +597,7 @@ class Arm_ins(arm_base.Arm_Base_ins):
         cond = self['cond']
         self.mne += CC[cond]
         if self['cond'] != 14:
-            self += code.Flow(cond="?")
+            self += code.Next(to=self.hi, cond="?")
 
     def assy_dst(self):
         o = self['off'] << 2

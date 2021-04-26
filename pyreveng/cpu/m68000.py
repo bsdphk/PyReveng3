@@ -778,14 +778,14 @@ class m68000_ins(assy.Instree_ins):
             self.cc = True
         elif c == 'F':
             if self.mne == "DB":
-                self.cc = "CNT=-1"
+                self.cc = "CNT!=-1"
             else:
                 self.cc = False
             self.mne += c
         else:
-            self.cc = c 
+            self.cc = c
             if self.mne == "DB":
-                self.cc += "|CNT=-1"
+                self.cc += "|CNT!=-1"
             self.mne += c
 
     def assy_const(self):
@@ -971,11 +971,11 @@ class m68000_ins(assy.Instree_ins):
             raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
                 self.lo, ew), self.im)
 
-        if not (ew & 0x30):
+        if not ew & 0x30:
             raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
                 self.lo, ew), self.im)
 
-        if ref != "PC" and not (ew & 0x80):    # Base Supress
+        if ref != "PC" and not ew & 0x80:    # Base Supress
             lan = [ref]
         else:
             lan = []
@@ -998,7 +998,7 @@ class m68000_ins(assy.Instree_ins):
         if scale:
             xr += "*%d" % (1 << scale)
 
-        if not (ew & 0x40):            # Index Supress
+        if not ew & 0x40:            # Index Supress
             lxr = [xr]
         else:
             lxr = []
@@ -1013,7 +1013,7 @@ class m68000_ins(assy.Instree_ins):
         else:
             basedisp = 0
 
-        if ref == "PC" and not (ew & 0x80):    # Base Supress
+        if ref == "PC" and not ew & 0x80:    # Base Supress
             basedisp += pc
 
         if ew & 2:
@@ -1026,7 +1026,7 @@ class m68000_ins(assy.Instree_ins):
         else:
             outherdisp = 0
 
-        if not (ew & 7):
+        if not ew & 7:
             # No index
             s = "(" + "+".join(lan + lxr)
             if basedisp < 0:
@@ -1238,7 +1238,7 @@ class m68000_ins(assy.Instree_ins):
 
     def assy_vect(self):
         if self.lang.trap_returns.get(self['vect']):
-            self += code.Flow()
+            self += code.Next(to=self.hi)
         return "#%d" % self['vect']
 
     def assy_W(self):
@@ -1637,5 +1637,3 @@ class m68000(assy.Instree_disass):
 
     def dataptr(self, adr):
         return data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr))
-
-

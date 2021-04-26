@@ -124,7 +124,7 @@ def fc_arg(asp, ins, arg):
             ins.oper.append(assy.Arg_verbatim("P@0x%x" % b))
         else:
             assert False, "BAD fc_arg spec: " + c
-    ins += code.Flow()
+    ins += code.Next(to=ins.hi)
 
 def fc_case(asp, ins, _arg):
     ins.flow_out.pop(-1)

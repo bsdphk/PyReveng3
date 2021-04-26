@@ -60,8 +60,7 @@ class Flow():
         self.fm = fm
 
         if self.typ == "N":
-            assert self.to is None
-            self.to = fm.hi
+            assert self.to is not None
 
         if self.lang is None:
             self.lang = fm.lang
@@ -89,6 +88,11 @@ class Flow():
         if not self.to is None:
             s += " 0x%x" % self.to
         leaf.lcmt += s + "\n"
+
+class Next(Flow):
+    ''' Continue to next instruction '''
+    def __init__(self, **kwargs):
+        super().__init__(typ='N', **kwargs)
 
 class Jump(Flow):
     ''' Transfer of control with no return/link address '''
