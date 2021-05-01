@@ -184,6 +184,8 @@ def example():
     for a, b in SYMBOLS.items():
         cx.m.set_label(a, b)
 
+    data.Const(cx.m, 0x0007765c, 0x00077662)
+
     resha_section(
         cx.m,
         0x70000,
@@ -311,7 +313,6 @@ def example():
         0x76990,
         0x76a46,
         0x76220,
-        # 0x77666,
     ):
         data.Txt(cx.m, a)
 
