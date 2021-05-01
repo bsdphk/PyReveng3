@@ -31,9 +31,7 @@ This class implements a basic recursive split-in-the-middle-interval-tree
 An interval-tree is a tree of intervals (duh!) which is useful here
 for keeping track of the bits we have taken apart.
 
-The objects you put into the tree must come with numerical .lo and
-.hi attributes, but you get to define the class(es) for that in
-your own code.
+Leafs must have numerical .lo and .hi attributes.
 
 Instantiating the tree you must provide the valid [lo...hi] interval.
 
@@ -44,57 +42,84 @@ rather than the interval they cover, but for now it seems to work
 pretty ok.
 """
 
+class TreeLeaf():
+    """
+    These are the leaves we hang into the tree class.
+
+    Many datatypes will sub-type this class and add functionality
+    """
+    def __init__(self, lo, hi):
+        assert isinstance(lo, int)
+        assert isinstance(hi, int)
+        assert lo < hi
+        self.lo = lo
+        self.hi = hi
+
+    def __repr__(self):
+        s = "<tree_leaf 0x%x-0x%x" % (self.lo, self.hi)
+        return s + ">"
+
+    def __lt__(self, other):
+        if self.lo != other.lo:
+            return self.lo < other.lo
+        return self.hi < other.hi
+
+    def __eq__(self, other):
+        return self.lo == other.lo and self.hi != other.hi
+
+    def __contains__(self, a):
+        return self.lo <= a < self.hi
+
 class Tree():
-    def __init__(self, lo, hi, lim=128, unique=False):
+
+    limit = 128
+
+    def __init__(self, lo, hi):
         # lim is only a performance parameter, it does not change
         # funcationality in any way.
         self.lo = lo
         self.mid = (lo + hi) // 2
         self.hi = hi
-        self.lim = lim
-        self.unique = unique
         self.less = None
         self.more = None
         self.cuts = list()
-        self.leaf = (hi - lo) <= lim
+        self.isbranch = (hi - lo) > self.limit
 
     def __repr__(self):
         return "<Tree 0x%x-0x%x-0x%x>" % (self.lo, self.mid, self.hi)
 
-    def insert(self, o):
+    def insert(self, leaf):
         """
         You guessed it...
         """
-        assert o.lo < o.hi
-        if o.hi <= self.mid and not self.leaf:
+        assert isinstance(leaf, TreeLeaf)
+        assert leaf.lo < leaf.hi
+        if not self.isbranch:
+            self.cuts.append(leaf)
+        elif leaf.hi <= self.mid:
             if self.less is None:
-                self.less = Tree(self.lo, self.mid, self.lim, self.unique)
-            self.less.insert(o)
-            return
-        if o.lo >= self.mid and not self.leaf:
+                self.less = Tree(self.lo, self.mid)
+            self.less.insert(leaf)
+        elif leaf.lo >= self.mid:
             if self.more is None:
-                self.more = Tree(self.mid, self.hi, self.lim, self.unique)
-            self.more.insert(o)
-            return
-        if self.unique:
-            for i in self.cuts:
-                if i == o:
-                    return
-        self.cuts.append(o)
+                self.more = Tree(self.mid, self.hi)
+            self.more.insert(leaf)
+        else:
+            self.cuts.append(leaf)
 
     def find(self, lo=None, hi=None):
-        ''' iterate over leaves between lo and hi '''
+        ''' Find leaves between lo and hi '''
         assert lo is not None or hi is not None
         if hi is None:
             hi = lo + 1
         if lo is None:
             lo = hi - 1
-        if lo <= self.mid and self.less is not None:
+        if lo <= self.mid and self.less:
             yield from self.less.find(lo, hi)
         for i in self.cuts:
             if i.lo < hi and lo < i.hi:
                 yield i
-        if hi >= self.mid and self.more is not None:
+        if hi >= self.mid and self.more:
             yield from self.more.find(lo, hi)
 
     def __iter__(self):
@@ -108,48 +133,38 @@ class Tree():
             while lst and lst[0].lo < cur.lo:
                 yield lst.pop(0)
             lst.extend(cur.cuts)
-            if cur.more is not None:
+            lst.sort()
+            if cur.more:
                 stk.append(cur.more)
-            if cur.less is not None:
+            if cur.less:
                 stk.append(cur.less)
             else:
-                lst.sort(key=lambda x: (x.lo, x.lo - x.hi))
                 while lst and lst[0].lo < cur.mid:
                     yield lst.pop(0)
-        while lst:
-            yield lst.pop(0)
+        yield from lst
 
 def test_tree():
     # Minimal test cases
 
-    class Leaf():
-        def __init__(self, lo, hi, tag):
-            self.lo = lo
-            self.hi = hi
-            self.tag = tag
-
-        def __repr__(self):
-            return "%x..%x %s" % (self.lo, self.hi, self.tag)
-
     print("Testing tree class")
-    it = Tree(0, 0x500, 1)
+    it = Tree(0, 0x500)
 
     # Super items
-    it.insert(Leaf(0x100, 0x400, 0))
-    it.insert(Leaf(0x100, 0x300, 0))
-    it.insert(Leaf(0x200, 0x400, 0))
+    it.insert(TreeLeaf(0x100, 0x400))
+    it.insert(TreeLeaf(0x100, 0x300))
+    it.insert(TreeLeaf(0x200, 0x400))
 
     # Same items
-    it.insert(Leaf(0x200, 0x300, 1))
+    it.insert(TreeLeaf(0x200, 0x300))
 
     # Sub items
-    it.insert(Leaf(0x210, 0x290, 2))
-    it.insert(Leaf(0x200, 0x299, 2))
-    it.insert(Leaf(0x201, 0x300, 2))
+    it.insert(TreeLeaf(0x210, 0x290))
+    it.insert(TreeLeaf(0x200, 0x299))
+    it.insert(TreeLeaf(0x201, 0x300))
 
     # Skew items
-    it.insert(Leaf(0x100, 0x299, 3))
-    it.insert(Leaf(0x201, 0x400, 3))
+    it.insert(TreeLeaf(0x100, 0x299))
+    it.insert(TreeLeaf(0x201, 0x400))
 
     la = 0
     ll = 0
@@ -157,8 +172,9 @@ def test_tree():
     shi = set()
     dlo = dict()
     dhi = dict()
+
     for i in it:
-        assert i.lo > la or i.hi - i.lo < ll
+        assert i.lo > la or i.hi - i.lo >= ll
         la = i.lo
         ll = i.hi - i.lo
         slo.add(i.lo)

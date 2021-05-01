@@ -28,15 +28,16 @@
 The Leaf class used everywhere
 """
 
-class Leaf():
+from pyreveng import tree
+
+class Leaf(tree.TreeLeaf):
     """
     These are the leaves we hang into the tree class.
 
     Many datatypes will sub-type this class and add functionality
     """
     def __init__(self, lo, hi, tag):
-        self.lo = lo
-        self.hi = hi
+        super().__init__(lo, hi)
         self.tag = tag
         self.pil = None
         self.lcmt = ""
@@ -47,24 +48,6 @@ class Leaf():
     def __repr__(self):
         s = "<leaf 0x%x-0x%x %s" % (self.lo, self.hi, self.tag)
         return s + ">"
-
-    def __lt__(self, other):
-        if self.lo != other.lo:
-            return self.lo < other.lo
-        if self.hi != other.hi:
-            return self.hi > other.hi
-
-    def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            return False
-        if self.lo != other.lo:
-            return False
-        if self.hi != other.hi:
-            return False
-        return True
-
-    def __contains__(self, a):
-        return self.lo <= a < self.hi
 
     def render(self):
         return self.rendered
