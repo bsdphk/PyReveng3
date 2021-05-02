@@ -1561,8 +1561,8 @@ class m68000(assy.Instree_disass):
             ins_word=16,
             mem_word=8,
             endian=">",
-                    abits=32,
-                )
+            abits=32,
+        )
         self.it.load_string(m68000_desc, m68000_ins)
         self.il = None
         self.verbatim += ("CCR", "SR", "USP")
