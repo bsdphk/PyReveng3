@@ -322,7 +322,6 @@ class MCS96(assy.Instree_disass):
             endian='<',
         )
         self.it.load_string(MCS96_DESC, MCS96Ins)
-        self.it.load_string(MCS80C196KB_DESC, MCS96Ins)
         self.it.load_string(MCS96_MACRO, MCS96Ins)
 
     def vectors(self, which=None):

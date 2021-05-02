@@ -64,12 +64,11 @@ class Const(Data):
             func = asp.__getitem__
         if fmt is None:
             fmt = "0x%x"
-        v = []
+        self.val = []
         for a in range(lo, hi, size):
-            v.append(fmt % func(a))
-        self.fmt = ",".join(v)
+            self.val.append(func(a))
+        self.fmt = ",".join(fmt % i for i in self.val)
         self.typ = ".CONST"
-        self.val = None
         self.compact = True
 
     def render(self):
