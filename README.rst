@@ -13,7 +13,7 @@ Presently this generality extends to:
 
 * Any wordsize up to 64bit is supported
 
-* Up to seven binary attributes per location
+* Up to seven bits of attributes per location
 
 * Mapped memory (Ex: `R1000_400/example.py`)
 
@@ -107,7 +107,7 @@ Disassemblers and examples using them
 
 * Intel i8085
 
-(No in-project examples)
+  * (No in-project examples)
 
 * Intel i8088/i8086
 
@@ -121,11 +121,11 @@ Disassemblers and examples using them
 
 * Recognize M680x0 Switch/case constructs
 
-(No in-project examples)
+  * (No in-project examples)
 
 * Motorola M68010
 
-(No in-project examples)
+  * (No in-project examples)
 
 * Motorola M68020
 
@@ -135,7 +135,7 @@ Disassemblers and examples using them
 
 * Motorola MC68881/882 Floating Point Coprocessor
 
-(No in-project examples)
+  * (No in-project examples)
 
 * Motorola MC6800/MC68HC11
 
@@ -180,6 +180,10 @@ Disassemblers and examples using them
   * ```Apollo_618C/example_cdu.py```
     II Morrow Apollo 618C Loran - Display Controller
 
+* Intel MCS-96 - 8096 family
+
+  * (No in-project examples)
+
 * MOS Technology 6500 Family
 
   * ```CBM900/example_fdc.py```
@@ -187,7 +191,7 @@ Disassemblers and examples using them
 
 * (Data General) Nova CPU
 
-(No in-project examples)
+  * (No in-project examples)
 
 * Rational R1000/400
 
