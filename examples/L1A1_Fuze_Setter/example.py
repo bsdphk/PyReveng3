@@ -28,7 +28,7 @@
 Royal Ordnance Fuze Setter Logic Unit L1A1
 ------------------------------------------
 See:
-	https://www.eevblog.com/forum/reviews/royal-ordnance-fuze-setter-logic-unit-l1a1-teardown
+	https://www.eevblog.com/forum/reviews/royal-ordnance-fuze-setter-logic-unit-l1a1-teardown/msg3565643/#msg3565643
 '''
 
 from pyreveng import mem, listing, code, assy
