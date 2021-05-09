@@ -193,6 +193,11 @@ Disassemblers and examples using them
 
   * (No in-project examples)
 
+* RCA CDP1802 "COSMAC"
+
+  * ```L1A1_Fuze_Setter/example.py```
+    Royal Ordnance Fuze Setter Logic Unit L1A1
+
 * Rational R1000/400
 
   * ```R1000_400/example_ada.py```
