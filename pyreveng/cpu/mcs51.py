@@ -31,188 +31,188 @@ from pyreveng import mem, assy
 
 MCS51_DESC = """
 
-#			|. . . . . . . .|. . . . . . . .|
-ACALL	a11,>C		| ahi |1 0 0 0 1| alo		| {
+#				|. . . . . . . .|. . . . . . . .|
+ACALL	a11,>C			| ahi |1 0 0 0 1| alo		| {
 	%S = sub i8 %S , 2
 	store i16 HI , i16* %S
 	br label DST
 }
 
-ADD	A,Rn		|0 0 1 0 1| rn  |
-ADD	A,adir		|0 0 1 0 0 1 0 1| adir		|
-ADD	A,iri		|0 0 1 0 0 1 1|i|
-ADD	A,data		|0 0 1 0 0 1 0 0| data		|
+ADD	A,Rn			|0 0 1 0 1| rn  |
+ADD	A,adir			|0 0 1 0 0 1 0 1| adir		|
+ADD	A,iri			|0 0 1 0 0 1 1|i|
+ADD	A,data			|0 0 1 0 0 1 0 0| data		|
 
-ADDC	A,Rn		|0 0 1 1 1| rn  |
-ADDC	A,adir		|0 0 1 1 0 1 0 1| adir		|
-ADDC	A,iri		|0 0 1 1 0 1 1|i|
-ADDC	A,data		|0 0 1 1 0 1 0 0| data		|
+ADDC	A,Rn			|0 0 1 1 1| rn  |
+ADDC	A,adir			|0 0 1 1 0 1 0 1| adir		|
+ADDC	A,iri			|0 0 1 1 0 1 1|i|
+ADDC	A,data			|0 0 1 1 0 1 0 0| data		|
 
-AJMP	a11,>J		| ahi |0 0 0 0 1| alo		|
+AJMP	a11,>J			| ahi |0 0 0 0 1| alo		|
 
-ANL	A,Rn		|0 1 0 1 1| rn  |
-ANL	A,adir		|0 1 0 1 0 1 0 1| adir		|
-ANL	A,iri		|0 1 0 1 0 1 1|i|
-ANL	A,data		|0 1 0 1 0 1 0 0| data		|
+ANL	A,Rn			|0 1 0 1 1| rn  |
+ANL	A,adir			|0 1 0 1 0 1 0 1| adir		|
+ANL	A,iri			|0 1 0 1 0 1 1|i|
+ANL	A,data			|0 1 0 1 0 1 0 0| data		|
 
-ANL	adir,A		|0 1 0 1 0 0 1 0| adir		|
-ANL	adir,data	|0 1 0 1 0 0 1 1| adir		| data		|
-ANL	C,abit		|1 0 0 0 0 0 1 0| abit		|
-ANL	C,nabit		|1 0 1 1 0 0 0 0| abit		|
+ANL	adir,A			|0 1 0 1 0 0 1 0| adir		|
+ANL	adir,data		|0 1 0 1 0 0 1 1| adir		| data		|
+ANL	C,abit			|1 0 0 0 0 0 1 0| abit		|
+ANL	C,nabit			|1 0 1 1 0 0 0 0| abit		|
 
-CJNE	A,adir,arel,>JC	|1 0 1 1 0 1 0 1| adir		| arel		|
-CJNE	A,data,arel,>JC	|1 0 1 1 0 1 0 0| data		| arel		|
+CJNE	A,adir,arel,>JC		|1 0 1 1 0 1 0 1| adir		| arel		|
+CJNE	A,data,arel,>JC		|1 0 1 1 0 1 0 0| data		| arel		|
 CJNE	Rn,data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
 CJNE	iri,data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
 
-CLR	A		|1 1 1 0 0 1 0 0| {
+CLR	A			|1 1 1 0 0 1 0 0| {
 	%A = i8 0x00
 }
-CLR	C		|1 1 0 0 0 0 1 1| {
+CLR	C			|1 1 0 0 0 0 1 1| {
 	%C = i1 0
 }
-CLR	abit		|1 1 0 0 0 0 1 0| abit		| {
+CLR	abit			|1 1 0 0 0 0 1 0| abit		| {
 	store i1 0 , i1* ABIT
 }
 
-CPL	A		|1 1 1 1 0 1 0 0|
-CPL	C		|1 0 1 1 0 0 1 1|
-CPL	abit		|1 0 1 1 0 0 1 0| abit		|
+CPL	A			|1 1 1 1 0 1 0 0|
+CPL	C			|1 0 1 1 0 0 1 1|
+CPL	abit			|1 0 1 1 0 0 1 0| abit		|
 
-DA	A		|1 1 0 1 0 1 0 0|
+DA	A			|1 1 0 1 0 1 0 0|
 
-DEC	A		|0 0 0 1 0 1 0 0|
-DEC	Rn		|0 0 0 1 1| rn  |
-DEC	adir		|0 0 0 1 0 1 0 1| adir		|
-DEC	iri		|0 0 0 1 0 1 1|i|
+DEC	A			|0 0 0 1 0 1 0 0|
+DEC	Rn			|0 0 0 1 1| rn  |
+DEC	adir			|0 0 0 1 0 1 0 1| adir		|
+DEC	iri			|0 0 0 1 0 1 1|i|
 
-DIV	AB		|1 0 0 0 0 1 0 0|
+DIV	AB			|1 0 0 0 0 1 0 0|
 
-DJNZ	Rn,arel,>C	|1 1 0 1 1| rn	| arel		|
-DJNZ	adir,arel,>C	|1 1 0 1 0 1 0 1| adir		| arel		|
+DJNZ	Rn,arel,>C		|1 1 0 1 1| rn	| arel		|
+DJNZ	adir,arel,>C		|1 1 0 1 0 1 0 1| adir		| arel		|
 
-INC	A		|0 0 0 0 0 1 0 0|
-INC	Rn		|0 0 0 0 1| rn	|
-INC	adir		|0 0 0 0 0 1 0 1| adir		|
-INC	iri		|0 0 0 0 0 1 1|i|
-INC	DPTR		|1 0 1 0 0 0 1 1|
+INC	A			|0 0 0 0 0 1 0 0|
+INC	Rn			|0 0 0 0 1| rn	|
+INC	adir			|0 0 0 0 0 1 0 1| adir		|
+INC	iri			|0 0 0 0 0 1 1|i|
+INC	DPTR			|1 0 1 0 0 0 1 1|
 
-JB	abit,arel,>JC	|0 0 1 0 0 0 0 0| abit		| arel		|
-JBC	abit,arel,>JC	|0 0 0 1 0 0 0 0| abit		| arel		|
+JB	abit,arel,bj,>JC	|0 0 1 0 0 0 0 0| abit		| arel		|
+JBC	abit,arel,bj,>JC	|0 0 0 1 0 0 0 0| abit		| arel		|
 
-JC	arel,>JC	|0 1 0 0 0 0 0 0| arel		|
+JC	arel,>JC		|0 1 0 0 0 0 0 0| arel		|
 
-JMP	@A+DPTR		|0 1 1 1 0 0 1 1|
+JMP	@A+DPTR,>JC		|0 1 1 1 0 0 1 1|
 
-JNB	abit,arel,>JC	|0 0 1 1 0 0 0 0| abit		| arel		|
+JNB	abit,arel,bj,>JC	|0 0 1 1 0 0 0 0| abit		| arel		|
 
-JNC	arel,>JC	|0 1 0 1 0 0 0 0| arel		|
+JNC	arel,>JC		|0 1 0 1 0 0 0 0| arel		|
 
-JNZ	arel,>JC	|0 1 1 1 0 0 0 0| arel		|
+JNZ	arel,>JC		|0 1 1 1 0 0 0 0| arel		|
 
-JZ	arel,>JC	|0 1 1 0 0 0 0 0| arel		|
+JZ	arel,>JC		|0 1 1 0 0 0 0 0| arel		|
 
-LCALL	a16,>C		|0 0 0 1 0 0 1 0| ahi		| alo		|
+LCALL	a16,>C			|0 0 0 1 0 0 1 0| ahi		| alo		|
 
-LJMP	a16,>J		|0 0 0 0 0 0 1 0| ahi		| alo		|
+LJMP	a16,>J			|0 0 0 0 0 0 1 0| ahi		| alo		|
 
-MOV	A,Rn		|1 1 1 0 1| rn	| {
+MOV	A,Rn			|1 1 1 0 1| rn	| {
 	%A = i8 RN
 }
-MOV	A,adir		|1 1 1 0 0 1 0 1| adir		| {
+MOV	A,adir			|1 1 1 0 0 1 0 1| adir		| {
 	%A = load i8 , i8* ADIR
 }
-MOV	A,iri		|1 1 1 0 0 1 1|i| {
+MOV	A,iri			|1 1 1 0 0 1 1|i| {
 	%A = load i8 , i8* RI
 }
-MOV	A,data		|0 1 1 1 0 1 0 0| data		| {
+MOV	A,data			|0 1 1 1 0 1 0 0| data		| {
 	%A = i8 DATA
 }
-MOV	Rn,A		|1 1 1 1 1| rn	| {
+MOV	Rn,A			|1 1 1 1 1| rn	| {
 	RN = i8 %A
 }
-MOV	Rn,adir		|1 0 1 0 1| rn	| adir		| {
+MOV	Rn,adir			|1 0 1 0 1| rn	| adir		| {
 	RN = load i8 , i8* ADIR
 }
-MOV	Rn,data	|0 1 1 1 1| rn	| data		| {
+MOV	Rn,data			|0 1 1 1 1| rn	| data		| {
 	RN = i8 DATA
 }
-MOV	adir,A		|1 1 1 1 0 1 0 1| adir		| {
+MOV	adir,A			|1 1 1 1 0 1 0 1| adir		| {
 	store i8 %A , i8* ADIR
 }
-MOV	adir,Rn		|1 0 0 0 1| rn	| adir		| {
+MOV	adir,Rn			|1 0 0 0 1| rn	| adir		| {
 	store i8 RN , i8* ADIR
 }
-MOV	adir2,adir	|1 0 0 0 0 1 0 1| adir		| adir2		| {
+MOV	adir2,adir		|1 0 0 0 0 1 0 1| adir		| adir2		| {
 	%0 = load i8 , i8* ADIR
 	store i8 %0 , i8* ADIR2
 }
-MOV	adir,iri	|1 0 0 0 0 1 1|i| adir		|
-MOV	adir,data	|0 1 1 1 0 1 0 1| adir		| data		|
-MOV	iri,A		|1 1 1 1 0 1 1|i|
-MOV	iri,adir	|1 0 1 0 0 1 1|i| adir		|
-MOV	iri,data	|0 1 1 1 0 1 1|i| data		|
+MOV	adir,iri		|1 0 0 0 0 1 1|i| adir		|
+MOV	adir,data		|0 1 1 1 0 1 0 1| adir		| data		|
+MOV	iri,A			|1 1 1 1 0 1 1|i|
+MOV	iri,adir		|1 0 1 0 0 1 1|i| adir		|
+MOV	iri,data		|0 1 1 1 0 1 1|i| data		|
 
-MOV	C,abit		|1 0 1 0 0 0 1 0| abit		|
-MOV	abit,C		|1 0 0 1 0 0 1 0| abit		|
+MOV	C,abit			|1 0 1 0 0 0 1 0| abit		|
+MOV	abit,C			|1 0 0 1 0 0 1 0| abit		|
 
-MOV	DPTR,data16	|1 0 0 1 0 0 0 0| dhi		| dlo		|
+MOV	DPTR,data16		|1 0 0 1 0 0 0 0| dhi		| dlo		|
 
-MOVC	A,@A+DPTR	|1 0 0 1 0 0 1 1|
-MOVC	A,@A+PC		|1 0 0 0 0 0 1 1|
+MOVC	A,@A+DPTR		|1 0 0 1 0 0 1 1|
+MOVC	A,@A+PC			|1 0 0 0 0 0 1 1|
 
-MOVX	A,iri		|1 1 1 0 0 0 1|i|
-MOVX	A,@DPTR		|1 1 1 0 0 0 0 0|
-MOVX	iri,A		|1 1 1 1 0 0 1|i|
-MOVX	@DPTR,A		|1 1 1 1 0 0 0 0|
+MOVX	A,iri			|1 1 1 0 0 0 1|i|
+MOVX	A,@DPTR			|1 1 1 0 0 0 0 0|
+MOVX	iri,A			|1 1 1 1 0 0 1|i|
+MOVX	@DPTR,A			|1 1 1 1 0 0 0 0|
 
-MUL	AB		|1 0 1 0 0 1 0 0|
+MUL	AB			|1 0 1 0 0 1 0 0|
 
-NOP	-		|0 0 0 0 0 0 0 0|
+NOP	-			|0 0 0 0 0 0 0 0|
 
-ORL	A,Rn		|0 1 0 0 1| rn	|
-ORL	A,adir		|0 1 0 0 0 1 0 1| adir		|
-ORL	A,iri		|0 1 0 0 0 1 1|i|
-ORL	A,data		|0 1 0 0 0 1 0 0| data		|
-ORL	adir,A		|0 1 0 0 0 0 1 0| adir		|
-ORL	adir,data	|0 1 0 0 0 0 1 1| adir		| data		|
-ORL	C,abit		|0 1 1 1 0 0 1 0| abit		|
-ORL	C,/abit		|1 0 1 0 0 0 0 0| abit		|
+ORL	A,Rn			|0 1 0 0 1| rn	|
+ORL	A,adir			|0 1 0 0 0 1 0 1| adir		|
+ORL	A,iri			|0 1 0 0 0 1 1|i|
+ORL	A,data			|0 1 0 0 0 1 0 0| data		|
+ORL	adir,A			|0 1 0 0 0 0 1 0| adir		|
+ORL	adir,data		|0 1 0 0 0 0 1 1| adir		| data		|
+ORL	C,abit			|0 1 1 1 0 0 1 0| abit		|
+ORL	C,/abit			|1 0 1 0 0 0 0 0| abit		|
 
-POP	adir		|1 1 0 1 0 0 0 0| adir		|
-PUSH	adir		|1 1 0 0 0 0 0 0| adir		|
+POP	adir			|1 1 0 1 0 0 0 0| adir		|
+PUSH	adir			|1 1 0 0 0 0 0 0| adir		|
 
-RET	>R		|0 0 1 0 0 0 1 0|
+RET	>R			|0 0 1 0 0 0 1 0|
 
-RETI	>R		|0 0 1 1 0 0 1 0|
+RETI	>R			|0 0 1 1 0 0 1 0|
 
-RL	A		|0 0 1 0 0 0 1 1|
-RLC	A		|0 0 1 1 0 0 1 1|
-RR	A		|0 0 0 0 0 0 1 1|
-RRC	A		|0 0 0 1 0 0 1 1|
+RL	A			|0 0 1 0 0 0 1 1|
+RLC	A			|0 0 1 1 0 0 1 1|
+RR	A			|0 0 0 0 0 0 1 1|
+RRC	A			|0 0 0 1 0 0 1 1|
 
-SETB	C		|1 1 0 1 0 0 1 1|
-SETB	abit		|1 1 0 1 0 0 1 0| abit		|
+SETB	C			|1 1 0 1 0 0 1 1|
+SETB	abit			|1 1 0 1 0 0 1 0| abit		|
 
-SJMP	arel,>J		|1 0 0 0 0 0 0 0| arel		|
+SJMP	arel,>J			|1 0 0 0 0 0 0 0| arel		|
 
-SUBB	A,Rn		|1 0 0 1 1| rn  |
-SUBB	A,adir		|1 0 0 1 0 1 0 1| adir		|
-SUBB	A,iri		|1 0 0 1 0 1 1|i|
-SUBB	A,data		|1 0 0 1 0 1 0 0| data		|
+SUBB	A,Rn			|1 0 0 1 1| rn  |
+SUBB	A,adir			|1 0 0 1 0 1 0 1| adir		|
+SUBB	A,iri			|1 0 0 1 0 1 1|i|
+SUBB	A,data			|1 0 0 1 0 1 0 0| data		|
 
-SWAP	A		|1 1 0 0 0 1 0 0|
-XCH	A,Rn		|1 1 0 0 1| rn  |
-XCH	A,adir		|1 1 0 0 0 1 0 1| adir		|
-XCH	A,iri		|1 1 0 0 0 1 1|i|
-XCHD	A,iri		|1 1 0 1 0 1 1|i|
+SWAP	A			|1 1 0 0 0 1 0 0|
+XCH	A,Rn			|1 1 0 0 1| rn  |
+XCH	A,adir			|1 1 0 0 0 1 0 1| adir		|
+XCH	A,iri			|1 1 0 0 0 1 1|i|
+XCHD	A,iri			|1 1 0 1 0 1 1|i|
 
-XRL	A,Rn		|0 1 1 0 1| rn	|
-XRL	A,adir		|0 1 1 0 0 1 0 1| adir		|
-XRL	A,iri		|0 1 1 0 0 1 1|i|
-XRL	A,data		|0 1 1 0 0 1 0 0| data		|
-XRL	adir,A		|0 1 1 0 0 0 1 0| adir		|
-XRL	adir,data	|0 1 1 0 0 0 1 1| adir		| data		|
+XRL	A,Rn			|0 1 1 0 1| rn	|
+XRL	A,adir			|0 1 1 0 0 1 0 1| adir		|
+XRL	A,iri			|0 1 1 0 0 1 1|i|
+XRL	A,data			|0 1 1 0 0 1 0 0| data		|
+XRL	adir,A			|0 1 1 0 0 0 1 0| adir		|
+XRL	adir,data		|0 1 1 0 0 0 1 1| adir		| data		|
 
 """
 
@@ -252,12 +252,26 @@ class MCS51_Ins(assy.Instree_ins):
         return "#0x%02x" % self['data']
 
     def assy_data16(self):
-        v = (self['dhi'] << 8) | self['dlo']
-        return "#0x%04x" % v
+        self.dstadr = (self['dhi'] << 8) | self['dlo']
+        return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_abit(self):
         b = self['abit']
         return assy.Arg_dst(self.lang.as_bit, b)
+
+    def assy_bj(self):
+        b = self['abit']
+        t = list(self.lang.as_bit.get_labels(b))
+        if t:
+            self.cc = t[0]
+        else:
+            self.cc = "bit=0x%x" % b
+        if self.mne == "JNB":
+            self.cc += '==0'
+        else:
+            self.cc += '==1'
+        self.cc = "(" + self.cc + ")"
+        
 
     def assy_nabit(self):
         b = self['abit']
@@ -316,6 +330,7 @@ class MCS51(assy.Instree_disass):
             lang,
             ins_word=8,
             abits=16,
+            endian=">",
         )
         self.add_as("data", "RAM+I/O", 8)
         self.add_as("bit", aspace=BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
@@ -369,8 +384,8 @@ class MCS51(assy.Instree_disass):
             "PSW",
             ["P", "1", "OV", "RS0", "RS1", "F0", "AC", "CY"]
         )
-        self.define_bits(0xe0, "ACC")
-        self.define_bits(0xf0, "B")
+        self.define_bits(0xe0, "ACC", "01234567")
+        self.define_bits(0xf0, "B", "01234567")
 
     def define_bits(self, a, n, b=None):
         self.as_data.set_label(a, n)
