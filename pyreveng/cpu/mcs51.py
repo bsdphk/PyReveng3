@@ -60,10 +60,10 @@ ANL	adir,data		|0 1 0 1 0 0 1 1| adir		| data		|
 ANL	C,abit			|1 0 0 0 0 0 1 0| abit		|
 ANL	C,nabit			|1 0 1 1 0 0 0 0| abit		|
 
-CJNE	A,adir,arel,>JC		|1 0 1 1 0 1 0 1| adir		| arel		|
-CJNE	A,data,arel,>JC		|1 0 1 1 0 1 0 0| data		| arel		|
-CJNE	Rn,data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
-CJNE	iri,data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
+CJNE	eq,A,adir,arel,>JC	|1 0 1 1 0 1 0 1| adir		| arel		|
+CJNE	eq,A,data,arel,>JC	|1 0 1 1 0 1 0 0| data		| arel		|
+CJNE	eq,Rn,data,arel,>JC	|1 0 1 1 1| rn	| data		| arel		|
+CJNE	eq,iri,data,arel,>JC	|1 0 1 1 0 1 1|i| data		| arel		|
 
 CLR	A			|1 1 1 0 0 1 0 0| {
 	%A = i8 0x00
@@ -258,6 +258,9 @@ class MCS51_Ins(assy.Instree_ins):
     def assy_abit(self):
         b = self['abit']
         return assy.Arg_dst(self.lang.as_bit, b)
+
+    def assy_eq(self):
+        self.cc = "NE"
 
     def assy_bj(self):
         b = self['abit']
