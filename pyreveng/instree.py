@@ -120,7 +120,7 @@ def parse_match(fmt):
 class InsLine():
     def __init__(self, wordsize, assy, bits, pilspec=None, handler=None):
         self.assy = assy.split()
-        self.bits = bits
+        self.raw_bits = bits
         self.pilspec = pilspec
         self.handler = handler
 
