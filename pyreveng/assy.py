@@ -118,6 +118,11 @@ class Instree_ins(Assy):
         self += code.Call(to=self.dstadr)
         self += code.Next(to=self.hi)
 
+    def flow_CC(self):
+        if self.cc is not False:
+            self += code.Call(cond=str(self.cc), to=self.dstadr)
+        self += code.Next(to=self.hi, cond="!" + str(self.cc))
+
     def arg(self, arg):
         if arg in self.lang.verbatim:
             self.oper.append(Arg_verbatim(arg))
