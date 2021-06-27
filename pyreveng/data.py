@@ -158,7 +158,10 @@ class Txt(Data):
         super().__init__(asp, lo, hi, "txt")
         self.txt = s
         self.fmt = "'" + s + "'"
-        if label:
+        if label and s.strip() == "":
+            lbl = 't_%d*SP' % len(s)
+            asp.set_label(lo, lbl)
+        elif label:
             lbl = 't_'
             for i in s:
                 if i in LABELCHAR:
