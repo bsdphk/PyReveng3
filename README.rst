@@ -17,7 +17,7 @@ Presently this generality extends to:
 
 * Mapped memory (Ex: `R1000_400/example.py`)
 
-* Banked memory (Ex: `HP2226/example_banked.py`)
+* Banked memory (Ex: `HP3336/example_banked.py`)
 
 * Multiple execution units in same address-space
 
