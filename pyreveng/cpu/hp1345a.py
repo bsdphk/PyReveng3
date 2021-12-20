@@ -85,9 +85,9 @@ class hp1345_ins(assy.Instree_ins):
 class hp1345a(assy.Instree_disass):
     def __init__(self, lang="hp1345a"):
         super().__init__(
-            lang,
-            16,
-            8,
-            ">"
+            name=lang,
+            ins_word=16,
+            mem_word=8,
+            endian=">"
         )
         self.add_ins(hp1345a_desc, hp1345_ins)
