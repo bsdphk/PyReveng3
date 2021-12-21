@@ -294,6 +294,7 @@ def example():
         cx.m.set_label(a, b)
 
     gpu = hp1345a.hp1345a()
+    gpu.m = cx.m
 
     cx.vectors(which=("RST", "NMI", "SWI", "IRQ", "FIRQ", "SWI2"))
 
@@ -389,7 +390,7 @@ def example():
             a += 2
             hp1345_render.svg(cx.m, a, a + l*2)
             while l > 0:
-                gpu.disass(a, cx.m)
+                gpu.disass(a, gpu.m)
                 a += 2
                 l -= 1
 

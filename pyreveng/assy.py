@@ -334,25 +334,25 @@ class Instree_disass(code.Decoder):
         assert issubclass(ins, Instree_ins)
         self.it.load_string(desc, ins)
 
-    def getmore_word(self, asp, adr, v):
-        v.append(asp[adr + len(v)])
+    def getmore_word(self, adr, v):
+        v.append(self.m[adr + len(v)])
 
-    def getmore_lu16(self, asp, adr, v):
-        v.append(asp.lu16(adr + len(v) * 2))
+    def getmore_lu16(self, adr, v):
+        v.append(self.m.lu16(adr + len(v) * 2))
 
-    def getmore_bu16(self, asp, adr, v):
-        v.append(asp.bu16(adr + len(v) * 2))
+    def getmore_bu16(self, adr, v):
+        v.append(self.m.bu16(adr + len(v) * 2))
 
-    def getmore_lu32(self, asp, adr, v):
-        v.append(asp.lu32(adr + len(v) * 4))
+    def getmore_lu32(self, adr, v):
+        v.append(self.m.lu32(adr + len(v) * 4))
 
-    def getmore_bu32(self, asp, adr, v):
-        v.append(asp.bu32(adr + len(v) * 4))
+    def getmore_bu32(self, adr, v):
+        v.append(self.m.bu32(adr + len(v) * 4))
 
     def decode(self, asp, adr, l=None):
         if l is None:
             l = []
-        for x in self.it.find(asp, adr, getmore=self.getmore):
+        for x in self.it.find(adr, getmore=self.getmore):
             assert x.handler is not None
             if l and not issubclass(x.handler, l[-1].handler):
                 continue

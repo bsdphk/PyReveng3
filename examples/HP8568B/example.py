@@ -897,6 +897,7 @@ def example():
         a = 0x6b84
 
         dsp = hp85662a.hp85662a()
+        dsp.m = cx.m
         while a < 0x6c98:
             x = cx.m.bs16(a)
             if x < 0:
@@ -904,6 +905,7 @@ def example():
                 y.fmt = ".DSPLOC\t0x%04x" % -x
                 y.lcmt = "adr=%d" % -x
                 dsp = hp85662a.hp85662a()
+                dsp.m = cx.m
             else:
                 y = dsp.disass(a, cx.m)
             a = y.hi

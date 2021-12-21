@@ -63,11 +63,12 @@ def example():
     m = mem.Stackup((FILENAME,), nextto=__file__)
     cx = mcs48.i8748()
     cx.m.map(m, 0)
+    gpu = hp1345a.hp1345a()
+    gpu.m = cx.m
 
     for a, b in SYMBOLS.items():
         cx.m.set_label(a, b)
 
-    gpu = hp1345a.hp1345a()
 
     cx.vectors()
 
@@ -78,13 +79,13 @@ def example():
 
     for a in range(0x222, 0x2c8, 2):
         l.append(cx.m.bu16(a))
-        gpu.disass(a, cx.m)
+        gpu.disass(a, gpu.m)
 
-    hp1345_render.svg(cx.m, 0x122, 0x2c8, l=l)
+    hp1345_render.svg(gpu.m, 0x122, 0x2c8, l=l)
 
     for a in range(0x31e, 0x400, 2):
         gpu.disass(a, cx.m)
-    hp1345_render.svg(cx.m, 0x31e, 0x400)
+    hp1345_render.svg(gpu.m, 0x31e, 0x400)
 
     return NAME, (cx.m,)
 

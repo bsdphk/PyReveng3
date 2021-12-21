@@ -424,18 +424,18 @@ class InsTree():
         fmt = "%0" + "%dx" % ((self.wordsize + 3) // 4)
         self.root.dump(fo, fmt)
 
-    def dive(self, priv, adr, lvl, v, getmore, r):
+    def dive(self, adr, lvl, v, getmore, r):
         while len(v) <= lvl:
-            getmore(priv, adr, v)
+            getmore(adr, v)
         b = v[lvl]
 
         for i in r.find(b):
             if isinstance(i, InsBranch):
-                for x in self.dive(priv, adr, lvl + 1, v, getmore, i):
+                for x in self.dive(adr, lvl + 1, v, getmore, i):
                     yield x
                 continue
             while len(v) < len(i.mask):
-                getmore(priv, adr, v)
+                getmore(adr, v)
             m = True
             for j in range(lvl, len(i.mask)):
                 if i.mask[j] & v[j] != i.bits[j]:
@@ -444,9 +444,9 @@ class InsTree():
             if m:
                 yield i
 
-    def find(self, priv, adr, getmore):
+    def find(self, adr, getmore):
         a = []
-        for x in self.dive(priv, adr, 0, a, getmore, self.root):
+        for x in self.dive(adr, 0, a, getmore, self.root):
             yield InsMatch(x, adr, a)
 
 #######################################################################
