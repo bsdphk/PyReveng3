@@ -53,6 +53,9 @@ Document references:
 	R1000_FE_Handbook.pdf
 	https://datamuseum.dk/wiki/Bits:30000964
 
+   OPCODE ASSIGNMENTS, July 16, 1986
+	http://datamuseum.dk/aa/r1k_backup/a9/a9d4fb5bd.html
+
 
 '''
 
