@@ -731,10 +731,14 @@ class Arg_ExtWord(assy.Arg):
             reg = "D"
         self.reg = reg + "%d" % ((self.ew >> 12) & 7)
         self.scale = (self.ew >> 9) & 3
-        self.make_il()
 
 class Arg_ExtWordShort(Arg_ExtWord):
     '''Short Extension Word Controlled Address Mode'''
+
+    def __init__(self, ins, id, ref, ew):
+        '''Full Extension Word Controlled Address Mode'''
+        super().__init__(ins, id, ref, ew)
+        self.make_il()
 
     def make_il(self):
         # XXX: IL part needs review
@@ -807,6 +811,159 @@ class Arg_ExtWordShort(Arg_ExtWord):
         else:
             s += self.ref + xr
         s += ")"
+        return s
+
+class Arg_ExtWordLong(Arg_ExtWord):
+    '''Full Extension Word Controlled Address Mode'''
+
+    def __init__(self, ins, id, ref, ew):
+        '''Full Extension Word Controlled Address Mode'''
+        super().__init__(ins, id, ref, ew)
+        self.pc = self.ins.hi - 2
+        if ref != "PC" and not ew & 0x80:    # Base Supress
+            self.lan = [ref]
+        else:
+            self.lan = []
+        bd = (ew >> 4) & 3
+        if bd == 2:
+            self.basedisp = ins.lang.m.bs16(ins.hi)
+            ins.hi += 2
+        elif bd == 3:
+            self.basedisp = ins.lang.m.bu32(ins.hi)
+            ins.hi += 4
+        else:
+            self.basedisp = 0
+
+        if ref == "PC" and not self.ew & 0x80:    # Base Supress
+            self.basedisp += self.pc
+
+        if ew & 0x800:
+            self.wl = ".L"
+        else:
+            self.wl = ".W"
+
+        self.xr = self.reg + self.wl
+
+        if self.scale:
+            self.xr += "*%d" % (1 << self.scale)
+
+        if not self.ew & 0x40:            # Index Supress
+            self.lxr = [self.xr]
+        else:
+            self.lxr = []
+
+        if self.ew & 2:
+            if self.ew & 1:
+                self.outherdisp = self.ins.lang.m.bu32(self.ins.hi)
+                self.ins.hi += 4
+            else:
+                self.outherdisp = self.ins.lang.m.bs16(self.ins.hi)
+                self.ins.hi += 2
+        else:
+            self.outherdisp = 0
+
+        self.make_il()
+        self.ins.lcmt += " LEW=%04x" % ew
+
+    def make_il(self):
+
+        if self.ew & 0x47 in (0x04, 0x44, 0x45, 0x46, 0x47):
+            raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
+                self.lo, self.ew), self.im)
+
+        if not self.ew & 0x30:
+            raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
+                self.lo, self.ew), self.im)
+
+        IS = (self.ew >> 6) & 1
+        IIS = (self.ew & 7)
+
+        il = self.ins.ea[self.id]
+        iltyp = self.ins.isz + "*"
+        ll = [None]
+
+        if self.ew & 0x800:
+            wl = ".L"
+            ll.append(
+                ["%2", "=", iltyp, "%" + self.reg]
+            )
+        else:
+            ll.append(
+                ["%1", "=", "trunc", "i32", "%" + self.reg,
+                    "to", "i16"]
+            )
+            ll.append(
+                ["%2", "=", "sext", "i16", "%1",
+                    "to", iltyp]
+            )
+            wl = ".W"
+        ll[0] = "%2"
+
+        if self.scale != 0:
+            ll.append(
+                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % self.scale]
+            )
+            ll[0] = "%3"
+
+        if self.basedisp > 0:
+            ll.append(
+                ["%4", "=", "add", iltyp, ll[0], ",",
+                    "0x%x" % self.basedisp]
+            )
+            ll[0] = "%4"
+        if self.basedisp < 0:
+            ll.append(
+                ["%4", "=", "sub", iltyp, ll[0], ",",
+                    "0x%x" % -self.basedisp]
+            )
+            ll[0] = "%4"
+
+        ll.append(
+            ["%5", "=", "add", iltyp, ll[0], ",", "%" + self.ref]
+        )
+        ll[0] = "%5"
+
+        il += [ll[0], ll[1:]]
+
+    def render(self):
+        if not self.ew & 7:
+            # No index
+            s = "(" + "+".join(self.lan + self.lxr)
+            if self.basedisp < 0:
+                s += "-#%x" % (-self.basedisp)
+            elif self.basedisp and s == "(":
+                s += "#" + self.ins.lang.m.adr(self.basedisp)
+            elif self.basedisp:
+                s += "+#" + self.ins.lang.m.adr(self.basedisp)
+            s += ")"
+        else:
+            if self.ew & 4:
+                # Post index
+                s = "((" + self.lan[0]
+                if self.basedisp < 0:
+                    s += "-#%x" % (-self.basedisp)
+                elif self.basedisp and s == "((":
+                    s += "#" + self.ins.lang.m.adr(self.basedisp)
+                elif self.basedisp:
+                    s += "+#" + self.ins.lang.m.adr(self.basedisp)
+                s += ")"
+                if self.lxr:
+                    s += "+" + self.lxr[0]
+            else:
+                # Pre index
+                s = "((" + "+".join(self.lan + self.lxr)
+                if self.basedisp < 0:
+                    s += "-#%x" % (-self.basedisp)
+                elif self.basedisp and s == "((":
+                    s += "#" + self.ins.lang.m.adr(self.basedisp)
+                elif self.basedisp:
+                    s += "+#" + self.ins.lang.m.adr(self.basedisp)
+                s += ")"
+            if self.outherdisp < 0:
+                s += "-#%x" % (-self.outherdisp)
+            elif self.outherdisp:
+                s += "+#" + self.ins.lang.m.adr(self.outherdisp)
+            s += ")"
         return s
 
 class m68000_ins(assy.Instree_ins):
@@ -965,166 +1122,9 @@ class m68000_ins(assy.Instree_ins):
             raise assy.Invalid("Non-zero scale in extension word")
 
         if ew & 0x100:
-            return self.assy_eaxt_f(id, ref, ew)
+            return Arg_ExtWordLong(self, id, ref, ew)
         else:
             return Arg_ExtWordShort(self, id, ref, ew)
-
-    def assy_eaxt_f(self, id, ref, ew):
-        '''Full Extension Word Controlled Address Mode'''
-
-        self.lcmt += " LEW=%04x" % ew
-        nobase = 0
-        noidx = 0
-        pc = self.hi - 2
-
-        if ew & 0x47 in (0x04, 0x44, 0x45, 0x46, 0x47):
-            raise assy.Invalid("0x%x EA-FEW 0x%04x IS+I/IS reserved" % (
-                self.lo, ew), self.im)
-
-        if not ew & 0x30:
-            raise assy.Invalid("0x%x EA-FEW 0x%04x BD=0" % (
-                self.lo, ew), self.im)
-
-        if ref != "PC" and not ew & 0x80:    # Base Supress
-            lan = [ref]
-        else:
-            lan = []
-
-        if ew & 0x8000:
-            reg = "A"
-        else:
-            reg = "D"
-
-        reg = reg + "%d" % ((ew >> 12) & 7)
-
-        if ew & 0x800:
-            wl = ".L"
-        else:
-            wl = ".W"
-
-        xr = reg + wl
-
-        scale = (ew >> 9) & 3
-        if scale:
-            xr += "*%d" % (1 << scale)
-
-        if not ew & 0x40:            # Index Supress
-            lxr = [xr]
-        else:
-            lxr = []
-
-        bd = (ew >> 4) & 3
-        if bd == 2:
-            basedisp = self.lang.m.bs16(self.hi)
-            self.hi += 2
-        elif bd == 3:
-            basedisp = self.lang.m.bu32(self.hi)
-            self.hi += 4
-        else:
-            basedisp = 0
-
-        if ref == "PC" and not ew & 0x80:    # Base Supress
-            basedisp += pc
-
-        if ew & 2:
-            if ew & 1:
-                outherdisp = self.lang.m.bu32(self.hi)
-                self.hi += 4
-            else:
-                outherdisp = self.lang.m.bs16(self.hi)
-                self.hi += 2
-        else:
-            outherdisp = 0
-
-        if not ew & 7:
-            # No index
-            s = "(" + "+".join(lan + lxr)
-            if basedisp < 0:
-                s += "-#%x" % (-basedisp)
-            elif basedisp and s == "(":
-                s += "#%x" % basedisp
-            elif basedisp:
-                s += "+#%x" % basedisp
-            s += ")"
-        else:
-            if ew & 4:
-                # Post index
-                s = "((" + lan[0]
-                if basedisp < 0:
-                    s += "-#%x" % (-basedisp)
-                elif basedisp and s == "((":
-                    s += "#%x" % basedisp
-                elif basedisp:
-                    s += "+#%x" % basedisp
-                s += ")"
-                if lxr:
-                    s += "+" + lxr[0]
-            else:
-                # Pre index
-                s = "((" + "+".join(lan + lxr)
-                if basedisp < 0:
-                    s += "-#%x" % (-basedisp)
-                elif basedisp and s == "((":
-                    s += "#%x" % basedisp
-                elif basedisp:
-                    s += "+#%x" % basedisp
-                s += ")"
-            if outherdisp < 0:
-                s += "-#%x" % (-outherdisp)
-            elif outherdisp:
-                s += "+#%x" % outherdisp
-            s += ")"
-
-        IS = (ew >> 6) & 1
-        IIS = (ew & 7)
-
-        il = self.ea[id]
-        iltyp = self.isz + "*"
-        ll = [None]
-
-        if ew & 0x800:
-            wl = ".L"
-            ll.append(
-                ["%2", "=", iltyp, "%" + reg]
-            )
-        else:
-            ll.append(
-                ["%1", "=", "trunc", "i32", "%" + reg,
-                    "to", "i16"]
-            )
-            ll.append(
-                ["%2", "=", "sext", "i16", "%1",
-                    "to", iltyp]
-            )
-            wl = ".W"
-        ll[0] = "%2"
-
-        if scale != 0:
-            ll.append(
-                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
-            )
-            ll[0] = "%3"
-
-        if basedisp > 0:
-            ll.append(
-                ["%4", "=", "add", iltyp, ll[0], ",",
-                    "0x%x" % basedisp]
-            )
-            ll[0] = "%4"
-        if basedisp < 0:
-            ll.append(
-                ["%4", "=", "sub", iltyp, ll[0], ",",
-                    "0x%x" % -basedisp]
-            )
-            ll[0] = "%4"
-
-        ll.append(
-            ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
-        )
-        ll[0] = "%5"
-
-        il += [ll[0], ll[1:]]
-        return s
 
     def assy_eax(self, id, eam, ear):
         il = []
