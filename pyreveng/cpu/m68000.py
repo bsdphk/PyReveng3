@@ -714,6 +714,101 @@ cond_code = (
 
 #######################################################################
 
+class Arg_ExtWord(assy.Arg):
+    '''Extension Word Controlled Address Mode'''
+
+    def __init__(self, ins, id, ref, ew):
+        self.ins = ins
+        self.id = id
+        self.ref = ref
+        self.ew = ew
+        self.basedisp = self.ew & 0xff
+        if self.basedisp & 0x80:
+            self.basedisp -= 0x100
+        if self.ew & 0x8000:
+            reg = "A"
+        else:
+            reg = "D"
+        self.reg = reg + "%d" % ((self.ew >> 12) & 7)
+        self.scale = (self.ew >> 9) & 3
+        self.make_il()
+
+class Arg_ExtWordShort(Arg_ExtWord):
+    '''Short Extension Word Controlled Address Mode'''
+
+    def make_il(self):
+        # XXX: IL part needs review
+        il = self.ins.ea[self.id]
+        iltyp = self.ins.isz + "*"
+        ll = [None]
+
+        if self.ew & 0x800:
+            wl = ".L"
+            ll.append(
+                ["%2", "=", iltyp, "%" + self.reg]
+            )
+        else:
+            ll.append(
+                ["%1", "=", "trunc", "i32", "%" + self.reg,
+                    "to", "i16"]
+            )
+            ll.append(
+                ["%2", "=", "sext", "i16", "%1",
+                    "to", iltyp]
+            )
+            wl = ".W"
+        ll[0] = "%2"
+
+        if self.scale != 0:
+            ll.append(
+                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % self.scale]
+            )
+            ll[0] = "%3"
+
+        if self.basedisp > 0:
+            ll.append(
+                ["%4", "=", "add", iltyp, ll[0], ",",
+                    "0x%x" % self.basedisp]
+            )
+            ll[0] = "%4"
+        if self.basedisp < 0:
+            ll.append(
+                ["%4", "=", "sub", iltyp, ll[0], ",",
+                    "0x%x" % -self.basedisp]
+            )
+            ll[0] = "%4"
+
+        ll.append(
+            ["%5", "=", "add", iltyp, ll[0], ",", "%" + self.ref]
+        )
+        ll[0] = "%5"
+
+        il += [ll[0], ll[1:]]
+
+    def render(self):
+
+        if self.ew & 0x800:
+            wl = ".L"
+        else:
+            wl = ".W"
+
+        xr = "+" + self.reg + wl
+
+        if self.scale:
+            xr += "*%d" % (1 << self.scale)
+
+        s = "("
+        if self.ref == "PC":
+            s += "#0x%x" % (self.basedisp + self.ins.hi - 2) + xr
+        elif self.basedisp < 0:
+            s += self.ref + xr + "-#0x%x" % (- self.basedisp)
+        elif self.basedisp > 0:
+            s += self.ref + xr + "+#0x%x" % self.basedisp
+        else:
+            s += self.ref + xr
+        s += ")"
+        return s
+
 class m68000_ins(assy.Instree_ins):
     def __init__(self, lim, lang):
         super().__init__(lim, lang)
@@ -872,92 +967,7 @@ class m68000_ins(assy.Instree_ins):
         if ew & 0x100:
             return self.assy_eaxt_f(id, ref, ew)
         else:
-            return self.assy_eaxt_s(id, ref, ew)
-
-    def assy_eaxt_s(self, id, ref, ew):
-        '''Short Extension Word Controlled Address Mode'''
-
-        basedisp = ew & 0xff
-        if basedisp & 0x80:
-            basedisp -= 0x100
-
-        if ew & 0x8000:
-            reg = "A"
-        else:
-            reg = "D"
-        reg = reg + "%d" % ((ew >> 12) & 7)
-
-        if ew & 0x800:
-            wl = ".L"
-        else:
-            wl = ".W"
-
-        xr = "+" + reg + wl
-
-        scale = (ew >> 9) & 3
-        if scale:
-            xr += "*%d" % (1 << scale)
-
-        s = "("
-        if ref == "PC":
-            s += "#0x%x" % (basedisp + self.hi - 2) + xr
-        elif basedisp < 0:
-            s += ref + xr + "-#0x%x" % (- basedisp)
-        elif basedisp > 0:
-            s += ref + xr + "+#0x%x" % basedisp
-        else:
-            s += ref + xr
-        s += ")"
-
-        # XXX: IL part needs review
-        il = self.ea[id]
-        iltyp = self.isz + "*"
-        ll = [None]
-
-        if ew & 0x800:
-            wl = ".L"
-            ll.append(
-                ["%2", "=", iltyp, "%" + reg]
-            )
-        else:
-            ll.append(
-                ["%1", "=", "trunc", "i32", "%" + reg,
-                    "to", "i16"]
-            )
-            ll.append(
-                ["%2", "=", "sext", "i16", "%1",
-                    "to", iltyp]
-            )
-            wl = ".W"
-        ll[0] = "%2"
-
-        if scale != 0:
-            ll.append(
-                ["%3", "=", "shl", iltyp, "%0", ",", "%d" % scale]
-            )
-            ll[0] = "%3"
-
-        if basedisp > 0:
-            ll.append(
-                ["%4", "=", "add", iltyp, ll[0], ",",
-                    "0x%x" % basedisp]
-            )
-            ll[0] = "%4"
-        if basedisp < 0:
-            ll.append(
-                ["%4", "=", "sub", iltyp, ll[0], ",",
-                    "0x%x" % -basedisp]
-            )
-            ll[0] = "%4"
-
-        ll.append(
-            ["%5", "=", "add", iltyp, ll[0], ",", "%" + ref]
-        )
-        ll[0] = "%5"
-
-        il += [ll[0], ll[1:]]
-        return s
-
+            return Arg_ExtWordShort(self, id, ref, ew)
 
     def assy_eaxt_f(self, id, ref, ew):
         '''Full Extension Word Controlled Address Mode'''
@@ -1201,12 +1211,13 @@ class m68000_ins(assy.Instree_ins):
             v = self.lang.m.bu16(self.hi)
             self.hi += 2
             il += ["0x%x" % v]
+            return assy.Arg_dst(self.lang.m, v, "#")
             return "#0x%04x" % v
         if eax == 0x1000 and self.sz == 4:
             v = self.lang.m.bu32(self.hi)
             self.hi += 4
             il += ["0x%x" % v]
-            return "#0x%08x" % v
+            return assy.Arg_dst(self.lang.m, v, "#")
         raise assy.Invalid(
             "0x%x EA? 0x%04x m=%d/r=%d" % (self.lo, eax, eam, ear))
 
