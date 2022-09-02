@@ -159,6 +159,13 @@ class AddressSpace():
         assert isinstance(lbl, str)
         self.lbl_d.setdefault(adr, []).append(lbl)
 
+    def set_first_label(self, adr, lbl):
+        ''' Set label, if none exists already '''
+        assert isinstance(lbl, str)
+        i = self.lbl_d.get(adr)
+        if not i:
+            self.lbl_d.setdefault(adr, []).append(lbl)
+
     def get_labels(self, adr):
         i = self.lbl_d.get(adr)
         if i:
@@ -379,6 +386,9 @@ class MemMapper(AddressSpace):
                 aa = a + low - offset
                 if low <= aa < high:
                     yield aa, b
+
+    def set_first_label(self, *args):
+        self.set_something("set_first_label", *args)
 
     def set_label(self, *args):
         self.set_something("set_label", *args)
