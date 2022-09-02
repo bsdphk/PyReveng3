@@ -1641,9 +1641,9 @@ class m68000(assy.Instree_disass):
 
             if len(vn[i]) == 1:
                 k = self.vector_name(vn[i][0])
-                self.m.set_label(i, k)
+                self.m.set_first_label(i, k)
             else:
-                self.m.set_label(i, "VECTORS_%d" % mv)
+                self.m.set_first_label(i, "VECTORS_%d" % mv)
                 mv += 1
 
     def dataptr(self, adr):
