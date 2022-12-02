@@ -56,8 +56,7 @@ class TreeLeaf():
         self.hi = hi
 
     def __repr__(self):
-        s = "<tree_leaf 0x%x-0x%x" % (self.lo, self.hi)
-        return s + ">"
+        return "<tree_leaf 0x%x-0x%x>" % (self.lo, self.hi)
 
     def __lt__(self, other):
         if self.lo != other.lo:
@@ -65,21 +64,20 @@ class TreeLeaf():
         return self.hi < other.hi
 
     def __eq__(self, other):
-        return self.lo == other.lo and self.hi != other.hi
+        return self.lo == other.lo and self.hi == other.hi
 
     def __contains__(self, a):
         return self.lo <= a < self.hi
 
 class Tree():
 
-    limit = 128
-
-    def __init__(self, lo, hi):
-        # lim is only a performance parameter, it does not change
+    def __init__(self, lo, hi, limit=128):
+        # limit is only a performance parameter, it does not change
         # funcationality in any way.
         self.lo = lo
         self.mid = (lo + hi) // 2
         self.hi = hi
+        self.limit = limit
         self.less = None
         self.more = None
         self.cuts = list()
