@@ -24,7 +24,15 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-'''Motorola M68020
+'''
+    Motorola M68020
+    ---------------
+
+TODO:
+    This looks wrong, PC relative ?
+    800043a2 4e fb 51 30  |N Q0|            JMP     (D5.W+#800043aa)
+    (IOC_EEPROM)
+   
 '''
 
 from pyreveng.cpu import m68010

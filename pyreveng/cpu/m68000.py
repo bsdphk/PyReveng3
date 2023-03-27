@@ -36,7 +36,7 @@ invalid		>U			|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
 #		src,dst		ea	|_ _ _ _|_ _ _v_|_ _v_ _|_v_ _ _|_ _ _ _|_ _ _ _|_ _ _ _|_ _ _ _|
 # 107/4-3
-aBCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
+ABCD		B,Dy,Dx		0000	|1 1 0 0| Dx  |1 0 0 0 0|0| Dy  |
 ABCD		B,decAy,decAx	0000	|1 1 0 0| Ax  |1 0 0 0 0|1| Ay  |
 # 108/4-4
 ADD		Z,Dn,ea		037d	|1 1 0 1| Dn  |1| sz| ea	| {
@@ -141,7 +141,7 @@ ASR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|0 0| Dn  | {
 	%SR.x = XXX
 	%SR.c = XXX
 }
-aSL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| ea	|
+ASL		W,ea		037c	|1 1 1 0|0 0 0|1|1 1| ea	|
 ASR		W,ea		037c	|1 1 1 0|0 0 0|0|1 1| ea	| {
 	%0 = ashr SZ EA , 1
 	%SR.n = icmp slt SZ %0 , 0
@@ -156,7 +156,7 @@ B		cc,dst,>JC	0000	|0 1 1 0| cc    | disp8		| {
 	br i1 CC label DST , label HI
 }
 # 131/4-27
-bCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| ea	| {
+BCHG		B,Dn,ea		037c	|0 0 0 0| Dn  |1 0 1| ea	| {
 	%0 = and SZ DN , 7
 	%1 = shl SZ 1 , %0
 	%2 = and SZ EA , %1
@@ -268,7 +268,7 @@ BTST		L,bn,Dn		0000	|0 0 0 0|1 0 0|0 0 0|0 0 0| Dn  |0 0 0 0|0 0 0 0| bn		| {
 	%SR.z = icmp eq SZ %0 , 0
 }
 # 173/4-69
-cHK		W,ea,Dn		1f7d	|0 1 0 0| Dn  |1 1|0| ea	|
+CHK		W,ea,Dn		1f7d	|0 1 0 0| Dn  |1 1|0| ea	|
 CHK		L,ea,Dn		1f7d	|0 1 0 0| Dn  |1 0|0| ea	|
 # 177/4-73
 CLR		Z,ea		037d	|0 1 0 0|0 0 1 0| sz| ea	| {
@@ -335,7 +335,7 @@ EORI		Z,data,ea	037d	|0 0 0 0|1 0 1 0| sz| ea	| {
 	LEAS %0
 }
 # 208/4-104
-eORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
+EORI		B,const,CCR	0000	|0 0 0 0|1 0 1 0|0 0|1 1 1|1 0 0|0 0 0 0|0 0 0 0| const		|
 # 209/4-105
 EXG		L,Dx,Dy		0000	|1 1 0 0| Dx  |1|0 1 0 0 0| Dy  | {
 	%0 = i32 DY
@@ -362,7 +362,7 @@ EXTW		L,Dn		0000	|0 1 0 0|1 0 0|0 1 1|0 0 0| Dn  | {
 	STDF4 DN
 }
 # 211/4-107
-iLLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
+ILLEGAL		-		0000	|0 1 0 0|1 0 1 0|1 1 1 1|1 1 0 0|
 # 212/4-108
 JMP		ea,>J		0f64	|0 1 0 0|1 1 1 0|1 1| ea	| {
 	br label PTR_EA
@@ -571,15 +571,15 @@ ROL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 1| Dy  |
 ROR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 1| Dy  |
 ROL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|1 1| Dn  |
 ROR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|1 1| Dn  |
-rOL		W,ea		037c	|1 1 1 0|0 1 1|1|1 1| ea	|
-rOR		W,ea		037c	|1 1 1 0|0 1 1|0|1 1| ea	|
+ROL		W,ea		037c	|1 1 1 0|0 1 1|1|1 1| ea	|
+ROR		W,ea		037c	|1 1 1 0|0 1 1|0|1 1| ea	|
 # 267/4-163
-rOXL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 0| Dy  |
-rOXR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 0| Dy  |
+ROXL		Z,Dx,Dy		0000	|1 1 1 0| Dx  |1| sz|1|1 0| Dy  |
+ROXR		Z,Dx,Dy		0000	|1 1 1 0| Dx  |0| sz|1|1 0| Dy  |
 ROXL		Z,rot,Dn	0000	|1 1 1 0|  rot|1| sz|0|1 0| Dn  |
 ROXR		Z,rot,Dn	0000	|1 1 1 0|  rot|0| sz|0|1 0| Dn  |
-rOXL		W,ea		037c	|1 1 1 0|0 1 0|1|1 1| ea	|
-rOXR		W,ea		037c	|1 1 1 0|0 1 0|0|1 1| ea	|
+ROXL		W,ea		037c	|1 1 1 0|0 1 0|1|1 1| ea	|
+ROXR		W,ea		037c	|1 1 1 0|0 1 0|0|1 1| ea	|
 # 272/4-168
 RTR		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
 # 273/4-169
@@ -589,7 +589,7 @@ RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1| {
 	br label %0
 }
 # 274/4-170
-sBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
+SBCD		B,Dx,Dy		0000	|1 0 0 0| Dy  |1 0 0 0 0|0| Dx  |
 SBCD		B,decAx,decAy	0000	|1 0 0 0| Ay  |1 0 0 0 0|1| Ax  |
 # 276/4-172
 S		cc,B,ea		037d	|0 1 0 1| cc    |1 1| ea	| {
@@ -656,7 +656,7 @@ SWAP		W,Dn		0000	|0 1 0 0|1 0 0 0|0 1 0 0|0| Dn  | {
 	STDF4 DN
 }
 # 290/4-186
-tAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| ea	|
+TAS		B,ea		037d	|0 1 0 0|1 0 1 0|1 1| ea	|
 # 292/4-188
 TRAP		vect,>J		0000	|0 1 0 0|1 1 1 0|0 1 0 0| vect	|
 # 293/4-189
@@ -664,7 +664,7 @@ TRAP		cc,W,word,>JC	0000	|0 1 0 1|cc	|1 1 1 1 1|0 1 0| word				|
 TRAP		cc,L,long,>JC	0000	|0 1 0 1|cc	|1 1 1 1 1|0 1 1| word1				| word2				|
 TRAP		cc,>J		0000	|0 1 0 1|cc	|1 1 1 1 1|1 0 0|
 # 295/4-191
-tRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
+TRAPV		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 0|
 # 296/4-192
 TST		Z,ea		1f7f	|0 1 0 0|1 0 1 0| sz| ea	| {
 	STDF4 EA
@@ -680,7 +680,7 @@ ANDI		W,word,SR	0000	|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 0| word				| {
 	%SR = and SZ %SR , WORD
 }
 # 464/6-10
-eORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
+EORI		W,word,SR	0000	|0 0 0 0|1 0 1 0|0 1 1 1|1 1 0 0| word				|
 # 473/6-19
 MOVE		W,ea,SR		1f7d	|0 1 0 0|0 1 1 0|1 1| ea	| {
 	%SR = i16 EA

@@ -112,7 +112,7 @@ class Instree_ins(Assy):
         if self.cc is not False:
             self += code.Jump(cond=str(self.cc), to=self.dstadr)
         if self.cc is not True:
-            self += code.Next(to=self.hi, cond="!" + str(self.cc))
+            self += code.Jump(cond="!" + str(self.cc), to=self.hi)
 
     def flow_C(self):
         self += code.Call(to=self.dstadr)

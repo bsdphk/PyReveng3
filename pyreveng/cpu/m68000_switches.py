@@ -27,6 +27,10 @@
 
 '''
 Recognize M680x0 Switch/case constructs
+
+TODO:
+     68K20: IOC_EEPROM @80003106/@80002ff8
+
 '''
 
 from pyreveng import assy, data, code
