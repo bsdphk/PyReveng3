@@ -31,9 +31,28 @@
 
 from pyreveng import instree, assy
 
+# References:  "HB" = CR80 Minicomputer Handbook 82/83, CSD/HDBK/0082 [[30004553]]
+# References:  "ISR" = CR80MX Instruction Set Reference Manual, CSS/006/RFM/0010 [[30004620]]
 #
-# From RCSL 42-i-1008 "RC3803 CPU Programmer's Reference Manual
+# Models according to HB: 9-4
 #
+#	1: CR8001S with or without micro program RAM but without subbus
+#	2: CR8001S with or without micro program RAM but with subbus
+#	3: CR80101S 
+#	4: CR8003M/030P-/00 unmapped CACHE CPU or the CR8002M SCM-CPU
+#	5: CR8003M/040PC/00 mapped CACHE CPU
+#
+# Models according to ISR: pdf19
+#	1: CR8001S with or without micro program RAM but without subbus
+#	2: CR8001S with or without micro program RAM but with subbus
+#	3: CR80101S or the CR8002D SCM_CPU
+#	4: CR8003D/030P-/00 unmapped CACHE CPU
+#	5: CR8003D/040PC/00 mapped CACHE CPU
+#	6: CR80101S or CR8002 SCM_CPU for XAMOS
+#	7: CR8003M/050PC/00 unmapped cache CPU for MX
+#	8: CR8501 CMR
+#
+
 cr80_mod12345_instructions = '''
 # HB: 9-15
 MODC	C8		| c8		|1|p|1 0|0 1 0 0|
@@ -400,6 +419,17 @@ GLDW	GX33,R3			|1| gx33|0| r3	|0 0 1 1 0 0 0 0|
 GSTW	R3,GX33,R3		|1| gx33|1| r3	|0 0 1 1 0 0 0 0|
 # HB: 9-140
 GNW	B8,R3			| b8		|0 1 0 0 0| r3	|
+'''
+
+cr80_alt_dec_instructions = '''
+# HB: 9-143
+CMPB	BX3,BX3,R3		|0| bx3	|x| bx3	|0 0 0 1 1| r3	|
+# HB: 9-144
+FILB	R3,BX3,R3		|1| bx3	|1| r3	|0 0 0 1 1| r3	|
+# HB: 9-145
+ADDD	R3,R3,R3		|0| r3	|0| r3	|0 0 1 0 1| r3	|
+# HB: 9-148
+SUBD	R3,R3,R3		|0| r3	|1| r3	|0 0 1 0 1| r3	|
 '''
 
 class cr80_ins(assy.Instree_ins):
