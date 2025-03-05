@@ -27,6 +27,29 @@
 '''Facit Twist terminal
 
 An example of a large, complex handwritten assembler program.
+
+
+Appendix 1(8) 4440 MLB CPU, CIRCUIT DIAGRAM  21
+-----------------------------------------------
+
+D95 decoder for read:
+
+	0x8000 -> D78 status register
+	0xa000 -> D104 ROM
+	0xc000 -> RDASCI(L) (5A4)
+	0xe000 -> RDATT(L) (6A3)
+
+D93 decoder for write:
+
+	0x0000 -> WREALT(L) (3A3)	AEROM circuits
+	0x2000 -> WRBRLT(L) (3A2)	Brightness DAC
+	0x4000 -> WRCRTC(L) (2A1)	6845
+	0x6000 -> WRSTAT(L) (3A1)	Chargen, bell etc.
+	0x8000 -> WRMPRM(L) (4A2)	?
+	0xa000 -> WRLTCH(L) (4A4,7A1)	?
+	0xc000 -> WRASCI(L) (5A2)	VideoRAM
+	0xe000 -> WRATT(L) (6A3)	Attribute Ram ?
+
 '''
 
 from pyreveng import mem, listing, discover, data
@@ -44,25 +67,38 @@ FILES = (
 )
 
 SYMBOLS = {
+    0x0700: "INTR_VECTOR_TABLE",
+    0x0700: "INTR_VECTOR_TABLE",
+    0x0728: "INTR_SPURIOUS",
     0x4a6c: "SWITCH(A, HL)",
     0x7d2a: "hex_byte(A, DE)",
     0x7d31: "hex_digit(A, DE)",
-    0xa0c4: "Init_DART_1_c_1",
-    0xa0ce: "Init_DART_1_c_2",
-    0xac5a: "Init_DART_1_c_3",
-    0xadc9: "Init_DART_0_c",
-    0xadd3: "Init_DART_0_d",
+    0xa0c4: "Init_DART1a_1",
+    0xa392: "Init_DART1a_1_DATA",
+    0xa0ce: "Init_DART1a_2",
+    0xa39e: "Init_DART1a_2_DATA",
+    0xac5a: "Init_DART1a_3",
+    0xacb0: "Init_DART1a_3_DATA",
+    0xadc9: "Init_DART0a",
+    0xaddd: "Init_DART0_DATA",
+    0xadd3: "Init_DART0b",
     0xc2f9: "menu_struct",
     0xcd1a: "cursor",
+    0xc472: "DART_0_WR5_COPY",
+    0x5493: "DART_Config(C)",
+    0xdf65: "DART_Config_DATA",
+    0x549e: "Init_Dart_Config_Data(HL)",
 }
 
 IO_SYMBOLS = {
-    0xec: "DART_1_a",
-    0xee: "DART_1_c",
-    0xf4: "DART_0_a",
-    0xf5: "DART_0_b",
-    0xf6: "DART_0_c",
-    0xf7: "DART_0_d",
+    0xec: "DART1_ad",
+    0xed: "DART1_bd",
+    0xee: "DART1_ac",
+    0xef: "DART1_bc",
+    0xf4: "DART0_ad",
+    0xf5: "DART0_bd",
+    0xf6: "DART0_ac",
+    0xf7: "DART0_bc",
     0xf8: "CTC_0",
     0xf9: "CTC_1",
     0xfa: "CTC_2",
@@ -110,7 +146,7 @@ class menu_desc(data.Data):
         for i in range(n):
             x = switch_tbl(cpu.m, a, cpu)
             a = x.hi
-            y = switch_tbl(cpu.m, b, cpu, func=x80string)
+            y = switch_tbl(cpu.m, b, cpu, func=x80stringx3)
             b = y.hi
 
     def render(self):
@@ -122,9 +158,65 @@ class menu_desc(data.Data):
         t += "}"
         return t
 
+class FTString(data.Data):
+    def __init__(self, asp, lo):
+        self.asp = asp
+        l = []
+        hi = lo
+        while asp[hi] not in (0x80,):
+            l.append(asp[hi])
+            hi += 1
+        super().__init__(asp, lo, hi + 1)
+        m = list(self.resolve(l))
+        self.txt = "".join(m)
+        self.compact = True
+
+    def resolve(self, l):
+        l = list(l)
+        while l:
+            x = l.pop(0)
+            i = self.asp.stringset.get(x)
+            if i is not None:
+                 yield from self.resolve(i)
+            elif 32 <= x <= 126:
+                 yield "%c" % x
+            elif x == 0x81:
+                 yield "┄"
+            elif x == 0x82:
+                 n1 = l.pop(0)
+                 n2 = l.pop(0)
+                 yield "«\n\t»\\x%02x(0x%02x%02x)" % (x, n1, n2)
+            elif x == 0x83:
+                 n1 = l.pop(0)
+                 n2 = l.pop(0)
+                 yield "\\x%02x(0x%02x, 0x%02x)" % (x, n1, n2)
+            elif x == 0x84:
+                 n = l.pop(0)
+                 yield "«\n\t»\\x%02x(0x%02x)" % (x, n)
+            elif x == 0x85:
+                 n = l.pop(0)
+                 yield "┅" * n
+            else:
+                 yield "\\x%02x" % x
+
+    def render(self):
+        return ".STR\t" + "»" + self.txt + "«"
+
 def x80string(asp, lo):
-    y = data.Txt(asp, lo, term=(0x80,), label=False)
+    #y = data.Txt(asp, lo, term=(0x80,), label=False)
+    y = FTString(asp, lo)
     y.compact = False
+    return y
+
+def x80stringx3(asp, lo):
+    y = FTString(asp, lo)
+    y.compact = True
+    if asp[y.hi] != 0x80:
+	    y = FTString(asp, y.hi)
+	    y.compact = True
+    if asp[y.hi] != 0x80:
+	    y = FTString(asp, y.hi)
+	    y.compact = True
     return y
 
 def fc_1028(asp, ins):
@@ -137,7 +229,7 @@ def fc_4919(asp, ins):
     if asp[ins.lo - 3] != 0x11:
         return
     da = asp.lu16(ins.lo - 2)
-    y = data.Txt(asp, da, term=(0x80, 0x85), label=False)
+    y = FTString(asp, da)
     y.lcmt = "0x4919_arg"
 
 def fc_4a6c(asp, ins):
@@ -159,7 +251,8 @@ def hack(cpu, lo):
     while lo:
         y = cpu.dataptr(lo)
         x = data.Pstruct(cpu.m, lo + 2, "B" * 1, fmt=", ".join(["0x%02x"] * 1))
-        x = data.Txt(cpu.m, lo + 3, term=(0x85,), label=False)
+        #x = data.Txt(cpu.m, lo + 3, term=(0x85,), label=False)
+        x = FTString(cpu.m, lo + 3)
         x.compact = True
         x = data.Pstruct(cpu.m, x.hi, "B" * 2, fmt=", ".join(["0x%02x"] * 2))
         x.compact = True
@@ -198,6 +291,7 @@ def example():
         assert sum(i.bytearray(i.lo, i.hi)) & 0xffff == csum
         m.append(i)
 
+
     charrom(m[3], m[4])
 
     cpu = z80.z80()
@@ -206,6 +300,23 @@ def example():
     cpu.m.map(m[2], 0xa000)
 
     cpu.flow_check.append(fc)
+
+    cpu.stringset = {}
+    cpu.m.stringset = cpu.stringset
+
+    r1 = 0x85a # Keypad
+    r1 = 0x864 # Keypad
+    r2 = 0xb2
+    o1 = r1 - r2 * 2
+    o2 = r1 + r2 * 2
+    print("O1", hex(o1), "O2", hex(o2))
+    for a in range(0x0810, 0x0900, 2):
+        x = cpu.dataptr(a)
+        y = data.Txt(cpu.m, x.dst, term=(0x81,), label=False)
+        w = (a - o1) // 2
+        cpu.stringset[w] = [cpu.m[x] for x in range(y.lo, y.hi)]
+        x.lcmt = "0x%02x  " % ((a - o1) // 2)
+        x.lcmt += y.txt
 
     for a, b in SYMBOLS.items():
         cpu.m.set_label(a, b)
@@ -219,11 +330,15 @@ def example():
 
     for a in range(0x0700, 0x0728, 2):
         x = cpu.codeptr(a)
+        n = (a - 0x700) 
+        if x.dst != 0x728:
+            cpu.m.set_label(x.dst, "IRQ_VEC_%02x" % n)
         cpu.m.set_line_comment(x.dst, "From tbl@0x0700")
 
     for a in range(0x0800, 0x0810, 2):
         x = cpu.codeptr(a)
-        cpu.m.set_line_comment(x.dst, "From tbl@0x0800")
+        n = (a - 0x800) // 2
+        cpu.m.set_label(x.dst, "Str_%02x_Handler" % (0x80 + n))
 
     for a in range(0x0900, 0x0908, 2):
         x = cpu.codeptr(a)
@@ -233,14 +348,10 @@ def example():
         x = cpu.codeptr(a)
         cpu.m.set_line_comment(x.dst, "From tbl@0x0e00")
 
-    for a in range(0x0810, 0x0900, 2):
-        x = cpu.dataptr(a)
-        y = data.Txt(cpu.m, x.dst, term=(0x81,), label=False)
-        x.lcmt = y.txt
-
     for a in range(0x0a45, 0x0be3, 2):
         x = cpu.dataptr(a)
-        y = data.Txt(cpu.m, x.dst, term=(0x80,), label=False)
+        #y = data.Txt(cpu.m, x.dst, term=(0x80,), label=False)
+        y = FTString(cpu.m, x.dst)
         x.lcmt = y.txt
 
     for a in range(0x3bb1, 0x3bd1, 2):
@@ -265,6 +376,7 @@ def example():
     data.Const(cpu.m, a, a + 1)
 
     x = data.Pstruct(cpu.m, 0x54a7, "B" * 12, fmt=", ".join(["0x%02x"] * 12))
+    x = data.Pstruct(cpu.m, 0x54b3, "B" * 12, fmt=", ".join(["0x%02x"] * 12))
     x = data.Pstruct(cpu.m, 0xaddd, "B" * 12, fmt=", ".join(["0x%02x"] * 12))
     x = data.Pstruct(cpu.m, 0xa392, "B" * 12, fmt=", ".join(["0x%02x"] * 12))
     x = data.Pstruct(cpu.m, 0xa39e, "B" * 12, fmt=", ".join(["0x%02x"] * 12))
@@ -321,26 +433,32 @@ def example():
 
     for a in range(0x789b, 0x78bb, 2):
         y = cpu.dataptr(a)
-        data.Txt(cpu.m, y.dst, term=(0x80,))
+        FTString(cpu.m, y.dst)
 
     for a in (
+            0x0915,
+            0x0cbe,
             0x7926,
             0x7cf7,
             0x7d03,
+            0x6fba,
+            0x6fd1,
+            0x6fd5,
+            0x6fdf,
     ):
-        data.Txt(cpu.m, a, term=(0x80,))
+        y = FTString(cpu.m, a)
+        y.lcmt = "MANUAL"
+
+    a = 0x600
+    while a < 0x67e:
+        y = FTString(cpu.m, a)
+        a = y.hi
 
     if False:
         # See 0x43cc
         for a in range(0x3d, 0x58, 2):
             y = cpu.codeptr(a)
             cpu.m.set_line_comment(y.dst, "MANUAL from tbl@0x3c")
-
-    if False:
-        # See 0x493e
-        for a in range(0x800, 0x900, 2):
-            y = cpu.codeptr(a)
-            cpu.m.set_line_comment(y.dst, "MANUAL from tbl@0x800")
 
     data.Pstruct(cpu.m, 0x89, "2B", fmt=", ".join(["0x%02x"] * 2))
     for a in range(0x524, 0x56c, 4):
@@ -374,6 +492,22 @@ def example():
             (0x3936, "via 0xcf58 ptr"),
             (0x3948, "via 0xcf58 ptr"),
             (0x39d8, "via 0xcf58 ptr"),
+            (0x39b4, "DART: Reset ext/status interrupts"),
+            (0x3a47, "DART: Error Reset"),
+            (0x3a52, "DART: RAISE DTR"),
+            (0x3a79, "DART: LOWER DTR"),
+            (0x3ab7, "DART: RAISE RTS"),
+            (0x3ae1, "DART: Reset ext/status interrupts"),
+            (0x3b02, "DART: Reset ext/status interrupts"),
+            (0x3b16, "DART: Reset ext/status interrupts"),
+            (0x4621, "DART: FLIP DTR ?"),
+            (0xac5d, "DART1_ac"),
+            (0xadc9, "DART0_ac"),
+            (0xadd3, "DART0_bc"),
+            (0xa0c7, "DART1_ac"),
+            (0xa0d1, "DART1_ac"),
+            (0x5466, "DART1_bc"),
+            (0x546b, "DART1_ac"),
     ):
         cpu.disass(a)
         if not b:
@@ -381,6 +515,22 @@ def example():
         cpu.m.set_line_comment(a, b)
 
     y = data.Data(cpu.m, 0x4707, 0x4707 + 0x15e)
+
+    cpu.m.set_block_comment(0x4919, 'String Expansion(HL=dst, DE=src)')
+    cpu.m.set_label(0x4919, "ExpandString(dst=HL,src=DE)")
+    cpu.m.set_block_comment(0x493f, '0x80 End')
+    cpu.m.set_block_comment(0x4942, '0x81 Pop level')
+    cpu.m.set_block_comment(0x4947, '0x84[1] ??')
+    cpu.m.set_block_comment(0x4951, '0x83[2] ??')
+    cpu.m.set_block_comment(0x4968, '0x82[2] Move to new destination address')
+    cpu.m.set_block_comment(0x496f, '0x85[1] Repeat space')
+    cpu.m.set_block_comment(0x497b, '0x86 Reset (u/l?) mode')
+    cpu.m.set_block_comment(0x4980, '0x87 Backspace')
+
+    cpu.m.set_label(0x4919, "ExpandString(dst=HL,src=DE)")
+
+    cpu.m.set_block_comment(0xb9a5, 'Send break ?')
+    cpu.m.set_block_comment(0xb9c6, 'Clear RTS ?')
 
     if False:
         discover.Discover(cpu)
