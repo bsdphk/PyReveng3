@@ -28,21 +28,23 @@
 The Leaf class used everywhere
 """
 
-from pyreveng import tree
+from pyreveng import bintree
 
-class Leaf(tree.TreeLeaf):
+class Leaf(bintree.BinTreeLeaf):
     """
     These are the leaves we hang into the tree class.
 
     Many datatypes will sub-type this class and add functionality
     """
+
+    compact = False
+
     def __init__(self, lo, hi, tag):
         super().__init__(lo, hi)
         self.tag = tag
         self.pil = None
         self.lcmt = ""
         self.rendered = None
-        self.compact = False
         self.aspace = None
 
     def __repr__(self):

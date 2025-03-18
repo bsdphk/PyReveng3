@@ -43,7 +43,7 @@ XXX: Need resolution of who controls rendering...
 import os.path
 import ctypes
 
-from pyreveng import tree, leaf
+from pyreveng import bintree, leaf
 
 DEFINED = (1 << 7)
 
@@ -94,7 +94,7 @@ class AddressSpace():
         self.bcmt_d = dict()
         self.lcmt_d = dict()
         self.rangelist = []
-        self.t = tree.Tree(self.lo, self.hi)
+        self.t = bintree.BinTree(self.lo, self.hi)
         nxdig = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
         self.afmtpct = apfx + "%%0%dx" % nxdig + asfx
         self.apct = apfx + "0x%%0%dx" % nxdig + asfx

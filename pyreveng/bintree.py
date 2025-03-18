@@ -42,7 +42,7 @@ rather than the interval they cover, but for now it seems to work
 pretty ok.
 """
 
-class TreeLeaf():
+class BinTreeLeaf():
     """
     These are the leaves we hang into the tree class.
 
@@ -56,7 +56,7 @@ class TreeLeaf():
         self.hi = hi
 
     def __repr__(self):
-        return "<tree_leaf 0x%x-0x%x>" % (self.lo, self.hi)
+        return "<BinTreeLeaf 0x%x-0x%x>" % (self.lo, self.hi)
 
     def __lt__(self, other):
         if self.lo != other.lo:
@@ -69,7 +69,7 @@ class TreeLeaf():
     def __contains__(self, a):
         return self.lo <= a < self.hi
 
-class Tree():
+class BinTree():
 
     def __init__(self, lo, hi, limit=128):
         # limit is only a performance parameter, it does not change
@@ -84,23 +84,23 @@ class Tree():
         self.isbranch = (hi - lo) > self.limit
 
     def __repr__(self):
-        return "<Tree 0x%x-0x%x-0x%x>" % (self.lo, self.mid, self.hi)
+        return "<BinTree 0x%x-0x%x-0x%x>" % (self.lo, self.mid, self.hi)
 
     def insert(self, leaf):
         """
         You guessed it...
         """
-        assert isinstance(leaf, TreeLeaf)
+        assert isinstance(leaf, BinTreeLeaf)
         assert leaf.lo < leaf.hi
         if not self.isbranch:
             self.cuts.append(leaf)
         elif leaf.hi <= self.mid:
             if self.less is None:
-                self.less = Tree(self.lo, self.mid)
+                self.less = BinTree(self.lo, self.mid)
             self.less.insert(leaf)
         elif leaf.lo >= self.mid:
             if self.more is None:
-                self.more = Tree(self.mid, self.hi)
+                self.more = BinTree(self.mid, self.hi)
             self.more.insert(leaf)
         else:
             self.cuts.append(leaf)
@@ -145,24 +145,24 @@ def test_tree():
     # Minimal test cases
 
     print("Testing tree class")
-    it = Tree(0, 0x500)
+    it = BinTree(0, 0x500)
 
     # Super items
-    it.insert(TreeLeaf(0x100, 0x400))
-    it.insert(TreeLeaf(0x100, 0x300))
-    it.insert(TreeLeaf(0x200, 0x400))
+    it.insert(BinTreeLeaf(0x100, 0x400))
+    it.insert(BinTreeLeaf(0x100, 0x300))
+    it.insert(BinTreeLeaf(0x200, 0x400))
 
     # Same items
-    it.insert(TreeLeaf(0x200, 0x300))
+    it.insert(BinTreeLeaf(0x200, 0x300))
 
     # Sub items
-    it.insert(TreeLeaf(0x210, 0x290))
-    it.insert(TreeLeaf(0x200, 0x299))
-    it.insert(TreeLeaf(0x201, 0x300))
+    it.insert(BinTreeLeaf(0x210, 0x290))
+    it.insert(BinTreeLeaf(0x200, 0x299))
+    it.insert(BinTreeLeaf(0x201, 0x300))
 
     # Skew items
-    it.insert(TreeLeaf(0x100, 0x299))
-    it.insert(TreeLeaf(0x201, 0x400))
+    it.insert(BinTreeLeaf(0x100, 0x299))
+    it.insert(BinTreeLeaf(0x201, 0x400))
 
     la = 0
     ll = 0
