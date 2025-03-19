@@ -84,6 +84,8 @@ class Discover():
                     continue
                 if x is None:
                     continue
+                if x.hi > hx:
+                    continue
                 for a in range(x.lo + 1, x.hi):
                     if list(self.cx.m.get_labels(a)):
                         break
