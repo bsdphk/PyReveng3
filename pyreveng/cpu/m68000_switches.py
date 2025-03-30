@@ -30,6 +30,8 @@ Recognize M680x0 Switch/case constructs
 
 TODO:
      68K20: IOC_EEPROM @80003106/@80002ff8
+     NTC2 EPROM: 0x0040eb3c
+     NTC2 EPROM: 0x0040b3bab
 
 '''
 
@@ -168,6 +170,20 @@ switches +=	' 4EFB				|' 	# JMP	  (#.+4+D?.W)
 switches +=	'0| dr0 |0 0 0 0 0 0 0 0 0 0 1 0|'
 switches +=	'\n'
 
+switches +=	'SWITCH5 SW5	|'
+switches +=	' 207B				|'	# MOVEA.L (#0xBLA+D0.L*4),A
+switches +=	' 0C04				|'	# arg
+switches +=	' 4ED0				|'	# JMP(A0)
+switches +=	'\n'
+
+switches +=	'SWITCH6 SW5	|'
+switches +=	' D080				|'	# ADD.L	D0,D0
+switches +=	' D080				|'	# ADD.L	D0,D0
+switches +=	' 207B				|'	# MOVEA.L (#0xBLA+D0.L),A
+switches +=	' 0804				|'	# arg
+switches +=	' 4ED0				|'	# JMP(A0)
+switches +=	'\n'
+
 #######################################################################
 
 class m68000_switch_ins(assy.Instree_ins):
@@ -183,8 +199,28 @@ class m68000_switch_ins(assy.Instree_ins):
         self.sub = 0
         self.add = 0
         self.reg = None
-        self.nm = "SWITCH_%x" % self.lo
+        self.nm = "SW_%x" % self.lo
         self.sz = None
+
+    def assy_SW5(self):
+        
+        if self.lang.m[self.lo - 2] == 0x62:
+            bhi = 2
+        elif self.lang.m.bu16(self.lo - 4) == 0x6200:
+            bhi = 4
+        else:
+            raise assy.Invalid("not BHI")
+        if self.lang.m.bu16(self.lo - (bhi + 6)) != 0xb0bc:
+            raise assy.Invalid("not CMP.L")
+        n = self.lang.m.bu32(self.lo - (bhi + 4))
+        ptr = self.hi
+        for i in range(n + 1):
+            dst = self.lang.m.bu32(ptr)
+            self.lang.m.set_line_comment(dst, "Switch @0x%x[0x%x]" % (self.hi, i))
+            self.dst(self.lang, i, dst)
+            ptr += 4
+        self.hi = ptr
+        self.compact = True
 
     def assy_W(self):
         if self.sz not in ('W', None):
@@ -335,7 +371,7 @@ class m68000_switch_ins(assy.Instree_ins):
         # XXX: Add flow
         self.lang.disass(dst)
         self += code.Jump(cond="0x%x" % no, to=dst)
-        pj.m.set_label(dst, self.nm + "_CASE_%d" % no)
+        pj.m.set_label(dst, self.nm + "_%d" % no)
 
 def m68000_switches(disass):
     disass.add_ins(switches, m68000_switch_ins)
