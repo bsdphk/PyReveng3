@@ -7,425 +7,306 @@
 '''
    This is a work-in-progress "partitioner" which divides code into
    what we will normally think of as individual functions.
-
-   For now output is hardcoded to /tmp/H
 '''
-
-import os
-import subprocess
-import html
 
 from pyreveng import code
 
 INFLOW_SPLIT = 20
 
-class Stretch():
-    def __init__(self):
-        self.nodes = []
-        self.sliced = False
-        self.lo = (1<<64)-1
-        self.hi = 0
-
-    def __str__(self):
-        return "<Stretch 0x%x-0x%x #%d>" % (self.lo, self.hi, len(self.nodes))
-
-    def __lt__(self, other):
-        return self.lo < other.lo
-
-    def add(self, node):
-        self.lo = min(self.lo, node.lo)
-        self.hi = max(self.hi, node.lo)
-        if node.lo == self.lo:
-            self.nodes.insert(0, node)
-        else:
-            self.nodes.append(node)
-        node.stretch = self
-
-    def dot_plot(self, pfx="/tmp/H/", filename=None):
-        if not filename:
-            filename = pfx + "/_%x.dot" % self.lo
-            print(self, "Dot to", filename)
-        fo = open(filename, "w+")
-        fo.write("digraph {\n")
-        fo.write('node [fontname="MonoSpace"]\n')
-        for i in self.nodes:
-            i.dot_node(fo)
-        for i in self.nodes:
-            i.dot_edges_in(fo)
-        for i in self.nodes:
-            i.dot_edges_out(fo)
-        fo.write("}\n")
-        fo.flush()
-
-        svgn = pfx + '/_%x.svg' % self.lo
-        x = subprocess.run([
-	    "sh", "-ec",
-            "dot -Gfontnames=svg -Tsvg > %s < " % svgn + filename
-        ])
-
-        fh = open(pfx + "/_%x.html" % self.lo, 'w')
-        fh.write('<html>\n')
-        fh.write('<head>\n')
-        fh.write('<style>\n')
-        if False:
-            fh.write('''
-
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    padding-bottom: 100%;
-    vertical-align: top;
-}
-''')
-
-        fh.write('</style>\n')
-        fh.write('</head>\n')
-        fh.write('<body>\n')
-        fh.write('<h1>Stretch ' + self.nodes[0].name + '</h1>\n')
-        fh.write('<div>\n')
-        fh.write(open(svgn).read().replace('xlink:href', 'href'))
-        fh.write('</div>\n')
-        fh.write('</body>\n')
-        fh.write('</html>\n')
-
-
-    def split(self, adr):
-        ss = Stretch()
-        i = self.nodes
-        self.nodes = []
-        self.lo = (1<<64)-1
-        self.hi = 0
-        for j in i:
-            if j.lo < adr:
-                self.add(j)
-            else:
-                ss.add(j)
-        return ss
-
-    def slice(self):
-        for i in self.nodes:
-            i.color = 0
-        blank = list(self.nodes)
-        ncolor = 0
-        while blank:
-            ncolor += 1
-            todo = [blank.pop(0)]
-            while todo:
-                i = todo.pop(0)
-                if i.color:
-                    continue
-                i.color = ncolor
-                for j in i.edges_out:
-                    if not j.dst or j.dst.stretch != self:
-                        continue
-                    if isinstance(j.flow, code.Call):
-                        continue
-                    if j.dst.color:
-                        continue
-                    j.color = i.color
-                    todo.append(j.dst)
-                for j in i.edges_in:
-                    if not j.src or j.src.stretch != self:
-                        continue
-                    if isinstance(j.flow, code.Call):
-                        continue
-                    if j.src.color:
-                        continue
-                    j.color = i.color
-                    todo.append(j.src)
-        # print(self, "Colors", ncolor - 1)
-
-        color_low = {}
-        color_high = {}
-
-        for i in self.nodes:
-            lo = color_low.get(i.color, i.lo)
-            color_low[i.color] = min(lo, i.lo)
-            hi = color_high.get(i.color, i.lo)
-            color_high[i.color] = max(lo, i.lo)
-
-        for col, low in sorted(color_low.items()):
-            if low in (self.lo, self.hi):
-                continue
-            good = True
-            for j in self.nodes:
-                if low <= j.lo <= color_high[col] and j.color != col:
-                    good = False
-                    break
-            if good:
-                yield color_low[col]
-
-    def condense(self):
-        for n in self.nodes:
-            if len(n.edges_in) != 1:
-                continue
-            if not isinstance(n.edges_in[0].flow, code.Next):
-                continue
-            p = n.edges_in[0].src
-            if len(p.edges_out) != 1:
-                continue
-            # print("Condense 0x%x, 0x%x" % (p.lo, n.lo))
-            p.leaves += n.leaves
-            p.edges_out = []
-            for i in n.edges_out:
-                i.src = p
-                p.edges_out.append(i)
-            n.edges_in = []
-            p.stretch.nodes.remove(n)
-            return True
-        return False
-
-class Node():
-    def __init__(self, leaf, name=None):
-        self.lo = leaf.lo
-        self.leaves = [leaf]
-        self.stretch = None
-        self.edges_out = []
-        self.edges_in = []
-        self.dotnode = "N_%x" % leaf.lo
-        assert name
-        self.name = name
-        self.color = 0
-
-    def __str__(self):
-        return "<N %x>" % self.lo
-
-    def add_edge_out(self, edge):
-        self.edges_out.append(edge)
-
-    def add_edge_in(self, edge):
-        self.edges_in.append(edge)
-
-    def out_flows(self):
-        for i in self.leaves:
-            yield from i.flow_out
-
-    def dot_node(self, fo):
-        if ' ' in self.name:
-            shape="folder"
-        else:
-            shape="box"
-        fo.write(self.dotnode + '[shape=%s, label=<\n' % shape)
-        fo.write('<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">\n')
-        fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % self.name)
-        for i in self.leaves:
-            fo.write('<TR><TD ALIGN="left"')
-            j = i.render().rstrip().expandtabs()
-            f = None
-            for x in i.flow_out:
-                if not isinstance(x, code.Call):
-                    continue
-                for y in self.edges_out:
-                    if y.flow == x and y:
-                        f = x
-                        y.rendered = True
-                        break
-            if f:
-                fo.write(' BGCOLOR="#eeeeee" PORT="x%x"' % i.lo)
-                if f.to:
-                    fo.write(' HREF="_%x.html"' % f.to)
-            fo.write('>' + html.escape(j) + '</TD></TR>\n')
-        fo.write('</TABLE>>];\n')
-
-    def dot_edges_in(self, fo):
-        i_calls = []
-        i_jumps = []
-        e_calls = []
-        e_jumps = []
-        for i in self.edges_in:
-            if isinstance(i.flow, code.Call):
-                if i.local():
-                    i_calls.append(i)
-                else:
-                    e_calls.append(i)
-            if isinstance(i.flow, code.Jump):
-                if i.local():
-                    i_jumps.append(i)
-                else:
-                    e_jumps.append(i)
-
-        if i_calls:
-            n = 'IC_%s' % self.dotnode
-            fo.write(n + ' [shape=plaintext, label=""]\n')
-            fo.write(n + ' -> ' + self.dotnode + ' [dir=back,arrowtail="odot"]\n')
-        if len(i_jumps) >= INFLOW_SPLIT:
-            n = 'IJ_%s' % self.dotnode
-            fo.write(n + ' [shape=plaintext, label=""]\n')
-            fo.write(n + ' -> ' + self.dotnode + ' [dir=back,arrowtail="oinv"]\n')
-            for i in i_jumps:
-                i.split_arrow = True
-
-        if e_calls:
-            n = 'XC_%s' % self.dotnode
-            t = '<table border="0">'
-            seen = set()
-            for i in e_calls:
-                if i.src.stretch in seen:
-                    continue
-                seen.add(i.src.stretch)
-                t += '<tr><td bgcolor="#eeeeee" align="left" href="_%x.html">' % i.src.stretch.lo
-                t += html.escape(i.src.stretch.nodes[0].name)
-                if i.flow.cond not in (True,):
-                    t += " [%s]" % html.escape(i.flow.cond)
-                t += "</td></tr>\n"
-            t += "</table>"
-            fo.write(n + ' [shape=plaintext, label=<%s>]\n' % t)
-            fo.write(n + ' -> ' + self.dotnode + ' [arrowhead="dot"]\n')
-        if e_jumps:
-            n = 'XJ_%s' % self.dotnode
-            t = '<table border="0">'
-            for i in e_jumps:
-                t += '<tr><td bgcolor="#eeeeee" href="_%x.html">' % i.src.stretch.lo
-                t += html.escape(i.src.name)
-                if i.flow.cond not in (True,):
-                    t += " [%s]" % html.escape(i.flow.cond)
-                t += "</td></tr>\n"
-            t += "</table>"
-            fo.write(n + ' [shape=plaintext, label=<%s>]\n' % t)
-            fo.write(n + ' -> ' + self.dotnode + ' [arrowhead="normal"]\n')
-
-    def dot_edges_out(self, fo):
-        for i in self.edges_out:
-            i.dot_edge_out(fo)
-
 class Edge():
+    '''
+       An edge represents transfer of control in and/or out
+       of stretches and are built from the code.Flow records.
+    '''
+
     def __init__(self, src, dst, flow):
         self.src = src
         self.dst = dst
         self.flow = flow
-        self.split_arrow = False
-        self.rendered = False
 
-    def local(self):
-        return self.dst and self.dst.stretch == self.src.stretch
+    def is_local(self):
+        ''' ... as in "Both ends have same color" '''
+        return self.dst and self.dst.color == self.src.color
 
-    def dot_edge_out(self, fo):
-        if self.rendered:
-            return
-        n = "O_" + self.src.dotnode
-        n += "_" + str(self.flow.typ).encode('ascii').hex()
+class Stretch():
+    '''
+        An unbroken stretch of instructions with no external
+        influence on state.  Said another way:  Jumps, calls,
+        returns, traps etc. can only occur as the last instruction
+        in a stretch.
+    '''
 
-        a = []
-        na = []
-        if self.flow.cond not in (None, True):
-            a.append('label="%s"' % str(self.flow.cond))
+    def __init__(self, leaf, asp, number):
+        self.lo = leaf.lo
+        self.leaves = [leaf]
+        self.codegroup = None
+        self.color = None
+        self.edges_out = []
+        self.edges_in = []
+        self.asp = asp
+        self.color = 0
+        self.myname = None
+        self.number = number
 
-        if isinstance(self.flow, code.Return):
-            na.append('shape=plaintext')
-            na.append('label=""')
-            a.append('arrowhead="tee"')
-        elif isinstance(self.flow, (code.Next, code.Jump)):
-            if self.local() and not self.split_arrow:
-                n = self.dst.dotnode
-            elif self.dst:
-                na.append('shape=plain')
-                na.append('style=filled')
-                na.append('label="%s"' % "\\l".join(self.dst.name.split(' ', 1)))
-                if not self.local():
-                    na.append('color="#eeeeee"')
-                    na.append('href="_%x.html"' % self.dst.stretch.lo)
-            else:
-                na.append('shape=plaintext')
-                na.append('label="?"')
-            a.append('arrowhead="onormal"')
-        elif isinstance(self.flow, code.Call):
-            if self.dst:
-                na.append('shape=plain')
-                na.append('style=filled')
-                na.append('label="%s"' % "\\l".join(self.dst.name.split(' ', 1)))
-                if not self.local():
-                    na.append('color="#eeeeee"')
-                    na.append('href="_%x.html"' % self.dst.lo)
-            else:
-                na.append('shape=plaintext')
-                na.append('label="?"')
-            if self.local():
-                a.append('arrowhead="odot"')
-            else:
-                a.append('arrowhead="dot"')
+    def __str__(self):
+        return "<Stretch %x %d>" % (self.lo, self.number)
 
-        if na:
-            fo.write('%s [%s]\n' % (n, ",".join(na)))
-        fo.write('%s -> %s' % (self.src.dotnode, n))
-        if a:
-            fo.write(' [' + ','.join(a) + ']')
-        fo.write('\n')
+    def __lt__(self, other):
+        return self.lo < other.lo
+
+    def add_edge_out(self, edge):
+        ''' ... '''
+        self.edges_out.append(edge)
+
+    def add_edge_in(self, edge):
+        ''' ... '''
+        self.edges_in.append(edge)
+
+    def out_flows(self):
+        ''' ... '''
+        for i in self.leaves:
+            yield from i.flow_out
+
+    def names(self):
+        ''' ... '''
+        yield from self.asp.get_labels(self.leaves[0].lo)
+
+    def get_name(self):
+        ''' ... '''
+        if not self.myname:
+            self.myname = ' | '.join(sorted(self.names()))
+        if not self.myname:
+            self.myname = self.asp.adr(self.lo)
+        return self.myname
+
+
+class Color():
+    '''
+       A group of stretches connected by non-Call Edges.
+
+       Most colors, the ones we like best, occupy a compact stretch
+       of address space into which no other colors intrude.
+    '''
+
+    def __init__(self, number):
+        self.lo = (1<<64)-1
+        self.hi = 0
+        self.stretches = []
+        self.number = number
+
+    def __str__(self):
+        return "<Color %d 0x%x-0x%x #%d>" % (self.number, self.lo, self.hi, len(self.stretches))
+
+    def __lt__(self, other):
+        return self.lo < other.lo
+
+    def add(self, stretch):
+        ''' ... '''
+        if stretch.color is not None:
+            print("Recoloring", stretch, stretch.color, "->", stretch.color)
+            assert False
+        self.stretches.append(stretch)
+        self.lo = min(self.lo, stretch.lo)
+        self.hi = max(self.hi, stretch.lo)
+        stretch.color = self
+
+    def condense(self):
+        ''' Merge stretches connected by code.Next records '''
+        for stretch in sorted(self.stretches):
+            if len(stretch.edges_in) != 1:
+                continue
+            if not isinstance(stretch.edges_in[0].flow, code.Next):
+                continue
+            successor = stretch.edges_in[0].src
+            if len(successor.edges_out) != 1:
+                continue
+            successor.leaves += stretch.leaves
+            successor.edges_out = []
+            for edge in stretch.edges_out:
+                edge.src = successor
+                successor.edges_out.append(edge)
+            stretch.edges_in = []
+            successor.color.stretches.remove(stretch)
+            return True
+        return False
+
+class CodeGroup():
+    '''
+       A group of instructions
+       =======================
+
+       A group of instructions which it makes sense to considered together,
+       for instance the instructions which make up a function or procedure.
+    '''
+
+    def __init__(self, asp):
+        self.stretches = set()
+        self.lo = (1<<64)-1
+        self.hi = 0
+        self.colors = set()
+        self.myname = None
+        self.asp = asp
+
+    def __str__(self):
+        return "<CodeGroup 0x%x-0x%x,%d,%d>" % (
+            self.lo, self.hi, len(self.stretches), len(self.colors)
+        )
+
+    def __lt__(self, other):
+        return self.lo < other.lo
+
+    def names(self):
+        ''' All names given to the stretches '''
+        for stretch in self.stretches:
+            interior = True
+            for edge in stretch.edges_in:
+                if not edge.is_local():
+                    interior = False
+
+            if not interior:
+                yield from stretch.names()
+
+    def get_name(self):
+        ''' ... '''
+        if not self.myname:
+            self.myname = ' | '.join(sorted(self.names()))
+        return self.myname
+
+    def add(self, stretch):
+        ''' Add a stretch to this group '''
+        self.lo = min(self.lo, stretch.lo)
+        self.hi = max(self.hi, stretch.lo)
+        self.stretches.add(stretch)
+        stretch.codegroup = self
+
+    def paint_by_numbers(self):
+        '''
+           Flood-fill all connected sets of stretches with individual "colors"
+
+           Only non-Call flows are considered
+        '''
+
+        self.colors = set()
+        for stretch in self.stretches:
+            stretch.color = None
+
+        for stretch in sorted(self.stretches):
+            if stretch.color:
+                continue
+
+            next_color = Color(len(self.colors))
+            self.colors.add(next_color)
+            next_color.add(stretch)
+            todo = [stretch]
+            while todo:
+                stretch = todo.pop(0)
+                assert stretch.color == next_color
+                for edge in stretch.edges_out:
+                    if isinstance(edge.flow, code.Call):
+                        continue
+                    if not edge.dst:
+                        continue
+                    if edge.dst.color is not None:
+                        assert edge.dst.color == next_color
+                    else:
+                        next_color.add(edge.dst)
+                        todo.append(edge.dst)
+                        # print("C DST", next_color, edge.src, edge.dst)
+                for edge in stretch.edges_in:
+                    if isinstance(edge.flow, code.Call):
+                        continue
+                    if not edge.src:
+                        continue
+                    if edge.src.color is not None:
+                        assert edge.src.color == next_color
+                    else:
+                        next_color.add(edge.src)
+                        todo.append(edge.src)
+                        # print("C SRC", next_color, edge.src, edge.dst)
+
+    def color_can_be_evicted(self, color):
+        ''' A color can be evicted if there are no miscolored stretches inside '''
+
+        if color.lo in (self.lo, self.hi):
+            return False
+        for stretch in self.stretches:
+            if stretch.color != color and color.lo <= stretch.lo <= color.hi:
+                print("Stranger in color", color, stretch, stretch.color)
+                return False
+        return True
+
+    def evict_colors(self):
+        ''' Evict all well-shaped colors '''
+
+        for color in list(sorted(self.colors)):
+            if not self.color_can_be_evicted(color):
+                continue
+            new_cg = CodeGroup(self.asp)
+            for stretch in color.stretches:
+                self.stretches.remove(stretch)
+                new_cg.add(stretch)
+            self.colors.remove(color)
+            new_cg.colors.add(color)
+            yield new_cg
+        self.lo = min(stretch.lo for stretch in self.stretches)
+        self.hi = max(stretch.lo for stretch in self.stretches)
+
+    def condense(self):
+        ''' Condense code.Next connected in stretches '''
+        for color in self.colors:
+            while color.condense():
+                continue
 
 
 class Partition():
+    '''
+       Partition the code.Code leaves on an address space into
+       "sensible" code groups.
 
-    def __init__(self, m):
+       "sensible" means a group of instructions which occupy a
+       compact range of the address space, into which other such
+       groups do not intrude.
 
-        self.stretches = []
-        self.nodes = {}
+       This is of course not always possible. (See also: spaghetti
+       code) and we leave the "dross", in the first group.
+    '''
+
+    def __init__(self, asp):
+
+        self.groups = []
+        self.stretches = {}
         self.edges = []
+        self.asp = asp
 
-        for i in m:
-            if getattr(i, "flow_out", None):
-                n = m.afmt(i.lo)
-                lbl = list(m.get_labels(i.lo))
-                if lbl:
-                    n += " " + lbl[0]
-                self.nodes[i.lo] = Node(i, name=n)
+        # Create a single codegroup with all instructions
+        # each in their own stretch.
+        self.residual_cg = CodeGroup(asp)
+        self.groups.append(self.residual_cg)
+        n = 0
+        for leaf in asp:
+            if hasattr(leaf, "flow_out"):
+                stretch = Stretch(leaf, asp, n)
+                n += 1
+                self.stretches[leaf.lo] = stretch
+                self.residual_cg.add(stretch)
 
-        if not self.nodes:
+        if not self.stretches:
             return
 
-        s = Stretch()
-        for i in self.nodes.values():
-            s.add(i)
-            for j in i.out_flows():
-                d = self.nodes.get(j.to)
-                k = Edge(i, d, j)
-                self.edges.append(k)
-                i.add_edge_out(k)
-                n = self.nodes.get(j.to)
-                if n:
-                    n.add_edge_in(k)
+        # Create Edges for all out-flows
+        for stretch in self.stretches.values():
+            for oflow in stretch.out_flows():
+                dst = self.stretches.get(oflow.to)
+                edge = Edge(stretch, dst, oflow)
+                self.edges.append(edge)
+                stretch.add_edge_out(edge)
+                dstretch = self.stretches.get(oflow.to)
+                if dstretch:
+                    dstretch.add_edge_in(edge)
 
-        self.stretches.append(s)
+        self.residual_cg.paint_by_numbers()
+        for new_cg in self.residual_cg.evict_colors():
+            self.groups.append(new_cg)
 
-        while True:
-            did = False
-            for s in self.stretches:
-                if s.sliced:
-                    continue
-                i = list(s.slice())
-                # print(s, len(i), "splits")
-                if not i:
-                    s.sliced = True
-                    continue
-                did = True
-                for j in reversed(sorted(i)):
-                    self.stretches.append(s.split(j))
-            if not did:
-                break
-
-        for i in sorted(self.stretches):
-            while i.condense():
-                continue
-
-    def dot_plot(self, pfx="/tmp/H/"):
-        os.makedirs(pfx, exist_ok=True)
-        for i in sorted(self.stretches):
-            i.dot_plot(pfx)
-
-        fo = open(pfx + "/index.html", "w")
-        fo.write('<html>\n')
-        fo.write('<head>\n')
-        fo.write('<style>\n')
-        fo.write('</style>\n')
-        fo.write('</head>\n')
-        fo.write('<body>\n')
-        fo.write('<table>\n')
-        for i in sorted(self.stretches):
-            fo.write('<tr><td>')
-            fo.write('<a href="_%x.html">%s</a>' % (i.lo, i.nodes[0].name))
-            fo.write('</td><tr>\n')
-        fo.write('</table>\n')
-        fo.write('</body>\n')
-        fo.write('</html>\n')
-
-        print(len(self.stretches), "Stretches")
+        for cg in sorted(self.groups):
+            cg.condense()
