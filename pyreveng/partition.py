@@ -156,15 +156,22 @@ class CodeGroup():
         return self.lo < other.lo
 
     def names(self):
-        ''' All names given to the stretches '''
-        for stretch in self.stretches:
-            interior = True
+        '''
+           All names given to the first stretch and any other stetches
+           called from outside.  The first stretch gets a free pass
+           because execution may get here through pointer gymnastics
+           undocumented by flow records.
+        '''
+        interior = False
+        for stretch in sorted(self.stretches):
             for edge in stretch.edges_in:
                 if not edge.is_local():
                     interior = False
+                    break
 
             if not interior:
                 yield from stretch.names()
+            interior = True
 
     def get_name(self):
         ''' ... '''

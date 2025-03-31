@@ -50,7 +50,7 @@ class GraphVzPartition():
                 fo.write('<tr><td>')
                 fo.write('<a href="_%x.html">' % cg.lo)
                 fo.write('%s…%s' % (self.partition.asp.afmt(cg.lo), self.partition.asp.afmt(cg.hi)))
-                fo.write(' ' + html.escape(cg.myname))
+                fo.write(' ' + html.escape(' | '.join(sorted(cg.names()))))
                 fo.write('</a></td><tr>\n')
             fo.write('</table>\n')
             fo.write('</body>\n')
@@ -111,6 +111,7 @@ class GraphVzPartition():
     def stretch_dot_node(self, stretch, fo):
         ''' Render the node of a stretch '''
 
+        stretch.get_name()
         names = list(stretch.names())
         if len(names) == 0:
             shape = "box"
@@ -161,13 +162,13 @@ class GraphVzPartition():
                     e_jumps.append(i)
 
         if i_calls:
-            n = 'IC_%s' % stretch.dotnode
+            n = 'IC_%x' % stretch.lo
             fo.write(n + ' [shape=plaintext, label=""]\n')
-            fo.write(n + ' -> ' + stretch.dotnode + ' [dir=back,arrowtail="odot"]\n')
+            fo.write(n + ' -> N_%x' % stretch.lo + ' [dir=back,arrowtail="odot"]\n')
         if len(i_jumps) >= INFLOW_SPLIT:
-            n = 'IJ_%s' % stretch.dotnode
+            n = 'IJ_%x' % stretch.lo
             fo.write(n + ' [shape=plaintext, label=""]\n')
-            fo.write(n + ' -> ' + stretch.dotnode + ' [dir=back,arrowtail="oinv"]\n')
+            fo.write(n + ' -> N_%x' % stretch.lo + ' [dir=back,arrowtail="oinv"]\n')
             for i in i_jumps:
                 self.split_arrows.add(i)
 
@@ -188,7 +189,7 @@ class GraphVzPartition():
             fo.write(n + ' [shape=plaintext, label=<%s>]\n' % t)
             fo.write(n + ' -> N_%x' % stretch.lo + ' [arrowhead="dot"]\n')
         if e_jumps:
-            n = 'XJ_%s' % stretch.dotnode
+            n = 'XJ_%x' % stretch.lo
             t = '<table border="0">'
             for i in e_jumps:
                 t += '<tr><td bgcolor="#eeeeee" href="_%x.html">' % i.src.codegroup.lo
@@ -198,7 +199,7 @@ class GraphVzPartition():
                 t += "</td></tr>\n"
             t += "</table>"
             fo.write(n + ' [shape=plaintext, label=<%s>]\n' % t)
-            fo.write(n + ' -> ' + stretch.dotnode + ' [arrowhead="normal"]\n')
+            fo.write(n + ' -> N_%x' % stretch.lo + ' [arrowhead="normal"]\n')
 
     def stretch_dot_edges_out(self, stretch, fo):
         ''' Render any outgoing edges not yet rendered '''
@@ -230,7 +231,7 @@ class GraphVzPartition():
         self.split_arrows = set()
         cg.get_name()
         filename = pfx + "/_%x.dot" % cg.lo
-        print(cg, "Dot to", filename)
+        # print(cg, "Dot to", filename)
         with open(filename, "w", encoding="utf8") as fo:
             fo.write("digraph {\n")
             fo.write('node [fontname="MonoSpace"]\n')
