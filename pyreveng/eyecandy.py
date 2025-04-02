@@ -10,6 +10,7 @@
    Output directory defaults to /tmp/H
 '''
 
+import sys
 import os
 import subprocess
 import html
@@ -17,6 +18,34 @@ import html
 from pyreveng import code
 
 INFLOW_SPLIT = 20
+
+class AddBlockComments():
+
+    def __init__(self, partition):
+        for cg in sorted(partition.groups):
+            if len(cg.colors) > 1:
+                continue
+            cg.asp.set_block_comment(cg.lo, 'Comes from:')
+            count = 0
+            for stretch in cg.stretches:
+                for edge in stretch.edges_in:
+                    if edge.is_local():
+                        continue
+                    if not edge.src:
+                        continue
+                    count += 1
+                    color = edge.src.color
+                    l = [ "   " ]
+                    l.append(cg.asp.adr(color.lo))
+                    if color.lo != edge.flow.fm.lo:
+                        l.append("@" + cg.asp.adr(edge.flow.fm.lo))
+                    l.append(str(edge.flow.typ))
+                    if edge.flow.cond not in (None, True):
+                        l.append(str(edge.flow.cond))
+                    cg.asp.set_block_comment(cg.lo, " ".join(l))
+            if count == 0:
+                cg.asp.set_block_comment(cg.lo, "    (unknown)")
+           
 
 class GraphVzPartition():
 
@@ -120,9 +149,10 @@ class GraphVzPartition():
         stretch.get_name()
         fo.write("N_%x " % stretch.lo + '[shape=%s, label=<\n' % shape)
         fo.write('<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">\n')
-        fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % stretch.asp.afmt(stretch.lo))
+        j = html.escape(stretch.asp.afmt(stretch.lo))
+        fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % j)
         for name in sorted(stretch.names()):
-            fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % name)
+            fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % html.escape(name))
         for i in stretch.leaves:
             fo.write('<TR><TD ALIGN="left"')
             j = i.render().rstrip().expandtabs()
@@ -177,11 +207,11 @@ class GraphVzPartition():
             t = '<table border="0">\n'
             seen = set()
             for i in e_calls:
-                if i.src.codegroup in seen:
+                if i.src.color in seen:
                     continue
-                seen.add(i.src.codegroup)
+                seen.add(i.src.color)
                 t += '<tr><td bgcolor="#eeeeee" align="left" href="_%x.html">' % i.src.codegroup.lo
-                t += html.escape(i.src.get_name())
+                t += html.escape(i.src.color.get_name())
                 if i.flow.cond not in (True,):
                     t += " [%s]" % html.escape(i.flow.cond)
                 t += "</td></tr>\n"
@@ -247,11 +277,15 @@ class GraphVzPartition():
         self.rendered = None
         self.split_arrows = None
 
+        #print("dot'ing", cg)
+        sys.stdout.flush()
         svgn = pfx + '/_%x.svg' % cg.lo
-        subprocess.run([
+        sp = subprocess.run([
             "sh", "-ec",
             "dot -Gfontnames=svg -Tsvg > %s < " % svgn + filename
         ])
+        if sp.returncode:
+            print("dot failed on", cg)
 
         with open(pfx + "/_%x.html" % cg.lo, 'w', encoding="utf8") as fh:
             fh.write('<html>\n')
