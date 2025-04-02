@@ -24,6 +24,9 @@ class Edge():
         self.dst = dst
         self.flow = flow
 
+    def __str__(self):
+        return "<Edge " + str(self.src) + " -> " + str(self.dst) + ">"
+
     def is_local(self):
         ''' ... as in "Both ends have same color" '''
         return self.dst and self.dst.color == self.src.color
@@ -88,11 +91,13 @@ class Color():
        of address space into which no other colors intrude.
     '''
 
-    def __init__(self, number):
+    def __init__(self, number, asp):
         self.lo = (1<<64)-1
         self.hi = 0
         self.stretches = []
         self.number = number
+        self.myname = None
+        self.asp = asp
 
     def __str__(self):
         return "<Color %d 0x%x-0x%x #%d>" % (self.number, self.lo, self.hi, len(self.stretches))
@@ -109,6 +114,32 @@ class Color():
         self.lo = min(self.lo, stretch.lo)
         self.hi = max(self.hi, stretch.lo)
         stretch.color = self
+
+    def names(self):
+        '''
+           All names given to the first stretch and any other stetches
+           called from outside.  The first stretch gets a free pass
+           because execution may get here through pointer gymnastics
+           undocumented by flow records.
+        '''
+        interior = False
+        for stretch in sorted(self.stretches):
+            for edge in stretch.edges_in:
+                if not edge.is_local():
+                    interior = False
+                    break
+
+            if not interior:
+                yield from stretch.names()
+            interior = True
+
+    def get_name(self):
+        ''' ... '''
+        if not self.myname:
+            self.myname = ' | '.join(sorted(self.names()))
+        if not self.myname:
+            self.myname = self.asp.adr(self.lo)
+        return self.myname
 
     def condense(self):
         ''' Merge stretches connected by code.Next records '''
@@ -157,26 +188,17 @@ class CodeGroup():
 
     def names(self):
         '''
-           All names given to the first stretch and any other stetches
-           called from outside.  The first stretch gets a free pass
-           because execution may get here through pointer gymnastics
-           undocumented by flow records.
+           All names from all colors
         '''
-        interior = False
-        for stretch in sorted(self.stretches):
-            for edge in stretch.edges_in:
-                if not edge.is_local():
-                    interior = False
-                    break
-
-            if not interior:
-                yield from stretch.names()
-            interior = True
+        for color in self.colors:
+             yield from color.names()
 
     def get_name(self):
         ''' ... '''
         if not self.myname:
             self.myname = ' | '.join(sorted(self.names()))
+        if not self.myname:
+            self.myname = self.asp.adr(self.lo)
         return self.myname
 
     def add(self, stretch):
@@ -201,7 +223,7 @@ class CodeGroup():
             if stretch.color:
                 continue
 
-            next_color = Color(len(self.colors))
+            next_color = Color(len(self.colors), self.asp)
             self.colors.add(next_color)
             next_color.add(stretch)
             todo = [stretch]
