@@ -68,10 +68,13 @@ class GraphVzPartition():
         ''' Make a very simple index.html file '''
 
         with open(self.output_dir + "/index.html", "w", encoding="utf8") as fo:
+            fo.write('<!DOCTYPE html>\n')
             fo.write('<html>\n')
             fo.write('<head>\n')
+            fo.write('<title>EyeCandy Index</title>\n')
             fo.write('<style>\n')
             fo.write('</style>\n')
+            fo.write('<meta charset="utf-8">\n')
             fo.write('</head>\n')
             fo.write('<body>\n')
             fo.write('<table>\n')
@@ -154,8 +157,16 @@ class GraphVzPartition():
         for name in sorted(stretch.names()):
             fo.write('<TR><TD ALIGN="left"><U>%s</U></TD></TR>\n' % html.escape(name))
         for i in stretch.leaves:
-            fo.write('<TR><TD ALIGN="left"')
-            j = i.render().rstrip().expandtabs()
+            j = ""
+            if 0 and i.pil:
+                for x in i.pil:
+                    if j:
+                        fo.write('<TR><TD align="left">' + j + '</TD></TR>\n')
+                    j = html.escape(x.render())
+                fo.write('<TR><TD ALIGN="left"')
+            else:
+                fo.write('<TR><TD ALIGN="left"')
+                j = html.escape(i.render().rstrip().expandtabs())
             f = None
             for x in i.flow_out:
                 if not isinstance(x, code.Call):
@@ -169,7 +180,7 @@ class GraphVzPartition():
                 fo.write(' BGCOLOR="#eeeeee" PORT="x%x"' % i.lo)
                 if f.to:
                     fo.write(' HREF="_%x.html"' % f.to)
-            fo.write('>' + html.escape(j) + '</TD></TR>\n')
+            fo.write('>' + j + '</TD></TR>\n')
         fo.write('</TABLE>>];\n')
 
     def stretch_dot_edges_in(self, stretch, fo):
@@ -262,7 +273,7 @@ class GraphVzPartition():
         cg.get_name()
         filename = pfx + "/_%x.dot" % cg.lo
         # print(cg, "Dot to", filename)
-        with open(filename, "w", encoding="utf8") as fo:
+        with open(filename + ".tmp", "w", encoding="utf8") as fo:
             fo.write("digraph {\n")
             fo.write('node [fontname="MonoSpace"]\n')
             for n, color in enumerate(cg.colors):
@@ -273,26 +284,40 @@ class GraphVzPartition():
                     fo.write("}\n")
             fo.write("}\n")
             fo.flush()
-
         self.rendered = None
         self.split_arrows = None
 
-        #print("dot'ing", cg)
-        sys.stdout.flush()
         svgn = pfx + '/_%x.svg' % cg.lo
-        sp = subprocess.run([
-            "sh", "-ec",
-            "dot -Gfontnames=svg -Tsvg > %s < " % svgn + filename
-        ])
-        if sp.returncode:
-            print("dot failed on", cg)
+
+
+        try:
+            before = open(filename).read()
+        except IndexError:
+            before = ""
+
+        after = open(filename + ".tmp").read()
+
+        if before != after:
+            os.rename(filename + ".tmp", filename)
+
+            print("dot'ing", cg)
+            sys.stdout.flush()
+            sp = subprocess.run([
+                "sh", "-ec",
+                "dot -Gfontnames=svg -Tsvg > %s < " % svgn + filename
+            ])
+            if sp.returncode:
+                print("dot failed on", cg)
 
         with open(pfx + "/_%x.html" % cg.lo, 'w', encoding="utf8") as fh:
+            fh.write('<!DOCTYPE html>\n')
             fh.write('<html>\n')
-            #fh.write('<head>\n')
-            #fh.write('<style>\n')
-            #fh.write('</style>\n')
-            #fh.write('</head>\n')
+            fh.write('<head>\n')
+            fh.write('<title>EyeCandy ' + html.escape(cg.asp.afmt(cg.lo)) + '</title>\n')
+            fh.write('<style>\n')
+            fh.write('</style>\n')
+            fh.write('<meta charset="utf-8">\n')
+            fh.write('</head>\n')
             fh.write('<body>\n')
             fh.write('<h1>CodeGroup ' + cg.asp.afmt(cg.lo) + "…" + cg.asp.afmt(cg.hi) + '</h1>\n')
             for name in sorted(cg.names()):
