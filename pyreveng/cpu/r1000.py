@@ -72,41 +72,31 @@ r1000_desc = """
 # Make places we get to, but do not handle grep(1)able
 QQunknown_instruction	-						| unknown			|
 
-#-----------------------
-# Very helpful, but only hypothesis /phk
-#zero_is_invalid_ins	>R						|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
-
-# BODY_0880 start
 Action			Illegal,>R					|0 0 0 0|0 0 0 0|0 0 0 0|0 0 0 0|
 
-#-----------------------
-# gc44,0076								|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 Action			Break_Optional					|0 0 0 0|0 0 0 0|0 0 0 0|0 1 1 1|
 Action			Idle						|0 0 0 0|0 0 0 0|0 0 0 0|1 0 0 0|
-#-----------------------
-# 93b91846e, 011e+0125		(Access type)
+
 Store_Top		Heap_Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 0 1|
 Store_Top		Heap_Access,At_Offset_2				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 0|
 Store_Top		Heap_Access,At_Offset_3				|0 0 0 0|0 0 0 0|0 0 1 1|0 0 1 1|
 Store_Top		Heap_Access,At_Offset_4				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 0 0|
 Store_Top		Heap_Access,At_Offset_5				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 0 1|
 Store_Top		Heap_Access,At_Offset_6				|0 0 0 0|0 0 0 0|0 0 1 1|0 1 1 0|
+
 Store_Top               Access,At_Offset_1				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 0 1|
 Store_Top               Access,At_Offset_2				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 1 0|
 Store_Top               Access,At_Offset_3				|0 0 0 0|0 0 0 0|0 0 1 1|1 0 1 1|
 Store_Top               Access,At_Offset_4				|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 0|
 Store_Top               Access,At_Offset_5				|0 0 0 0|0 0 0 0|0 0 1 1|1 1 0 1|
 Store_Top               Access,At_Offset_6                         	|0 0 0 0|0 0 0 0|0 0 1 1|1 1 1 0|
+
 Store_Top_Unchecked	Float,At_Offset_1                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 0 1|
 Store_Top_Unchecked	Float,At_Offset_2                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 1 0|
 Store_Top_Unchecked	Float,At_Offset_3                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 0 1 1|
 Store_Top_Unchecked	Float,At_Offset_4                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 0 0|
 Store_Top_Unchecked	Float,At_Offset_5                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 0 1|
 Store_Top_Unchecked	Float,At_Offset_6                              	|0 0 0 0|0 0 0 0|0 1 0 0|0 1 1 0|
-
-#-----------------------
-# ⟦85b414c73⟧ 0x34e..34f	(Float)
-#STORE_TOP		x						|0 0 0 0|0 0 0 0|0 1 0 0|0|0| x |
 
 Store_Top               Float,At_Offset_1                               |0 0 0 0|0 0 0 0|0 1 0 0|1 0 0 1|
 Store_Top               Float,At_Offset_2                               |0 0 0 0|0 0 0 0|0 1 0 0|1 0 1 0|
@@ -134,49 +124,44 @@ Action			Query_Frame					|0 0 0 0|0 0 0 0|0 1 1 0|1 0 0 1|
 Action			Alter_Break_Mask				|0 0 0 0|0 0 0 0|0 1 1 0|1 0 1 0|
 Action			Query_Break_Address				|0 0 0 0|0 0 0 0|0 1 1 0|1 0 1 1|
 Action			Query_Break_Mask				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 0|
-Action			Query_Break_Cause				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 1| #0917
-Action			Exit_Break					|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 0| #0912
-#-----------------------
-# gc88,0025								|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
+Action			Query_Break_Cause				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 0 1|
+Action			Exit_Break					|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 0|
 Action			Break_Unconditional				|0 0 0 0|0 0 0 0|0 1 1 0|1 1 1 1|
 
-# End of BODY_0880
-
-# Start of BODY_0a20
-
+# a9d4fb5bd: unused
 Action			Discrete,Diana_Spare2				|0 0 0 0|0 0 0 0|1 0 0 0|0 1 1 1|
+
+# a9d4fb5bd: execute,heap_access,diana_module_table_lookup  !other_group
 Action			Heap_Access,Diana_Spare2			|0 0 0 0|0 0 0 0|1 0 0 0|1 0 0 0|
+
+# a9d4fb5bd: execute,discrete,diana_translate_sm_ptr  !other_group
 Action			Discrete,Diana_Spare1				|0 0 0 0|0 0 0 0|1 0 0 0|1 0 0 1|
+
+# a9d4fb5bd: execute,discrete,diana_is_id_node  !other_group
 Action			Discrete,Diana_Spare0				|0 0 0 0|0 0 0 0|1 0 0 0|1 0 1 0|
+
 Action			Heap_Access,Diana_Seq_Type_Get_Head		|0 0 0 0|0 0 0 0|1 0 0 0|1 0 1 1|
 Action			Heap_Access,Diana_Put_Node_On_Seq_Type		|0 0 0 0|0 0 0 0|1 0 0 0|1 1 0 0|
-Action			Heap_Access,Family				|0 0 0 0|0 0 0 0|1 0 0 0|1 1 0 1|
+
+Action			Heap_Access,Diana_Allocate_Tree_Node		|0 0 0 0|0 0 0 0|1 0 0 0|1 1 0 1|
 Action			Discrete,Diana_Arity_For_Kind			|0 0 0 0|0 0 0 0|1 0 0 0|1 1 1 0|
 Action			Discrete,Diana_Map_Kind_To_Vci			|0 0 0 0|0 0 0 0|1 0 0 0|1 1 1 1|
+
 Action			Store_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 0| pse                           |
-
-#-----------------------
-#ACTION			PUSH_STRING_INDEXED,pse				|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse				|
 Action			Push_String_Extended_Indexed,pse		|0 0 0 0|0 0 0 0|1 0 0 1|0 0 0 1| pse                           |
-
-#-----------------------
-# gc43,0029		PUSH_STRING					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0|
-#ACTION			PUSH_STRING,pse					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse				|
-# 0c4c/aa
 Action			Push_String_Extended,pse			|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 0| pse                           |
 
-
 #-----------------------
-# gc43,001c comments this as "push full address of a location in current code segment"
+# a9d4fb5bd: unused
+# 2fa0095f7: Action, Spare7_Action
+# guru course at pg43,001c comments this as "push full address of a location in current code segment"
 # XXX: it may be a bit of a stretch to assume that is a subp /phk
-push_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
-# 0c47/aa does not have a subp in idsassembler (2fa0095f7, 0361, 0x90-0x92), but push_full_address is a better guess than Spare7_Action
-#Action			Spare7_Action					|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1|
+QQpush_full_address	subp						|0 0 0 0|0 0 0 0|1 0 0 1|0 0 1 1| subp				|
 
 Execute			Package,Field_Reference_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 0 1|
-Execute			Package,Entry					|0 0 0 0|0 0 0 0|1 0 0 1|0 1 1 0|
+Execute			Package,Field_Execute_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 1 0|
 Execute			Package,Field_Write_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|0 1 1 1|
-Execute			Package,Field_Read_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|1 0 0 0| #0c2f
+Execute			Package,Field_Read_Dynamic			|0 0 0 0|0 0 0 0|1 0 0 1|1 0 0 0|
 Action			Reference_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 0 0 1|
 Action			Call_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 0 1 0|
 Action			Store_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 0 1 1|
@@ -185,36 +170,13 @@ Action			Jump_Nonzero_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 1 0 1|
 Action			Jump_Zero_Dynamic				|0 0 0 0|0 0 0 0|1 0 0 1|1 1 1 0|
 Action			Jump_Dynamic					|0 0 0 0|0 0 0 0|1 0 0 1|1 1 1 1|
 
-#-----------------------
-# See for instance ⟦2009596b6⟧ @b4
-#PUSH_STRING_EXTENDED	abs,mark					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs				|
 Action			Push_Structure_Extended,abs,mark		|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 0| abs                           |
-
-#-----------------------
-# See for instance ⟦b66a7252c⟧  /phk
-#PUSH_FLOAT_EXTENDED	abs,dbl						|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs				|
 Action			Push_Float_Extended				|0 0 0 0|0 0 0 0|1 0 1 0|0 0 0 1| abs                           |
-
-#-----------------------
-#PUSH_DISCRETE_EXTENDED	abs,literal					|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs				|
 Action			Push_Discrete_Extended				|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 0| abs                           |
-
 Action			Loop_Decreasing_Extended,abs,>JC		|0 0 0 0|0 0 0 0|1 0 1 0|0 0 1 1| abs                           |
-
-#-----------------------
-# XXX: a4 could be djnz or similar, always seem to jump backwards to a LOAD_TOP_0
 Action			Loop_Increasing_Extended,abs,>JC		|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 0| abs				|
-
-#-----------------------
-# XXX: See 9739edd68 @0xf2e
 Action			Jump_Nonzero_Extended,abs,>JC			|0 0 0 0|0 0 0 0|1 0 1 0|0 1 0 1| abs				|
-
-#-----------------------
-# XXX: See f1ef8a8ae @0x57d
 Action			Jump_Zero_Extended,abs,>JC			|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 0| abs				|
-
-#-----------------------
-# ⟦ed62618ed⟧ @0x1cc confirms this is unconditional /phk
 Action			Jump_Extended,abs,>J				|0 0 0 0|0 0 0 0|1 0 1 0|0 1 1 1| abs				|
 
 # Guess, Fits parameters, Field_Execute_Dynamic is not used elsewhere.
@@ -229,56 +191,26 @@ Action			Make_Self					|0 0 0 0|0 0 0 0|1 0 1 1|0 1 1 1|
 Action			Set_Priority					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 0 0|
 Action			Get_Priority					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 0 1|
 Action			Initiate_Delay					|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 0|
-
-#-----------------------
-# gc43,003d								|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
 Action			Signal_Completion,>R				|0 0 0 0|0 0 0 0|1 0 1 1|1 0 1 1|
-
-#-----------------------
-# gc43,003c 		SIGNAL_ACTIVATED				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
 Action			Signal_Activated				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 0|
-
-Action			Activate_Heap_Tasks				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 1| #0b95
+Action			Activate_Heap_Tasks				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 0 1|
 Action			Activate_Tasks					|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 0|
-
-#-----------------------
-# gc42,000d		ACCEPT_ACTIVATION				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 Action			Accept_Activation				|0 0 0 0|0 0 0 0|1 0 1 1|1 1 1 1|
 
 Action			Make_Default					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 0|
 Action			Set_Block_Start					|0 0 0 0|0 0 0 0|1 1 0 0|0 1 0 1|
 Action			Check_Subprogram_Elaborated			|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 0|
-
-#-----------------------
-# gc42,000f		ELABORATE_SUBPROGRAM				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1| #0b77
 Action			Elaborate_Subprogram				|0 0 0 0|0 0 0 0|1 1 0 0|0 1 1 1|
-
-#-----------------------
-# (3f2fe70c1,02d3)	end of a loop		for J in X'range loop ... end loop;
 Action			Pop_Auxiliary_Range				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 0|
-
-#-----------------------
-# (3f2fe70c1,012e)	end of a loop
 Action			Pop_Auxiliary_Loop				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 0 1|
-
-#-----------------------
-# 467 times followed by 0x0000
-# many times last instruction before TRAP entry point /phk
-# Returning pointer or directly returning function result (36a4ea3d7, 0374 - return Null_Time)
 Action			Exit_Nullary_Function,>R			|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 0|
-
 Action			Pop_Block_With_Result				|0 0 0 0|0 0 0 0|1 1 0 0|1 0 1 1|
 Action			Pop_Block					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 0|
 Action			Spare6_Action					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 0 1|
 Action			Pop_Auxiliary					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 0|
-
-#-----------------------
-# ⟦ec043f33f⟧ @0x5f has this followed by a two-word instruction.
-# May be conditional return? /phk
-# (93b91846e,0123)	start of a loop
 Action			Mark_Auxiliary					|0 0 0 0|0 0 0 0|1 1 0 0|1 1 1 1|
-
 Action			Swap_Control					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 0 0|
+
 Pop_Control		Pop_Count_1					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 0 1|
 Pop_Control		Pop_Count_2					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 1 0|
 Pop_Control		Pop_Count_3					|0 0 0 0|0 0 0 0|1 1 0 1|0 0 1 1|
@@ -286,11 +218,6 @@ Pop_Control		Pop_Count_4					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 0 0|
 Pop_Control		Pop_Count_5					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 0 1|
 Pop_Control		Pop_Count_6					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 1 0|
 Pop_Control		Pop_Count_7					|0 0 0 0|0 0 0 0|1 1 0 1|0 1 1 1|
-
-#-----------------------
-# gc43,00027		0						|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
-# /aa
-#LOAD_TOP		x						|0 0 0 0|0 0 0 0|1 1 0 1|1|0| x |
 
 Load_Top		At_Offset_0					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 0|
 Load_Top		At_Offset_1					|0 0 0 0|0 0 0 0|1 1 0 1|1 0 0 1|
@@ -304,55 +231,37 @@ Load_Top		At_Offset_6					|0 0 0 0|0 0 0 0|1 1 0 1|1 1 1 0|
 # feh269,1c		Value_02					|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
 # gc44,0046		1						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 0 1|
 # gc43,0036		2						|0 0 0 0|0 0 0 0|1 1 1 0|0 0 1 0|
+# 2fa0095f7: emulation skips value_17
+# a9d4fb5bd: has value_00 to value_31
 Load_Encached		eon						|0 0 0 0|0 0 0 0|1 1 1| eon	|
 
-# end of BODY_0a20
-
-# Start of BODY_0ca0
-
-
-#-----------------------
-# g88,001e		EXCEPTION_CLASS,RAISE_OP 			|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
-# g28, location 4 = raise instruction					|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
 Execute			Exception,Raise,>R				|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 0|
-
-#-----------------------
 Execute			Exception,Reraise,>R				|0 0 0 0|0 0 0 1|0 0 0 0|0 0 0 1|
 
 Execute			Exception,Address				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 0|
 Execute			Exception,Get_Name				|0 0 0 0|0 0 0 1|0 0 0 0|0 1 1 1|
+
 Execute			Exception,Is_Instruction_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 0 1|
 Execute			Exception,Is_Tasking_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 0|
 Execute			Exception,Is_Storage_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 0 1 1|
 Execute			Exception,Is_Program_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 0|
-Execute			Exception,Is_Numeric_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1| #0ee0
+Execute			Exception,Is_Numeric_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 0 1|
 Execute			Exception,Is_Constraint_Error			|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x0366	when Calendar.Time_Error =>
-Execute			Exception,Equal					|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1| #0ed4
+Execute			Exception,Equal					|0 0 0 0|0 0 0 1|0 0 0 0|1 1 1 1|
 
 Execute			Any,Is_Initialization_Repeated			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 0|
 Execute			Any,Has_Repeated_Initialization			|0 0 0 0|0 0 0 1|0 0 0 1|0 0 0 1|
 Execute			Any,Make_Constrained				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 0|
-
-# Decoded by disassembler, but not by microcode
-#Execute		Heap_Access,Size				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 1|
+Execute			Heap_Access,Size				|0 0 0 0|0 0 0 1|0 0 0 1|0 0 1 1|
 Execute			Access,Size					|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 0|
 Execute			Any,Structure_Clear				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 0 1|
 Execute			Any,Address_Of_Type				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 1 0|
 Execute			Any,Structure_Query				|0 0 0 0|0 0 0 1|0 0 0 1|0 1 1 1|
 Execute			Any,Write_Unchecked				|0 0 0 0|0 0 0 1|0 0 0 1|1 0 0 0|
 Execute			Any,Check_In_Formal_Type			|0 0 0 0|0 0 0 1|0 0 0 1|1 0 0 1|
-Execute			Any,Not_In_Type					|0 0 0 0|0 0 0 1|0 0 0 1|1 0 1 0| #0e92
+Execute			Any,Not_In_Type					|0 0 0 0|0 0 0 1|0 0 0 1|1 0 1 0|
 Execute			Any,In_Type					|0 0 0 0|0 0 0 1|0 0 0 1|1 0 1 1|
 Execute			Any,Convert_Unchecked				|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
-
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x68d	Name : constant String := Months'Image (Month);
-# Used for Image function, followed by 1c00 or 1c01
-#QQuImage		-						|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 0|
-
 Execute			Any,Convert_To_Formal				|0 0 0 0|0 0 0 1|0 0 0 1|1 1 0 1|
 Execute			Any,Convert					|0 0 0 0|0 0 0 1|0 0 0 1|1 1 1 0|
 Execute			Any,Is_Scalar					|0 0 0 0|0 0 0 1|0 0 0 1|1 1 1 1|
@@ -365,11 +274,7 @@ Execute			Any,Set_Constraint				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 1|
 Execute			Any,Has_Default_Initialization			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 0|
 Execute			Any,Run_Initialization_Utility			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 1|
 
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x000d	type Years  is new Calendar.Year_Number (in spec)
-# ⟦cb8e43375⟧ @0x0023   Pi : Float (in spec)
 Execute			Any,Make_Visible				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1| #0e3e
-
 Execute			Any,Change_Utility				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 0|
 Execute			Any,Spare14					|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 1|
 Execute			Any,Size					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 0 0|
@@ -379,17 +284,18 @@ Execute			Any,Equal					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 1 1|
 
 Execute			Family,Count					|0 0 0 0|0 0 0 1|0 0 1 1|0 0 1 0|
 Execute			Family,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|0 0 1 1|
+
 Execute			Entry,Count					|0 0 0 0|0 0 0 1|0 0 1 1|0 1 1 0|
 Execute			Entry,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|0 1 1 1|
+
 Execute			Select,Terminate_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 0|
 Execute			Select,Timed_Duration_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 0 1|
 Execute			Select,Timed_Guard_Write			|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 0|
 Execute			Select,Rendezvous				|0 0 0 0|0 0 0 1|0 0 1 1|1 1 1 1|
 
 Execute			Discrete,Divide_And_Scale			|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 0|
-#-----------------------
-# ⟦36a4ea3d7⟧ @0x044d
 Execute			Discrete,Multiply_And_Scale			|0 0 0 0|0 0 0 1|0 1 0 0|0 0 0 1|
+
 Execute			Heap_Access,Diana_Find_Permanent_Attribute	|0 0 0 0|0 0 0 1|0 1 0 0|0 0 1 0|
 Execute			Heap_Access,Adaptive_Balanced_Tree_Lookup	|0 0 0 0|0 0 0 1|0 1 0 0|0 0 1 1|
 Execute			Heap_Access,Get_Name				|0 0 0 0|0 0 0 1|0 1 0 0|0 1 0 0|
@@ -397,6 +303,7 @@ Execute			Heap_Access,Diana_Tree_Kind			|0 0 0 0|0 0 0 1|0 1 0 0|0 1 0 1|
 Execute			Heap_Access,Hash				|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 0|
 Execute			Heap_Access,Construct_Segment			|0 0 0 0|0 0 0 1|0 1 0 0|0 1 1 1|
 Execute			Heap_Access,Get_Offset				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 0|
+
 Execute			Float,Less_Equal_Zero				|0 0 0 0|0 0 0 1|0 1 0 0|1 0 0 1|
 Execute			Float,Greater_Equal_Zero			|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 0|
 Execute			Float,Less_Zero					|0 0 0 0|0 0 0 1|0 1 0 0|1 0 1 1|
@@ -420,10 +327,11 @@ Execute			Variant_Record,Component_Offset			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 0|
 Execute			Variant_Record,Structure_Query			|0 0 0 0|0 0 0 1|0 1 1 0|0 1 1 1|
 Execute			Variant_Record,Reference_Makes_Copy		|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 0|
 Execute			Variant_Record,Read_Discriminant_Constraint	|0 0 0 0|0 0 0 1|0 1 1 0|1 0 0 1|
-# 016a undefined in disassembler
-QQ_execute		Variant_Record,XXX				|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 0|
-# End of BODY_0ca0
-# Start of BODY_0f60
+
+# 2fa0095f7: emulation has nothing
+# a9d4fb5bd: has execute,variant_record,indirects_appended  !other_group
+execute			Variant_Record,Indirects_Appended		|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 0|
+
 Execute			Variant_Record,Read_Variant			|0 0 0 0|0 0 0 1|0 1 1 0|1 0 1 1|
 Execute			Variant_Record,Is_Constrained			|0 0 0 0|0 0 0 1|0 1 1 0|1 1 0 0|
 Execute			Variant_Record,Structure_Write			|0 0 0 0|0 0 0 1|0 1 1 0|1 1 0 1|
@@ -440,22 +348,22 @@ Execute			Record,Structure_Write				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 0 1|
 Execute			Record,Not_Equal				|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 0|
 Execute			Record,Equal					|0 0 0 0|0 0 0 1|0 1 1 1|1 1 1 1|
 
-# Decoded by disassembler, but not by microcode
-#Execute		Record,Structure_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 0| # 1145
-Execute			Record,Field_Reference				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 1|
-Execute			Record,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 0|
-Execute			Record,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 1|
+Execute			Subvector,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 0| # 1145
+Execute			Subvector,Field_Reference			|0 0 0 0|0 0 0 1|1 0 0 0|1 0 0 1|
+Execute			Subvector,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 0|
+Execute			Subvector,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 0 1 1|
 
-# Decoded by disassembler, but not by microcode
-#Execute		Subarray,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 0|
+Execute			Subarray,Structure_Write			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 0|
 Execute			Subarray,Field_Reference			|0 0 0 0|0 0 0 1|1 0 0 0|1 1 0 1|
 Execute			Subarray,Field_Write				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 0|
 Execute			Subarray,Field_Read				|0 0 0 0|0 0 0 1|1 0 0 0|1 1 1 1|
+
 Execute			Matrix,Check_In_Type				|0 0 0 0|0 0 0 1|1 0 0 1|1 0 1 1|
 Execute			Matrix,Not_In_Type				|0 0 0 0|0 0 0 1|1 0 0 1|1 1 0 0|
 Execute			Matrix,In_Type					|0 0 0 0|0 0 0 1|1 0 0 1|1 1 0 1|
 Execute			Matrix,Convert_To_Formal			|0 0 0 0|0 0 0 1|1 0 0 1|1 1 1 0|
 Execute			Matrix,Convert					|0 0 0 0|0 0 0 1|1 0 0 1|1 1 1 1|
+
 Execute			Matrix,Subarray					|0 0 0 0|0 0 0 1|1 0 1 0|0 0 1 1|
 Execute			Matrix,Structure_Write				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 0|
 Execute			Matrix,Field_Reference				|0 0 0 0|0 0 0 1|1 0 1 0|0 1 0 1|
@@ -469,41 +377,30 @@ Execute			Matrix,Last					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 0 0|
 Execute			Matrix,First					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 0 1|
 Execute			Matrix,Not_Equal				|0 0 0 0|0 0 0 1|1 0 1 0|1 1 1 0|
 Execute			Matrix,Equal					|0 0 0 0|0 0 0 1|1 0 1 0|1 1 1 1|
+
 Execute			Vector,Hash					|0 0 0 0|0 0 0 1|1 0 1 1|1 1 1 0|
 Execute			Vector,Less_Equal				|0 0 0 0|0 0 0 1|1 0 1 1|1 1 1 1|
 Execute			Vector,Greater_Equal				|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 0|
 Execute			Vector,Less					|0 0 0 0|0 0 0 1|1 1 0 0|0 0 0 1|
 Execute			Vector,Greater					|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 0|
-
-# gc44,005f		VECTOR_CLASS,CHECK_IN_TYPE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 Execute			Vector,Check_In_Type				|0 0 0 0|0 0 0 1|1 1 0 0|0 0 1 1|
 Execute			Vector,Not_In_Type				|0 0 0 0|0 0 0 1|1 1 0 0|0 1 0 0|
 Execute			Vector,In_Type					|0 0 0 0|0 0 0 1|1 1 0 0|0 1 0 1|
 Execute			Vector,Convert_To_Formal			|0 0 0 0|0 0 0 1|1 1 0 0|0 1 1 0|
 Execute			Vector,Convert					|0 0 0 0|0 0 0 1|1 1 0 0|0 1 1 1|
+
 Execute			Vector,Prepend					|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 0|
 Execute			Vector,Append					|0 0 0 0|0 0 0 1|1 1 0 0|1 0 1 1|
-#-----------------------
-# gc44,007c		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
-# gc45,008f		VECTOR_CLASS,CATENATE_OP			|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 Execute			Vector,Catenate					|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 0|
 Execute			Vector,Slice_Reference				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 0 1|
 Execute			Vector,Slice_Write				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 0|
-#-----------------------
-# ⟦36a4ea3d7⟧, @0x06a0	return Name (Name'First .. Name'First + 2);
-# Used to get a subarray
 Execute			Vector,Slice_Read				|0 0 0 0|0 0 0 1|1 1 0 0|1 1 1 1|
 Execute			Vector,Complement				|0 0 0 0|0 0 0 1|1 1 0 1|0 0 0 0|
 Execute			Vector,Xor					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 0 1|
 Execute			Vector,Or					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 1 0|
 Execute			Vector,And					|0 0 0 0|0 0 0 1|1 1 0 1|0 0 1 1|
 Execute			Vector,Structure_Write				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 0|
-#-----------------------
-# ⟦3f2fe70c1⟧, @0x0219	Max   : Natural     renames Max_Width (Current_Column);
 Execute			Vector,Field_Reference				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 0 1|
-#-----------------------
-# gc44,006b		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
-# gc45,00a6		VECTOR_CLASS,FIELD_WRITE_OP			|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 Execute			Vector,Field_Write				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 0|
 Execute			Vector,Field_Read				|0 0 0 0|0 0 0 1|1 1 0 1|0 1 1 1|
 Execute			Vector,Element_Type				|0 0 0 0|0 0 0 1|1 1 0 1|1 0 0 0|
@@ -514,10 +411,7 @@ Execute			Vector,Last					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 0|
 Execute			Vector,First					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 0 1|
 Execute			Vector,Not_Equal				|0 0 0 0|0 0 0 1|1 1 0 1|1 1 1 0|
 Execute			Vector,Equal					|0 0 0 0|0 0 0 1|1 1 0 1|1 1 1 1|
-# End of BODY_0f60
 
-#-----------------------
-# Start of BODY_11a0
 Execute			Array,Check_In_Type				|0 0 0 0|0 0 0 1|1 1 1 0|1 0 1 1| #1494
 Execute			Array,Not_In_Type				|0 0 0 0|0 0 0 1|1 1 1 0|1 1 0 0|
 Execute			Array,In_Type					|0 0 0 0|0 0 0 1|1 1 1 0|1 1 0 1|
@@ -537,21 +431,19 @@ Execute			Array,Last					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 0 0|
 Execute			Array,First					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 0 1| #143a
 Execute			Array,Not_Equal					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 1 0|
 Execute			Array,Equal					|0 0 0 0|0 0 0 1|1 1 1 1|1 1 1 1| #142e
+
 Execute			Module,Check_Elaborated				|0 0 0 0|0 0 1 0|0 0 0 0|0 1 1 0| #1428
+
 Execute			Task,Abort_Multiple				|0 0 0 0|0 0 1 0|0 0 0 0|1 0 0 0| #1422
 Execute			Task,Abort					|0 0 0 0|0 0 1 0|0 0 0 0|1 0 0 1|
+
 Execute			Module,Get_Name					|0 0 0 0|0 0 1 0|0 0 0 0|1 0 1 0|
 Execute			Module,Is_Terminated				|0 0 0 0|0 0 1 0|0 0 0 0|1 0 1 1|
 Execute			Module,Is_Callable				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 0 0|
 Execute			Module,Elaborate				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 0 1|
-
-#-----------------------
-# gc43,0026		MODULE_CLASS,AUGMENT_IMPORTS_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
 Execute			Module,Augment_Imports				|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 0|
-
-#-----------------------
-#EXECUTE		MODULE_CLASS,ACTIVATE_OP			|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
 Execute			Module,Activate					|0 0 0 0|0 0 1 0|0 0 0 0|1 1 1 1|
+
 Execute			Heap_Access,Get_Segment				|0 0 0 0|0 0 1 0|0 0 0 1|0 0 0 0|
 Execute			Heap_Access,Convert_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 0 0 1|
 Execute			Heap_Access,Address				|0 0 0 0|0 0 1 0|0 0 0 1|0 0 1 0|
@@ -559,10 +451,7 @@ Execute			Heap_Access,Check_In_Type			|0 0 0 0|0 0 1 0|0 0 0 1|0 0 1 1|
 Execute			Heap_Access,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 0|
 Execute			Heap_Access,In_Type				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 0 1|
 Execute			Heap_Access,Convert				|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 0|
-#-----------------------
-# gc45,00a5		Heap_Access,All_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
 Execute			Heap_Access,All_Reference			|0 0 0 0|0 0 1 0|0 0 0 1|0 1 1 1|
-
 Execute			Heap_Access,All_Write				|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 0|
 Execute			Heap_Access,All_Read				|0 0 0 0|0 0 1 0|0 0 0 1|1 0 0 1|
 Execute			Heap_Access,Element_Type			|0 0 0 0|0 0 1 0|0 0 0 1|1 0 1 0|
@@ -571,6 +460,7 @@ Execute			Heap_Access,Not_Null				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 0|
 Execute			Heap_Access,Is_Null				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 0 1|
 Execute			Heap_Access,Maximum				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 0|
 Execute			Heap_Access,Equal				|0 0 0 0|0 0 1 0|0 0 0 1|1 1 1 1|
+
 Execute			Access,Deallocate				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 0|
 Execute			Access,Allow_Deallocate				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 0 1|
 Execute			Access,Convert_Reference			|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 0|
@@ -578,10 +468,7 @@ Execute			Access,Check_In_Type				|0 0 0 0|0 0 1 0|0 0 1 0|0 0 1 1|
 Execute			Access,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 0|
 Execute			Access,In_Type					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 0 1|
 Execute			Access,Convert					|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 0|
-#-----------------------
-# ⟦93b91846e⟧ @0x0149	if Ptr.Kind = Number_Kind then
 Execute			Access,All_Reference				|0 0 0 0|0 0 1 0|0 0 1 0|0 1 1 1|
-
 Execute			Access,All_Write				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 0|
 Execute			Access,All_Read					|0 0 0 0|0 0 1 0|0 0 1 0|1 0 0 1|
 Execute			Access,Element_Type				|0 0 0 0|0 0 1 0|0 0 1 0|1 0 1 0|
@@ -596,21 +483,10 @@ Execute			Float,Write_Unchecked				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 0 1|
 Execute			Float,Check_In_Type				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 0|
 Execute			Float,Not_In_Type				|0 0 0 0|0 0 1 0|0 0 1 1|0 0 1 1|
 Execute			Float,In_Type					|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 0|
-#-----------------------
-# ⟦cb8e43375⟧ @0xc4
 Execute			Float,Round_To_Discrete				|0 0 0 0|0 0 1 0|0 0 1 1|0 1 0 1|
 Execute			Float,Truncate_To_Discrete			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 0|
-#-----------------------
-# ⟦cb8e43375⟧ @0xc7
-# 85b414c73 0x055	Ymax : Float := Float (Integer (Pi * Two ** (It / 2)));
-#QQu_CONVERT_TO_FLOAT	-						|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
-
 Execute			Float,Convert_From_Discrete			|0 0 0 0|0 0 1 0|0 0 1 1|0 1 1 1|
 Execute			Float,Convert					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 0|
-
-#-----------------------
-# ⟦85b414c73⟧ @0x463 looks like a classical polynomial expansion
-# Assembler instruction is EXECUTE, Float_Class, op
 Execute			Float,Exponentiate				|0 0 0 0|0 0 1 0|0 0 1 1|1 0 0 1|
 Execute			Float,Divide					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 0|
 Execute			Float,Times					|0 0 0 0|0 0 1 0|0 0 1 1|1 0 1 1|
@@ -643,18 +519,15 @@ Execute			Discrete,Partial_Minus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 0|
 Execute			Discrete,Partial_Plus				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 0 1|
 Execute			Discrete,Instruction_Read			|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 0|
 Execute			Discrete,Raise,>R				|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
-#-----------------------
-# 196 times followed by 0x0000
-# a dozen times right before TRAP entry /phk
-#QQunknown_return_257	>R						|0 0 0 0|0 0 1 0|0 1 0 1|0 1 1 1|
-
 Execute			Discrete,Test_And_Set_Next			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 0|
 Execute			Discrete,Test_And_Set_Previous			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 0 1|
 Execute			Discrete,Write_Unchecked			|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 0|
 Execute			Discrete,Check_In_Type				|0 0 0 0|0 0 1 0|0 1 0 1|1 0 1 1|
-# End of BODY_11a0
 
-# Start of BODY_14a0
+# 2fa0095f7: emulation has nothing
+# a9d4fb5bd: has execute,discrete,reverse_bounds_check
+Execute			Discrete,ReverseBounds_Check			|0 0 0 0|0 0 1 0|0 1 0 1|1 1 0 0|
+
 Execute			Discrete,Bounds_Check				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 0 1|
 Execute			Discrete,Convert				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 0|
 Execute			Discrete,Not_In_Type				|0 0 0 0|0 0 1 0|0 1 0 1|1 1 1 1|
@@ -674,16 +547,11 @@ Execute			Discrete,Minimum				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 0|
 Execute			Discrete,Exponentiate				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 0 1|
 Execute			Discrete,Modulo					|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 0|
 Execute			Discrete,Remainder				|0 0 0 0|0 0 1 0|0 1 1 0|1 1 1 1|
-
 Execute			Discrete,Divide					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 0|
 Execute			Discrete,Times					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 0 1|
 Execute			Discrete,Minus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 0|
 Execute			Discrete,Plus					|0 0 0 0|0 0 1 0|0 1 1 1|0 0 1 1|
 Execute			Discrete,Absolute_Value				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 0|
-
-#-----------------------
-# ⟦85b414c73⟧ @0x171 /phk AND ?
-# Epsilon : Float := Beta ** (-It / 2); (-It, It is integer)
 Execute			Discrete,Unary_Minus				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 0 1|
 Execute			Discrete,Complement				|0 0 0 0|0 0 1 0|0 1 1 1|0 1 1 0|
 Execute			Discrete,Xor					|0 0 0 0|0 0 1 0|0 1 1 1|0 1 1 1|
@@ -696,41 +564,20 @@ Execute			Discrete,Greater				|0 0 0 0|0 0 1 0|0 1 1 1|1 1 0 1|
 Execute			Discrete,Not_Equal				|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 0|
 Execute			Discrete,Equal					|0 0 0 0|0 0 1 0|0 1 1 1|1 1 1 1|
 
-#-----------------------
-# ⟦37717da67⟧ @0x5ce4 indicates this takes an extension /phk
-Declare_Subprogram	subp,For_Accept					|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
-
-#-----------------------
-# gc42,000b		FOR_OUTER_CALL,IS_VISIBLE,NOT_ELABORATED	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0|
-Declare_Subprogram	subp,For_Outer_Call,Visible,Unelaborated	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
-
-#-----------------------
-# ⟦a88379b5f⟧ indicates this takes an extension # /phk
-Declare_Subprogram	subp,For_Outer_Call,Unelaborated		|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| subp				|
-
-#-----------------------
-# gc87,000b		subp,FOR_OUTER_CALL,IS_VISIBLE			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
-Declare_Subprogram	subp,For_Outer_Call,Visible			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
-
-#-----------------------
-# gc43,0038		FOR_OUTER_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1|
-Declare_Subprogram	subp,For_Outer_Call				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
-
-#-----------------------
-# ⟦89b72b217⟧ @0x2abd indicates this takes an extension # /phk
-Declare_Subprogram	subp,For_Call,Unelaborated			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
-
-#-----------------------
-# gc44,0077		FOR_CALL					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1|
-Declare_Subprogram	subp,For_Call					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
-
-#-----------------------
-# gc43,001e		NULL_SUBPROGRAM					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
+Declare_Subprogram	For_Accept,subp					|0 0 0 0|0 0 1 0|1 0 0 1|1 0 0 1| subp				|
+Declare_Subprogram	For_Outer_Call,Visible,Unelaborated,subp	|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 0| subp				|
+Declare_Subprogram	For_Outer_Call,Unelaborated,subp		|0 0 0 0|0 0 1 0|1 0 0 1|1 0 1 1| subp				|
+Declare_Subprogram	For_Outer_Call,Visible,subp			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 0| subp				|
+Declare_Subprogram	For_Outer_Call,subp				|0 0 0 0|0 0 1 0|1 0 0 1|1 1 0 1| subp				|
+Declare_Subprogram	For_Call,Unelaborated,subp			|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 0| subp				|
+Declare_Subprogram	For_Call,subp					|0 0 0 0|0 0 1 0|1 0 0 1|1 1 1 1| subp				|
 Declare_Subprogram	Null_Subprogram					|0 0 0 0|0 0 1 0|1 0 1 0|0 0 0 0|
 
 Declare_Subprogram	For_Accept,With_Address				|0 0 0 0|0 0 1 0|1 0 1 0|0 0 1 0|
+
 Declare_Subprogram	For_Outer_Call,Visible,With_Address		|0 0 0 0|0 0 1 0|1 0 1 0|0 1 0 0|
 Declare_Subprogram	For_Outer_Call,With_Address			|0 0 0 0|0 0 1 0|1 0 1 0|0 1 0 1|
+
 Declare_Subprogram	For_Call,Visible,Unelaborated,With_Address	|0 0 0 0|0 0 1 0|1 0 1 0|1 0 0 0|
 Declare_Subprogram	For_Call,Unelaborated,With_Address		|0 0 0 0|0 0 1 0|1 0 1 0|1 0 0 1|
 Declare_Subprogram	For_Call,Visible,With_Address			|0 0 0 0|0 0 1 0|1 0 1 0|1 0 1 0|
@@ -741,18 +588,14 @@ Declare_Variable	Float,With_Value,With_Constraint		|0 0 0 0|0 0 1 0|1 0 1 1|1 1 
 
 Declare_Variable	Any,Visible					|0 0 0 0|0 0 1 0|1 1 0 0|0 1 1 0|
 Declare_Variable	Any						|0 0 0 0|0 0 1 0|1 1 0 0|0 1 1 1|
-Declare_Variable	Family						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 0 1|
-Declare_Variable	Entry						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 1 1|
-Declare_Variable	Select,Choice_Open				|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 0|
 
-#-----------------------
-# See ⟦657d85b18⟧ @0x12d
-# See ⟦eecee3432⟧ @0x2f2/phk
-# See ⟦826a261d9⟧ @0x8a7/phk
-#QQunknown_2cf		-						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
+Declare_Variable	Family						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 0 1|
+
+Declare_Variable	Entry						|0 0 0 0|0 0 1 0|1 1 0 0|1 0 1 1|
+
+Declare_Variable	Select,Choice_Open				|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 0|
 Declare_Variable	Select						|0 0 0 0|0 0 1 0|1 1 0 0|1 1 1 1|
-# End of BODY_14a0
-# Start of BODY_16a8
+
 Declare_Variable	Variant_Record,Visible,With_Constraint		|0 0 0 0|0 0 1 0|1 1 1 1|1 0 1 1|
 Declare_Variable	Variant_Record,With_Constraint			|0 0 0 0|0 0 1 0|1 1 1 1|1 1 0 0|
 Declare_Variable	Variant_Record,Duplicate			|0 0 0 0|0 0 1 0|1 1 1 1|1 1 0 1|
@@ -764,6 +607,8 @@ Complete_Type		Variant_Record,By_Completing_Constraint		|0 0 0 0|0 0 1 1|0 0 0 0
 Complete_Type		Variant_Record,By_Constraining_Incomplete	|0 0 0 0|0 0 1 1|0 0 0 0|0 1 0 1|
 Complete_Type		Variant_Record,By_Renaming			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 0|
 Complete_Type		Variant_Record,By_Defining			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
+
+#XXX: 20250528 revised to here
 
 Declare_Type		Variant_Record,Constrained_Incomplete		|0 0 0 0|0 0 1 1|0 0 0 1|0 0 0 1|
 Declare_Type		Variant_Record,Constrained_Incomplete,Visible	|0 0 0 0|0 0 1 1|0 0 0 1|0 0 1 0|
@@ -1120,13 +965,13 @@ Exit_Subprogram		From_Utility,>R,topoffset			|0 1 0 0|0 0 1 1|   topoffset	|
 
 #-----------------------
 # phk
-Exit_Subprogram		With_Value,>R,topoffset				|0 1 0 0|0 1 0 0|   topoffset	|
+Exit_Subprogram		With_Result,>R,topoffset			|0 1 0 0|0 1 0 0|   topoffset	|
 
 #-----------------------
 # g43,002d		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
 # g44,0080		2						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 1 0|
 # feh269,1e		1						|0 1 0 0|0 1 0 1|0 0 0 0|0 0 0 1|
-Exit_Suprogram		topoffset,>R					|0 1 0 0|0 1 0 1|   topoffset	|
+Exit_Subprogram		topoffset,>R					|0 1 0 0|0 1 0 1|   topoffset	|
 
 #-----------------------
 # ⟦fad6fc6ba⟧ limits the argument to 8 bits
@@ -1214,8 +1059,8 @@ class r1000_ins(assy.Instree_ins):
     ''' '''
 
     def assy_case_max(self):
-        i = 1 + self['case_max']
-        for j in range(i):
+        i = self['case_max']
+        for j in range(i + 1):
             self += code.Jump(cond="#0x%x" % j, to=self.hi + j)
             self.lang.m.set_line_comment(self.hi + j, "case 0x%x" % j)
         return "0x%x" % i
@@ -1288,7 +1133,7 @@ class r1000_ins(assy.Instree_ins):
 
     def assy_topoffset(self):
         v = self['topoffset']
-        return "New_Top_Offset 0x%x" % v
+        return "0x%x" % v
 
     def assy_literal(self):
         y = self.lang.literal(self.dstadr)
@@ -1311,11 +1156,11 @@ class r1000_ins(assy.Instree_ins):
     def assy_slit(self):
         if self.chk2cf():
             return
-        # Short_Literal_Value [-2**10..2**10-1]
         v = self['slit']
-        if v & (1<<10):
-            v = v - (1<<11)
-            return "-0x%x" % (-v)
+        # Short_Literal_Value [-2**10..2**10-1]
+        #if v & (1<<10):
+        #    v = v - (1<<11)
+        #    return "-0x%x" % (-v)
         return "0x%x" % v
 
     def assy_llvl(self):
