@@ -274,7 +274,7 @@ Execute			Any,Set_Constraint				|0 0 0 0|0 0 0 1|0 0 1 0|0 1 0 1|
 Execute			Any,Has_Default_Initialization			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 0|
 Execute			Any,Run_Initialization_Utility			|0 0 0 0|0 0 0 1|0 0 1 0|0 1 1 1|
 
-Execute			Any,Make_Visible				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1| #0e3e
+Execute			Any,Make_Visible				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 0 1|
 Execute			Any,Change_Utility				|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 0|
 Execute			Any,Spare14					|0 0 0 0|0 0 0 1|0 0 1 0|1 0 1 1|
 Execute			Any,Size					|0 0 0 0|0 0 0 1|0 0 1 0|1 1 0 0|
@@ -608,14 +608,24 @@ Complete_Type		Variant_Record,By_Constraining_Incomplete	|0 0 0 0|0 0 1 1|0 0 0 
 Complete_Type		Variant_Record,By_Renaming			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 0|
 Complete_Type		Variant_Record,By_Defining			|0 0 0 0|0 0 1 1|0 0 0 0|0 1 1 1|
 
-#XXX: 20250528 revised to here
-
+# a9d4fb5bd has comment: -formerly declare_type,variant_record,incomplete,constrained          !declare_group
 Declare_Type		Variant_Record,Constrained_Incomplete		|0 0 0 0|0 0 1 1|0 0 0 1|0 0 0 1|
+
+# a9d4fb5bd has comment: -formerly declare_type,variant_record,incomplete,visible,constrained
 Declare_Type		Variant_Record,Constrained_Incomplete,Visible	|0 0 0 0|0 0 1 1|0 0 0 1|0 0 1 0|
+
+# a9d4fb5bd has comment: -formerly declare_type,variant_record,constrained_incomplete          !declare_group
+# ?			?						|0 0 0 0|0 0 1 1|0 0 0 1|0 0 1 1|
+
+# a9d4fb5bd has comment: -formerly declare_type,variant_record,constrained_incomplete,visible  !declare_group
+# ?			?						|0 0 0 0|0 0 1 1|0 0 0 1|0 1 0 0|
+
 Declare_Type		Variant_Record,Defined_Incomplete		|0 0 0 0|0 0 1 1|0 0 0 1|0 1 0 1|
 Declare_Type		Variant_Record,Defined_Incomplete,Visible	|0 0 0 0|0 0 1 1|0 0 0 1|0 1 1 0|
+
 Declare_Type		Variant_Record,Incomplete			|0 0 0 0|0 0 1 1|0 0 0 1|1 0 0 0|
 Declare_Type		Variant_Record,Incomplete,Visible		|0 0 0 0|0 0 1 1|0 0 0 1|1 0 0 1|
+
 Declare_Type		Variant_Record,Constrained			|0 0 0 0|0 0 1 1|0 0 0 1|1 0 1 1|
 Declare_Type		Variant_Record,Constrained,Visible		|0 0 0 0|0 0 1 1|0 0 0 1|1 1 0 0|
 Declare_Type		Variant_Record,Defined				|0 0 0 0|0 0 1 1|0 0 0 1|1 1 0 1|
@@ -631,8 +641,10 @@ Complete_Type		Record,By_Defining				|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 0|
 
 Declare_Type		Record,Defined_Incomplete			|0 0 0 0|0 0 1 1|0 0 1 0|0 1 1 1|
 Declare_Type		Record,Defined_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 0 1 0|1 0 0 0|
+
 Declare_Type		Record,Incomplete				|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 0|
 Declare_Type		Record,Incomplete,Visible			|0 0 0 0|0 0 1 1|0 0 1 0|1 0 1 1|
+
 Declare_Type		Record,Defined					|0 0 0 0|0 0 1 1|0 0 1 0|1 1 0 1|
 Declare_Type		Record,Defined,Visible				|0 0 0 0|0 0 1 1|0 0 1 0|1 1 1 0|
 
@@ -640,8 +652,6 @@ Declare_Variable	Array,Visible,With_Constraint			|0 0 0 0|0 0 1 1|0 0 1 1|0 0 1 
 Declare_Variable	Array,With_Constraint				|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 0|
 Declare_Variable	Array,Duplicate					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 0 1|
 Declare_Variable	Array,Visible					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 0|
-#-----------------------
-# gc44,004b		ARRAY_CLASS					|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
 Declare_Variable	Array						|0 0 0 0|0 0 1 1|0 0 1 1|0 1 1 1|
 
 Complete_Type		Array,By_Component_Completion			|0 0 0 0|0 0 1 1|0 1 0 0|0 0 0 0|
@@ -653,29 +663,28 @@ Declare_Type		Array,Constrained_Incomplete,Bounds_With_Object		|1 0 0 0|0 0 1 1|
 Declare_Type		Array,Constrained_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|0 1 1 1|
 Declare_Type		Array,Defined_Incomplete,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 0|
 Declare_Type		Array,Defined_Incomplete,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 0 0 1|
+
 Declare_Type		Array,Incomplete,Bounds_With_Object			|0 0 0 0|0 0 1 1|0 1 0 0|1 0 1 1|
 Declare_Type		Array,Incomplete,Visible,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 0 0|
 
-# Guess, undefined in disassembler
-QQ_Declare_Type		Array,Constrained,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 0|
+# 2fa0095f7: emulation has nothing
+# in a9d4fb5bd
+Declare_Type		Array,Constrained,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 0|
 
-# End of BODY_16a8
-
-# Start of BODY_1868
 Declare_Type		Array,Constrained,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 0|1 1 1 1|
 Declare_Type		Array,Defined,Bounds_With_Object		|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 0|
 Declare_Type		Array,Defined,Visible,Bounds_With_Object	|0 0 0 0|0 0 1 1|0 1 0 1|0 0 0 1|
+
 Declare_Type		Array,Constrained_Incomplete			|0 0 0 0|0 0 1 1|0 1 0 1|0 0 1 1|
 Declare_Type		Array,Constrained_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 1 0 1|0 1 0 0|
-Declare_Type		Array,Defined_Incomplete			|0 0 0 0|0 0 1 1|0 1 0 1|0 1 0 1|#1ab4
-Declare_Type		Array,Defined_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 1 0 1|0 1 1 0|#1aad
+Declare_Type		Array,Defined_Incomplete			|0 0 0 0|0 0 1 1|0 1 0 1|0 1 0 1|
+Declare_Type		Array,Defined_Incomplete,Visible		|0 0 0 0|0 0 1 1|0 1 0 1|0 1 1 0|
+
 Declare_Type		Array,Incomplete				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 0 0|
 Declare_Type		Array,Incomplete,Visible			|0 0 0 0|0 0 1 1|0 1 0 1|1 0 0 1|
+
 Declare_Type		Array,Constrained				|0 0 0 0|0 0 1 1|0 1 0 1|1 0 1 1|
 Declare_Type		Array,Constrained,Visible			|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 0|
-
-#-----------------------
-# gc44,0049		ARRAY_CLASS,DEFINED				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 Declare_Type		Array,Defined					|0 0 0 0|0 0 1 1|0 1 0 1|1 1 0 1|
 Declare_Type		Array,Defined,Visible				|0 0 0 0|0 0 1 1|0 1 0 1|1 1 1 0|
 
@@ -687,58 +696,52 @@ Declare_Variable	Task,Visible					|0 0 0 0|0 0 1 1|0 1 1 0|1 1 1 0|
 Declare_Variable	Task						|0 0 0 0|0 0 1 1|0 1 1 0|1 1 1 1|
 
 Complete_Type		Task,By_Renaming				|0 0 0 0|0 0 1 1|0 1 1 1|0 1 0 0|
+
 Declare_Type		Task,Incomplete					|0 0 0 0|0 0 1 1|0 1 1 1|0 1 1 1|
 Declare_Type		Task,Incomplete,Visible				|0 0 0 0|0 0 1 1|0 1 1 1|1 0 0 0|
+
 Declare_Type		Task,Defined,Not_Elaborated			|0 0 0 0|0 0 1 1|0 1 1 1|1 0 1 0|
 Declare_Type		Task,Defined,Visible,Not_Elaborated		|0 0 0 0|0 0 1 1|0 1 1 1|1 0 1 1|
+
 Declare_Type		Task,Defined					|0 0 0 0|0 0 1 1|0 1 1 1|1 1 0 1|
 Declare_Type		Task,Defined,Visible				|0 0 0 0|0 0 1 1|0 1 1 1|1 1 1 0|
 
 Declare_Variable	Package,Visible,On_Processor			|0 0 0 0|0 0 1 1|1 0 0 0|0 1 0 0|
 Declare_Variable	Package,On_Processor				|0 0 0 0|0 0 1 1|1 0 0 0|0 1 0 1|
 Declare_Variable	Package,Visible					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 0|
-#-----------------------
-# gc43,0020		PACKAGE_CLASS					|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
 Declare_Variable	Package						|0 0 0 0|0 0 1 1|1 0 0 0|0 1 1 1|
 
 Declare_Type		Package,Defined,Not_Elaborated			|0 0 0 0|0 0 1 1|1 0 0 0|1 1 0 0|
 Declare_Type		Package,Defined,Visible,Not_Elaborated		|0 0 0 0|0 0 1 1|1 0 0 0|1 1 0 1|
-
-#-----------------------
-# gc43,001f		PACKAGE_CLASS,DEFINED				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
 Declare_Type		Package,Defined					|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 0|
 Declare_Type		Package,Defined,Visible				|0 0 0 0|0 0 1 1|1 0 0 0|1 1 1 1|
 
-Declare_Variable	Heap_Access,Visible,By_Allocation,With_Value	|0 0 0 0|0 0 1 1|1 0 0 1|0 1 0 1|
-
-#-----------------------
-# gc44,0074		Heap_Access,BY_ALLOCATION,WITH_VALUE				|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-Declare_Variable	Heap_Access,By_Allocation,With_Value				|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation,With_Subtype			|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 1|
-Declare_Variable	Heap_Access,By_Allocation,With_Subtype				|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation,With_Constraint		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 1|
-Declare_Variable	Heap_Access,By_Allocation,With_Constraint			|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 0|
-Declare_Variable	Heap_Access,Visible,By_Allocation				|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 1|
-Declare_Variable	Heap_Access,By_Allocation					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 0|
-Declare_Variable	Heap_Access,Duplicate						|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
-Declare_Variable	Heap_Access,Visible						|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
-Declare_Variable	Heap_Access							|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Value		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 0 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Value			|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Subtype		|0 0 0 0|0 0 1 1|1 0 0 1|0 1 1 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Subtype			|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation,With_Constraint	|0 0 0 0|0 0 1 1|1 0 0 1|1 0 0 1|
+Declare_Variable	Heap_Access,By_Allocation,With_Constraint		|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 0|
+Declare_Variable	Heap_Access,Visible,By_Allocation			|0 0 0 0|0 0 1 1|1 0 0 1|1 0 1 1|
+Declare_Variable	Heap_Access,By_Allocation				|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 0|
+Declare_Variable	Heap_Access,Duplicate					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 0 1|
+Declare_Variable	Heap_Access,Visible					|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 0|
+Declare_Variable	Heap_Access						|0 0 0 0|0 0 1 1|1 0 0 1|1 1 1 1|
 
 Complete_Type		Heap_Access,By_Component_Completion				|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 0|
 Complete_Type		Heap_Access,By_Constraining					|0 0 0 0|0 0 1 1|1 0 1 0|0 0 0 1|
 Complete_Type		Heap_Access,By_Renaming						|0 0 0 0|0 0 1 1|1 0 1 0|0 0 1 0|
 Complete_Type		Heap_Access,By_Defining						|0 0 0 0|0 0 1 1|1 0 1 0|0 0 1 1|
-Declare_Type		Heap_Access,Indirect_Literal,Values_Relative,With_Size		|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 0|
-Declare_Type		Heap_Access,Indirect_Literal,Values_Relative			|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 1|
-Declare_Type		Heap_Access,Indirect_Literal,Visible,Values_Relative		|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 0|
-Declare_Type		Heap_Access,Indirect_Literal,Visible,Values_Relative,With_Size	|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 1|
-Declare_Type		Heap_Access,Indirect_Literal					|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 0|
-Declare_Type		Heap_Access,Indirect_Literal,Visible				|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 1|
-Declare_Type		Heap_Access,Constrained						|0 0 0 0|0 0 1 1|1 0 1 0|1 0 1 1|
-Declare_Type		Heap_Access,Constrained,Visible					|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 0|
 
-#-----------------------
-# gc44,0052		Heap_Access,DEFINED				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
+Declare_Type		Heap_Access,Incomplete,Values_Relative,With_Size		|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 0|
+Declare_Type		Heap_Access,Incomplete,Values_Relative				|0 0 0 0|0 0 1 1|1 0 1 0|0 1 0 1|
+Declare_Type		Heap_Access,Incomplete,Visible,Values_Relative			|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 0|
+Declare_Type		Heap_Access,Incomplete,Visible,Values_Relative,With_Size	|0 0 0 0|0 0 1 1|1 0 1 0|0 1 1 1|
+Declare_Type		Heap_Access,Incomplete						|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 0|
+Declare_Type		Heap_Access,Incomplete,Visible					|0 0 0 0|0 0 1 1|1 0 1 0|1 0 0 1|
+
+Declare_Type		Heap_Access,Constrained				|0 0 0 0|0 0 1 1|1 0 1 0|1 0 1 1|
+Declare_Type		Heap_Access,Constrained,Visible			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 0|
 Declare_Type		Heap_Access,Defined				|0 0 0 0|0 0 1 1|1 0 1 0|1 1 0 1|
 Declare_Type		Heap_Access,Defined,Visible			|0 0 0 0|0 0 1 1|1 0 1 0|1 1 1 0|
 
@@ -758,12 +761,10 @@ Complete_Type		Access,By_Component_Completion			|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 0
 Complete_Type		Access,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 0 1|
 Complete_Type		Access,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 0|
 
-# 85eec923c, 0020	type List is Access Listdata; (completing type List is private)
-# Guess /aa. By_Defining follows By_Renaming for other types
+# 2fa0095f7: emulation has nothing
 Complete_Type		Access,By_Defining				|0 0 0 0|0 0 1 1|1 1 0 0|0 1 1 1|
-# End of BODY_1868
 
-# Start of BODY_1ae0
+
 Declare_Type		Access,Incomplete,Accesses_Protected		|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 0|
 Declare_Type		Access,Incomplete,Visible,Accesses_Protected	|0 0 0 0|0 0 1 1|1 1 0 0|1 1 0 1|
 Declare_Type		Access,Incomplete				|0 0 0 0|0 0 1 1|1 1 0 0|1 1 1 0|
@@ -773,9 +774,6 @@ Declare_Type		Access,Constrained				|0 0 0 0|0 0 1 1|1 1 0 1|0 0 0 1|
 Declare_Type		Access,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 0|
 Declare_Type		Access,Defined,Accesses_Protected		|0 0 0 0|0 0 1 1|1 1 0 1|0 0 1 1|
 Declare_Type		Access,Defined,Visible,Accesses_Protected	|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 0|
-#-----------------------
-# gc44,004f		Access,DEFINED					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
-#			Type PA is Access A; (in procedure)
 Declare_Type		Access,Defined					|0 0 0 0|0 0 1 1|1 1 0 1|0 1 0 1|
 Declare_Type		Access,Defined,Visible				|0 0 0 0|0 0 1 1|1 1 0 1|0 1 1 0|
 
@@ -783,26 +781,27 @@ Declare_Variable	Float,Duplicate					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 0|
 Declare_Variable	Float,Visible					|0 0 0 0|0 0 1 1|1 1 0 1|1 0 0 1|
 Declare_Variable	Float						|0 0 0 0|0 0 1 1|1 1 0 1|1 0 1 0|
 Declare_Variable	Float,Visible,With_Value			|0 0 0 0|0 0 1 1|1 1 0 1|1 0 1 1|
+
 Complete_Type		Float,By_Constraining				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 0 0|
 Complete_Type		Float,By_Renaming				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 0 1|
 Complete_Type		Float,By_Defining				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 0|
+
 Declare_Variable	Float,With_Value				|0 0 0 0|0 0 1 1|1 1 0 1|1 1 1 1|
 
 Declare_Type		Float,Incomplete				|0 0 0 0|0 0 1 1|1 1 1 0|0 0 0 0|
 Declare_Type		Float,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 1 0|0 0 0 1|
+
 Declare_Type		Float,Constrained				|0 0 0 0|0 0 1 1|1 1 1 0|0 0 1 1|
 Declare_Type		Float,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 0|0 1 0 0|
 Declare_Type		Float,Defined					|0 0 0 0|0 0 1 1|1 1 1 0|0 1 0 1|
 Declare_Type		Float,Defined,Visible				|0 0 0 0|0 0 1 1|1 1 1 0|0 1 1 0|
+
 Declare_Variable	Discrete,Visible,With_Value,With_Constraint	|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 0|
 Declare_Variable	Discrete,Duplicate				|0 0 0 0|0 0 1 1|1 1 1 0|1 0 0 1|
 Declare_Variable	Discrete,Visible				|0 0 0 0|0 0 1 1|1 1 1 0|1 0 1 0|
 Declare_Variable	Discrete					|0 0 0 0|0 0 1 1|1 1 1 0|1 0 1 1|
-
-#-----------------------
-# feh269,1d		DISCRETE,WITH_VALUE,WITH_CONSTRAINT		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
-# ⟦36a4ea3d7⟧ @0x0717	Month : Integer := Months'Pos (Date.Month) + 1;
 Declare_Variable	Discrete,With_Value,With_Constraint		|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 0|
+
 Complete_Type		Discrete,By_Constraining			|0 0 0 0|0 0 1 1|1 1 1 0|1 1 0 1|
 Complete_Type		Discrete,By_Renaming				|0 0 0 0|0 0 1 1|1 1 1 0|1 1 1 0|
 Complete_Type		Discrete,By_Defining				|0 0 0 0|0 0 1 1|1 1 1 0|1 1 1 1|
@@ -811,25 +810,24 @@ Declare_Variable	Discrete,Visible,With_Value			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 0|
 Declare_Variable	Discrete,With_Value				|0 0 0 0|0 0 1 1|1 1 1 1|0 0 0 1|
 Declare_Variable	Discrete,Incomplete,Unsigned			|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 0|
 Declare_Variable	Discrete,Incomplete,Visible,Unsigned		|0 0 0 0|0 0 1 1|1 1 1 1|0 0 1 1|
+
 Declare_Variable	Discrete,Incomplete				|0 0 0 0|0 0 1 1|1 1 1 1|0 1 0 1|
 Declare_Variable	Discrete,Incomplete,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 0|
 
 # Guess, used after defining Discrete type
-QQ_Declare_Variable	Discrete,XXX					|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 1|
+#QQ_Declare_Variable	Discrete,XXX					|0 0 0 0|0 0 1 1|1 1 1 1|0 1 1 1|
 
 Declare_Type		Discrete,Constrained				|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 0|
 Declare_Type		Discrete,Constrained,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 0 1|
 Declare_Type		Discrete,Defined,With_Size			|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 0|
 Declare_Type		Discrete,Defined,Visible,With_Size		|0 0 0 0|0 0 1 1|1 1 1 1|1 0 1 1|
-QQ_Declare_Type		Discrete,XXX					|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 0|
-#-----------------------
-# (93b91846e, 0025)/aa		type Kind_Value is (Day, Hour, Minute, Second, Millisecond, Number); (in procedure)
+
 Declare_Type		Discrete,Defined				|0 0 0 0|0 0 1 1|1 1 1 1|1 1 0 1|
-# Not defined in disassembler (03fe), assume same as 03fd, but visible
+
+# 2fa0095f7: emulation has nothing
 Declare_Type		Discrete,Defined,Visible			|0 0 0 0|0 0 1 1|1 1 1 1|1 1 1 0|
 
-# End of BODY_1ae0
-# Start of BODY_0588
+# 20250528 rev. to here.
 
 # 0400	UNSIGNED_IMMEDIATE
 Execute_Immediate	Set_Value_Visible_Unchecked,uimmediate		|0 0 0 0|0 1 0 0|   uimmediate  |
