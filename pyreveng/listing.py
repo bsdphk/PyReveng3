@@ -237,7 +237,6 @@ class Listing():
         for map, i, j in self.asp.segments():
             for n, leaf in enumerate(map):
                 a0 = leaf.lo + i
-                print("  ", hex(a0))
                 try:
                     votes.add(
                         len(
