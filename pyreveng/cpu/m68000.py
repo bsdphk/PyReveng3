@@ -583,7 +583,7 @@ ROXR		W,ea		037c	|1 1 1 0|0 1 0|0|1 1| ea	|
 # 272/4-168
 RTR		-		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 1 1|
 # 273/4-169
-RTS		>R		0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1| {
+RTS		>R,padrts	0000	|0 1 0 0|1 1 1 0|0 1 1 1|0 1 0 1| {
 	%0 = load i32 , i32* %A7
 	%A7 = add i32 %A7 , 4
 	br label %0
@@ -939,6 +939,8 @@ class Arg_ExtWordLong(Arg_ExtWord):
         else:
             if self.ew & 4:
                 # Post index
+                print("ST", [ self.lan ])
+                print("ST2", self)
                 s = "((" + self.lan[0]
                 if self.basedisp < 0:
                     s += "-#%x" % (-self.basedisp)
@@ -1237,6 +1239,22 @@ class m68000_ins(assy.Instree_ins):
         self.isz = "i32"
         self.imsk = 0xffffffff
         self.mne += ".L"
+
+    def assy_padrts(self):
+        if not self.lang.align_rts:
+            return
+        if (self.lo & 3) != 0:
+            return
+        if self.lang.m.bu16(self.hi) not in (
+            0x0000, # zeros
+            0x4e71, # NOP
+        ):
+            return
+        i = list(self.lang.m.find(self.hi))
+        if len(i) != 0:
+            return
+        self.hi += 2
+        return assy.Arg_verbatim("PAD")
 
     def assy_rlist(self):
         return "+".join(self.subr_rlist())
@@ -1566,7 +1584,11 @@ class m68000_ins(assy.Instree_ins):
 
 
 class m68000(assy.Instree_disass):
-    def __init__(self, lang="m68000"):
+    def __init__(
+        self,
+        lang="m68000",
+        align_rts=False,
+    ):
         super().__init__(
             lang,
             ins_word=16,
@@ -1575,6 +1597,7 @@ class m68000(assy.Instree_disass):
             abits=32,
         )
         self.it.load_string(m68000_desc, m68000_ins)
+        self.align_rts = align_rts
         self.il = None
         self.verbatim += ("CCR", "SR", "USP")
         self.ea_fullext = False
@@ -1605,13 +1628,14 @@ class m68000(assy.Instree_disass):
             return "VECTOR_TRAP_0x%x" % (v - 32)
         return "VECTOR_0x%x" % v
 
-    def vectors(self, hi=0x400):
-        y = self.dataptr(0)
+    def vectors(self, hi=0x400, offset=0x0):
+        y = self.dataptr(0 + offset)
         y.lcmt = "Reset SP"
         vn = {}
         vi = {}
-        a = 0x4
-        while a < hi:
+        a = 0x4 + offset
+        while a < hi + offset:
+            nam = self.vector_name((a - offset) >> 2)
             x = self.m.bu32(a)
             if x in (0x0, 0xffffffff):
                 y = self.dataptr(a)
@@ -1622,29 +1646,27 @@ class m68000(assy.Instree_disass):
                     try:
                         vi[x] = self.disass(x)
                         vn[x] = []
-                        vn[x].append(a >> 2)
+                        vn[x].append(nam)
                     except assy.Invalid:
                         pass
                     except mem.MemError:
                         pass
                 if x > a:
                     y = self.codeptr(a)
-            y.lcmt = self.vector_name(a >> 2)
+            y.lcmt = nam
             hi = min(hi, x)
             a += 4
         mv = 0
         for i in vn:
-            for v in vn[i]:
-                k = self.vector_name(v)
+            for nam in vn[i]:
                 if isinstance(vi[i], m68000_ins):
-                    vi[i].lcmt += "--> " + k + "\n"
+                    vi[i].lcmt += "<-- " + nam + "\n"
 
             if len(vn[i]) == 1:
-                k = self.vector_name(vn[i][0])
-                self.m.set_first_label(i, k)
+                self.m.set_first_label(i, vn[i][0])
             else:
                 self.m.set_first_label(i, "VECTORS_%d" % mv)
                 mv += 1
 
-    def dataptr(self, adr):
-        return data.Dataptr(self.m, adr, adr + 4, self.m.bu32(adr))
+    def dataptr(self, adr, cls=data.Dataptr, *args, **kwargs):
+        return cls(self.m, adr, adr + 4, self.m.bu32(adr), *args, **kwargs)

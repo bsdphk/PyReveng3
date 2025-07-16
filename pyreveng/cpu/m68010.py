@@ -63,8 +63,8 @@ class m68010_ins(m68000.m68000_ins):
 
 
 class m68010(m68000.m68000):
-    def __init__(self, lang="m68010"):
-        super().__init__(lang)
+    def __init__(self, lang="m68010", **kwargs):
+        super().__init__(lang, **kwargs)
         self.add_ins(m68010_desc, m68010_ins)
         self.cregs = {
             0x000: ("SFC", "Source Function Code"),

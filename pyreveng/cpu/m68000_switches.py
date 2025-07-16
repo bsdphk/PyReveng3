@@ -201,9 +201,44 @@ class m68000_switch_ins(assy.Instree_ins):
         self.reg = None
         self.nm = "SW_%x" % self.lo
         self.sz = None
+        self.dsts = {}
+
+    def ranges(self, numbers):
+        ''' Reduce list of numbers to ranges '''
+        diff = None
+        for i,j in enumerate(sorted(numbers)):
+            if i - j != diff:
+                if diff is not None:
+                    yield first,last
+                first = j
+                diff = i -j
+            last = j
+        if diff is not None:
+            yield first,last
+
+    def add_dst_labels(self):
+        ''' Add destination labels and line comments '''
+        mv = max(max(x) for x in self.dsts.values())
+        fmt = "%%0%dx" % len("%x" % mv)
+        l = list(len(x) for x in self.dsts.values())
+        m = max(l)
+        if m == 1 or l.count(m) > 1:
+            m = None
+        for dst, nos in sorted(self.dsts.items()):
+            if len(nos) == m:
+                # Probably the default, but we dont know for sure, so be precise.
+                self.lang.m.set_label(dst, self.nm + "_most")
+            else:
+                self.lang.m.set_label(dst, self.nm + "_0x" + "_".join(fmt %x for x in sorted(nos)))
+            for lo,hi in self.ranges(nos):
+                if lo == hi:
+                    cmt = "Switch @0x%x[0x%s]" % (self.hi, fmt % lo)
+                else:
+                    cmt = "Switch @0x%x[0x%s…0x%s]" % (self.hi, fmt % lo, fmt % hi)
+                self.lang.m.set_line_comment(dst, cmt)
 
     def assy_SW5(self):
-        
+
         if self.lang.m[self.lo - 2] == 0x62:
             bhi = 2
         elif self.lang.m.bu16(self.lo - 4) == 0x6200:
@@ -216,11 +251,11 @@ class m68000_switch_ins(assy.Instree_ins):
         ptr = self.hi
         for i in range(n + 1):
             dst = self.lang.m.bu32(ptr)
-            self.lang.m.set_line_comment(dst, "Switch @0x%x[0x%x]" % (self.hi, i))
             self.dst(self.lang, i, dst)
             ptr += 4
         self.hi = ptr
         self.compact = True
+        self.add_dst_labels()
 
     def assy_W(self):
         if self.sz not in ('W', None):
@@ -255,6 +290,7 @@ class m68000_switch_ins(assy.Instree_ins):
         self.high = n - 1
         self.wordtable()
         raise assy.Invalid()
+        self.add_dst_labels()
 
     def assy_SW(self):
 
@@ -345,6 +381,7 @@ class m68000_switch_ins(assy.Instree_ins):
         self.range()
         self += code.Jump()
         # raise assy.Invalid()
+        self.add_dst_labels()
 
     def wordtable(self):
         self.lang.m.set_label(self.hi, self.nm + '_TAB')
@@ -369,9 +406,12 @@ class m68000_switch_ins(assy.Instree_ins):
 
     def dst(self, pj, no, dst):
         # XXX: Add flow
-        self.lang.disass(dst)
+        #self.lang.disass(dst)
         self += code.Jump(cond="0x%x" % no, to=dst)
-        pj.m.set_label(dst, self.nm + "_%d" % no)
+        if dst not in self.dsts:
+            self.dsts[dst] = set()
+        self.dsts[dst].add(no)
+        #pj.m.set_label(dst, self.nm + "_%d" % no)
 
 def m68000_switches(disass):
     disass.add_ins(switches, m68000_switch_ins)

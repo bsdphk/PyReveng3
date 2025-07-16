@@ -117,8 +117,8 @@ class m68020_ins(m68010.m68010_ins):
 
 
 class m68020(m68010.m68010):
-    def __init__(self, lang="m68020"):
-        super().__init__(lang)
+    def __init__(self, lang="m68020", **kwargs):
+        super().__init__(lang, **kwargs)
         self.it.load_string(m68020_desc, m68020_ins)
         self.ea_fullext = True
         self.ea_scale = True
@@ -128,6 +128,15 @@ class m68020(m68010.m68010):
             0x803: ("MSP", "Master Stack Pointer"),
             0x804: ("ISP", "Interrupt Stack Pointer"),
         })
+
+    def coldfire(self):
+        self.cregs[0x004] = ("ACR0", "Access control register 0")
+        self.cregs[0x005] = ("ACR1", "Access control register 1")
+        self.cregs[0x801] = ("VBR", "Vector base address register")
+        self.cregs[0xc00] = ("ROMBAR", "ROM base address register")
+        self.cregs[0xc04] = ("RAMBAR", "RAM base address register")
+        self.cregs[0xc0f] = ("MBAR","Module base address register")
+
 
 if __name__ == '__main__':
     m = m68020()
