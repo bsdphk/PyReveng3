@@ -31,6 +31,7 @@ Data of various sorts
 import struct
 
 from pyreveng import leaf
+from pyreveng import datastruct
 
 # Characters from text strings that go into their labels.
 LABELCHAR = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?_'
@@ -42,9 +43,29 @@ ASCII[13] = "\\r"
 
 #######################################################################
 
-class Data(leaf.Leaf):
-    def __init__(self, asp, lo, hi, t="data", fmt=None):
+class DataABC(leaf.Leaf):
+    def __init__(self, asp, lo, hi, t="dataabc"):
         super().__init__(lo, hi, t)
+        self.tree = asp
+
+    def insert(self):
+        self.tree.insert(self)
+        self.commit()
+        return self
+
+    def commit(self):
+        ''' called (also) when datastructure containing this is insert()'ed '''
+
+    def render(self):
+        yield "DataABC[" + ",".join(self.tree.dfmt(x) for x in range(self.lo, self.hi)) + "]"
+
+    @classmethod
+    def using(cls, **kwargs):
+        return (cls, kwargs)
+
+class Data(DataABC):
+    def __init__(self, asp, lo, hi, t="data", fmt=None):
+        super().__init__(asp, lo, hi, t)
         asp.insert(self)
         self.fmt = fmt
 
@@ -114,6 +135,26 @@ class Dataptr(Data):
     def render(self):
         return ".PTR\t" + self.pfx + self.dasp.adr(self.dst) + self.sfx
 
+class StringPtr(Data):
+    def __init__(self, asp, lo, hi, dst, *args, **kwargs):
+        super().__init__(asp, lo, hi, "stringptr")
+        self.dst = dst
+        if dst == 0:
+            self.txt = None
+            return
+        for i in asp.find(lo=self.dst):
+            t = getattr(i, "txt", None)
+            if t:
+                self.txt = i.txt
+                return
+        t = Txt(asp, self.dst, *args, **kwargs)
+        self.txt = t.txt
+
+    def render(self):
+        if self.txt is None:
+            return ".STRPTR\tNULL"
+        return ".STRPTR\t" + "»" + self.txt + "«"
+
 def stringify(asp, lo, length=None, term=None, charset=None):
     if term is None:
         term = (0,)
@@ -135,10 +176,23 @@ def stringify(asp, lo, length=None, term=None, charset=None):
             if length == 0:
                 return lo, s
 
-class Txt(Data):
-    def __init__(self, asp, lo, hi=None,
-        label=True, pfx=None, align=1, splitnl=False, **kwargs):
+class Text(DataABC):
+
+    def __init__(
+        self,
+        asp,
+        lo,
+        hi=None,
+        width=None,
+        label=False,
+        pfx=None,
+        align=1,
+        splitnl=False,
+        **kwargs
+    ):
         self.splitnl = splitnl
+        if hi is None and width is not None:
+            hi = lo + width
         self.pre = ""
         if pfx == 1:
             x = asp[lo]
@@ -173,21 +227,98 @@ class Txt(Data):
 
     def render(self):
         if not self.splitnl:
-            return ".TXT\t" + self.pre + "'" + self.txt + "'"
+            yield ".TXT\t" + self.pre + "'" + self.txt + "'"
+            return
 
         l = self.txt.split('\\n')
         if len(l) == 1:
-            return ".TXT\t" + self.pre + "'" + self.txt + "'"
+            yield ".TXT\t" + self.pre + "'" + self.txt + "'"
+            return
 
         txt = ''
         p = self.pre
 
-        for i in l[:-1]:
-            txt += '.TXT\t' + p + "'" + i + "\\n'\n"
-            p = ''
-        if l[-1]:
-            txt += '.TXT\t' + p + "'" + l[-1] + "'"
-        return txt
+        for i in l[:]:
+            yield '.TXT\t' + p + "'" + i + "\\n'"
 
     def arg_render(self):
         return "'" + self.txt + "'"
+
+class Txt(Text):
+
+    def __init__(self, *args, label=True, **kwargs):
+        super().__init__(*args, label=label, **kwargs)
+        self.insert()
+
+    def render(self):
+        return "\n".join(super().render())
+
+
+#######################################################################
+
+class Bu8(DataABC):
+    def __init__(self, asp, lo):
+        super().__init__(asp, lo, lo+1)
+        self.val = asp[lo]
+
+    def render(self):
+        yield "0x%02x" % self.val
+
+class Bu16(DataABC):
+    def __init__(self, asp, lo):
+        super().__init__(asp, lo, lo+2)
+        self.val = self.tree.bu16(self.lo)
+
+    def render(self):
+        yield "0x%04x" % self.val
+
+class Bu32(DataABC):
+    def __init__(self, asp, lo):
+        super().__init__(asp, lo, lo+4)
+        self.val = self.tree.bu32(self.lo)
+
+    def render(self):
+        yield "0x%08x" % self.val
+
+class Struct(datastruct.Struct, DataABC):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, naked=True, **kwargs)
+
+    def number_field(self, offset, width):
+        return DataABC(self.tree, offset, offset + width, t="struct")
+
+    def base_init(self, **kwargs):
+        DataABC.__init__(self, self.tree, self.lo, hi=self.hi, **kwargs)
+
+def Array(count, what, **kwargs):
+    return datastruct.Array(Struct, count, what, **kwargs)
+
+class Pointer(DataABC):
+
+    NOWHERE=(0,)
+
+    def __init__(self, *args, target=None, **kwargs):
+        assert isinstance(self.dst, int)
+        super().__init__(*args, **kwargs)
+        self.target = target
+
+    def render(self):
+        if self.dst in self.NOWHERE:
+            yield self.tree.apct % self.dst
+        else:
+            yield self.tree.adr(self.dst)
+
+    def commit(self):
+        if self.target is None:
+            return
+        if self.dst in self.NOWHERE:
+            return
+        for obj in self.tree.find(self.dst):
+            if isinstance(obj, self.target):
+                return
+        self.target(self.tree, self.dst).insert()
+
+    @classmethod
+    def to(cls, target):
+        return (cls, {"target": target})
