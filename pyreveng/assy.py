@@ -254,7 +254,7 @@ class Instree_disass(code.Decoder):
             self.codeptr = self.codeptr_lu32
         elif endian == ">" and abits == 32:
             self.codeptr = self.codeptr_bu32
-        elif abits == 8:
+        else:
             self.codeptr = self.codeptr_8
 
         self.flow_check = []
@@ -324,7 +324,7 @@ class Instree_disass(code.Decoder):
             lo = 0
             hi = 1 << bits
         if aspace is None:
-            aspace = mem.MemMapper(lo, hi, name=desc)
+            aspace = mem.MemMapper(lo, hi, name=desc, cx=self)
         self.aspace[name] = aspace
         if name == "mem":
             self.m = aspace
