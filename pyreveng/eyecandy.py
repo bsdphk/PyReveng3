@@ -63,6 +63,90 @@ class GraphVzPartition():
             self.cg_dot_plot(cg, output_dir)
 
         self.make_index_html()
+        self.make_top_dot(partition)
+
+    def make_top_dot(self, partition):
+
+        self.rendered = dict()
+        self.incoming = dict()
+        self.outgoing = dict()
+        for cg in sorted(partition.groups):
+            for color in cg.colors:
+                for stretch in sorted(color.stretches):
+                    for edge in stretch.edges_out:
+                        if not edge.dst:
+                            continue
+                        if edge.dst.codegroup == cg:
+                            continue
+                        self.make_top_edge(cg, edge.dst.codegroup)
+
+        limit = 10 
+        self.hidden = set()
+
+        self.make_top_prune_leaves()
+        while self.make_top_prune():
+            continue
+
+        with open(self.output_dir + "/top.dot", "w", encoding="utf8") as fo:
+            fo.write('digraph {\n')
+            fo.write('rankdir=LR\n')
+            for a, b in self.rendered.items():
+                if b is not False:
+                    continue
+                assert a not in self.hidden
+                fo.write('CG%x [shape=plaintext,label="%s"] # %d %d\n' % (a, cg.asp.adr(a), self.incoming[a], self.outgoing[a]))
+            for a, b in self.rendered.items():
+                if b is not True:
+                    continue
+                i, j = a
+                assert j not in self.hidden
+                if self.incoming[j] <= limit:
+                    fo.write('CG%x -> CG%x\n' % (i, j))
+            fo.write('}\n')
+        self.rendered = None
+
+    def make_top_prune_leaves(self):
+        for a, b in self.outgoing.items():
+            if b == 0:
+                 self.hidden.add(a)
+        for a, b in list(self.rendered.items()):
+            if b is False and a in self.hidden:
+                 del self.rendered[a]
+            if b is True and a[1] in self.hidden:
+                 
+                 del self.rendered[a]
+
+    def make_top_prune(self):
+        retval = False
+        return retval
+        for a, b in list(self.rendered.items()):
+            if b is False:
+                if self.outgoing[a] == 0 and a not in self.hidden:
+                     self.hidden.add(a)
+                     retval = True
+            elif 0:
+                i, j = a
+                if j in hidden:
+                     del self.rendered[a]
+                     retval = True
+        return retval
+
+    def make_top_edge(self, cg1, cg2):
+        key = (cg1.lo, cg2.lo)
+        if key in self.rendered:
+            return
+        self.rendered[key] = True
+        self.make_top_cg(cg1)
+        self.make_top_cg(cg2)
+        self.outgoing[cg1.lo] += 1
+        self.incoming[cg2.lo] += 1
+
+    def make_top_cg(self, cg):
+        if cg.lo in self.rendered:
+            return
+        self.rendered[cg.lo] = False
+        self.incoming[cg.lo] = 0
+        self.outgoing[cg.lo] = 0
 
     def make_index_html(self):
         ''' Make a very simple index.html file '''
@@ -292,7 +376,7 @@ class GraphVzPartition():
 
         try:
             before = open(filename).read()
-        except IndexError:
+        except FileNotFoundError:
             before = ""
 
         after = open(filename + ".tmp").read()
