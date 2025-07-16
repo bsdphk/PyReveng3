@@ -168,11 +168,16 @@ class ListLeaf(List):
         else:
             pil = None
 
+        g = self.leaf.render()
+        if isinstance(g, str):
+            lines = tolines(g)
+        else:
+            lines = list(g)
         return self.lst.format(
             fo,
             self.lo,
             self.hi,
-            tolines(self.leaf.render()),
+            lines,
             pil,
             self.leaf.compact,
         )
@@ -225,17 +230,28 @@ class Listing():
         if self.blanks is None:
             self.blanks = self.ncol * 2
 
-        self.x_label = None
-        for _n in range(10):
-            for _mem, i, j in self.asp.segments():
+        # Find the width of the address+data column by probing one leaf
+        # in each mapped address space
+        votes = set()
+        votes.add(8)
+        for map, i, j in self.asp.segments():
+            for n, leaf in enumerate(map):
+                a0 = leaf.lo + i
+                print("  ", hex(a0))
                 try:
-                    t = int(random.uniform(i, j))
-                    self.x_label = len((self.fmt_adr(t, t + self.ncol) + "\t").expandtabs())
+                    votes.add(
+                        len(
+                            (
+                                self.fmt_adr(a0, a0 + self.ncol) +
+                                "\t"
+                            ).expandtabs()
+                        )
+                    )
                     break
                 except mem.MemError:
                     continue
-            if self.x_label is not None:
-                break
+        self.x_label = max(votes)
+
         self.x_leaf = self.x_label + 8
         self.x_lcmt = self.x_leaf + self.leaf_width
         self.x_pil = self.x_lcmt + 16
@@ -260,6 +276,7 @@ class Listing():
         ] + [
             ListLabel(self, adr, l) for adr, l in asp.get_all_labels() if adr in self
         ] + [
+            # XXX: this unintentionally sorts linecomments by contents
             ListLineComment(self, adr, l) for adr, l in asp.get_all_line_comments() if adr in self
         ] + [
             ListLeaf(self, leaf) for leaf in asp if leaf.lo in self
@@ -420,11 +437,18 @@ class Listing():
     def __contains__(self, adr):
         return self.lo <= adr < self.hi
 
-def Example(func, **kwargs):
+def Example(func, fn=None, **kwargs):
     nm, ms = func()
     rv = []
+    if fn is not None:
+        fo = open(fn, "w")
+    else:
+        fo = None
     for n, m in enumerate(ms):
-        fn="/tmp/_%s.%02d.asm" % (nm, n)
-        rv.append(fn)
-        Listing(m, fn=fn, **kwargs)
+        if fo is None:
+            fno="/tmp/_%s.%02d.asm" % (nm, n)
+            rv.append(fno)
+            Listing(m, fn=fno, **kwargs)
+        else:
+            Listing(m, fo=fo, **kwargs)
     return rv
