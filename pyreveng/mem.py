@@ -45,7 +45,7 @@ import ctypes
 
 from pyreveng import bintree, leaf
 
-DEFINED = (1 << 7)
+DEFINED_FLAG = 1 << 7
 
 def mapped(x):
     ''' Decorator to mark methods which should be "exported" up to MemMapper'''
@@ -53,6 +53,7 @@ def mapped(x):
     return x
 
 class MemError(Exception):
+    ''' Make it easy to spot when addresses are not as expected '''
 
     def __init__(self, adr, reason):
         super().__init__()
@@ -64,7 +65,8 @@ class MemError(Exception):
         return repr(self.value)
 
 class Range():
-    ''' A range grouping '''
+    ''' Document, indent or hide a range addresses in the listing '''
+
     def __init__(self, lo, hi, txt, indent=False, visible=True):
         self.lo = lo
         self.hi = hi
@@ -90,9 +92,10 @@ class AddressSpace():
         self.lo = lo
         self.hi = hi
         self.name = name
-        self.lbl_d = dict()
-        self.bcmt_d = dict()
-        self.lcmt_d = dict()
+        self.lbl_d = {}
+        self.lbl_n = {}
+        self.bcmt_d = {}
+        self.lcmt_d = {}
         self.rangelist = []
         self.t = bintree.BinTree(self.lo, self.hi)
         nxdig = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
@@ -137,6 +140,7 @@ class AddressSpace():
         raise MemError(adr, "Undefined")
 
     def gaps(self):
+        ''' yield the gaps between things we have explained '''
         ll = self.lo
         for i in sorted(self):
             if i.lo > ll:
@@ -158,6 +162,7 @@ class AddressSpace():
     def set_label(self, adr, lbl):
         assert isinstance(lbl, str)
         self.lbl_d.setdefault(adr, []).append(lbl)
+        self.lbl_n[lbl] = adr
 
     def set_first_label(self, adr, lbl):
         ''' Set label, if none exists already '''
@@ -165,6 +170,11 @@ class AddressSpace():
         i = self.lbl_d.get(adr)
         if not i:
             self.lbl_d.setdefault(adr, []).append(lbl)
+            self.lbl_n[lbl] = adr
+
+    def get_adr_from_label(self, lbl):
+        ''' Get address of label (or None) '''
+        return self.lbl_n.get(lbl)
 
     def get_labels(self, adr):
         i = self.lbl_d.get(adr)
@@ -220,12 +230,34 @@ class AddressSpace():
 
 class MemMapper(AddressSpace):
 
-    def __init__(self, lo, hi, **kwargs):
+    '''
+       An abstract address space into which other address spaces are mapped
+
+       This is the workhorse, for instace the Z-80 CPU has two of these,
+       one for its memory space (0x0000…0xffff) and one for its I/O space
+       (0x00…0xff).  If the system has an EPROM, that is loaded into its
+       own ByteMem and mapped into the memory space at the proper address.
+
+       The point of this indirection is that systems can have multiple
+       instruction interpreters which contribute the same memory, but
+       see it at different addresses.
+
+       When a system has memory overlays or bank-switching, each view will
+       have its own MemMapper, filled accordingly.
+    '''
+
+    def __init__(self, lo, hi, cx=None, **kwargs):
+        # Re: cx argument:
+        # In general memories should know nothing about code execution, but
+        # the mapper is typically associated with just one single instruction
+        # interpreter, so it makes sense to offer a backpointer to that, to
+        # bring methods such as cx.codeptr() in reach.
         super().__init__(lo, hi, **kwargs)
         self.mapping = []
         self.seglist = []
         self.bits = 0
         self.xlat = self.xlat0
+        self.cx = cx
 
     def __repr__(self):
         return "<MemMapper %s 0x%x-0x%x>" % (self.name, self.lo, self.hi)
@@ -391,6 +423,8 @@ class MemMapper(AddressSpace):
         self.set_something("set_first_label", *args)
 
     def set_label(self, *args):
+        adr, lbl = args
+        self.lbl_n[lbl] = adr
         self.set_something("set_label", *args)
 
     def get_labels(self, *args):
@@ -398,7 +432,6 @@ class MemMapper(AddressSpace):
 
     def get_all_labels(self):
         yield from self.get_all_somethings("get_all_labels")
-
 
     def set_line_comment(self, *args):
         self.set_something("set_line_comment", *args)
@@ -525,7 +558,7 @@ class WordMem(AddressSpace):
     def __getitem__(self, adr):
         """Read location"""
         b = self._off(adr)
-        if not self.a[b] & DEFINED:
+        if not self.a[b] & DEFINED_FLAG:
             raise MemError(adr, "Undefined")
         return self.m[b]
 
@@ -535,7 +568,7 @@ class WordMem(AddressSpace):
             raise MemError(adr, "Data too wide (0x%x)" % dat)
         b = self._off(adr)
         self.m[b] = self.mt(dat)
-        self.a[b] |= DEFINED
+        self.a[b] |= DEFINED_FLAG
 
     def wr(self, adr, dat):
         self[adr] = dat
