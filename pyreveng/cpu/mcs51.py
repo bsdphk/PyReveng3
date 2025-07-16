@@ -339,7 +339,7 @@ class MCS51(assy.Instree_disass):
         self.add_as("bit", aspace=BitSpace(0x00, 0x100, "BITSPACE", self.as_data))
 
         self.it.load_string(MCS51_DESC, MCS51_Ins)
-        self.verbatim += ("A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC")
+        self.verbatim += ("A", "AB", "C", "DPTR", "@A+DPTR", "@A+PC", "@DPTR")
         self.define_bits(
             0x80,
             "P0",
