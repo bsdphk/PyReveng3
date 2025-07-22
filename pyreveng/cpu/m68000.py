@@ -531,7 +531,7 @@ NEG		Z,ea		037d	|0 1 0 0|0 1 0|0| sz| ea	| {
 # 249/4-146
 NEGX		Z,ea		037d	|0 1 0 0|0 0 0|0| sz| ea	|
 # 251/4-147
-NOP		-		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1| {
+NOP		nopcnt		0000	|0 1 0 0|1 1 1|0 0 1|1 1 0|0 0 1| {
 	%0 = i32 0
 }
 # 252/4-148
@@ -1281,6 +1281,17 @@ class m68000_ins(assy.Instree_ins):
 
     def assy_word(self):
         return "#0x%04x" % self['word']
+
+    def assy_nopcnt(self):
+        cnt = 1
+        while self.lang.m.bu16(self.hi) == 0x4e71:
+            cnt += 1
+            self.hi += 2
+        if cnt > 1:
+            self.compact = True
+            return "*0x%x" % cnt
+        else:
+            return None
 
     def assy_Z(self):
         if self['sz'] == 3:
