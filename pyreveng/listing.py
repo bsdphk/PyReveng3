@@ -130,10 +130,10 @@ class ListBlockComment(List):
 class ListLineComment(List):
     def __init__(self, lst, lo, lcmt):
         super().__init__(lst, lo, lo, 50)
-        self.lcmt = set(lcmt)
+        self.lcmt = list(lcmt)
 
     def render(self, _fo, _lst):
-        for i in sorted(self.lcmt):
+        for i in self.lcmt:
             for j in tolines(i):
                 self.lst.lcmts.append(j.rstrip())
 
@@ -275,7 +275,6 @@ class Listing():
         ] + [
             ListLabel(self, adr, l) for adr, l in asp.get_all_labels() if adr in self
         ] + [
-            # XXX: this unintentionally sorts linecomments by contents
             ListLineComment(self, adr, l) for adr, l in asp.get_all_line_comments() if adr in self
         ] + [
             ListLeaf(self, leaf) for leaf in asp if leaf.lo in self
