@@ -17,7 +17,11 @@ import html
 
 from pyreveng import code
 
+# Split jump arrows if a stretch has more than this many predecessors
 INFLOW_SPLIT = 20
+
+# Summarize same src-dst arrows with a count above this number
+ONLY_COUNT_ARROWS = 7
 
 class AddBlockComments():
 
@@ -172,7 +176,7 @@ class GraphVzPartition():
             fo.write('</body>\n')
             fo.write('</html>\n')
 
-    def edge_dot_edge_out(self, edge, fo):
+    def edge_dot_edge_out(self, edge, fo, label=None):
         ''' Render outgoing edge '''
 
         n = "O_%x" % edge.src.lo
@@ -180,7 +184,9 @@ class GraphVzPartition():
 
         a = []
         na = []
-        if edge.flow.cond not in (None, True):
+        if label is not None:
+            a.append('label="%s"' % label)
+        elif edge.flow.cond not in (None, True):
             a.append('label="%s"' % str(edge.flow.cond))
 
         if isinstance(edge.flow, code.Return):
@@ -193,7 +199,10 @@ class GraphVzPartition():
             elif edge.dst:
                 na.append('shape=plain')
                 na.append('style=filled')
-                na.append('label="%s"' % "\\l".join(sorted(edge.dst.names())))
+                i = "\\l".join(sorted(edge.dst.names()))
+                if len(i) == 0:
+                    i = edge.dst.asp.adr(edge.dst.lo)
+                na.append('label="%s"' % i)
                 if not edge.is_local():
                     na.append('color="#eeeeee"')
                     na.append('href="_%x.html"' % edge.dst.codegroup.lo)
@@ -272,6 +281,7 @@ class GraphVzPartition():
 
         i_calls = []
         i_jumps = []
+        ci_jumps = set()
         e_calls = []
         e_jumps = []
         for i in stretch.edges_in:
@@ -282,6 +292,7 @@ class GraphVzPartition():
                     e_calls.append(i)
             if isinstance(i.flow, code.Jump):
                 if i.is_local():
+                    ci_jumps.add(i.src)
                     i_jumps.append(i)
                 else:
                     e_jumps.append(i)
@@ -290,7 +301,7 @@ class GraphVzPartition():
             n = 'IC_%x' % stretch.lo
             fo.write(n + ' [shape=plaintext, label=""]\n')
             fo.write(n + ' -> N_%x' % stretch.lo + ' [dir=back,arrowtail="odot"]\n')
-        if len(i_jumps) >= INFLOW_SPLIT:
+        if len(ci_jumps) >= INFLOW_SPLIT:
             n = 'IJ_%x' % stretch.lo
             fo.write(n + ' [shape=plaintext, label=""]\n')
             fo.write(n + ' -> N_%x' % stretch.lo + ' [dir=back,arrowtail="oinv"]\n')
@@ -329,10 +340,25 @@ class GraphVzPartition():
     def stretch_dot_edges_out(self, stretch, fo):
         ''' Render any outgoing edges not yet rendered '''
 
+        # If there are too many edges to the same destination
+        # draw a single arrow, labled with the count
+        dcount = {}
         for edge in stretch.edges_out:
-            if edge not in self.rendered:
-                self.edge_dot_edge_out(edge, fo)
-                self.rendered.add(edge)
+            n = dcount.get(edge.dst, 0)
+            dcount[edge.dst] = n + 1
+
+        for edge in stretch.edges_out:
+            if edge in self.rendered:
+                continue
+            self.rendered.add(edge)
+            if edge.dst not in dcount:
+                continue
+            c = dcount[edge.dst]
+            if c >= ONLY_COUNT_ARROWS:
+                self.edge_dot_edge_out(edge, fo, "[*%d]" % c)
+                del dcount[edge.dst]
+                continue
+            self.edge_dot_edge_out(edge, fo)
 
     def color_dot_plot(self, color, fo):
         ''' render the nodes of a color '''
