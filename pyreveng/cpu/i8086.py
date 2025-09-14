@@ -153,7 +153,7 @@ XOR	ea,r	|0 0 1 1 0 0|1|w|mod| reg | rm  |
 #XOR	-	|1 0 0 0 0 0|0|1|mod|1 1 0| rm  | d1		| d2		|
 #XOR	-	|1 0 0 0 0 0|s|w|mod|1 1 0| rm  | d1		|
 XOR	W,i2,a	|0 0 1 1 0 1 0|1| i1		| i2		|
-XOR	B,ii,a	|0 0 1 1 0 1 0|0| i1		|
+XOR	B,i1,a	|0 0 1 1 0 1 0|0| i1		|
 #
 REPNZ	-	|1 1 1 1 0 0 1|0|
 REP	-	|1 1 1 1 0 0 1|1|
@@ -526,6 +526,8 @@ PUSH	i1	|0 1 1 0 1 0 1 0| i1		|
 IMUL	-	|0 1 1 0 1 0 1 1|mod| reg | rm  | mdata		|
 ENTER	-	|1 1 0 0 1 0 0 0| elow		| ehigh		| el		|
 LEAVE	-	|1 1 0 0 1 0 0 1|
+PUSHA	-	|0 1 1 0 0 0 0 0|
+POPA	-	|0 1 1 0 0 0 0 1|
 
 ROL	ea,i1	|1 1 0 0 0 0 0|w|mod|0 0 0| rm  | i1		|
 ROR	ea,i1	|1 1 0 0 0 0 0|w|mod|0 0 1| rm  | i1		|
