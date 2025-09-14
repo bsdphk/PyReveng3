@@ -222,7 +222,7 @@ class Text(DataABC):
                     lbl += i
                 elif lbl[-1] != '_':
                     lbl += '_'
-            asp.set_label(lo, lbl)
+            asp.set_first_label(lo, lbl)
         self.compact = True
 
     def render(self):
@@ -268,6 +268,14 @@ class Bu16(DataABC):
     def __init__(self, asp, lo):
         super().__init__(asp, lo, lo+2)
         self.val = self.tree.bu16(self.lo)
+
+    def render(self):
+        yield "0x%04x" % self.val
+
+class Lu16(DataABC):
+    def __init__(self, asp, lo):
+        super().__init__(asp, lo, lo+2)
+        self.val = self.tree.lu16(self.lo)
 
     def render(self):
         yield "0x%04x" % self.val
