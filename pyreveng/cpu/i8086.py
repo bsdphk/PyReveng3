@@ -442,7 +442,11 @@ class i8086_ins(assy.Instree_ins):
         self.seg = self['slo'] | (self['shi'] << 8)
         self.off = self['alo'] | (self['ahi'] << 8)
         self.dstadr = (self.seg << 4) + self.off
-        return "0x%04x:0x%04x" % (self.seg, self.off)
+        return assy.Arg_dst(
+            self.lang.m,
+            self.dstadr,
+            "0x%04x:0x%04x " % (self.seg, self.off)
+        )
 
     def assy_ea(self):
         s = self.seg
