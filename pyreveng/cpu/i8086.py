@@ -514,3 +514,60 @@ class i8086(assy.Instree_disass):
 
     def has_8087(self):
         self.add_ins(i8087_desc, i8086_ins)
+
+i80186_desc="""
+PUSH	i2	|0 1 1 0 1 0 0 0| i1		| i2		|
+IMUL	-	|0 1 1 0 1 0 0 1|mod| reg | rm  | mdatalow	| mdatahigh	|
+PUSH	i1	|0 1 1 0 1 0 1 0| i1		|
+IMUL	-	|0 1 1 0 1 0 1 1|mod| reg | rm  | mdata		|
+ENTER	-	|1 1 0 0 1 0 0 0| elow		| ehigh		| el		|
+LEAVE	-	|1 1 0 0 1 0 0 1|
+
+ROL	ea,i1	|1 1 0 0 0 0 0|w|mod|0 0 0| rm  | i1		|
+ROR	ea,i1	|1 1 0 0 0 0 0|w|mod|0 0 1| rm  | i1		|
+RCL	ea,i1	|1 1 0 0 0 0 0|w|mod|0 1 0| rm  | i1		|
+RCR	ea,i1	|1 1 0 0 0 0 0|w|mod|0 1 1| rm  | i1		|
+SHL	ea,i1	|1 1 0 0 0 0 0|w|mod|1 0 0| rm  | i1		|
+SHR	ea,i1	|1 1 0 0 0 0 0|w|mod|1 0 1| rm  | i1		|
+SAR	ea,i1	|1 1 0 0 0 0 0|w|mod|1 1 1| rm  | i1		|
+
+ADD	ea,i1	|1 0 0 0 0 0 0|w|mod|0 0 0| rm  | i1		|
+OR	ea,i1	|1 0 0 0 0 0 0|w|mod|0 0 1| rm  | i1		|
+ADC	ea,i1	|1 0 0 0 0 0 0|w|mod|0 1 0| rm  | i1		|
+SBB	ea,i1	|1 0 0 0 0 0 0|w|mod|0 1 1| rm  | i1		|
+SUB	ea,i1	|1 0 0 0 0 0 0|w|mod|1 0 1| rm  | i1		|
+XOR	ea,i1	|1 0 0 0 0 0 0|w|mod|1 1 0| rm  | i1		|
+"""
+
+i80186_desc = fixup_mod_reg_rm(i80186_desc)
+
+class i80186_ins(i8086_ins):
+    ''' ... '''
+
+class i80186(assy.Instree_disass):
+
+    def __init__(self):
+        super().__init__(
+            "i80186",
+            ins_word=8,
+            abits=20,
+        )
+        self.add_as("io", "I/O", bits=16)
+        self.add_ins(i8086_desc, i8086_ins)
+        self.add_ins(i80186_desc, i80186_ins)
+        self.segment_assumes = {
+            "cs": [],
+            "ss": [],
+            "ds": [],
+            "ss": [],
+        }
+
+    def what_is_segment(self, seg, adr):
+        for lo, hi, val in self.segment_assumes[seg]:
+            if lo <= adr < hi:
+                 return val
+        return None
+
+    def assume(self, seg, lo, hi, val):
+        self.segment_assumes[seg].append([lo, hi, val])
+        
