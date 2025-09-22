@@ -377,6 +377,8 @@ class i8086_ins(assy.Instree_ins):
         if d & 0x80:
             d -= 256
         self.dstadr = self.hi + d
+        if self.mne[0] == "J":
+            self.cc = self.mne[1:]
         return assy.Arg_dst(self.lang.m, self.dstadr)
 
     def assy_cs(self):
@@ -521,9 +523,9 @@ class i8086(assy.Instree_disass):
 
 i80186_desc="""
 PUSH	i2	|0 1 1 0 1 0 0 0| i1		| i2		|
-IMUL	-	|0 1 1 0 1 0 0 1|mod| reg | rm  | mdatalow	| mdatahigh	|
+IMUL	W,ea,i2	|0 1 1 0 1 0 0 1|mod| reg | rm  | i1		| i2		|
+IMUL	B,ea,i1	|0 1 1 0 1 0 1 1|mod| reg | rm  | i1		|
 PUSH	i1	|0 1 1 0 1 0 1 0| i1		|
-IMUL	-	|0 1 1 0 1 0 1 1|mod| reg | rm  | mdata		|
 ENTER	-	|1 1 0 0 1 0 0 0| elow		| ehigh		| el		|
 LEAVE	-	|1 1 0 0 1 0 0 1|
 PUSHA	-	|0 1 1 0 0 0 0 0|
