@@ -236,12 +236,11 @@ class Listing():
         votes.add(8)
         for map, i, j in self.asp.segments():
             for n, leaf in enumerate(map):
-                a0 = leaf.lo + i
                 try:
                     votes.add(
                         len(
                             (
-                                self.fmt_adr(a0, a0 + self.ncol) +
+                                self.fmt_adr(leaf.lo, leaf.lo + self.ncol) +
                                 "\t"
                             ).expandtabs()
                         )
