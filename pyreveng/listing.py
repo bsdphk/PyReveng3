@@ -234,13 +234,13 @@ class Listing():
         # in each mapped address space
         votes = set()
         votes.add(8)
-        for map, i, j in self.asp.segments():
-            for n, leaf in enumerate(map):
+        for map, map_lo, map_hi in self.asp.segments():
+            for leaf in map:
                 try:
                     votes.add(
                         len(
                             (
-                                self.fmt_adr(leaf.lo, leaf.lo + self.ncol) +
+                                self.fmt_adr(map_lo + leaf.lo, map_lo + leaf.lo + self.ncol) +
                                 "\t"
                             ).expandtabs()
                         )
@@ -248,6 +248,7 @@ class Listing():
                     break
                 except mem.MemError:
                     continue
+
         self.x_label = max(votes)
 
         self.x_leaf = self.x_label + 8
@@ -258,7 +259,7 @@ class Listing():
         t = tabto(t, self.x_lcmt) + "|LCMT"
         if self.pil:
             t = tabto(t, self.x_pil) + "|PIL"
-        # fo.write(t + '\n')
+        # self.fo.write(t + '\n')
 
 
         self.plan = [
