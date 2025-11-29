@@ -259,7 +259,7 @@ class GraphVzPartition():
                 fo.write('<TR><TD ALIGN="left"')
             else:
                 fo.write('<TR><TD ALIGN="left"')
-                j = html.escape(i.render().rstrip().expandtabs())
+                j = '</TD></TR>\n<TR><TD align="left">'.join(html.escape(x) for x in i.render())
             f = None
             for x in i.flow_out:
                 if not isinstance(x, code.Call):
