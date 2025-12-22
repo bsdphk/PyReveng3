@@ -68,7 +68,7 @@ from pyreveng import assy, data, code
 
 r1000_desc = """
 
-QQUnknown		-						| unknown			|
+Illegal			-						| illegal			|
 
 # No comments means present in both 2fa0095f7 emulation and a9d4fb5bd
 
@@ -249,7 +249,8 @@ Execute			Any,Is_Initialization_Repeated			| 0110				|
 Execute			Any,Has_Repeated_Initialization			| 0111				|
 Execute			Any,Make_Constrained				| 0112				|
 
-Execute			Heap_Access,Size				| 0113				|
+# M207_54.M200_UCODE has 0113 as Illegal
+# Execute		Heap_Access,Size				| 0113				|
 
 Execute			Access,Size					| 0114				|
 
@@ -351,14 +352,16 @@ Execute			Record,Not_Equal				| 017E				|
 Execute			Record,Equal					| 017F				|
 
 # a9d4fb5bd has comment "!unimplemented"
-Execute			Subvector,Structure_Write			| 0188				|
+# M207_54.M200_UCODE has 0188 as Illegal
+# Execute		Subvector,Structure_Write			| 0188				|
 
 Execute			Subvector,Field_Reference			| 0189				|
 Execute			Subvector,Field_Write				| 018A				|
 Execute			Subvector,Field_Read				| 018B				|
 
 # a9d4fb5bd has comment "!unimplemented"
-Execute			Subarray,Structure_Write			| 018C				|
+# M207_54.M200_UCODE has 018c as Illegal
+# Execute		Subarray,Structure_Write			| 018C				|
 
 Execute			Subarray,Field_Reference			| 018D				|
 Execute			Subarray,Field_Write				| 018E				|
@@ -945,33 +948,18 @@ Load			llvl,ldelta					|1 1 1| llvl  | ldelta		|
 # Instructions decoded by M207_54.M200_UCODE but not explained elsewhere
 ucode_desc = """
 
-
-QQUnknown		InMicrocode					| 0001				|
-QQUnknown		InMicrocode					| 0002				|
-QQUnknown		InMicrocode					| 0003				|
-QQUnknown		InMicrocode					| 0004				|
-QQUnknown		InMicrocode					| 0005				|
-QQUnknown		InMicrocode					| 0006				|
-
-QQUnknown		InMicrocode					| 0009				|
-QQUnknown		InMicrocode					| 000A				|
-QQUnknown		InMicrocode					| 000B				|
-QQUnknown		InMicrocode					| 000C				|
-QQUnknown		InMicrocode					| 000D				|
-QQUnknown		InMicrocode					| 000E				|
-QQUnknown		InMicrocode					| 000F				|
-
+Halt			InMicrocode					| 0010				|
 
 # a9d4fb5bd has comment "- temporarily being used for performance analysis"
 QQUnknown		InMicrocode					|0 0 0 0|0 0 0 0|0 0 0 1| x	|
 
 # Same Microcode as 0x0145 Execute Heap_Access,Diana_Tree_Kind
 QQUnknown		InMicrocode					| 0070				|
-
 QQUnknown		InMicrocode					| 0071				|
 QQUnknown		InMicrocode					| 0072				|
 QQUnknown		InMicrocode					| 0073				|
 QQUnknown		InMicrocode					| 0074				|
+
 QQUnknown		InMicrocode					| 0075				|
 QQUnknown		InMicrocode					| 0076				|
 
