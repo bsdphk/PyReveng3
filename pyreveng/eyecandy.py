@@ -27,28 +27,28 @@ class AddBlockComments():
 
     def __init__(self, partition):
         for cg in sorted(partition.groups):
-            if len(cg.colors) > 1:
-                continue
-            cg.asp.set_block_comment(cg.lo, 'Comes from:')
-            count = 0
             for stretch in cg.stretches:
+                bcl = []
                 for edge in stretch.edges_in:
                     if edge.is_local():
                         continue
                     if not edge.src:
                         continue
-                    count += 1
                     color = edge.src.color
                     l = [ "   " ]
-                    l.append(cg.asp.adr(color.lo))
-                    if color.lo != edge.flow.fm.lo:
-                        l.append("@" + cg.asp.adr(edge.flow.fm.lo))
-                    l.append(str(edge.flow.typ))
+                    l.append(cg.asp.afmt(edge.flow.fm.lo))
                     if edge.flow.cond not in (None, True):
-                        l.append(str(edge.flow.cond))
-                    cg.asp.set_block_comment(cg.lo, " ".join(l))
-            if count == 0:
-                cg.asp.set_block_comment(cg.lo, "    (unknown)")
+                        l.append(str(edge.flow.typ) + " " + edge.flow.cond)
+                    else:
+                        l.append(str(edge.flow.typ))
+                    a = cg.asp.adr(color.lo)
+                    if a != l[1]:
+                        l[-1] = l[-1].ljust(16)
+                        l.append("from color " + a)
+                    bcl.append(" ".join(l))
+                if bcl:
+                    cg.asp.set_block_comment(stretch.lo, 'Comes from:')
+                    cg.asp.set_block_comment(stretch.lo, "\n".join(sorted(bcl)))
            
 
 class GraphVzPartition():
@@ -259,7 +259,10 @@ class GraphVzPartition():
                 fo.write('<TR><TD ALIGN="left"')
             else:
                 fo.write('<TR><TD ALIGN="left"')
-                j = '</TD></TR>\n<TR><TD align="left">'.join(html.escape(x) for x in i.render())
+                x = list(html.escape(x) for x in i.render())
+                j = '</TD></TR>\n<TR><TD align="left">'.join(x)
+                if len(x) > 1:
+                    j += '</TD></TR>\n<TR><TD align="left">----------'
             f = None
             for x in i.flow_out:
                 if not isinstance(x, code.Call):
