@@ -101,7 +101,6 @@ class AddressSpace():
         nxdig = max(len("%x" % self.lo), len("%x" % (self.hi - 1)))
         self.afmtpct = apfx + "%%0%dx" % nxdig + asfx
         self.apct = apfx + "0x%%0%dx" % nxdig + asfx
-        self.apct = apfx + "0x%x" + asfx
 
     def __repr__(self):
         return "<address_space %s 0x%x-0x%x>" % (
