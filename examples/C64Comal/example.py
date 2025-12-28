@@ -1,10 +1,23 @@
 
-from pyreveng import mem, listing, data
+from pyreveng import assy, mem, listing, data
 import pyreveng.cpu.mos6500 as mos6500
 import pyreveng.cpu.banked as banked
 
 NAME = "C64_Comal80"
 NPG = 4
+
+hack_desc = '''
+SKIP	x	| 2C		| A0		|
+SKIP	x	| 2C		| A2		|
+SKIP	x	| 2C		| A9		|
+'''
+
+class hack_ins(assy.Instree_ins):
+    ''' ... '''
+
+    def assy_x(self):
+        # XXX: Figure out proper flow
+        self.hi -= 1
 
 class HiLoTab(data.Struct):
     
@@ -21,8 +34,21 @@ class HiLoTab(data.Struct):
         yield 'HiLoTab {'
         n = 0
         for t,b in zip(self.top, self.bot):
-            yield '    [0x%02x] 0x%02x, 0x%02x' % (n, t.val, b.val)
+            yield '    [0x%02x]: 0x%02x, 0x%02x' % (n, t.val, b.val)
         yield '}'
+
+class ReturnIndexTab(HiLoTab):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dst = list(t.val*256 + b.val + 1 for t,b in zip(self.top, self.bot))
+
+    def render(self):
+        yield 'ReturnIndexTab {'
+        for n, d in enumerate(self.dst):
+            yield '    [0x%02x]: %s' % (n, self.tree.adr(d))
+        yield '}'
+
 
 class ListTab(HiLoTab):
     def __init__(self, tree, lo, count, offset, tokentab):
@@ -197,6 +223,7 @@ class Comal80():
             m3[n] = crt[0xc080 + n]
 
         self.cx = banked.BankedCPU(NPG, mos6500.mos6500)
+        self.cx.add_ins(hack_desc, hack_ins)
         self.cx.bank[0].m.map(m0, lo=0x8000)
         self.cx.bank[1].m.map(m1, lo=0x8000)
         self.cx.bank[2].m.map(m2, lo=0x8000)
@@ -206,39 +233,123 @@ class Comal80():
         self.foo01()
         #self.foo03()
         self.foo04()
+        self.foo05()
+        self.foo06()
+
+    def foo06(self):
+
+        for a, l in (
+            (0x0012, "List_ElementCount"),
+            (0x0089, "List_Ptr"),
+            (0xc65f, "List_Stack-1"),
+            (0xc660, "List_Stack"),
+            (0xc661, "List_Stack+1"),
+            (0xc846, "List_Indent"),
+        ):
+            for b in self.cx.bank:
+                b.m.set_label(a, l)
+
+    def foo05(self):
+
+        for b, a, l in (
+             (1, 0x0038, "CurTokenNo"),
+             (1, 0xb745, "List_AppendOpen_Swap_Join_AppendClose"),
+             (1, 0xb9ef, "ListSwapJoin"),
+             (1, 0xb9f2, "ListJoin"),
+             (1, 0xba21, "ListPushTok"),
+             (1, 0xba77, "ListVarParen_[RIS](X)"),
+             (1, 0xbad2, "ListSwap"),
+             (1, 0xbcae, "ListAppendSpace"),
+             (1, 0xbcab, "ListAppendDoubleQuote"),
+             (1, 0xbcb1, "ListAppendComma"),
+             (1, 0xbcb4, "ListAppendOpenParens"),
+             (1, 0xbcb7, "ListAppendCloseParens"),
+             (1, 0xbcb9, "ListAppend(Y)"),
+             (1, 0xbccb, "ListPrependComma"),
+             (1, 0xbcce, "ListPrependSpace"),
+             (1, 0xbce3, "ListTrimLastChar()"),
+        ):
+             self.cx.bank[b].m.set_label(a, l)
+
+        for b, a, lc in (
+        ):
+             self.cx.bank[b].m.set_line_comment(a, lc)
 
     def foo04(self):
 
-        y = HiLoTab(self.cx.bank[1].m, 0xb960, 0x3f).insert()
+        expl = {
+            0x00: "Nop",
+            0x06: "AppendSpace_PushTok_Join",
+            0x08: "VarParenReal",
+            0x09: "VarParenInt",
+            0x0a: "VarParenString",
+            0x0b: "Join_PushTok_Join",
+            0x0c: "PushTok_Swap_Join",
+            0x0d: "PushTok_Swap_Join_Join",
+            0x0e: "PushTok_AppendSpace_PrependSpace_Swap_Join_Join",
+            0x0f: "PushTok_AppendSpace_Swap_Join",
+            0x10: "PushTok_AppendSpace_Swap_Join_Join",
+            0x11: "PushTok",
+            0x12: "PushTok_Swap_Join_AppendClose",
+            0x13: "PushTok_AppendOpen_Swap_Join_AppendClose",
+            0x14: "PushTok_AppendDollar_AppendOpen_Swap_Join_AppendClose",
+            0x15: "PushTok_AppendSpace",
+            0x16: "PushTok_AppendSpace_Indent2",
+            0x17: "PushTok_AppendSpace_Indent3",
+            0x18: "PushTok_AppendSpace_Indent1",
+            0x19: "TrimLast",
+            0x1a: "StackOp_PushTok_AppendSpace_Swap_Join_Join_AppendColon_AppendSpace",
+            0x1b: "PushTok_AppendOpen_Swap_Join_AppendClose_Join",
+            0x1e: "PushTok_Join",
+            0x20: "Indent4_AppendSpace_PushTok_Join_AppendSpace",
+            0x2a: "Join_AppendColon_PushTok",
+            0x2b: "Error",
+            0x30: "Error",
+            0x32: "PrependComma_Join_PushTok_AppendSpace_Swap_Join",
+            0x34: "Error",
+            0x35: "Error",
+            0x37: "Error",
+            0x38: "Error",
+            0x3b: "Join_AppendColon_AppendSpace",
+            0x3c: "PushTok_AppendDollar",
+            0x3d: "TrimLast_AppendClose_AppendOpen",
+            0x3e: "PrependComma_Join_PushTok_AppendSpace_Swap_Join_AppendComma",
+        }
 
-    def foo03(self):
-        self.f2 = [0] * 64
-        self.foo02(0, self.tab_list_1, self.tab_list_2)
-        for i in range(0x100, 0x114):
-            print("NI %03x" % i)
-        self.foo02(0x114, self.tab_list_3, self.tab_list_4)
-        for n, i in enumerate(self.f2):
-            if not i:
-                continue
-            print("%02x" % n, i)
+        y = ReturnIndexTab(self.cx.bank[1].m, 0xb960, 0x3f).insert()
+        self.cx.bank[1].m.set_label(y.lo, "StackOpTbl[0x3f]")
+        for n, adr in enumerate(y.dst):
+             self.cx.bank[1].disass(adr)
+             lbl = expl.get(n)
+             if lbl:
+                 self.cx.bank[1].m.set_label(adr, "StackOp_%s_[0x%02x]" % (lbl, n))
+             else:
+                 self.cx.bank[1].m.set_label(adr, "StackOp[0x%02x]" % n)
 
     def foo00(self):
         self.lextokens = data.Array(
-            173,
+            0xad,
             (data.Text, {"pfx": 1,}),
             vertical=True,
         )(
             self.cx.bank[1].m,
             0x8009,
         ).insert()
-        return
-        ptr = 0x8009
-        self.lextokens = []
-        while ptr < 0x834e:
-            y = data.Text(self.cx.bank[1].m, ptr, pfx=1).insert()
-            self.lextokens.append(y.txt)
-            ptr = y.hi
-        print("LEN", len(self.lextokens))
+        self.cx.bank[1].m.set_label(self.lextokens.lo, "LexTokens[0xad]")
+        data.Bu8(self.cx.bank[1].m, self.lextokens.hi).insert()
+        self.cx.bank[1].m.set_line_comment(self.lextokens.hi, "List terminator")
+
+        with open("/tmp/c64_unicomal_tables.py", "w") as file:
+            file.write("# Machine-generated by PyReveng3\n\n")
+            file.write("TOKENS = [\n")
+            file.write("    None,\n")
+            for n, ltok in enumerate(self.lextokens):
+                if ltok.txt != "\\x00":
+                    file.write(("    '''%s'''," % ltok.txt).ljust(20))
+                else:
+                    file.write(("    None,").ljust(20))
+                file.write(" # 0x%x\n" % (n+1))
+            file.write("]\n")
 
     def foo01(self):
 
@@ -248,104 +359,27 @@ class Comal80():
         self.tab_list_2 = ListTab(self.cx.bank[1].m, 0xb5cc, 44, 0x114, self.lextokens).insert()
         self.cx.bank[1].m.set_label(self.tab_list_2.lo, "TAB_LIST_2")
 
-        return
-
-        self.tab_list_1 = data.Array(
-            255,
-            data.Bu8,
-            vertical=True
-        )(
-            self.cx.bank[1].m,
-            0xb3ce
-        ).insert()
-        self.cx.bank[1].m.set_label(self.tab_list_1.lo, "TAB_LIST_1")
-
-        self.tab_list_2 = data.Array(
-            255,
-            data.Bu8,
-            vertical=True
-        )(
-            self.cx.bank[1].m,
-            0xb4cd
-        ).insert()
-        self.cx.bank[1].m.set_label(self.tab_list_2.lo, "TAB_LIST_2")
-
-        self.tab_list_3 = data.Array(
-            44,
-            data.Bu8,
-            vertical=True
-        )(
-            self.cx.bank[1].m,
-            0xb5b8 + 20
-        ).insert()
-        self.cx.bank[1].m.set_label(self.tab_list_3.lo, "TAB_LIST_3")
-
-        self.tab_list_4 = data.Array(
-            44,
-            data.Bu8,
-            vertical=True
-        )(
-            self.cx.bank[1].m,
-            0xb5e4 + 20
-        ).insert()
-        self.cx.bank[1].m.set_label(self.tab_list_4.lo, "TAB_LIST_4")
-
-    def foo02(self, off, list1, list2):
-
-        #for n, i in enumerate(self.tab_list_1):
-        for n, i in enumerate(list1):
-            tl2 = self.tab_list_2[n]
-            tl2 = list2[n]
-            l = [
-                "NI",
-                "%03x:" % (n+off),
-                "%02x" % i.val,
-                "%02x" % tl2.val,
-                "-",
-                "%02x" % (i.val & 0xc0),
-                "%02x" % (i.val & 0x3f),
-            ]
-            g = self.lextokens[tl2.val - 1].txt
-            if i.val & 0x3f == 0x11:
-                print(*l, 'Push.this("%s"),' % g)
-            elif i.val & 0x3f == 0x0b:
-                g = {
-                    0x00: '""',
-                    0x01: '")"',
-                    0x03: '","',
-                    0x6b: '":"',
-                }.get(tl2.val)
-                print(*l, 'Join.suffix(%s),' % g)
-            elif i.val & 0x3f == 0x0c:
-                print(*l, 'Wrap.inside("%s", ""),' % g)
-            elif i.val & 0x3f == 0x0d:
-                print(*l, 'Join.around("%s"),' % g)
-            elif i.val & 0x3f == 0x0e:
-                print(*l, 'Join.around(" %s "),' % g)
-            elif i.val & 0x3f == 0x0f:
-                print(*l, 'Wrap.inside("%s ", ""),' % g)
-            elif i.val & 0x3f == 0x13:
-                g = '"' + self.lextokens[tl2.val - 1].txt + '("'
-                print(*l, "WRAP.inside", g, '"),"')
-            elif i.val & 0x3f == 0x14:
-                g = '"' + self.lextokens[tl2.val - 1].txt + '$("'
-                print(*l, "WRAP.inside", g, '"),"')
-            elif i.val & 0x3f == 0x15:
-                print(*l, 'Push.this("%s "),' % g)
-            elif i.val & 0x3f == 0x16:
-                print(*l, 'Push.this("%s", indent=-2),' % g)
-            elif i.val & 0x3f == 0x1e:
-                print(*l, 'Wrap.inside("", "%s"),' % g)
-            elif i.val & 0x3f == 0x32:
-                print(*l, 'Join.around(",", pfx="%s "),' %  g)
-            elif i.val & 0x3f == 0x3c:
-                print(*l, 'Push.this("%s$"),' % g)
-            elif i.val & 0x3f == 0x3e:
-                print(*l, 'PrefixOpen,')
-            else:
-                self.f2[i.val & 0x3f] += 1
-                print(*l)
-
+        with open("/tmp/c64_unicomal_tables.py", "a") as file:
+            file.write("\n")
+            file.write("DISPATCH = {\n")
+            for tbl in (
+                self.tab_list_1,
+                self.tab_list_2,
+            ):
+                n = tbl.offset
+                for top, bot in zip(tbl.top, tbl.bot):
+                    extra = top.val >> 6
+                    mode = top.val & 0x3f
+                    tok = bot.val
+                    file.write("    0x%03x: (0x%02x, 0x%x, 0x%02x)," % (
+                            n, mode, extra, tok
+                        )
+                    )
+                    if 0 < tok < 0xad:
+                        file.write(" # %s" % self.lextokens[tok-1].txt)
+                    file.write("\n")
+                    n += 1
+            file.write("}\n")
 
     def retval(self):
         retval = [
