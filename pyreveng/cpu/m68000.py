@@ -939,8 +939,8 @@ class Arg_ExtWordLong(Arg_ExtWord):
         else:
             if self.ew & 4:
                 # Post index
-                print("ST", [ self.lan ])
-                print("ST2", self)
+                #print("ST", [ self.lan ])
+                #print("ST2", self)
                 s = "((" + self.lan[0]
                 if self.basedisp < 0:
                     s += "-#%x" % (-self.basedisp)
