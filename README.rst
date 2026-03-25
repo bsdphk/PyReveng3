@@ -1,3 +1,8 @@
+PyReveng3 has moved
+===================
+
+To here: https://codeberg.org/Datamuseum-dk/PyReveng3
+
 PyReveng3 is a toolkit for reverse engineering and analysing binary
 programs, or for that matter any binary data, for computer archaeologic
 investigations.
